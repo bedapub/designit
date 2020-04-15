@@ -1,0 +1,30 @@
+Package: designit
+Title: Blocking and randomization for experimental design
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Balazs",
+           family = "Banfai",
+           role = c("aut", "cre"),
+           email = "balazs.banfai@roche.com",
+           comment = c(ORCID = "0000-0003-0422-7977"))
+Description:
+    Blocking and randomization for experimental design.
+    TODO: expand this.
+License: MIT + file LICENSE
+Depends:
+    R,
+    shinymeta (>= 0.2.0)
+Imports: 
+    magrittr,
+    rlang (>= 0.4.0),
+    dplyr,
+    tidyselect,
+    stringr,
+    AlgDesign
+Suggests: 
+    testthat,
+    roxygen2
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
