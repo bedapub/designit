@@ -18,11 +18,11 @@ generate_blocks <- function(.tbl,
                             .prefix = "B",
                             .control = list()) {
   variables <- rlang::enquos(...)
+  .tbl <- .tbl %>%
+    mutate(.id_for_samples = 1:n())
   x <- .tbl %>%
-    dplyr::select(...)
   mt <- generate_terms(x)
-  # mf <- stats::as.formula(paste("~ 1 + . ^", ncol(x)))
-  # mt <- stats::terms.formula(mf, data = x, simplify = TRUE)
+    dplyr::select(..., .id_for_samples)
   # mm <- stats::model.matrix(mt, data = x)
   # mm <- mm[, estimable(mm)]
   n <- nrow(x)
@@ -48,17 +48,26 @@ generate_blocks <- function(.tbl,
                                  blocksizes = blocksizes,
                                  nRepeats = 100,
                                  args = TRUE)
-  des_blk_lst <- lapply(des_blk$Blocks, tibble::rownames_to_column, var = "OrderWithinBlock")
+  des_blk_lst <- lapply(des_blk$Blocks, tibble::rownames_to_column, var = "OrderWithin")
   des_blk_tbl <- dplyr::bind_rows(des_blk_lst, .id = "Block") %>%
+    dplyr::mutate(Block = Block %>%
+                    stringr::str_remove("^B") %>%
+                    stringr::str_pad(
+                      max(0, max(stringr::str_length(Block)) - 1),
+                      pad = "0")) %>%
     dplyr::group_by(Block) %>%
-    dplyr::mutate(OrderWithinBlock = sample(OrderWithinBlock)) %>%
+    dplyr::mutate(OrderWithin = sample(OrderWithin)) %>%
     dplyr::ungroup()
   res <- dplyr::left_join(.tbl, des_blk_tbl,
-                          by = sapply(variables, rlang::quo_name)) %>%
+                          by = c(
+                            sapply(variables, rlang::quo_name),
+                            ".id_for_samples")
+  ) %>%
     dplyr::mutate(Block = stringr::str_c(.prefix,
-                                  stringr::str_remove(Block, "B")
-                                  )
-           ) %>%
+                                         stringr::str_remove(Block, "B")
+    ),
+    .id_for_samples = NULL
+    ) %>%
     dplyr::rename({{.name}} := Block)
   des$design <- NULL
   des$args.data <- NULL
