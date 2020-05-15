@@ -49,7 +49,7 @@ kruskal <- function(m){
   if (length(unique(m)) == 1) {
     kw <- as.double(length(levels(m))) # everything from the same group -> some large value
   } else {
-    kw <- kruskal.test(x, m)$statistic
+    kw <- stats::kruskal.test(x, m)$statistic
   }
   return(kw)
 }
@@ -75,9 +75,9 @@ neighbors <- function(m){
 #' Summary score for an experimental layout based on the distribution of levels
 #' of the factors to be balanced.
 #' @title get Score
-#' @param layout a data.table with the factors to be balanced and their current positions
+#' @param layout a data.frame with the factors to be balanced and their current positions
 #' @param bal a vector with the names of experimental conditions to be balanced
-#' @param sc_Weights named vector of weights for the dimensions (default all 1)
+#' @param sc_weights named vector of weights for the dimensions (default all 1)
 #' @param bal_weights named vector of weights for the factors to be balanced (default all 1)
 #' @param sc_groups list of dimension name groups to be used jointly for scoring
 #' @param sc_tests list of tests to use for each scoring group
@@ -105,15 +105,18 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
       if (tests[[ti]] != 'meanDiff') {
         # get the penalty for each dimension group
         # factor von balace variables
-        penalty <- layout[, lapply(.SD, testFun), .SDcols = bal, by = group]
-        score <- penalty[, lapply(.SD, function(x){sum(x^2, na.rm = TRUE)}), .SDcols = bal]
+        penalty <- layout %>% group_by(!!sym(group)) %>%
+          summarize_at(.vars = vars(bal), testFun)
+        score <- penalty %>%
+          summarize(score = sum((!!sym(bal))^2, na.rm = TRUE))
         score <- sum(score * bal_weights) #multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       } else {
         # loop over balance variables
-        means <- layout[, lapply(.SD, mean), .SDcols = bal, by = group]
+        means <- layout %>%
+          summarize_at(.vars = vars(bal), .funs = mean)
         #uselevel <- ifelse(length(groups)>1, group[2])
-        diff <- means[, lapply(.SD, meanDiff), .SDcols = bal]
+        diff <- means %>% summarize(.vars = vars(bal), meanDiff)
         score <- sum(diff * bal_weights) #multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       }
@@ -149,7 +152,7 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
 #' @export
 #'
 randomize <- function(design, report, layoutDim, balance,
-                    factors = balance,
+                    balance = balance,
                     #scorings
                     scoringGroups = as.list(names(layoutDim)),
                     scoringTests = as.list(rep('countGini', length(layoutDim))),
@@ -161,7 +164,6 @@ randomize <- function(design, report, layoutDim, balance,
                     #initial sample distribution
                     distribute = 1:(prod(layoutDim))){
   #require(lattice)
-  #require(data.table)
 
   # initialization
   nloc <- prod(layoutDim) # available locations
@@ -227,7 +229,7 @@ randomize <- function(design, report, layoutDim, balance,
 
 
   # sort balance factors by current layout and get penalty score
-  mfac <- data.table(grid,design[shuffle, ])
+  mfac <- cbind(grid,design[shuffle, ])
   globalmin <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
                         sc_tests = scoringTests, bal_weights = balweights,
                         sc_weights = scoringWeights)
@@ -243,7 +245,7 @@ randomize <- function(design, report, layoutDim, balance,
     shuffle[!fixed] <- distribute
 
     # scoring
-    mfac <- data.table(grid,design[shuffle,])
+    mfac <- cbind(grid,design[shuffle,])
     penalty <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
                       sc_tests = scoringTests, bal_weights = balweights,
                       sc_weights = scoringWeights)
@@ -276,7 +278,7 @@ randomize <- function(design, report, layoutDim, balance,
     shuffle[!fixed] <- distribute #update shuffle vector
 
     # scoring
-    mfac <- data.table(grid,design[shuffle,])
+    mfac <- cbind(grid,design[shuffle,])
     penalty <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
                       sc_tests = scoringTests, bal_weights = balweights,
                       sc_weights = scoringWeights)
@@ -302,7 +304,7 @@ randomize <- function(design, report, layoutDim, balance,
     if (length(convert) > 0) {
       # reconvert factors to letters # TODO: This version still needs testing
       mfac <- mfac %>%
-        mutate_at(.vars = vars(convert), .funs = function(x) {
+        dplyr::mutate_at(.vars = vars(convert), .funs = function(x) {
         factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x,na.rm = TRUE)])}
         )
     }
