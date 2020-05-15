@@ -4,8 +4,14 @@
 \alias{generate_blocks}
 \title{Generate block design}
 \usage{
-generate_blocks(.tbl, k, ..., .name = "Batch", .prefix = "B",
-  .control = list())
+generate_blocks(
+  .tbl,
+  k,
+  ...,
+  .name = "Batch",
+  .prefix = "B",
+  .control = list()
+)
 }
 \arguments{
 \item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}).}
@@ -18,7 +24,7 @@ generate_blocks(.tbl, k, ..., .name = "Batch", .prefix = "B",
 
 \item{.prefix}{prefix of batch values ("B" for B1, B2, etc.).}
 
-\item{.control}{list o}
+\item{.control}{list of arguments for optFederov and optBlock.}
 }
 \value{
 sample list with the batch
