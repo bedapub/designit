@@ -20,7 +20,8 @@ Imports:
     dplyr,
     tidyselect,
     stringr,
-    AlgDesign
+    AlgDesign,
+    ineq
 Suggests: 
     testthat,
     roxygen2
