@@ -11,6 +11,7 @@
 #' @export
 #'
 #' @examples
+#'
 generate_blocks <- function(.tbl,
                             k,
                             ...,
@@ -19,10 +20,10 @@ generate_blocks <- function(.tbl,
                             .control = list()) {
   variables <- rlang::enquos(...)
   .tbl <- .tbl %>%
-    mutate(.id_for_samples = 1:n())
+    dplyr::mutate(.id_for_samples = 1:n())
   x <- .tbl %>%
-  mt <- generate_terms(x)
     dplyr::select(..., .id_for_samples)
+  mt <- generate_terms(x)
   # mm <- stats::model.matrix(mt, data = x)
   # mm <- mm[, estimable(mm)]
   n <- nrow(x)
