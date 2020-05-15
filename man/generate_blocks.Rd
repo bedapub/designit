@@ -32,3 +32,6 @@ sample list with the batch
 \description{
 Generate block design
 }
+\examples{
+
+}
