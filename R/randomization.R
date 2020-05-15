@@ -160,9 +160,9 @@ randomize <- function(design, report, layoutDim, balance,
                     balweights = rep(1,length(balance)),
                     #initial sample distribution
                     distribute = 1:(prod(layoutDim))){
-  require(lattice)
-  require(plyr)
-  require(data.table)
+  #require(lattice)
+  #require(plyr)
+  #require(data.table)
 
   # initialization
   nloc <- prod(layoutDim) # available locations
