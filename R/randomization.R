@@ -161,22 +161,22 @@ randomize <- function(design, report, layoutDim, balance,
                     #initial sample distribution
                     distribute = 1:(prod(layoutDim))){
   #require(lattice)
-  #require(plyr)
   #require(data.table)
 
   # initialization
   nloc <- prod(layoutDim) # available locations
   nsamp <- nrow(design)   # number of samples
   ndim <- length(layoutDim) # number of experiment dimensions
-  grid <- data.table(expand.grid(sapply(layoutDim,
-                                        function(x){seq(1 ,x)}, simplify = F))) # TODO: maybe lapply?
+  grid <- expand.grid(sapply(layoutDim, function(x){seq(1 ,x)}, simplify = F)) %>% # TODO: maybe lapply?
+    as.data.frame()
 
   shuffle <- rep.int(0, nloc) # vectors to track fixed fixedPos
   fixed <- rep(FALSE, nloc)
 
-  # # make factors
-  # design[, (factors) := lapply(.SD, factor), .SDcols = factors]
-  for (f in balance) {design[,f] = factor(design[,f])}
+  # make factors
+  design <- design %>%
+    dplyr::mutate_at(.vars = vars(balance), factor)
+
 
   # Adding empty samples
   if (nloc < nsamp) {stop('too many samples')
@@ -196,9 +196,7 @@ randomize <- function(design, report, layoutDim, balance,
       fixedPos[, convert] <- lapply(
         convert, function(col){dim <- sub('Fix','',col);
                               fixedPos[, col] <- toupper(fixedPos[, col]);
-                              fixedPos[, col] <- mapvalues(fixedPos[, col],
-                                                         from = LETTERS[1:layoutDim[dim]],
-                                                         to = 1:layoutDim[dim]);
+                              fixedPos[, col] <- factor(fixedPos[, col], labels = 1:layoutDim[dim]);
                               as.numeric(fixedPos[, col])})
     }
     # put columns in same order as layoutDim
@@ -303,14 +301,10 @@ randomize <- function(design, report, layoutDim, balance,
   if (length(fixedPos) > 0) {
     if (length(convert) > 0) {
       # reconvert factors to letters # TODO: This version still needs testing
-      mfac[, (convert) := lapply(.SD, function(x){
-        mapvalues(x, from = 1:max(x, na.rm = TRUE), to = LETTERS[1:max(x,na.rm = TRUE)])
-      }), .SDcols = convert]
-      # for(col in convert){
-      #   dim <- sub('Fix', '', col)
-      #   mfac[, dim,with=FALSE] <- mapvalues(mfac[,dim,with=FALSE],
-      #                                       from=1:layoutDim[dim], to=LETTERS[1:layoutDim[dim]])
-      # }
+      mfac <- mfac %>%
+        mutate_at(.vars = vars(convert), .funs = function(x) {
+        factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x,na.rm = TRUE)])}
+        )
     }
   }
   return(list(design = mfac, globalmin = globalmin, bestdist = bestdist,
