@@ -106,17 +106,17 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
         # get the penalty for each dimension group
         # factor von balace variables
         penalty <- layout %>% group_by(!!sym(group)) %>%
-          summarize_at(.vars = vars(bal), testFun)
+          dplyr::summarize_at(.vars = vars(bal), testFun)
         score <- penalty %>%
-          summarize(score = sum((!!sym(bal))^2, na.rm = TRUE))
+          dplyr::summarize(score = sum((!!sym(bal))^2, na.rm = TRUE))
         score <- sum(score * bal_weights) #multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       } else {
         # loop over balance variables
         means <- layout %>%
-          summarize_at(.vars = vars(bal), .funs = mean)
+          dplyr::summarize_at(.vars = vars(bal), .funs = mean)
         #uselevel <- ifelse(length(groups)>1, group[2])
-        diff <- means %>% summarize(.vars = vars(bal), meanDiff)
+        diff <- means %>% dplyr::summarize(.vars = vars(bal), meanDiff)
         score <- sum(diff * bal_weights) #multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       }
