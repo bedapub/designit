@@ -152,7 +152,6 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
 #' @export
 #'
 randomize <- function(design, report, layoutDim, balance,
-                    balance = balance,
                     #scorings
                     scoringGroups = as.list(names(layoutDim)),
                     scoringTests = as.list(rep('countGini', length(layoutDim))),
