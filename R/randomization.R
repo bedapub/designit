@@ -43,7 +43,7 @@ meanDiff <- function(m) {
 #' @author Juliane Siebourg-Polster
 #'
 kruskal <- function(m) {
-  m <- na.omit(m)
+  m <- stats::na.omit(m)
   x <- as.numeric(1:length(m))
   if (length(unique(m)) == 1) {
     kw <- as.double(length(levels(m))) # everything from the same group -> some large value
@@ -74,7 +74,7 @@ neighbors <- function(m) {
 #' of the factors to be balanced.
 #' @title get Score
 #' @param layout a data.frame with the factors to be balanced and their current positions
-#' @param bal a vector with the names of experimental conditions to be balanced
+#' @param balance a vector with the names of experimental conditions to be balanced
 #' @param sc_weights named vector of weights for the dimensions (default all 1)
 #' @param bal_weights named vector of weights for the factors to be balanced (default all 1)
 #' @param sc_groups list of dimension name groups to be used jointly for scoring
@@ -87,10 +87,10 @@ neighbors <- function(m) {
 #' @export
 #'
 #'
-getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
-                     sc_tests = scoringTests, bal_weights = balweights,
-                     sc_weights = scoringWeights) {
-  scoresDim <- c() # vector to store the score of each dimension group
+getScore <- function(layout, balance, sc_groups, sc_tests,
+                     bal_weights = rep(1, length(balance)),
+                     sc_weights = rep(1, length(sc_groups))) {
+  scores_dim <- c() # vector to store the score of each dimension group
   for (s in 1:length(sc_groups)) {
     tscore <- 0
     group <- sc_groups[[s]]
@@ -105,25 +105,25 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
         # get the penalty for each dimension group
         # factor von balace variables
         penalty <- layout %>%
-          group_by(!!sym(group)) %>%
-          dplyr::summarize_at(.vars = vars(bal), testFun)
+          dplyr::group_by(!!sym(group)) %>%
+          dplyr::summarize_at(.vars = dplyr::vars(balance), testFun)
         score <- penalty %>%
-          dplyr::summarize(score = sum((!!sym(bal))^2, na.rm = TRUE))
+          dplyr::summarize(score = sum((!!sym(balance))^2, na.rm = TRUE))
         score <- sum(score * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       } else {
         # loop over balance variables
         means <- layout %>%
-          dplyr::summarize_at(.vars = vars(bal), .funs = mean)
+          dplyr::summarize_at(.vars = dplyr::vars(balance), .funs = mean)
         # uselevel <- ifelse(length(groups)>1, group[2])
-        diff <- means %>% dplyr::summarize(.vars = vars(bal), meanDiff)
+        diff <- means %>% dplyr::summarize(.vars = dplyr::vars(balance), meanDiff)
         score <- sum(diff * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       }
     }
-    scoresDim <- c(scoresDim, tscore)
+    scores_dim <- c(scores_dim, tscore)
   }
-  return(sum(scoresDim * sc_weights))
+  return(sum(scores_dim * sc_weights))
 }
 
 
@@ -134,14 +134,14 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
 #' @param design a data.frame with the sample ids, experimental conditions and
 #' information about fixed samples (columns with 'Fix' prefix and then the dimension name)
 #' @param report a string with the sample identifier
-#' @param layoutDim a named vector with the experimental dimensions
+#' @param layout_dim a named vector with the experimental dimensions
 #' @param balance a vector with the names of experimental conditions to be balanced
-#' @param scoringGroups list of dimension name groups to be used jointly for scoring
-#' @param scoringTests list of dimension name groups to be used jointly for scoring
+#' @param scoring_groups list of dimension name groups to be used jointly for scoring
+#' @param scoring_tests list of dimension name groups to be used jointly for scoring
 #' @param burnin a number of initial burnin runs (default=100)
 #' @param annealprotocol a vector with the number of pairs to swap in each annealing step
-#' @param scoringWeights named vector of weights for the dimensions (default all 1)
-#' @param balweights named vector of weights for the factors to be balanced (default all 1)
+#' @param scoring_weights named vector of weights for the dimensions (default all 1)
+#' @param balance_weights named vector of weights for the factors to be balanced (default all 1)
 #' @param distribute a starting distribution
 #'
 #' @return the value of the Gini index
@@ -150,24 +150,24 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
 #'
 #' @export
 #'
-randomize <- function(design, report, layoutDim, balance,
+randomize <- function(design, report, layout_dim, balance,
                       # scorings
-                      scoringGroups = as.list(names(layoutDim)),
-                      scoringTests = as.list(rep("countGini", length(layoutDim))),
+                      scoring_groups = as.list(names(layout_dim)),
+                      scoring_tests = as.list(rep("countGini", length(layout_dim))),
                       # anneling params
                       burnin = 100, annealprotocol,
                       # weights
-                      scoringWeights = rep(1, length(scoringGroups)),
-                      balweights = rep(1, length(balance)),
+                      scoring_weights = rep(1, length(scoring_groups)),
+                      balance_weights = rep(1, length(balance)),
                       # initial sample distribution
-                      distribute = 1:(prod(layoutDim))) {
+                      distribute = 1:(prod(layout_dim))) {
   # require(lattice)
 
   # initialization
-  nloc <- prod(layoutDim) # available locations
+  nloc <- prod(layout_dim) # available locations
   nsamp <- nrow(design) # number of samples
-  ndim <- length(layoutDim) # number of experiment dimensions
-  grid <- expand.grid(sapply(layoutDim, function(x) {
+  ndim <- length(layout_dim) # number of experiment dimensions
+  grid <- expand.grid(sapply(layout_dim, function(x) {
     seq(1, x)
   }, simplify = F)) %>% # TODO: maybe lapply?
     as.data.frame()
@@ -177,7 +177,7 @@ randomize <- function(design, report, layoutDim, balance,
 
   # make factors
   design <- design %>%
-    dplyr::mutate_at(.vars = vars(balance), factor)
+    dplyr::mutate_at(.vars = dplyr::vars(balance), factor)
 
 
   # Adding empty samples
@@ -199,16 +199,16 @@ randomize <- function(design, report, layoutDim, balance,
         convert, function(col) {
           dim <- sub("Fix", "", col)
           fixedPos[, col] <- toupper(fixedPos[, col])
-          fixedPos[, col] <- factor(fixedPos[, col], labels = 1:layoutDim[dim])
+          fixedPos[, col] <- factor(fixedPos[, col], labels = 1:layout_dim[dim])
           as.numeric(fixedPos[, col])
         }
       )
     }
-    # put columns in same order as layoutDim
-    fixedPos <- fixedPos[, paste0("Fix", names(layoutDim))]
+    # put columns in same order as layout_dim
+    fixedPos <- fixedPos[, paste0("Fix", names(layout_dim))]
 
     # fixed position index vector
-    if (ncol(fixedPos) == length(layoutDim)) {
+    if (ncol(fixedPos) == length(layout_dim)) {
       # fixed position indicator
       f <- apply((!is.na(fixedPos)), 1, all)
       # fixed vector index
@@ -216,7 +216,7 @@ randomize <- function(design, report, layoutDim, balance,
         fixedPos[which(f), 1:ndim], 1,
         function(pos) {
           sum((pos - c(0, rep(1, ndim - 1))) *
-            cumprod(c(1, layoutDim[1:(ndim - 1)])))
+            cumprod(c(1, layout_dim[1:(ndim - 1)])))
         }
       )
       fixed[idxf] <- TRUE
@@ -238,9 +238,9 @@ randomize <- function(design, report, layoutDim, balance,
   # sort balance factors by current layout and get penalty score
   mfac <- cbind(grid, design[shuffle, ])
   globalmin <- getScore(
-    layout = mfac, bal = balance, sc_groups = scoringGroups,
-    sc_tests = scoringTests, bal_weights = balweights,
-    sc_weights = scoringWeights
+    layout = mfac, balance = balance, sc_groups = scoring_groups,
+    sc_tests = scoring_tests, bal_weights = balance_weights,
+    sc_weights = scoring_weights
   )
   cat("start optimization from minimum:", globalmin, "\n")
 
@@ -256,9 +256,9 @@ randomize <- function(design, report, layoutDim, balance,
     # scoring
     mfac <- cbind(grid, design[shuffle, ])
     penalty <- getScore(
-      layout = mfac, bal = balance, sc_groups = scoringGroups,
-      sc_tests = scoringTests, bal_weights = balweights,
-      sc_weights = scoringWeights
+      layout = mfac, balance = balance, sc_groups = scoring_groups,
+      sc_tests = scoring_tests, bal_weights = balance_weights,
+      sc_weights = scoring_weights
     )
 
     # update results
@@ -292,9 +292,9 @@ randomize <- function(design, report, layoutDim, balance,
     # scoring
     mfac <- cbind(grid, design[shuffle, ])
     penalty <- getScore(
-      layout = mfac, bal = balance, sc_groups = scoringGroups,
-      sc_tests = scoringTests, bal_weights = balweights,
-      sc_weights = scoringWeights
+      layout = mfac, balance = balance, sc_groups = scoring_groups,
+      sc_tests = scoring_tests, bal_weights = balance_weights,
+      sc_weights = scoring_weights
     )
 
     # update results
@@ -317,7 +317,7 @@ randomize <- function(design, report, layoutDim, balance,
     if (length(convert) > 0) {
       # reconvert factors to letters # TODO: This version still needs testing
       mfac <- mfac %>%
-        dplyr::mutate_at(.vars = vars(convert), .funs = function(x) {
+        dplyr::mutate_at(.vars = dplyr::vars(convert), .funs = function(x) {
           factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x, na.rm = TRUE)])
         })
     }
