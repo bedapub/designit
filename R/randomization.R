@@ -1,3 +1,7 @@
+# All functions used by the 'randomization procedure' from Guido and Juliane
+# to be kept for reference and removed when the new workflow can cover this.
+
+
 #' Gini index on a factor vector of counts using the Gini function
 #' from the package ineq
 #' @title Gini index on counts
