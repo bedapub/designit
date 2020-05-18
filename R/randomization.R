@@ -152,27 +152,30 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #'
 #' @examples
 #'
+#' \dontrun{
 #' # samples to use
-#' samples <- structure(list(Group = c(1, 2, 3, 4, 5),
-#'                      Treatment = c("vehicle", "RTR24036", "RTR25500", "RTR25506", "RTR27176"),
+#' samples <- data.frame(Group = c(1, 2, 3, 4, 5),
+#'                      Treatment = c("vehicle", "RTR24", "RTR25",
+#'                                    "RTR26", "RTR27"),
 #'                      Dose = c(0, 25, 25, 25, 25),
-#'                      animals = c(2, 2, 2, 2, 2)), row.names = c(NA, 5L), class = "data.frame")
+#'                      animals = c(2, 2, 2, 2, 2))
 #'
 #' # generate initial sample table (2 animals per group with 3 replicates)
-#' samples <- bind_rows(samples %>% mutate(animals = 1), samples) %>%
-#'             rename(animal = animals)
-#' samples <- bind_rows(list(samples,samples,samples)) %>%
-#'             mutate(replicate = rep(1:3, each = 10),
+#' samples <- dplyr::bind_rows(samples %>% dplyr::mutate(animals = 1), samples) %>%
+#'             dplyr::rename(animal = animals)
+#' samples <- dplyr::bind_rows(list(samples,samples,samples)) %>%
+#'             dplyr::mutate(replicate = rep(1:3, each = 10),
 #'                    SampleID = paste0(Treatment,'_',animal,'_',replicate),
 #'                    AnimalID = paste0(Treatment,'_',animal))
 #'
 #' # to be put on a 96 well plate
-#' # (there will be empty wells, first and last column plus two more wells)
+#' # (empty wells: first and last column plus two more wells)
 #' empty <- 8*4 - nrow(samples) # n locations - n samples
-#' emptydf <- data.frame(Treatment = 'empty', FixColumn = 4, FixRow = 8 + 1 - (1:empty))
+#' emptydf <- data.frame(Treatment = 'empty',
+#'                       FixColumn = 4, FixRow = 8 + 1 - (1:empty))
 #'
 #' # final sample table
-#' design <- full_join(samples, emptydf)
+#' design <- dplyr::full_join(samples, emptydf)
 #'
 #' # set parameters
 #' layout_dim <- c(Row = 8, Column = 4)
@@ -193,13 +196,15 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #'                     burnin = 200, annealprotocol = annealprotocol,
 #'                     scoring_weights = scoring_weights,
 #'                     balance_weights = balance_weights,
-#'                     distribute = sample(1:(prod(layout_dim)))) # initial distribution
+#'                     distribute = sample(1:(prod(layout_dim))))
 #'
 #' final_design <- result$design %>%
-#'   mutate(Column = Column + 1) # keep first column empty
+#'   dplyr::mutate(Column = Column + 1) # first column empty
 #'
 #' #plot
-#' ggplot(final_design,aes(x = Column, y = Row, fill = Treatment, alpha = factor(animal))) +
+#' library(ggplot)
+#' ggplot(final_design,
+#'        aes(x = Column, y = Row, fill = Treatment, alpha = factor(animal))) +
 #'   theme_minimal() + geom_tile() +
 #'   scale_x_continuous(breaks = unique(final_design$Column)) +
 #'   scale_y_reverse(breaks = rev(unique(final_design$Row))) +
@@ -209,8 +214,10 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #'       caption = 'Treatment distribution across Columns.')
 #'
 #' # optimization curve
-#' plot(score ~ iteration, data = result$opti, log = "x", ylab = "penalty", type = "b")
-#'                                                                                                                                                                                                                                                                                                                                                                                                                 NA, NA, NA, NA, 8, 7)), row.names = c(NA, -32L), class = "data.frame")
+#' plot(score ~ iteration, data = result$opti,
+#'      log = "x", ylab = "penalty", type = "b")
+#' }
+#'
 randomize <- function(design, report, layout_dim, balance,
                       # scorings
                       scoring_groups = as.list(names(layout_dim)),
@@ -222,7 +229,6 @@ randomize <- function(design, report, layout_dim, balance,
                       balance_weights = rep(1, length(balance)),
                       # initial sample distribution
                       distribute = 1:(prod(layout_dim))) {
-  # require(lattice)
 
   # initialization
   nloc <- prod(layout_dim) # available locations
@@ -239,7 +245,6 @@ randomize <- function(design, report, layout_dim, balance,
   # make factors
   design <- design %>%
     dplyr::mutate_at(.vars = dplyr::vars(balance), factor)
-
 
   # Adding empty samples
   if (nloc < nsamp) {
@@ -286,7 +291,8 @@ randomize <- function(design, report, layout_dim, balance,
         distribute <- distribute[!f]
       }
     }
-    # TODO: add something for reusable layout, i.e. same fixed rows / cols per each plate
+    # TODO: add something for reusable layout,
+    # i.e. same fixed rows / cols per each plate
   }
 
   optiX <- optiY <- vector() # vectors to track optimization
