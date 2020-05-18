@@ -14,7 +14,7 @@ getScore(
 )
 }
 \arguments{
-\item{layout}{a data.table with the factors to be balanced and their current positions}
+\item{layout}{a data.frame with the factors to be balanced and their current positions}
 
 \item{bal}{a vector with the names of experimental conditions to be balanced}
 
@@ -24,7 +24,7 @@ getScore(
 
 \item{bal_weights}{named vector of weights for the factors to be balanced (default all 1)}
 
-\item{sc_Weights}{named vector of weights for the dimensions (default all 1)}
+\item{sc_weights}{named vector of weights for the dimensions (default all 1)}
 }
 \value{
 the summarized penalty score

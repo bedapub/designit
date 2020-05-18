@@ -9,7 +9,6 @@ randomize(
   report,
   layoutDim,
   balance,
-  factors = balance,
   scoringGroups = as.list(names(layoutDim)),
   scoringTests = as.list(rep("countGini", length(layoutDim))),
   burnin = 100,
