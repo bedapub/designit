@@ -5,18 +5,18 @@
 \title{get Score}
 \usage{
 getScore(
-  layout = mfac,
-  bal = balance,
-  sc_groups = scoringGroups,
-  sc_tests = scoringTests,
-  bal_weights = balweights,
-  sc_weights = scoringWeights
+  layout,
+  balance,
+  sc_groups,
+  sc_tests,
+  bal_weights = rep(1, length(balance)),
+  sc_weights = rep(1, length(sc_groups))
 )
 }
 \arguments{
 \item{layout}{a data.frame with the factors to be balanced and their current positions}
 
-\item{bal}{a vector with the names of experimental conditions to be balanced}
+\item{balance}{a vector with the names of experimental conditions to be balanced}
 
 \item{sc_groups}{list of dimension name groups to be used jointly for scoring}
 

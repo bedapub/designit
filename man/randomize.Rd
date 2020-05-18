@@ -7,15 +7,15 @@
 randomize(
   design,
   report,
-  layoutDim,
+  layout_dim,
   balance,
-  scoringGroups = as.list(names(layoutDim)),
-  scoringTests = as.list(rep("countGini", length(layoutDim))),
+  scoring_groups = as.list(names(layout_dim)),
+  scoring_tests = as.list(rep("countGini", length(layout_dim))),
   burnin = 100,
   annealprotocol,
-  scoringWeights = rep(1, length(scoringGroups)),
-  balweights = rep(1, length(balance)),
-  distribute = 1:(prod(layoutDim))
+  scoring_weights = rep(1, length(scoring_groups)),
+  balance_weights = rep(1, length(balance)),
+  distribute = 1:(prod(layout_dim))
 )
 }
 \arguments{
@@ -24,21 +24,21 @@ information about fixed samples (columns with 'Fix' prefix and then the dimensio
 
 \item{report}{a string with the sample identifier}
 
-\item{layoutDim}{a named vector with the experimental dimensions}
+\item{layout_dim}{a named vector with the experimental dimensions}
 
 \item{balance}{a vector with the names of experimental conditions to be balanced}
 
-\item{scoringGroups}{list of dimension name groups to be used jointly for scoring}
+\item{scoring_groups}{list of dimension name groups to be used jointly for scoring}
 
-\item{scoringTests}{list of dimension name groups to be used jointly for scoring}
+\item{scoring_tests}{list of dimension name groups to be used jointly for scoring}
 
 \item{burnin}{a number of initial burnin runs (default=100)}
 
 \item{annealprotocol}{a vector with the number of pairs to swap in each annealing step}
 
-\item{scoringWeights}{named vector of weights for the dimensions (default all 1)}
+\item{scoring_weights}{named vector of weights for the dimensions (default all 1)}
 
-\item{balweights}{named vector of weights for the factors to be balanced (default all 1)}
+\item{balance_weights}{named vector of weights for the factors to be balanced (default all 1)}
 
 \item{distribute}{a starting distribution}
 }
