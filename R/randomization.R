@@ -1,8 +1,3 @@
-################################################
-# randomization functions
-################################################
-
-
 #' Gini index on a factor vector of counts using the Gini function
 #' from the package ineq
 #' @title Gini index on counts
@@ -13,12 +8,11 @@
 #'
 #' @export
 #'
-countGini <- function(m){
+countGini <- function(m) {
   lev <- nlevels(m)
-  m <- table(m, useNA = 'no')
+  m <- table(m, useNA = "no")
   return(ineq::Gini(c(m, rep(0, (lev - length(m))))))
 }
-
 
 
 #' Mean differens on vector to score continuous variables
@@ -30,9 +24,10 @@ countGini <- function(m){
 #'
 #' @export
 #'
-meanDiff <- function(m){
-  (max(m) - min(m))/mean(m)
+meanDiff <- function(m) {
+  (max(m) - min(m)) / mean(m)
 }
+
 
 #' Kruskal-Wallis test statistic from the ranking of a factor vector
 #' TODO: This is currently not used, it does not optimize for the correct layout
@@ -43,7 +38,7 @@ meanDiff <- function(m){
 #'
 #' @author Juliane Siebourg-Polster
 #'
-kruskal <- function(m){
+kruskal <- function(m) {
   m <- na.omit(m)
   x <- as.numeric(1:length(m))
   if (length(unique(m)) == 1) {
@@ -65,11 +60,10 @@ kruskal <- function(m){
 #'
 #' @export
 #'
-neighbors <- function(m){
+neighbors <- function(m) {
   x <- sum(m[1:(length(m) - 1)] == m[2:length(m)])
   return(x)
 }
-
 
 
 #' Summary score for an experimental layout based on the distribution of levels
@@ -92,7 +86,6 @@ neighbors <- function(m){
 getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
                      sc_tests = scoringTests, bal_weights = balweights,
                      sc_weights = scoringWeights) {
-
   scoresDim <- c() # vector to store the score of each dimension group
   for (s in 1:length(sc_groups)) {
     tscore <- 0
@@ -100,31 +93,33 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
     tests <- sc_tests[[s]]
     for (ti in 1:length(tests)) {
       # make test function from given string
-      testFun <- function(x){do.call(tests[[ti]], list(x))}
+      testFun <- function(x) {
+        do.call(tests[[ti]], list(x))
+      }
 
-      if (tests[[ti]] != 'meanDiff') {
+      if (tests[[ti]] != "meanDiff") {
         # get the penalty for each dimension group
         # factor von balace variables
-        penalty <- layout %>% group_by(!!sym(group)) %>%
+        penalty <- layout %>%
+          group_by(!!sym(group)) %>%
           dplyr::summarize_at(.vars = vars(bal), testFun)
         score <- penalty %>%
           dplyr::summarize(score = sum((!!sym(bal))^2, na.rm = TRUE))
-        score <- sum(score * bal_weights) #multiply score for each balance factor by its weight and sum
+        score <- sum(score * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       } else {
         # loop over balance variables
         means <- layout %>%
           dplyr::summarize_at(.vars = vars(bal), .funs = mean)
-        #uselevel <- ifelse(length(groups)>1, group[2])
+        # uselevel <- ifelse(length(groups)>1, group[2])
         diff <- means %>% dplyr::summarize(.vars = vars(bal), meanDiff)
-        score <- sum(diff * bal_weights) #multiply score for each balance factor by its weight and sum
+        score <- sum(diff * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       }
-
     }
     scoresDim <- c(scoresDim, tscore)
   }
-  return(sum(scoresDim * sc_weights) )
+  return(sum(scoresDim * sc_weights))
 }
 
 
@@ -152,23 +147,25 @@ getScore <- function(layout = mfac, bal = balance, sc_groups = scoringGroups,
 #' @export
 #'
 randomize <- function(design, report, layoutDim, balance,
-                    #scorings
-                    scoringGroups = as.list(names(layoutDim)),
-                    scoringTests = as.list(rep('countGini', length(layoutDim))),
-                    #anneling params
-                    burnin = 100, annealprotocol,
-                    #weights
-                    scoringWeights = rep(1,length(scoringGroups)),
-                    balweights = rep(1,length(balance)),
-                    #initial sample distribution
-                    distribute = 1:(prod(layoutDim))){
-  #require(lattice)
+                      # scorings
+                      scoringGroups = as.list(names(layoutDim)),
+                      scoringTests = as.list(rep("countGini", length(layoutDim))),
+                      # anneling params
+                      burnin = 100, annealprotocol,
+                      # weights
+                      scoringWeights = rep(1, length(scoringGroups)),
+                      balweights = rep(1, length(balance)),
+                      # initial sample distribution
+                      distribute = 1:(prod(layoutDim))) {
+  # require(lattice)
 
   # initialization
   nloc <- prod(layoutDim) # available locations
-  nsamp <- nrow(design)   # number of samples
+  nsamp <- nrow(design) # number of samples
   ndim <- length(layoutDim) # number of experiment dimensions
-  grid <- expand.grid(sapply(layoutDim, function(x){seq(1 ,x)}, simplify = F)) %>% # TODO: maybe lapply?
+  grid <- expand.grid(sapply(layoutDim, function(x) {
+    seq(1, x)
+  }, simplify = F)) %>% # TODO: maybe lapply?
     as.data.frame()
 
   shuffle <- rep.int(0, nloc) # vectors to track fixed fixedPos
@@ -180,59 +177,68 @@ randomize <- function(design, report, layoutDim, balance,
 
 
   # Adding empty samples
-  if (nloc < nsamp) {stop('too many samples')
+  if (nloc < nsamp) {
+    stop("too many samples")
   } else if (nloc > nsamp) {
     nempty <- nloc - nsamp
-    cat('\n Adding', nempty,'empty sample(s) to fill layout\n')
+    cat("\n Adding", nempty, "empty sample(s) to fill layout\n")
     design[(nsamp + 1):nloc, ] <- matrix(NA, ncol = ncol(design), nrow = nempty)
   }
 
-
   # get fixed position columns
-  fixedPos <- design[, grep('Fix', colnames(design))]
+  fixedPos <- design[, grep("Fix", colnames(design))]
   if (length(fixedPos) > 0) {
     # convert to numeric
     convert <- colnames(fixedPos)[sapply(fixedPos, is.character)]
     if (length(convert) > 0) {
       fixedPos[, convert] <- lapply(
-        convert, function(col){dim <- sub('Fix','',col);
-                              fixedPos[, col] <- toupper(fixedPos[, col]);
-                              fixedPos[, col] <- factor(fixedPos[, col], labels = 1:layoutDim[dim]);
-                              as.numeric(fixedPos[, col])})
+        convert, function(col) {
+          dim <- sub("Fix", "", col)
+          fixedPos[, col] <- toupper(fixedPos[, col])
+          fixedPos[, col] <- factor(fixedPos[, col], labels = 1:layoutDim[dim])
+          as.numeric(fixedPos[, col])
+        }
+      )
     }
     # put columns in same order as layoutDim
-    fixedPos <- fixedPos[, paste0('Fix', names(layoutDim))]
+    fixedPos <- fixedPos[, paste0("Fix", names(layoutDim))]
 
     # fixed position index vector
     if (ncol(fixedPos) == length(layoutDim)) {
-        # fixed position indicator
-        f <- apply((!is.na(fixedPos)), 1, all)
-        # fixed vector index
-        idxf <- apply(fixedPos[which(f), 1:ndim], 1,
-                      function(pos){sum((pos - c(0, rep(1, ndim - 1))) *
-                                          cumprod(c(1, layoutDim[1:(ndim - 1)])))})
-        fixed[idxf] <- TRUE
-        shuffle[idxf] <- (1:nloc)[f]
-        if (length(distribute) == length(f)) {
-            distribute <- distribute[!f]
+      # fixed position indicator
+      f <- apply((!is.na(fixedPos)), 1, all)
+      # fixed vector index
+      idxf <- apply(
+        fixedPos[which(f), 1:ndim], 1,
+        function(pos) {
+          sum((pos - c(0, rep(1, ndim - 1))) *
+            cumprod(c(1, layoutDim[1:(ndim - 1)])))
         }
+      )
+      fixed[idxf] <- TRUE
+      shuffle[idxf] <- (1:nloc)[f]
+      if (length(distribute) == length(f)) {
+        distribute <- distribute[!f]
+      }
     }
     # TODO: add something for reusable layout, i.e. same fixed rows / cols per each plate
   }
 
   optiX <- optiY <- vector() # vectors to track optimization
-  shuffle[!fixed] <- distribute #update shuffle vector
+  shuffle[!fixed] <- distribute # update shuffle vector
 
   bestdist <- distribute
   bestsol <- shuffle
 
 
   # sort balance factors by current layout and get penalty score
-  mfac <- cbind(grid,design[shuffle, ])
-  globalmin <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
-                        sc_tests = scoringTests, bal_weights = balweights,
-                        sc_weights = scoringWeights)
-  cat('start optimization from minimum:', globalmin,'\n')
+  mfac <- cbind(grid, design[shuffle, ])
+  globalmin <- getScore(
+    layout = mfac, bal = balance, sc_groups = scoringGroups,
+    sc_tests = scoringTests, bal_weights = balweights,
+    sc_weights = scoringWeights
+  )
+  cat("start optimization from minimum:", globalmin, "\n")
 
 
   # Start of optimization
@@ -244,10 +250,12 @@ randomize <- function(design, report, layoutDim, balance,
     shuffle[!fixed] <- distribute
 
     # scoring
-    mfac <- cbind(grid,design[shuffle,])
-    penalty <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
-                      sc_tests = scoringTests, bal_weights = balweights,
-                      sc_weights = scoringWeights)
+    mfac <- cbind(grid, design[shuffle, ])
+    penalty <- getScore(
+      layout = mfac, bal = balance, sc_groups = scoringGroups,
+      sc_tests = scoringTests, bal_weights = balweights,
+      sc_weights = scoringWeights
+    )
 
     # update results
     if (penalty < globalmin) {
@@ -256,31 +264,34 @@ randomize <- function(design, report, layoutDim, balance,
       bestdist <- distribute
       optiX <- c(optiX, run)
       optiY <- c(optiY, globalmin)
-      cat("Burnin:",run,"  Min:", globalmin,"\n")
+      cat("Burnin:", run, "  Min:", globalmin, "\n")
     }
   }
 
   # 2. annealing phase with pairwise reshuffling
   for (run in 1:length(annealprotocol)) {
-
-    if (run %% 1000 == 0) { cat("At iter", run, "\n")}
+    if (run %% 1000 == 0) {
+      cat("At iter", run, "\n")
+    }
 
     # switch pairs
-    distribute <- bestdist;
+    distribute <- bestdist
     idx2 <- 1:length(distribute)
-    r1 <- sample(idx2,annealprotocol[run])
-    r2 <- sample(setdiff(idx2,r1), annealprotocol[run])
+    r1 <- sample(idx2, annealprotocol[run])
+    r2 <- sample(setdiff(idx2, r1), annealprotocol[run])
     tmp <- distribute[r1]
     distribute[r1] <- distribute[r2]
     distribute[r2] <- tmp
 
-    shuffle[!fixed] <- distribute #update shuffle vector
+    shuffle[!fixed] <- distribute # update shuffle vector
 
     # scoring
-    mfac <- cbind(grid,design[shuffle,])
-    penalty <- getScore(layout = mfac, bal = balance, sc_groups = scoringGroups,
-                      sc_tests = scoringTests, bal_weights = balweights,
-                      sc_weights = scoringWeights)
+    mfac <- cbind(grid, design[shuffle, ])
+    penalty <- getScore(
+      layout = mfac, bal = balance, sc_groups = scoringGroups,
+      sc_tests = scoringTests, bal_weights = balweights,
+      sc_weights = scoringWeights
+    )
 
     # update results
     if (penalty < globalmin) {
@@ -291,7 +302,6 @@ randomize <- function(design, report, layoutDim, balance,
       optiY <- c(optiY, globalmin)
       cat("Iter:", burnin + run, "  Min:", globalmin, "\n")
     }
-
   }
 
   cat("End of optimization\n")
@@ -304,12 +314,12 @@ randomize <- function(design, report, layoutDim, balance,
       # reconvert factors to letters # TODO: This version still needs testing
       mfac <- mfac %>%
         dplyr::mutate_at(.vars = vars(convert), .funs = function(x) {
-        factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x,na.rm = TRUE)])}
-        )
+          factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x, na.rm = TRUE)])
+        })
     }
   }
-  return(list(design = mfac, globalmin = globalmin, bestdist = bestdist,
-              opti = cbind(iteration = optiX, score = optiY)))
-
+  return(list(
+    design = mfac, globalmin = globalmin, bestdist = bestdist,
+    opti = cbind(iteration = optiX, score = optiY)
+  ))
 }
-
