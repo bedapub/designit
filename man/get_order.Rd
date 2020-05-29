@@ -15,3 +15,6 @@ highest order (numeric).
 \description{
 Get highest order interaction
 }
+\examples{
+
+}
