@@ -310,7 +310,7 @@ randomize <- function(design, report, layout_dim, balance,
     sc_tests = scoring_tests, bal_weights = balance_weights,
     sc_weights = scoring_weights
   )
-  cat("start optimization from minimum:", globalmin, "\n")
+  message("start optimization from minimum:", globalmin, "\n")
 
 
   # Start of optimization
