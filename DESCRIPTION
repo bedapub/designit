@@ -17,6 +17,8 @@ Imports:
     magrittr,
     rlang (>= 0.4.0),
     dplyr,
+    ggplot2,
+    tibble,
     tidyselect,
     stringr,
     AlgDesign,
