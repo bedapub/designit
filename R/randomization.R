@@ -336,7 +336,7 @@ randomize <- function(design, report, layout_dim, balance,
       bestdist <- distribute
       optiX <- c(optiX, run)
       optiY <- c(optiY, globalmin)
-      cat("Burnin:", run, "  Min:", globalmin, "\n")
+      message("Burnin:", run, "  Min:", globalmin, "\n")
     }
   }
 
