@@ -1,0 +1,6 @@
+url: https://pages.code.roche.com/BEDA/DesignIt
+
+destination: docs
+
+template:
+  assets: pkgdown/assets
