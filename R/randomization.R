@@ -235,8 +235,9 @@ randomize <- function(design, report, layout_dim, balance,
   nsamp <- nrow(design) # number of samples
   ndim <- length(layout_dim) # number of experiment dimensions
   grid <- expand.grid(sapply(layout_dim, function(x) {
-    seq(1, x)
-  }, simplify = F)) %>% # TODO: maybe lapply?
+      seq(1, x)
+    }, simplify = F)) %>% # TODO: maybe lapply?
+
     as.data.frame()
 
   shuffle <- rep.int(0, nloc) # vectors to track fixed fixedPos
