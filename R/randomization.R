@@ -343,7 +343,7 @@ randomize <- function(design, report, layout_dim, balance,
   # 2. annealing phase with pairwise reshuffling
   for (run in 1:length(annealprotocol)) {
     if (run %% 1000 == 0) {
-      cat("At iter", run, "\n")
+      message("At iter", run, "\n")
     }
 
     # switch pairs
