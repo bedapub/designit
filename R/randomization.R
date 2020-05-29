@@ -222,7 +222,7 @@ randomize <- function(design, report, layout_dim, balance,
                       # scorings
                       scoring_groups = as.list(names(layout_dim)),
                       scoring_tests = as.list(rep("countGini", length(layout_dim))),
-                      # anneling params
+                      # annealing params
                       burnin = 100, annealprotocol,
                       # weights
                       scoring_weights = rep(1, length(scoring_groups)),
