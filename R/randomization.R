@@ -252,7 +252,7 @@ randomize <- function(design, report, layout_dim, balance,
     stop("too many samples")
   } else if (nloc > nsamp) {
     nempty <- nloc - nsamp
-    cat("\n Adding", nempty, "empty sample(s) to fill layout\n")
+    message("\n Adding", nempty, "empty sample(s) to fill layout\n")
     design[(nsamp + 1):nloc, ] <- matrix(NA, ncol = ncol(design), nrow = nempty)
   }
 
