@@ -12,7 +12,7 @@ Description:
     TODO: expand this.
 License: MIT + file LICENSE
 Depends:
-    R,
+    R (>= 3.5.0),
     shinymeta (>= 0.2.0)
 Imports: 
     magrittr,
@@ -20,11 +20,12 @@ Imports:
     dplyr,
     tidyselect,
     stringr,
-    AlgDesign
+    AlgDesign,
+    ineq
 Suggests: 
     testthat,
     roxygen2
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
