@@ -21,6 +21,7 @@ Imports:
     stringr,
     AlgDesign,
     R6
+    ineq
 Suggests: 
     testthat,
     roxygen2

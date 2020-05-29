@@ -2,13 +2,19 @@
 % Please edit documentation in R/plot.R
 \name{plot_design}
 \alias{plot_design}
-\title{Title}
+\title{Plot batch design}
 \usage{
-plot_design(.tbl, batch1, batch2)
+plot_design(.tbl, ..., .color, .alpha = NULL)
 }
 \arguments{
-\item{batch2}{}
+\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}).}
+
+\item{...}{columns to select for \code{x} axis (see \code{\link[dplyr:select]{dplyr::select()}}).}
+
+\item{batch1}{first batch variable (color).}
+
+\item{batch2}{second batch variable (transparency).}
 }
 \description{
-Title
+Plot batch design
 }
