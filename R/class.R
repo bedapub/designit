@@ -191,6 +191,13 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stop("Cannot set number of excluded elements in container (read-only).")
       }
     },
+    n_available = function(value) {
+      if (missing(value)) {
+        self$n_elements - self$n_excluded
+      } else {
+        stop("Cannot set number of elements in container (read-only).")
+      }
+    },
     exclude = function(value) {
       if (missing(value)) {
         private$exclude_df
