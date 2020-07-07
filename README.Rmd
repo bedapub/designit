@@ -54,6 +54,28 @@ a <- readxl::read_excel('inst/extdata/CEA-PRIT_CEAmodels_for randomization.xlsx'
 TODO
 
 ## Example
+```{r message=FALSE}
+library(designit)
+# define samples data.frame
+samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
+samples
+
+bc <- BatchContainer$new(
+  dimensions=c('plate'=3, 'row'=2, 'column'=2),
+  exclude=data.frame(plate=2, row=1, column=2)
+)
+
+bc
+
+bc$exclude
+bc$n_elements
+bc$n_excluded
+bc$n_available
+bc$elements_df
+
+distributed <- distribute_samples(samples, bc, random_seed=1)
+distributed
+```
 
 ```{r}
 library(tidyverse)
