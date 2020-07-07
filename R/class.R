@@ -4,7 +4,7 @@
 #' @param samples data.frame with samples and unique .sample_id field.
 #' @param batch_container Instance of BatchContainer class
 distribute_random <- function(samples, batch_container) {
-  assertthat::assert_that(samples %has_name% '.sample_id')
+  assertthat::assert_that(assertthat::has_name(samples, '.sample_id'))
 
   elements <- batch_container$elements_df
 
