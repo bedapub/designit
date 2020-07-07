@@ -99,31 +99,27 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
                           size,
                           weight = NA,
                           parent_dimension = NULL) {
-      if (!is.character(name) || length(name) != 1 || name == "") {
-        stop("dimension name should a non-empty character of length 1")
-      }
-
-      if (!is.numeric(size) || length(size) != 1 || size < 1 || size %% 1 != 0) {
-        stop("dimension size should be a positive integer")
-      }
+      if (!is.character(name) || length(name) != 1 || name == "")
+        stop("Dimension name should a non-empty character of length 1")
 
       if (name == '.sample_id')
         stop("Cannot use reserved name for a dimension (.sample_id)")
+
+      if (!is.numeric(size) || length(size) != 1 || size < 1 || size %% 1 != 0)
+        stop("Dimension size should be a positive integer")
 
       if (!is.na(weight) &&
         (!is.numeric(weight) ||
           length(weight) != 1 ||
           weight < 0 ||
-          is.infinite(weight))) {
+          is.infinite(weight)))
         stop("weight should be a finate non-negative numeric of length 1")
-      }
 
       if (!is.null(parent_dimension) &&
         (!is.character(parent_dimension) ||
           length(parent_dimension) != 1 ||
-          parent_dimension == "")) {
+          parent_dimension == ""))
         stop("parent_dimension should be a non-empty character")
-      }
 
       self$name <- name
       self$size <- as.integer(size)
