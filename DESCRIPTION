@@ -20,6 +20,7 @@ Imports:
     purrr,
     tidyselect,
     tibble,
+    assertthat,
     stringr,
     AlgDesign,
     R6

@@ -37,13 +37,53 @@ Design <- R6::R6Class("Design",
   )
 )
 
-distribute_samples <- function(samples, batch_container) {
+distribute_random <- function(samples, batch_container) {
+  elements <- batch_container$elements_df
+
+  assertthat::assert_that(nrow(elements) >= nrow(samples))
+
+  expanded_ids <- c(samples$.sample_id,
+                    rep(NA_integer_, nrow(elements) - nrow(samples)))
+
+  elements$.sample_id <- sample(expanded_ids)
+
+  samples <- samples %>%
+    left_join(elements, by='.sample_id') %>%
+    select(-.sample_id)
+
+  return(samples)
+}
+
+distribute_samples <- function(samples, batch_container,
+                               distribution_function=distribute_random,
+                               random_seed=NULL) {
   validate_samples(samples)
 
   if (nrow(samples) > batch_container$n_available)
     stop("More samples than availble elements in the batch container")
 
+  if (length(intersect(batch_container$dimension_names, colnames(samples))) > 0)
+    stop("Some of the samples columns match batch container dimension names")
 
+  if ('.sample_id' %in% colnames(samples))
+    stop("Samples data.frame has a column with reserved name .sample_id")
+
+  if (!is.null(random_seed)) {
+    saved_seed <- .Random.seed
+    set.seed(random_seed)
+  } else {
+    saved_seed <- NULL
+  }
+
+  samples$.sample_id <- 1:nrow(samples)
+
+  samples <- distribution_function(samples, batch_container)
+
+  # In cased we set a random seed, restore it after the function call.
+  if (!is.null(saved_seed))
+    .Random.seed <- saved_seed
+
+  return(samples)
 }
 
 validate_samples <- function(samples) {
@@ -80,6 +120,9 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
         stop("dimension size should be a positive integer")
       }
 
+      if (name == '.sample_id')
+        stop("Cannot use reserved name for a dimension (.sample_id)")
+
       if (!is.na(weight) &&
         (!is.numeric(weight) ||
           length(weight) != 1 ||
@@ -108,6 +151,15 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
         stringr::str_glue("{self$name}<size={self$size}>")
       } else {
         stop("short_info is a read-only field")
+      }
+    },
+    values = function(value) {
+      if (missing(value)) {
+        res <- list(1:self$size)
+        names(res) <- self$name
+        res
+      } else {
+        stop("values is a read-only field")
       }
     }
   )
@@ -195,7 +247,33 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (missing(value)) {
         self$n_elements - self$n_excluded
       } else {
-        stop("Cannot set number of elements in container (read-only).")
+        stop("Cannot set dimension names (read-only).")
+      }
+    },
+    n_dimension= function(value) {
+      if (missing(value)) {
+        length(private$dimensions)
+      } else {
+        stop("Cannot set number of dimensions (read-only).")
+      }
+    },
+    dimension_names = function(value) {
+      if (missing(value)) {
+        names(private$dimensions)
+      } else {
+        stop("Cannot set number of dimensions (read-only).")
+      }
+    },
+    elements_df = function(value) {
+      if (missing(value)) {
+        private$dimensions %>%
+          purrr::map(~ .x$values) %>%
+          purrr::flatten() %>%
+          expand.grid() %>%
+          tibble::as_tibble() %>%
+          dplyr::anti_join(self$exclude, by=self$dimension_names)
+      } else {
+        stop("Cannot set elements data.frame (read-only).")
       }
     },
     exclude = function(value) {
