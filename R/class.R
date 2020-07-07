@@ -18,8 +18,8 @@ distribute_random <- function(samples, batch_container) {
   elements$.sample_id <- sample(expanded_ids)
 
   samples <- samples %>%
-    left_join(elements, by='.sample_id') %>%
-    select(-.sample_id)
+    dplyr::left_join(elements, by='.sample_id') %>%
+    dplyr::select(-.sample_id)
 
   assertthat::assert_that(n_samples == nrow(samples))
 
