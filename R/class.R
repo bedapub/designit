@@ -37,6 +37,28 @@ Design <- R6::R6Class("Design",
   )
 )
 
+distribute_samples <- function(samples, batch_container) {
+  validate_samples(samples)
+
+  if (nrow(samples) > batch_container$n_available)
+    stop("More samples than availble elements in the batch container")
+
+
+}
+
+validate_samples <- function(samples) {
+  if (!is.data.frame(samples))
+    stop("Samples should be a data.frame or tibble")
+
+  if (nrow(samples) != dplyr::n_distinct(samples)) {
+    stop("Non-unique rows in samples")
+  }
+
+  if (nrow(samples) < 1) {
+    stop("Samples should have at least one row")
+  }
+}
+
 #' R6 Class representing a batch container dimension.
 BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   public = list(
