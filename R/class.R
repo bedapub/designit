@@ -1,3 +1,8 @@
+#' Dummy distribution function which distributes samples randomly.
+#'
+#' @export
+#' @param samples data.frame with samples and unique .sample_id field.
+#' @param batch_container Instance of BatchContainer class
 distribute_random <- function(samples, batch_container) {
   elements <- batch_container$elements_df
 
@@ -15,6 +20,13 @@ distribute_random <- function(samples, batch_container) {
   return(samples)
 }
 
+#' General function for performing sample assignment.
+#'
+#' @export
+#' @param samples data.frame with samples and unique .sample_id field.
+#' @param batch_container Instance of BatchContainer class
+#' @param sitribution_function Function performing sample distribution
+#' @param random_seed If set will fix random seed and then return the original value
 distribute_samples <- function(samples, batch_container,
                                distribution_function=distribute_random,
                                random_seed=NULL) {
@@ -47,6 +59,7 @@ distribute_samples <- function(samples, batch_container,
   return(samples)
 }
 
+#' Validates sample data.frame.
 validate_samples <- function(samples) {
   if (!is.data.frame(samples))
     stop("Samples should be a data.frame or tibble")
@@ -60,7 +73,11 @@ validate_samples <- function(samples) {
   }
 }
 
+
+
 #' R6 Class representing a batch container dimension.
+#'
+#' @export
 BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   public = list(
     name = NULL,
@@ -128,6 +145,8 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 
 
 #' R6 Class representing a batch container.
+#'
+#' @export
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     initialize = function(
