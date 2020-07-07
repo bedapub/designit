@@ -235,7 +235,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           }
         }
 
-        private$exclude_df <- tibble::as.tibble(value)
+        private$exclude_df <- tibble::as_tibble(value)
       }
     }
   )
