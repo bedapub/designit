@@ -31,7 +31,8 @@ The goal of designit is to …
 
 **should we support more than 2 levels?**
 
-**what to do with numeric covariates**
+**what to do with numeric
+covariates**
 
 ``` r
 a <- readxl::read_excel('inst/extdata/CEA-PRIT_CEAmodels_for randomization.xlsx')
@@ -44,15 +45,67 @@ TODO
 ## Example
 
 ``` r
+library(designit)
+# define samples data.frame
+samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
+samples
+#>   a b c
+#> 1 a a b
+#> 2 a b b
+#> 3 a c c
+
+bc <- BatchContainer$new(
+  dimensions=c('plate'=3, 'row'=2, 'column'=2),
+  exclude=data.frame(plate=2, row=1, column=2)
+)
+
+bc
+#> Batch container with 12 elements and 1 excluded.
+#>   Dimensions: plate<size=3>, row<size=2>, column<size=2>
+
+bc$exclude
+#> # A tibble: 1 x 3
+#>   plate   row column
+#>   <int> <int>  <int>
+#> 1     2     1      2
+bc$n_elements
+#> [1] 12
+bc$n_excluded
+#> [1] 1
+bc$n_available
+#> [1] 11
+bc$elements_df
+#> # A tibble: 11 x 3
+#>    plate   row column
+#>    <int> <int>  <int>
+#>  1     1     1      1
+#>  2     2     1      1
+#>  3     3     1      1
+#>  4     1     2      1
+#>  5     2     2      1
+#>  6     3     2      1
+#>  7     1     1      2
+#>  8     3     1      2
+#>  9     1     2      2
+#> 10     2     2      2
+#> 11     3     2      2
+
+distributed <- distribute_samples(samples, bc, random_seed=1)
+distributed
+#>   a b c plate row column
+#> 1 a a b     1   2      1
+#> 2 a b b     2   2      1
+#> 3 a c c     1   1      2
+```
+
+``` r
 library(tidyverse)
-#> -- Attaching packages ---------------------------------- tidyverse 1.3.0 --
-#> v ggplot2 3.2.1     v purrr   0.3.3
-#> v tibble  2.1.3     v dplyr   0.8.5
-#> v tidyr   1.0.2     v stringr 1.4.0
-#> v readr   1.3.1     v forcats 0.5.0
-#> Warning: package 'dplyr' was built under R version 3.6.3
-#> Warning: package 'forcats' was built under R version 3.6.3
-#> -- Conflicts ------------------------------------- tidyverse_conflicts() --
+#> ── Attaching packages ──────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+#> ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
+#> ✓ tibble  3.0.1     ✓ dplyr   1.0.0
+#> ✓ tidyr   1.1.0     ✓ stringr 1.4.0
+#> ✓ readr   1.3.1     ✓ forcats 0.5.0
+#> ── Conflicts ─────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 x <- expand.grid(b = paste0('b', 1:4),
