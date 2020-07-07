@@ -47,6 +47,9 @@ distribute_samples <- function(samples, batch_container,
   if ('.sample_id' %in% colnames(samples))
     stop("Samples data.frame has a column with reserved name .sample_id")
 
+  if (!inherits(batch_container, "BatchContainer"))
+    stop("batch_container should be an instance of the BatchContainer class")
+
   if (!is.null(random_seed)) {
     saved_seed <- .Random.seed
     set.seed(random_seed)
@@ -175,7 +178,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       private$dimensions <- purrr::imap(dimensions, function(element, name) {
         if (is.numeric(element)) {
           BatchContainerDimension$new(name = name, size = element)
-        } else if (class(element)[1] == "BatchContainerDimension") {
+        } else if (inherits(element, "BatchContainerDimension")) {
           element
         } else {
           BatchContainerDimension$new(
