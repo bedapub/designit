@@ -4,9 +4,13 @@
 #' @param samples data.frame with samples and unique .sample_id field.
 #' @param batch_container Instance of BatchContainer class
 distribute_random <- function(samples, batch_container) {
+  assertthat::assert_that(samples %has_name% '.sample_id')
+
   elements <- batch_container$elements_df
 
   assertthat::assert_that(nrow(elements) >= nrow(samples))
+
+  n_samples <- nrow(samples)
 
   expanded_ids <- c(samples$.sample_id,
                     rep(NA_integer_, nrow(elements) - nrow(samples)))
@@ -16,6 +20,8 @@ distribute_random <- function(samples, batch_container) {
   samples <- samples %>%
     left_join(elements, by='.sample_id') %>%
     select(-.sample_id)
+
+  assertthat::assert_that(n_samples == nrow(samples))
 
   return(samples)
 }
