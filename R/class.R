@@ -51,7 +51,10 @@ distribute_samples <- function(samples, batch_container,
     stop("batch_container should be an instance of the BatchContainer class")
 
   if (!is.null(random_seed)) {
+    if (!exists(".Random.seed"))
+      set.seed(NULL)
     saved_seed <- .Random.seed
+    on.exit({.Random.seed <<- saved_seed})
     set.seed(random_seed)
   } else {
     saved_seed <- NULL
@@ -60,10 +63,6 @@ distribute_samples <- function(samples, batch_container,
   samples$.sample_id <- 1:nrow(samples)
 
   samples <- distribution_function(samples, batch_container)
-
-  # In cased we set a random seed, restore it after the function call.
-  if (!is.null(saved_seed))
-    .Random.seed <- saved_seed
 
   return(samples)
 }
