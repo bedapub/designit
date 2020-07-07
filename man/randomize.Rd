@@ -4,19 +4,12 @@
 \alias{randomize}
 \title{randomize experimental layout}
 \usage{
-randomize(
-  design,
-  report,
-  layout_dim,
-  balance,
+randomize(design, report, layout_dim, balance,
   scoring_groups = as.list(names(layout_dim)),
   scoring_tests = as.list(rep("countGini", length(layout_dim))),
-  burnin = 100,
-  annealprotocol,
-  scoring_weights = rep(1, length(scoring_groups)),
-  balance_weights = rep(1, length(balance)),
-  distribute = 1:(prod(layout_dim))
-)
+  burnin = 100, annealprotocol, scoring_weights = rep(1,
+  length(scoring_groups)), balance_weights = rep(1, length(balance)),
+  distribute = 1:(prod(layout_dim)))
 }
 \arguments{
 \item{design}{a data.frame with the sample ids, experimental conditions and

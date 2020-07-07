@@ -4,14 +4,8 @@
 \alias{getScore}
 \title{get Score}
 \usage{
-getScore(
-  layout,
-  balance,
-  sc_groups,
-  sc_tests,
-  bal_weights = rep(1, length(balance)),
-  sc_weights = rep(1, length(sc_groups))
-)
+getScore(layout, balance, sc_groups, sc_tests, bal_weights = rep(1,
+  length(balance)), sc_weights = rep(1, length(sc_groups)))
 }
 \arguments{
 \item{layout}{a data.frame with the factors to be balanced and their current positions}

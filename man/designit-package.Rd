@@ -10,7 +10,7 @@ Blocking and randomization for experimental design.
     TODO: expand this.
 }
 \author{
-\strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID})
+\strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (0000-0003-0422-7977)
 
 }
 \keyword{internal}
