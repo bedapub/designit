@@ -4,8 +4,12 @@
 \alias{distribute_samples}
 \title{General function for performing sample assignment.}
 \usage{
-distribute_samples(samples, batch_container,
-  distribution_function = distribute_random, random_seed = NULL)
+distribute_samples(
+  samples,
+  batch_container,
+  distribution_function = distribute_random,
+  random_seed = NULL
+)
 }
 \arguments{
 \item{samples}{data.frame with samples and unique .sample_id field.}

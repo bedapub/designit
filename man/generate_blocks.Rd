@@ -4,8 +4,14 @@
 \alias{generate_blocks}
 \title{Generate block design}
 \usage{
-generate_blocks(.tbl, k, ..., .name = "Batch", .prefix = "B",
-  .control = list())
+generate_blocks(
+  .tbl,
+  k,
+  ...,
+  .name = "Batch",
+  .prefix = "B",
+  .control = list()
+)
 }
 \arguments{
 \item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}).}
