@@ -23,7 +23,7 @@ Imports:
     assertthat,
     stringr,
     AlgDesign,
-    R6
+    R6,
     ineq
 Suggests: 
     testthat,
