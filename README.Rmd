@@ -71,7 +71,7 @@ bc$exclude
 bc$n_locations
 bc$n_excluded
 bc$n_available
-bc$elements_df
+bc$locations_df
 
 distributed <- distribute_samples(samples, bc, random_seed=1)
 distributed

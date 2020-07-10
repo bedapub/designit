@@ -6,7 +6,7 @@
 distribute_random <- function(samples, batch_container) {
   assertthat::assert_that(assertthat::has_name(samples, '.sample_id'))
 
-  elements <- batch_container$elements_df
+  elements <- batch_container$locations_df
 
   assertthat::assert_that(nrow(elements) >= nrow(samples))
 
@@ -261,7 +261,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stop("Cannot set number of dimensions (read-only).")
       }
     },
-    elements_df = function(value) {
+    locations_df = function(value) {
       if (missing(value)) {
         private$dimensions %>%
           purrr::map(~ .x$values) %>%
