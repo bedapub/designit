@@ -6,19 +6,19 @@
 distribute_random <- function(samples, batch_container) {
   assertthat::assert_that(assertthat::has_name(samples, '.sample_id'))
 
-  elements <- batch_container$locations_df
+  locations <- batch_container$locations_df
 
-  assertthat::assert_that(nrow(elements) >= nrow(samples))
+  assertthat::assert_that(nrow(locations) >= nrow(samples))
 
   n_samples <- nrow(samples)
 
   expanded_ids <- c(samples$.sample_id,
-                    rep(NA_integer_, nrow(elements) - nrow(samples)))
+                    rep(NA_integer_, nrow(locations) - nrow(samples)))
 
-  elements$.sample_id <- sample(expanded_ids)
+  locations$.sample_id <- sample(expanded_ids)
 
   samples <- samples %>%
-    dplyr::left_join(elements, by='.sample_id') %>%
+    dplyr::left_join(locations, by='.sample_id') %>%
     dplyr::select(-.sample_id)
 
   assertthat::assert_that(n_samples == nrow(samples))
