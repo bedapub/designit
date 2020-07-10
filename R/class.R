@@ -97,7 +97,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' by the sample distribution function.
     weight = NULL,
 
-    #' @field parent_dimension parent of the dimension.
+    #' @field parent_dimension name of the parent dimension.
     #' E.g., plate rows and columns belong to the plate.
     #' However, there is no nesting between rows and columns.
     #' This could be used by a sample distribution function
