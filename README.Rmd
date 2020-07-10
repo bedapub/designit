@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -76,6 +78,84 @@ bc$elements_df
 distributed <- distribute_samples(samples, bc, random_seed=1)
 distributed
 ```
+
+### Plate layout two factors
+
+TODO: move to vignette once there
+
+Samples of a 2-condition experiment in several animals are to be
+placed on 2 48 well plates.
+
+These are the conditions
+
+```{r}
+
+# conditions to use
+conditions <- data.frame(group = c(1, 2, 3, 4, 5),
+                      treatment = c("vehicle", "TRT1", "TRT2",
+                                    "TRT1", "TRT2"),
+                      dose = c(0, 25, 25, 50, 50))
+
+kable(conditions)
+```
+
+We will have 3 animals per groups with 4 replicates each
+
+```{r}
+# sample table (2 animals per group with 3 replicates)
+n_reps <- 4
+n_animals <- 3
+samples <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), .id = 'animal') 
+samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 'replicate') %>%
+  dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
+                AnimalID = paste0(treatment,'_',animal))
+
+DT::datatable(samples)
+```
+
+Corner wells of the plates should be left empty
+
+```{r}
+# to be put on a 48 well plate
+# (empty wells: first and last column plus two more wells)
+exclude_wells <- expand.grid(plate = 1:2, column = c(1,8), row = c(1,6))
+```
+
+Create a BatchContainer object that provides all possible locations
+
+```{r}
+bc <- BatchContainer$new(
+  dimensions=c('plate' = 2, 'row' = 6, 'column' = 8),
+  exclude=exclude_wells
+)
+bc
+
+bc$n_available
+bc$exclude
+```
+
+Randomly assign samples to the plate locations
+
+```{r}
+design <- distribute_samples(samples = samples, batch_container = bc, 
+                             distribution_function = distribute_random, random_seed = 42)
+
+DT::datatable(design)
+```
+
+Plot of the result
+
+```{r}
+library(ggplot2)
+design %>% 
+  ggplot(aes(x = factor(column), y = factor(-row), fill = treatment, alpha = factor(dose))) + 
+  geom_tile() +
+  facet_wrap(~plate) + 
+  theme_bw() 
+  
+```
+
+
 
 ```{r}
 library(tidyverse)
