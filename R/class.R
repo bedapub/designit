@@ -88,9 +88,22 @@ validate_samples <- function(samples) {
 #' @export
 BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   public = list(
+
+    #' @field name dimension name.
     name = NULL,
+
+    #' @field size dimension size.
     size = NULL,
+
+    #' @field weight dimension weight. This can be interpreted
+    #' by the sample distribution function.
     weight = NULL,
+
+    #' @field parent_dimension parent of the dimension.
+    #' E.g., plate rows and columns belong to the plate.
+    #' However, there is no nesting between rows and columns.
+    #' This could be used by a sample distribution function
+    #' taking plate effect into account.
     parent_dimension = NULL,
 
     initialize = function(
