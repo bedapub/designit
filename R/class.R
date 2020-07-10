@@ -202,7 +202,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     print = function(...) {
       cat(stringr::str_glue(
-        "Batch container with {self$n_elements} elements and {self$n_excluded} excluded.\n",
+        "Batch container with {self$n_locations} elements and {self$n_excluded} excluded.\n",
         .trim = FALSE
       ))
       cat("  Dimensions: ")
@@ -220,7 +220,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   active = list(
-    n_elements = function(value) {
+    n_locations = function(value) {
       if (missing(value)) {
         private$dimensions %>%
           purrr::map_int(~ .x$size) %>%
@@ -242,7 +242,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
     n_available = function(value) {
       if (missing(value)) {
-        self$n_elements - self$n_excluded
+        self$n_locations - self$n_excluded
       } else {
         stop("Cannot set dimension names (read-only).")
       }
@@ -299,7 +299,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           stop("non-unique rows in exclude")
         }
 
-        if (nrow(value) >= self$n_elements) {
+        if (nrow(value) >= self$n_locations) {
           stop("All the elements of the container cannot be excluded")
         }
 

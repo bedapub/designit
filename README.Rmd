@@ -68,7 +68,7 @@ bc <- BatchContainer$new(
 bc
 
 bc$exclude
-bc$n_elements
+bc$n_locations
 bc$n_excluded
 bc$n_available
 bc$elements_df
