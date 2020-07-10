@@ -39,7 +39,7 @@ distribute_samples <- function(samples, batch_container,
   validate_samples(samples)
 
   if (nrow(samples) > batch_container$n_available)
-    stop("More samples than availble elements in the batch container")
+    stop("More samples than availble locations in the batch container")
 
   if (length(intersect(batch_container$dimension_names, colnames(samples))) > 0)
     stop("Some of the samples columns match batch container dimension names")
@@ -202,7 +202,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     print = function(...) {
       cat(stringr::str_glue(
-        "Batch container with {self$n_locations} elements and {self$n_excluded} excluded.\n",
+        "Batch container with {self$n_locations} locations and {self$n_excluded} excluded.\n",
         .trim = FALSE
       ))
       cat("  Dimensions: ")
@@ -226,7 +226,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           purrr::map_int(~ .x$size) %>%
           prod()
       } else {
-        stop("Cannot set number of elements in container (read-only).")
+        stop("Cannot set number of locations in a container (read-only).")
       }
     },
     n_excluded = function(value) {
@@ -237,7 +237,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           nrow(private$exclude_df)
         }
       } else {
-        stop("Cannot set number of excluded elements in container (read-only).")
+        stop("Cannot set number of excluded locations in container (read-only).")
       }
     },
     n_available = function(value) {
@@ -270,7 +270,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           tibble::as_tibble() %>%
           dplyr::anti_join(self$exclude, by=self$dimension_names)
       } else {
-        stop("Cannot set elements data.frame (read-only).")
+        stop("Cannot set locations data.frame (read-only).")
       }
     },
     exclude = function(value) {
@@ -300,7 +300,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         }
 
         if (nrow(value) >= self$n_locations) {
-          stop("All the elements of the container cannot be excluded")
+          stop("All locations in a container cannot be excluded")
         }
 
         for (dim_name in names(private$dimensions)) {
