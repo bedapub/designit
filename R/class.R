@@ -90,8 +90,8 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' @field name dimension name.
     name = NULL,
 
-    #' @field size dimension size.
-    size = NULL,
+    #' @field values vector of dimension values.
+    values = NULL,
 
     #' @field weight dimension weight. This can be interpreted
     #' by the sample distribution function.
@@ -106,49 +106,76 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 
     initialize = function(
                           name,
-                          size,
-                          weight = NA,
+                          size = NULL,
+                          values = NULL,
+                          weight = NA_real_,
                           parent_dimension = NULL) {
       assertthat::assert_that(assertthat::is.string(name), name != "",
                               msg="Dimension name should a non-empty string")
 
       assertthat::assert_that(name != '.sample_id',
                               msg="Cannot use reserved name for a dimension (.sample_id)")
+      self$name <- name
 
-      assertthat::assert_that(assertthat::is.count(size), size >= 1,
-                              msg="Dimension size should be a positive integer")
+      assertthat::assert_that(!is.null(size) || !is.null(values),
+                              msg="You need to provide values or size for a dimension")
+
+      if (!is.null(size)) {
+        assertthat::assert_that(assertthat::is.count(size), size >= 1,
+                                msg="Dimension size should be a positive integer")
+
+        self$values <- 1:size
+      } else {
+        assertthat::assert_that(is.numeric(values) ||
+                                is.character(values) ||
+                                is.factor(values),
+                                msg='values should be numeric, factor or character vector')
+        assertthat::assert_that(length(values) > 0)
+
+        if (is.numeric(values)) {
+          assertthat::assert_that(all(values %% 1 == 0),
+                                  msg='numeric values are suppose to be integer')
+
+          values <- as.integer(values)
+        }
+
+        if (is.factor(values)) {
+          values <- levels(x)[levels(x) %in% x]
+          assertthat::assert_that(is.character(values), length(values) > 0)
+        }
+
+        assertthat::assert_that(all(!duplicated(values)), msg='values are duplicated')
+
+        self$values <- values
+      }
 
       assertthat::assert_that(length(weight) == 1)
 
       if (!is.na(weight))
         assertthat::assert_that(is.numeric(weight), is.finite(weight), weight >=0)
 
+      self$weight <- weight
+
       if (!is.null(parent_dimension))
         assertthat::assert_that(assertthat::is.string(parent_dimension),
                                 parent_dimension != "")
-
-      self$name <- name
-      self$size <- as.integer(size)
-      self$weight <- weight
       self$parent_dimension <- parent_dimension
     }
   ),
 
   active = list(
+    size = function(value) {
+      if (missing(value)) {
+        length(self$values)
+      } else {
+        stop("size is a read-only field")
+      }
+    },
     short_info = function(value) {
       if (missing(value)) {
         stringr::str_glue("{self$name}<size={self$size}>")
       } else {
         stop("short_info is a read-only field")
-      }
-    },
-    values = function(value) {
-      if (missing(value)) {
-        res <- list(1:self$size)
-        names(res) <- self$name
-        res
-      } else {
-        stop("values is a read-only field")
       }
     }
   )
@@ -167,22 +194,24 @@ BatchContainer <- R6::R6Class("BatchContainer",
                           exclude = NULL) {
       assertthat::assert_that(length(dimensions) >= 1)
 
-      if (is.numeric(dimensions))
-        assertthat::assert_that(!is.null(names(dimensions)),
-                                msg='Dimensions should have names')
+      assertthat::assert_that(!is.null(names(dimensions)),
+                              msg='Dimensions should have names')
 
       private$dimensions <- purrr::imap(dimensions, function(dm, name) {
         if (is.numeric(dm)) {
           assertthat::assert_that(!is.null(name), msg="dimension should have a name")
           BatchContainerDimension$new(name = name, size = dm)
         } else if (inherits(dm, "BatchContainerDimension")) {
+          assertthat::assert_that(dm$name == name,
+                                  'Dimension names should match the list names')
           dm
         } else {
-          BatchContainerDimension$new(
-            name = name, size = dm$size,
-            weight = dm$weight,
-            parent_dimension = dm$parent_dimension
-          )
+          assertthat::assert_that(is.list(dm),
+                                  msg="Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers")
+          assertthat::assert_that(is.null(dm$name) || dm$name==name,
+                                  msg="dimension name should be set as a list name")
+          dm$name <- name
+          do.call(BatchContainerDimension$new, dm)
         }
       })
 
@@ -257,8 +286,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (missing(value)) {
         private$dimensions %>%
           purrr::map(~ .x$values) %>%
-          purrr::flatten() %>%
           expand.grid() %>%
+          dplyr::arrange(dplyr::across(dplyr::everything())) %>%
           tibble::as_tibble() %>%
           dplyr::anti_join(self$exclude, by=self$dimension_names)
       } else {
@@ -280,7 +309,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
                                          msg="Columns of exclude should match dimensions")
 
         value <- value[, names(private$dimensions)] %>%
-          dplyr::mutate(dplyr::across(dplyr::everything(), as.integer))
+          dplyr::mutate(dplyr::across(where(is.numeric), as.integer),
+                        dplyr::across(where(is.factor), as.character))
 
         rownames(value) <- NULL
 
@@ -292,8 +322,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
         for (dim_name in names(private$dimensions)) {
           assertthat::assert_that(
-            all(value[[dim_name]] <= private$dimensions[[dim_name]]$size),
-            all(value[[dim_name]] > 0),
+            all(value[[dim_name]] %in% private$dimensions[[dim_name]]$values),
             msg=stringr::str_glue("Some values are outside range in dimension '{dim_name}'")
             )
         }

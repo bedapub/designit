@@ -61,8 +61,12 @@ samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
 samples
 
 bc <- BatchContainer$new(
-  dimensions=c('plate'=3, 'row'=2, 'column'=2),
-  exclude=data.frame(plate=2, row=1, column=2)
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
 )
 
 bc
