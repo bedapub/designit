@@ -183,16 +183,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stop("dimensions must have unique names")
       }
 
-      private$dimensions <- purrr::imap(dimensions, function(element, name) {
-        if (is.numeric(element)) {
-          BatchContainerDimension$new(name = name, size = element)
-        } else if (inherits(element, "BatchContainerDimension")) {
-          element
+      private$dimensions <- purrr::imap(dimensions, function(dm, name) {
+        if (is.numeric(dm)) {
+          BatchContainerDimension$new(name = name, size = dm)
+        } else if (inherits(dm, "BatchContainerDimension")) {
+          dm
         } else {
           BatchContainerDimension$new(
-            name = name, size = element$size,
-            weight = element$weight,
-            parent_dimension = element$parent_dimension
+            name = name, size = dm$size,
+            weight = dm$weight,
+            parent_dimension = dm$parent_dimension
           )
         }
       })
