@@ -1,0 +1,10 @@
+pandoc: 2.7.3
+pkgdown: 1.5.1
+pkgdown_sha: ~
+articles:
+  sample: sample.html
+last_built: 2020-07-13T16:39Z
+urls:
+  reference: https://pages.code.roche.com/BEDA/DesignIt/reference
+  article: https://pages.code.roche.com/BEDA/DesignIt/articles
+

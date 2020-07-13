@@ -9,7 +9,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of designit is to …
+The goal of designit is to … **TODO** fill this\!
 
 ## skeleton
 
@@ -45,14 +45,12 @@ TODO
 
 ``` r
 library(tidyverse)
-#> -- Attaching packages ---------------------------------- tidyverse 1.3.0 --
-#> v ggplot2 3.2.1     v purrr   0.3.3
-#> v tibble  2.1.3     v dplyr   0.8.5
+#> -- Attaching packages ----------------------------------------- tidyverse 1.3.0 --
+#> v ggplot2 3.3.0     v purrr   0.3.4
+#> v tibble  3.0.1     v dplyr   0.8.5
 #> v tidyr   1.0.2     v stringr 1.4.0
 #> v readr   1.3.1     v forcats 0.5.0
-#> Warning: package 'dplyr' was built under R version 3.6.3
-#> Warning: package 'forcats' was built under R version 3.6.3
-#> -- Conflicts ------------------------------------- tidyverse_conflicts() --
+#> -- Conflicts -------------------------------------------- tidyverse_conflicts() --
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 x <- expand.grid(b = paste0('b', 1:4),
