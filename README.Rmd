@@ -81,6 +81,14 @@ bc$distribute_samples(samples, random_seed=1)
 
 head(bc$get_samples())
 bc$get_samples(remove_empty_locations=TRUE)
+
+# You can reassign samples starting from the current assignment.
+bc$distribute_samples(random_seed=2)
+head(bc$get_samples())
+
+# Results should be reproducible if the seed is set.
+bc$distribute_samples(random_seed=1)
+bc$get_samples(remove_empty_locations=TRUE)
 ```
 
 ```{r}
