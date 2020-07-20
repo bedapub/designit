@@ -17,3 +17,6 @@ generate_terms(.tbl, ...)
 \description{
 Generate \code{terms.object} (formula with attributes)
 }
+\examples{
+
+}
