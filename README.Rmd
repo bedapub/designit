@@ -77,8 +77,10 @@ bc$n_excluded
 bc$n_available
 bc$locations_df
 
-distributed <- distribute_samples(samples, bc, random_seed=1)
-distributed
+bc$distribute_samples(samples, random_seed=1)
+
+head(bc$get_samples())
+bc$get_samples(remove_empty_locations=TRUE)
 ```
 
 ```{r}

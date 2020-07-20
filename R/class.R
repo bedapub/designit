@@ -19,61 +19,9 @@ distribute_random <- function(samples, batch_container) {
 
   locations$.sample_id <- sample(expanded_ids)
 
-  samples <- samples %>%
-    dplyr::left_join(locations, by = ".sample_id") %>%
-    dplyr::select(-.sample_id)
-
-  assertthat::assert_that(n_samples == nrow(samples))
-
-  return(samples)
-}
-
-#' General function for performing sample assignment.
-#'
-#' @export
-#' @param samples data.frame with samples and unique .sample_id field.
-#' @param batch_container Instance of BatchContainer class
-#' @param sitribution_function Function performing sample distribution
-#' @param random_seed If set will fix random seed and then return the original value
-distribute_samples <- function(samples, batch_container,
-                               distribution_function = distribute_random,
-                               random_seed = NULL) {
-  validate_samples(samples)
-
-  assertthat::assert_that(nrow(samples) <= batch_container$n_available,
-    msg = "More samples than availble locations in the batch container"
+  list(
+    assignment = locations
   )
-
-  assertthat::assert_that(length(intersect(batch_container$dimension_names, colnames(samples))) == 0,
-    msg = "Some of the samples columns match batch container dimension names"
-  )
-
-  assertthat::assert_that(!".sample_id" %in% colnames(samples),
-    msg = "Samples data.frame has a column with reserved name .sample_id"
-  )
-
-  assertthat::assert_that(inherits(batch_container, "BatchContainer"),
-    msg = "batch_container should be an instance of the BatchContainer class"
-  )
-
-  if (!is.null(random_seed)) {
-    if (!exists(".Random.seed")) {
-      set.seed(NULL)
-    }
-    saved_seed <- .Random.seed
-    on.exit({
-      .Random.seed <<- saved_seed
-    })
-    set.seed(random_seed)
-  } else {
-    saved_seed <- NULL
-  }
-
-  samples$.sample_id <- 1:nrow(samples)
-
-  samples <- distribution_function(samples, batch_container)
-
-  return(samples)
 }
 
 #' Validates sample data.frame.
@@ -310,6 +258,94 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
       res
     },
+
+    #' General method for performing sample assignment.
+    #'
+    #' @param samples data.frame with samples and unique .sample_id field.
+    #' @param ditribution_function Function performing sample distribution
+    #' @param random_seed If set will fix random seed and then return the original value
+    #' @return Any extra results provided by the distribution function. E.g.,
+    #' optimization trajectory or optimization score.
+    distribute_samples = function(samples = NULL,
+                                  distribution_function = distribute_random,
+                                  random_seed = NULL) {
+      assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
+        msg = "samples argument is NULL"
+      )
+
+      assertthat::assert_that(!(is.null(samples) && !is.null(private$samples)),
+        msg = stringr::str_c(
+          "Batch container already has samples, cannot assign new samples table. ",
+          "You can however continue optimization for samples in the container."
+        )
+      )
+
+      if (!is.null(samples)) {
+        validate_samples(samples)
+
+        assertthat::assert_that(nrow(samples) <= self$n_available,
+          msg = "More samples than availble locations in the batch container"
+        )
+
+        assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
+          msg = "Some of the samples columns match batch container dimension names"
+        )
+
+        assertthat::assert_that(!".sample_id" %in% colnames(samples),
+          msg = "Samples data.frame has a column with reserved name .sample_id"
+        )
+
+        samples$.sample_id <- 1:nrow(samples)
+      } else {
+        samples <- private$samples
+
+        assertthat::assert_that(".sample_id" %in% colnames(samples))
+      }
+
+      if (!is.null(random_seed)) {
+        if (!exists(".Random.seed")) {
+          set.seed(NULL)
+        }
+        saved_seed <- .Random.seed
+        on.exit({
+          .Random.seed <<- saved_seed
+        })
+        set.seed(random_seed)
+      } else {
+        saved_seed <- NULL
+      }
+
+      res <- distribution_function(samples, self)
+
+      assertthat::assert_that(is.list(res),
+        msg = "Distribution function should return a list"
+      )
+
+      # distribution function should return a list.
+      # if l$assignment is NULL, it means that distribution was impossible
+      # distribution function can assign other member of the list such as
+      # optimization trajectory, final score value, etc.
+      if (!is.null(res$assignment)) {
+        assertthat::assert_that(is.data.frame(res$assignment))
+        assertthat::assert_that(nrow(res$assignment) == self$n_available,
+          msg = stringr::str_c(
+            "Distribution function assingment should include all available locations. ",
+            "Empty location should have .sample_id equal to NA."
+          )
+        )
+        assertthat::assert_that(names(res$assignment)[ncol(res$assignment)] == ".sample_id",
+          msg = "Last column of sample assignment should be .sample_id"
+        )
+        private$assignment <- res$assignment
+        res$assignment <- NULL
+        private$samples <- samples
+      } else {
+        warning("Sample distribution did not succeed")
+      }
+
+      invisible(res)
+    },
+
 
     print = function(...) {
       cat(stringr::str_glue(
