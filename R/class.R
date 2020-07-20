@@ -261,8 +261,11 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @param assignment Return sample assignment. If FALSE, only
     #' samples table is returned, with out batch assignment.
     #' @param include_id Keep .sample_id in the tibble.
+    #' @param remove_empty_locations Removes empty locations
+    #' from the result tibble.
     #' @return tibble with samples and sample assignment.
-    samples = function(assignment = TRUE, include_id = FALSE) {
+    get_samples = function(assignment = TRUE, include_id = FALSE,
+                           remove_empty_locations = FALSE) {
       assertthat::assert_that(!is.null(private$samples),
         msg = "Cannot return samples for empty batch container."
       )
@@ -273,22 +276,34 @@ BatchContainer <- R6::R6Class("BatchContainer",
       assertthat::assert_that(names(private$samples)[ncol(private$samples)] == ".sample_id",
         msg = "Last column of private$samples should be .sample_id"
       )
-      assertthat::assert_that(names(private$assignment)[1] == ".sample_id",
-        msg = "First column of private$assignment should be .sample_id"
+      assertthat::assert_that(names(private$assignment)[ncol(private$assignment)] == ".sample_id",
+        msg = "Last column of private$assignment should be .sample_id"
       )
 
-      assertthat::assert_that(all(names(private$assignment)[-1] == self$dimension_names),
+      assertthat::assert_that(all(names(private$assignment)[-ncol(private$assignment)] == self$dimension_names),
         msg = "private$assignment column names should match dimension names"
       )
 
       assertthat::assert_that(assertthat::is.flag(assignment))
       assertthat::assert_that(assertthat::is.flag(include_id))
+      assertthat::assert_that(assertthat::is.flag(remove_empty_locations))
 
-      res <- private$samples
-      if (assignment) {
-        res <- res %>%
-          dplyr::left_join(private_assignment, by = ".sample_id")
+      if (!assignment) {
+        assertthat::assert_that(!remove_empty_locations,
+          msg = "remove_empty_locations only makes sense when assignment is TRUE"
+        )
       }
+      if (assignment) {
+        res <- private$assignment %>%
+          dplyr::left_join(private$samples, by = ".sample_id")
+        if (remove_empty_locations) {
+          res <- res %>%
+            dplyr::filter(!is.na(.sample_id))
+        }
+      } else {
+        res <- private$samples
+      }
+
       if (!include_id) {
         res <- res %>%
           dplyr::select(-.sample_id)
