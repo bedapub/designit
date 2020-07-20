@@ -12,6 +12,9 @@ R6 Class representing a batch container.
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{BatchContainer$new()}}
+\item \href{#method-has_samples}{\code{BatchContainer$has_samples()}}
+\item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
+\item \href{#method-distribute_samples}{\code{BatchContainer$distribute_samples()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
 \item \href{#method-clone}{\code{BatchContainer$clone()}}
 }
@@ -22,13 +25,82 @@ R6 Class representing a batch container.
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(
-  dimensions = NULL,
+  dimensions,
   interactions = FALSE,
   interaction_weights = NULL,
   exclude = NULL
 )}\if{html}{\out{</div>}}
 }
 
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-has_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-has_samples}{}}}
+\subsection{Method \code{has_samples()}}{
+Returns TRUE if batch has samples.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$has_samples()}\if{html}{\out{</div>}}
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-get_samples}{}}}
+\subsection{Method \code{get_samples()}}{
+Return table with samples and sample assignment.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_samples(
+  assignment = TRUE,
+  include_id = FALSE,
+  remove_empty_locations = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{assignment}}{Return sample assignment. If FALSE, only
+samples table is returned, with out batch assignment.}
+
+\item{\code{include_id}}{Keep .sample_id in the tibble.}
+
+\item{\code{remove_empty_locations}}{Removes empty locations
+from the result tibble.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+tibble with samples and sample assignment.
+General method for performing sample assignment.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-distribute_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-distribute_samples}{}}}
+\subsection{Method \code{distribute_samples()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$distribute_samples(
+  samples = NULL,
+  distribution_function = distribute_random,
+  random_seed = NULL
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{samples}}{data.frame with samples and unique .sample_id field.}
+
+\item{\code{random_seed}}{If set will fix random seed and then return the original value}
+
+\item{\code{ditribution_function}}{Function performing sample distribution}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+Any extra results provided by the distribution function. E.g.,
+optimization trajectory or optimization score.
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-print"></a>}}

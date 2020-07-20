@@ -8,6 +8,24 @@ R6 Class representing a batch container dimension.
 
 R6 Class representing a batch container dimension.
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{name}}{dimension name.}
+
+\item{\code{values}}{vector of dimension values.}
+
+\item{\code{weight}}{dimension weight. This can be interpreted
+by the sample distribution function.}
+
+\item{\code{parent_dimension}}{name of the parent dimension.
+E.g., plate rows and columns belong to the plate.
+However, there is no nesting between rows and columns.
+This could be used by a sample distribution function
+taking plate effect into account.}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -20,7 +38,13 @@ R6 Class representing a batch container dimension.
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(name, size, weight = NA, parent_dimension = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(
+  name,
+  size = NULL,
+  values = NULL,
+  weight = NA_real_,
+  parent_dimension = NULL
+)}\if{html}{\out{</div>}}
 }
 
 }
