@@ -82,6 +82,7 @@ General method for performing sample assignment.
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainer$distribute_samples(
   samples = NULL,
   distribution_function = distribute_random,
+  distribution_function_args = list(),
   random_seed = NULL
 )}\if{html}{\out{</div>}}
 }
@@ -94,6 +95,8 @@ General method for performing sample assignment.
 \item{\code{random_seed}}{If set will fix random seed and then return the original value}
 
 \item{\code{ditribution_function}}{Function performing sample distribution}
+
+\item{\code{ditribution_function_args}}{Arguments for the distribution function}
 }
 \if{html}{\out{</div>}}
 }

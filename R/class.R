@@ -263,11 +263,13 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #'
     #' @param samples data.frame with samples and unique .sample_id field.
     #' @param ditribution_function Function performing sample distribution
+    #' @param ditribution_function_args Arguments for the distribution function
     #' @param random_seed If set will fix random seed and then return the original value
     #' @return Any extra results provided by the distribution function. E.g.,
     #' optimization trajectory or optimization score.
     distribute_samples = function(samples = NULL,
                                   distribution_function = distribute_random,
+                                  distribution_function_args = list(),
                                   random_seed = NULL) {
       assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
         msg = "samples argument is NULL"
@@ -315,7 +317,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         saved_seed <- NULL
       }
 
-      res <- distribution_function(samples, self)
+      res <- do.call(distribution_function,
+                     c(list(samples, self), distribution_function_args))
 
       assertthat::assert_that(is.list(res),
         msg = "Distribution function should return a list"
