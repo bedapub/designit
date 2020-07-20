@@ -273,7 +273,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "samples argument is NULL"
       )
 
-      assertthat::assert_that(!(is.null(samples) && !is.null(private$samples)),
+      assertthat::assert_that(!(!is.null(samples) && !is.null(private$samples)),
         msg = stringr::str_c(
           "Batch container already has samples, cannot assign new samples table. ",
           "You can however continue optimization for samples in the container."
