@@ -73,3 +73,7 @@ head(bc$get_samples())
 bc$distribute_samples(random_seed=1)
 bc$get_samples(remove_empty_locations=TRUE)
 ```
+
+## Examples
+
+See vignettes `vignette("basic_examples")`.

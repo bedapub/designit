@@ -4,10 +4,19 @@
     <loc>https://pages.code.roche.com/BEDA/DesignIt/index.html</loc>
   </url>
   <url>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/BatchContainer.html</loc>
+  </url>
+  <url>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/BatchContainerDimension.html</loc>
+  </url>
+  <url>
     <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/countGini.html</loc>
   </url>
   <url>
     <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/designit-package.html</loc>
+  </url>
+  <url>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/distribute_random.html</loc>
   </url>
   <url>
     <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/drop_order.html</loc>
@@ -46,6 +55,12 @@
     <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/tidyeval.html</loc>
   </url>
   <url>
-    <loc>https://pages.code.roche.com/BEDA/DesignIt/articles/sample.html</loc>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/reference/validate_samples.html</loc>
+  </url>
+  <url>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/articles/Old_README_from_Balazs.html</loc>
+  </url>
+  <url>
+    <loc>https://pages.code.roche.com/BEDA/DesignIt/articles/basic_examples.html</loc>
   </url>
 </urlset>

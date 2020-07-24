@@ -2,7 +2,7 @@
 title: "Basic examples"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{basic_examples}
+  %\VignetteIndexEntry{Basic examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -65,7 +65,7 @@ conditions <- data.frame(group = c(1, 2, 3, 4, 5),
                                     "TRT1", "TRT2"),
                       dose = c(0, 25, 25, 50, 50))
 
-kable(conditions)
+knitr::kable(conditions)
 ```
 
 We will have 3 animals per groups with 4 replicates each

@@ -46,7 +46,7 @@ The goal of designit is to ... **TODO** fill this!
 **what to do with numeric covariates**
 
 
-```{r}
+```{r eval=FALSE}
 a <- readxl::read_excel('inst/extdata/CEA-PRIT_CEAmodels_for randomization.xlsx')
 ```
 

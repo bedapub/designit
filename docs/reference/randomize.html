@@ -96,7 +96,10 @@ experimental dimensions and factors to be balanced" />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/sample.html">Sample Vignette</a>
+      <a href="../articles/Old_README_from_Balazs.html">UNKNOWN TITLE</a>
+    </li>
+    <li>
+      <a href="../articles/basic_examples.html">Basic examples</a>
     </li>
   </ul>
 </li>
@@ -209,7 +212,7 @@ information about fixed samples (columns with 'Fix' prefix and then the dimensio
 
 <span class='co'># generate initial sample table (2 animals per group with 3 replicates)</span>
 <span class='no'>samples</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span>(<span class='no'>samples</span> <span class='kw'>%&gt;%</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>animals</span> <span class='kw'>=</span> <span class='fl'>1</span>), <span class='no'>samples</span>) <span class='kw'>%&gt;%</span>
-            <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>rename</a></span>(<span class='kw'>animal</span> <span class='kw'>=</span> <span class='no'>animals</span>)
+            <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span>(<span class='kw'>animal</span> <span class='kw'>=</span> <span class='no'>animals</span>)
 <span class='no'>samples</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span>(<span class='fu'><a href='https://rdrr.io/r/base/list.html'>list</a></span>(<span class='no'>samples</span>,<span class='no'>samples</span>,<span class='no'>samples</span>)) <span class='kw'>%&gt;%</span>
             <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='kw'>replicate</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span>(<span class='fl'>1</span>:<span class='fl'>3</span>, <span class='kw'>each</span> <span class='kw'>=</span> <span class='fl'>10</span>),
                    <span class='kw'>SampleID</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span>(<span class='no'>Treatment</span>,<span class='st'>'_'</span>,<span class='no'>animal</span>,<span class='st'>'_'</span>,<span class='no'>replicate</span>),
@@ -222,7 +225,7 @@ information about fixed samples (columns with 'Fix' prefix and then the dimensio
                       <span class='kw'>FixColumn</span> <span class='kw'>=</span> <span class='fl'>4</span>, <span class='kw'>FixRow</span> <span class='kw'>=</span> <span class='fl'>8</span> + <span class='fl'>1</span> - (<span class='fl'>1</span>:<span class='no'>empty</span>))
 
 <span class='co'># final sample table</span>
-<span class='no'>design</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/join.html'>full_join</a></span>(<span class='no'>samples</span>, <span class='no'>emptydf</span>)
+<span class='no'>design</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>dplyr</span><span class='kw ns'>::</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>full_join</a></span>(<span class='no'>samples</span>, <span class='no'>emptydf</span>)
 
 <span class='co'># set parameters</span>
 <span class='no'>layout_dim</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='kw'>Row</span> <span class='kw'>=</span> <span class='fl'>8</span>, <span class='kw'>Column</span> <span class='kw'>=</span> <span class='fl'>4</span>)
@@ -261,7 +264,7 @@ information about fixed samples (columns with 'Fix' prefix and then the dimensio
       <span class='kw'>caption</span> <span class='kw'>=</span> <span class='st'>'Treatment distribution across Columns.'</span>)
 
 <span class='co'># optimization curve</span>
-<span class='fu'><a href='https://rdrr.io/r/base/plot.html'>plot</a></span>(<span class='no'>score</span> ~ <span class='no'>iteration</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>result</span>$<span class='no'>opti</span>,
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.html'>plot</a></span>(<span class='no'>score</span> ~ <span class='no'>iteration</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>result</span>$<span class='no'>opti</span>,
      <span class='kw'>log</span> <span class='kw'>=</span> <span class='st'>"x"</span>, <span class='kw'>ylab</span> <span class='kw'>=</span> <span class='st'>"penalty"</span>, <span class='kw'>type</span> <span class='kw'>=</span> <span class='st'>"b"</span>)
 }</div></pre>
   </div>
