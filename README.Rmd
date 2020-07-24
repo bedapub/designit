@@ -27,9 +27,9 @@ The goal of designit is to generate optimal sample allocations for experimental 
 
 You can install the development version from Roche GitHub with:
 
-```{r echo=TRUE}
+```{r echo=TRUE, eval=FALSE}
 # install.packages("devtools")
-devtools::install_gitlab("BEDA/designit", host = "gitlab.roche.com")
+devtools::install_gitlab("BEDA/designit", host = "code.roche.com")
 ```
 
 ## Usage
