@@ -9,7 +9,7 @@
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of designit is to …
+The goal of designit is to … **TODO** fill this\!
 
 ## skeleton
 
@@ -55,57 +55,103 @@ samples
 #> 3 a c c
 
 bc <- BatchContainer$new(
-  dimensions=c('plate'=3, 'row'=2, 'column'=2),
-  exclude=data.frame(plate=2, row=1, column=2)
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
 )
 
 bc
-#> Batch container with 12 elements and 1 excluded.
-#>   Dimensions: plate<size=3>, row<size=2>, column<size=2>
+#> Batch container with 18 locations and 2 excluded.
+#>   Dimensions: plate<size=3>, row<size=3>, column<size=2>
 
 bc$exclude
-#> # A tibble: 1 x 3
-#>   plate   row column
-#>   <int> <int>  <int>
-#> 1     2     1      2
-bc$n_elements
-#> [1] 12
+#> # A tibble: 2 x 3
+#>   plate row   column
+#>   <int> <chr>  <int>
+#> 1     1 a          1
+#> 2     1 a          3
+bc$n_locations
+#> [1] 18
 bc$n_excluded
-#> [1] 1
+#> [1] 2
 bc$n_available
-#> [1] 11
-bc$elements_df
-#> # A tibble: 11 x 3
-#>    plate   row column
-#>    <int> <int>  <int>
-#>  1     1     1      1
-#>  2     2     1      1
-#>  3     3     1      1
-#>  4     1     2      1
-#>  5     2     2      1
-#>  6     3     2      1
-#>  7     1     1      2
-#>  8     3     1      2
-#>  9     1     2      2
-#> 10     2     2      2
-#> 11     3     2      2
+#> [1] 16
+bc$locations_df
+#> # A tibble: 16 x 3
+#>    plate row   column
+#>    <int> <fct>  <int>
+#>  1     1 b          1
+#>  2     1 b          3
+#>  3     1 c          1
+#>  4     1 c          3
+#>  5     2 a          1
+#>  6     2 a          3
+#>  7     2 b          1
+#>  8     2 b          3
+#>  9     2 c          1
+#> 10     2 c          3
+#> 11     3 a          1
+#> 12     3 a          3
+#> 13     3 b          1
+#> 14     3 b          3
+#> 15     3 c          1
+#> 16     3 c          3
 
-distributed <- distribute_samples(samples, bc, random_seed=1)
-distributed
-#>   a b c plate row column
-#> 1 a a b     1   2      1
-#> 2 a b b     2   2      1
-#> 3 a c c     1   1      2
+bc$distribute_samples(samples, random_seed=1)
+
+head(bc$get_samples())
+#> # A tibble: 6 x 6
+#>   plate row   column a     b     c    
+#>   <int> <fct>  <int> <fct> <fct> <fct>
+#> 1     1 b          1 <NA>  <NA>  <NA> 
+#> 2     1 b          3 <NA>  <NA>  <NA> 
+#> 3     1 c          1 <NA>  <NA>  <NA> 
+#> 4     1 c          3 a     a     b    
+#> 5     2 a          1 a     b     b    
+#> 6     2 a          3 <NA>  <NA>  <NA>
+bc$get_samples(remove_empty_locations=TRUE)
+#> # A tibble: 3 x 6
+#>   plate row   column a     b     c    
+#>   <int> <fct>  <int> <fct> <fct> <fct>
+#> 1     1 c          3 a     a     b    
+#> 2     2 a          1 a     b     b    
+#> 3     2 b          3 a     c     c
+
+# You can reassign samples starting from the current assignment.
+bc$distribute_samples(random_seed=2)
+head(bc$get_samples())
+#> # A tibble: 6 x 6
+#>   plate row   column a     b     c    
+#>   <int> <fct>  <int> <fct> <fct> <fct>
+#> 1     1 b          1 <NA>  <NA>  <NA> 
+#> 2     1 b          3 <NA>  <NA>  <NA> 
+#> 3     1 c          1 <NA>  <NA>  <NA> 
+#> 4     1 c          3 <NA>  <NA>  <NA> 
+#> 5     2 a          1 <NA>  <NA>  <NA> 
+#> 6     2 a          3 a     a     b
+
+# Results should be reproducible if the seed is set.
+bc$distribute_samples(random_seed=1)
+bc$get_samples(remove_empty_locations=TRUE)
+#> # A tibble: 3 x 6
+#>   plate row   column a     b     c    
+#>   <int> <fct>  <int> <fct> <fct> <fct>
+#> 1     1 c          3 a     a     b    
+#> 2     2 a          1 a     b     b    
+#> 3     2 b          3 a     c     c
 ```
 
 ``` r
 library(tidyverse)
-#> ── Attaching packages ──────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
+#> ── Attaching packages ───────────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
 #> ✓ ggplot2 3.3.2     ✓ purrr   0.3.4
-#> ✓ tibble  3.0.1     ✓ dplyr   1.0.0
+#> ✓ tibble  3.0.3     ✓ dplyr   1.0.0
 #> ✓ tidyr   1.1.0     ✓ stringr 1.4.0
 #> ✓ readr   1.3.1     ✓ forcats 0.5.0
-#> ── Conflicts ─────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
+#> ── Conflicts ──────────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
 #> x dplyr::filter() masks stats::filter()
 #> x dplyr::lag()    masks stats::lag()
 x <- expand.grid(b = paste0('b', 1:4),

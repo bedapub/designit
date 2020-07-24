@@ -4,81 +4,39 @@
 #' @param samples data.frame with samples and unique .sample_id field.
 #' @param batch_container Instance of BatchContainer class
 distribute_random <- function(samples, batch_container) {
-  assertthat::assert_that(assertthat::has_name(samples, '.sample_id'))
+  assertthat::assert_that(assertthat::has_name(samples, ".sample_id"))
 
-  elements <- batch_container$elements_df
+  locations <- batch_container$locations_df
 
-  assertthat::assert_that(nrow(elements) >= nrow(samples))
+  assertthat::assert_that(nrow(locations) >= nrow(samples))
 
   n_samples <- nrow(samples)
 
-  expanded_ids <- c(samples$.sample_id,
-                    rep(NA_integer_, nrow(elements) - nrow(samples)))
+  expanded_ids <- c(
+    samples$.sample_id,
+    rep(NA_integer_, nrow(locations) - nrow(samples))
+  )
 
-  elements$.sample_id <- sample(expanded_ids)
+  locations$.sample_id <- sample(expanded_ids)
 
-  samples <- samples %>%
-    dplyr::left_join(elements, by='.sample_id') %>%
-    dplyr::select(-.sample_id)
-
-  assertthat::assert_that(n_samples == nrow(samples))
-
-  return(samples)
-}
-
-#' General function for performing sample assignment.
-#'
-#' @export
-#' @param samples data.frame with samples and unique .sample_id field.
-#' @param batch_container Instance of BatchContainer class
-#' @param sitribution_function Function performing sample distribution
-#' @param random_seed If set will fix random seed and then return the original value
-distribute_samples <- function(samples, batch_container,
-                               distribution_function=distribute_random,
-                               random_seed=NULL) {
-  validate_samples(samples)
-
-  if (nrow(samples) > batch_container$n_available)
-    stop("More samples than availble elements in the batch container")
-
-  if (length(intersect(batch_container$dimension_names, colnames(samples))) > 0)
-    stop("Some of the samples columns match batch container dimension names")
-
-  if ('.sample_id' %in% colnames(samples))
-    stop("Samples data.frame has a column with reserved name .sample_id")
-
-  if (!inherits(batch_container, "BatchContainer"))
-    stop("batch_container should be an instance of the BatchContainer class")
-
-  if (!is.null(random_seed)) {
-    if (!exists(".Random.seed"))
-      set.seed(NULL)
-    saved_seed <- .Random.seed
-    on.exit({.Random.seed <<- saved_seed})
-    set.seed(random_seed)
-  } else {
-    saved_seed <- NULL
-  }
-
-  samples$.sample_id <- 1:nrow(samples)
-
-  samples <- distribution_function(samples, batch_container)
-
-  return(samples)
+  list(
+    assignment = locations
+  )
 }
 
 #' Validates sample data.frame.
 validate_samples <- function(samples) {
-  if (!is.data.frame(samples))
-    stop("Samples should be a data.frame or tibble")
+  assertthat::assert_that(is.data.frame(samples),
+    msg = "Samples should be a data.frame or tibble"
+  )
 
-  if (nrow(samples) != dplyr::n_distinct(samples)) {
-    stop("Non-unique rows in samples")
-  }
+  assertthat::assert_that(nrow(samples) == dplyr::n_distinct(samples),
+    msg = "Non-unique rows in samples"
+  )
 
-  if (nrow(samples) < 1) {
-    stop("Samples should have at least one row")
-  }
+  assertthat::assert_that(nrow(samples) >= 1,
+    msg = "Samples should have at least one row"
+  )
 }
 
 
@@ -88,60 +46,106 @@ validate_samples <- function(samples) {
 #' @export
 BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   public = list(
+
+    #' @field name dimension name.
     name = NULL,
-    size = NULL,
+
+    #' @field values vector of dimension values.
+    values = NULL,
+
+    #' @field weight dimension weight. This can be interpreted
+    #' by the sample distribution function.
     weight = NULL,
+
+    #' @field parent_dimension name of the parent dimension.
+    #' E.g., plate rows and columns belong to the plate.
+    #' However, there is no nesting between rows and columns.
+    #' This could be used by a sample distribution function
+    #' taking plate effect into account.
     parent_dimension = NULL,
 
     initialize = function(
                           name,
-                          size,
-                          weight = NA,
+                          size = NULL,
+                          values = NULL,
+                          weight = NA_real_,
                           parent_dimension = NULL) {
-      if (!is.character(name) || length(name) != 1 || name == "")
-        stop("Dimension name should a non-empty character of length 1")
+      assertthat::assert_that(assertthat::is.string(name), name != "",
+        msg = "Dimension name should a non-empty string"
+      )
 
-      if (name == '.sample_id')
-        stop("Cannot use reserved name for a dimension (.sample_id)")
-
-      if (!is.numeric(size) || length(size) != 1 || size < 1 || size %% 1 != 0)
-        stop("Dimension size should be a positive integer")
-
-      if (!is.na(weight) &&
-        (!is.numeric(weight) ||
-          length(weight) != 1 ||
-          weight < 0 ||
-          is.infinite(weight)))
-        stop("weight should be a finate non-negative numeric of length 1")
-
-      if (!is.null(parent_dimension) &&
-        (!is.character(parent_dimension) ||
-          length(parent_dimension) != 1 ||
-          parent_dimension == ""))
-        stop("parent_dimension should be a non-empty character")
-
+      assertthat::assert_that(name != ".sample_id",
+        msg = "Cannot use reserved name for a dimension (.sample_id)"
+      )
       self$name <- name
-      self$size <- as.integer(size)
+
+      assertthat::assert_that(!is.null(size) || !is.null(values),
+        msg = "You need to provide values or size for a dimension"
+      )
+
+      if (!is.null(size)) {
+        assertthat::assert_that(assertthat::is.count(size), size >= 1,
+          msg = "Dimension size should be a positive integer"
+        )
+
+        self$values <- 1:size
+      } else {
+        assertthat::assert_that(is.numeric(values) ||
+          is.character(values) ||
+          is.factor(values),
+        msg = "values should be numeric, factor or character vector"
+        )
+        assertthat::assert_that(length(values) > 0)
+
+        if (is.numeric(values)) {
+          assertthat::assert_that(all(values %% 1 == 0),
+            msg = "numeric values are suppose to be integer"
+          )
+
+          values <- as.integer(values)
+        }
+
+        if (is.factor(values)) {
+          values <- levels(x)[levels(x) %in% x]
+          assertthat::assert_that(is.character(values), length(values) > 0)
+        }
+
+        assertthat::assert_that(all(!duplicated(values)), msg = "values are duplicated")
+
+        self$values <- values
+      }
+
+      assertthat::assert_that(length(weight) == 1)
+
+      if (!is.na(weight)) {
+        assertthat::assert_that(is.numeric(weight), is.finite(weight), weight >= 0)
+      }
+
       self$weight <- weight
+
+      if (!is.null(parent_dimension)) {
+        assertthat::assert_that(
+          assertthat::is.string(parent_dimension),
+          parent_dimension != ""
+        )
+      }
       self$parent_dimension <- parent_dimension
     }
   ),
 
   active = list(
+    size = function(value) {
+      if (missing(value)) {
+        length(self$values)
+      } else {
+        stop("size is a read-only field")
+      }
+    },
     short_info = function(value) {
       if (missing(value)) {
         stringr::str_glue("{self$name}<size={self$size}>")
       } else {
         stop("short_info is a read-only field")
-      }
-    },
-    values = function(value) {
-      if (missing(value)) {
-        res <- list(1:self$size)
-        names(res) <- self$name
-        res
-      } else {
-        stop("values is a read-only field")
       }
     }
   )
@@ -154,42 +158,201 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     initialize = function(
-                          dimensions = NULL,
+                          dimensions,
                           interactions = FALSE,
                           interaction_weights = NULL,
                           exclude = NULL) {
-      if (is.null(dimensions) || length(dimensions) == 0) {
-        stop("dimensions cannot be NULL or 0 length")
-      }
+      assertthat::assert_that(length(dimensions) >= 1)
 
-      if (is.null(names(dimensions))) {
-        stop("dimensions should have names")
-      }
+      assertthat::assert_that(!is.null(names(dimensions)),
+        msg = "Dimensions should have names"
+      )
 
-      if (any(duplicated(names(dimensions)))) {
-        stop("dimensions must have unique names")
-      }
-
-      private$dimensions <- purrr::imap(dimensions, function(element, name) {
-        if (is.numeric(element)) {
-          BatchContainerDimension$new(name = name, size = element)
-        } else if (inherits(element, "BatchContainerDimension")) {
-          element
-        } else {
-          BatchContainerDimension$new(
-            name = name, size = element$size,
-            weight = element$weight,
-            parent_dimension = element$parent_dimension
+      private$dimensions <- purrr::imap(dimensions, function(dm, name) {
+        if (is.numeric(dm)) {
+          assertthat::assert_that(!is.null(name), msg = "dimension should have a name")
+          BatchContainerDimension$new(name = name, size = dm)
+        } else if (inherits(dm, "BatchContainerDimension")) {
+          assertthat::assert_that(
+            dm$name == name,
+            "Dimension names should match the list names"
           )
+          dm
+        } else {
+          assertthat::assert_that(is.list(dm),
+            msg = "Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers"
+          )
+          assertthat::assert_that(is.null(dm$name) || dm$name == name,
+            msg = "dimension name should be set as a list name"
+          )
+          dm$name <- name
+          do.call(BatchContainerDimension$new, dm)
         }
       })
+
+      assertthat::assert_that(all(!duplicated(self$dimension_names)),
+        msg = "duplicated dimension names"
+      )
 
       self$exclude <- exclude
     },
 
+
+    #' @description
+    #' Returns TRUE if batch has samples.
+    has_samples = function() {
+      !is.null(private$samples)
+    },
+
+    #' @description
+    #' Return table with samples and sample assignment.
+    #' @param assignment Return sample assignment. If FALSE, only
+    #' samples table is returned, with out batch assignment.
+    #' @param include_id Keep .sample_id in the tibble.
+    #' @param remove_empty_locations Removes empty locations
+    #' from the result tibble.
+    #' @return tibble with samples and sample assignment.
+    get_samples = function(assignment = TRUE, include_id = FALSE,
+                           remove_empty_locations = FALSE) {
+      assertthat::assert_that(!is.null(private$samples),
+        msg = "Cannot return samples for empty batch container."
+      )
+      assertthat::assert_that(!is.null(private$assignment),
+        msg = "If samples are present they should be assigned to location in the batch container"
+      )
+
+      assertthat::assert_that(names(private$samples)[ncol(private$samples)] == ".sample_id",
+        msg = "Last column of private$samples should be .sample_id"
+      )
+      assertthat::assert_that(names(private$assignment)[ncol(private$assignment)] == ".sample_id",
+        msg = "Last column of private$assignment should be .sample_id"
+      )
+
+      assertthat::assert_that(all(names(private$assignment)[-ncol(private$assignment)] == self$dimension_names),
+        msg = "private$assignment column names should match dimension names"
+      )
+
+      assertthat::assert_that(assertthat::is.flag(assignment))
+      assertthat::assert_that(assertthat::is.flag(include_id))
+      assertthat::assert_that(assertthat::is.flag(remove_empty_locations))
+
+      if (!assignment) {
+        assertthat::assert_that(!remove_empty_locations,
+          msg = "remove_empty_locations only makes sense when assignment is TRUE"
+        )
+      }
+      if (assignment) {
+        res <- private$assignment %>%
+          dplyr::left_join(private$samples, by = ".sample_id")
+        if (remove_empty_locations) {
+          res <- res %>%
+            dplyr::filter(!is.na(.sample_id))
+        }
+      } else {
+        res <- private$samples
+      }
+
+      if (!include_id) {
+        res <- res %>%
+          dplyr::select(-.sample_id)
+      }
+      res
+    },
+
+    #' General method for performing sample assignment.
+    #'
+    #' @param samples data.frame with samples and unique .sample_id field.
+    #' @param ditribution_function Function performing sample distribution
+    #' @param ditribution_function_args Arguments for the distribution function
+    #' @param random_seed If set will fix random seed and then return the original value
+    #' @return Any extra results provided by the distribution function. E.g.,
+    #' optimization trajectory or optimization score.
+    distribute_samples = function(samples = NULL,
+                                  distribution_function = distribute_random,
+                                  distribution_function_args = list(),
+                                  random_seed = NULL) {
+      assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
+        msg = "samples argument is NULL"
+      )
+
+      assertthat::assert_that(!(!is.null(samples) && !is.null(private$samples)),
+        msg = stringr::str_c(
+          "Batch container already has samples, cannot assign new samples table. ",
+          "You can however continue optimization for samples in the container."
+        )
+      )
+
+      if (!is.null(samples)) {
+        validate_samples(samples)
+
+        assertthat::assert_that(nrow(samples) <= self$n_available,
+          msg = "More samples than availble locations in the batch container"
+        )
+
+        assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
+          msg = "Some of the samples columns match batch container dimension names"
+        )
+
+        assertthat::assert_that(!".sample_id" %in% colnames(samples),
+          msg = "Samples data.frame has a column with reserved name .sample_id"
+        )
+
+        samples$.sample_id <- 1:nrow(samples)
+      } else {
+        samples <- private$samples
+
+        assertthat::assert_that(".sample_id" %in% colnames(samples))
+      }
+
+      if (!is.null(random_seed)) {
+        if (!exists(".Random.seed")) {
+          set.seed(NULL)
+        }
+        saved_seed <- .Random.seed
+        on.exit({
+          .Random.seed <<- saved_seed
+        })
+        set.seed(random_seed)
+      } else {
+        saved_seed <- NULL
+      }
+
+      res <- do.call(distribution_function,
+                     c(list(samples, self), distribution_function_args))
+
+      assertthat::assert_that(is.list(res),
+        msg = "Distribution function should return a list"
+      )
+
+      # distribution function should return a list.
+      # if l$assignment is NULL, it means that distribution was impossible
+      # distribution function can assign other member of the list such as
+      # optimization trajectory, final score value, etc.
+      if (!is.null(res$assignment)) {
+        assertthat::assert_that(is.data.frame(res$assignment))
+        assertthat::assert_that(nrow(res$assignment) == self$n_available,
+          msg = stringr::str_c(
+            "Distribution function assingment should include all available locations. ",
+            "Empty location should have .sample_id equal to NA."
+          )
+        )
+        assertthat::assert_that(names(res$assignment)[ncol(res$assignment)] == ".sample_id",
+          msg = "Last column of sample assignment should be .sample_id"
+        )
+        private$assignment <- res$assignment
+        res$assignment <- NULL
+        private$samples <- samples
+      } else {
+        warning("Sample distribution did not succeed")
+      }
+
+      invisible(res)
+    },
+
+
     print = function(...) {
       cat(stringr::str_glue(
-        "Batch container with {self$n_elements} elements and {self$n_excluded} excluded.\n",
+        "Batch container with {self$n_locations} locations and {self$n_excluded} excluded.\n",
         .trim = FALSE
       ))
       cat("  Dimensions: ")
@@ -203,17 +366,23 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
   private = list(
     dimensions = NULL,
-    exclude_df = NULL
+    exclude_df = NULL,
+    #' @description
+    #' Tibble with sample information and sample ids.
+    samples = NULL,
+    #' @description
+    #' Tibble with sample ids and assignment to batch container locations.
+    assignment = NULL
   ),
 
   active = list(
-    n_elements = function(value) {
+    n_locations = function(value) {
       if (missing(value)) {
         private$dimensions %>%
           purrr::map_int(~ .x$size) %>%
           prod()
       } else {
-        stop("Cannot set number of elements in container (read-only).")
+        stop("Cannot set number of locations in a container (read-only).")
       }
     },
     n_excluded = function(value) {
@@ -224,17 +393,17 @@ BatchContainer <- R6::R6Class("BatchContainer",
           nrow(private$exclude_df)
         }
       } else {
-        stop("Cannot set number of excluded elements in container (read-only).")
+        stop("Cannot set number of excluded locations in container (read-only).")
       }
     },
     n_available = function(value) {
       if (missing(value)) {
-        self$n_elements - self$n_excluded
+        self$n_locations - self$n_excluded
       } else {
         stop("Cannot set dimension names (read-only).")
       }
     },
-    n_dimension= function(value) {
+    n_dimension = function(value) {
       if (missing(value)) {
         length(private$dimensions)
       } else {
@@ -248,16 +417,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stop("Cannot set number of dimensions (read-only).")
       }
     },
-    elements_df = function(value) {
+    locations_df = function(value) {
       if (missing(value)) {
         private$dimensions %>%
           purrr::map(~ .x$values) %>%
-          purrr::flatten() %>%
           expand.grid() %>%
+          dplyr::arrange(dplyr::across(dplyr::everything())) %>%
           tibble::as_tibble() %>%
-          dplyr::anti_join(self$exclude, by=self$dimension_names)
+          dplyr::anti_join(self$exclude, by = self$dimension_names)
       } else {
-        stop("Cannot set elements data.frame (read-only).")
+        stop("Cannot set locations data.frame (read-only).")
       }
     },
     exclude = function(value) {
@@ -269,32 +438,33 @@ BatchContainer <- R6::R6Class("BatchContainer",
           return()
         }
 
-        if (!is.data.frame(value)) {
-          stop("Exclude should be a data.frame/tibble or NULL")
-        }
+        assertthat::assert_that(is.data.frame(value), msg = "Exclude should be a data.frame/tibble or NULL")
 
-        if (!setequal(colnames(value), names(private$dimensions))) {
-          stop("Columns of exclude should match dimensions")
-        }
+        assertthat::assert_that(setequal(colnames(value), names(private$dimensions)),
+          msg = "Columns of exclude should match dimensions"
+        )
 
         value <- value[, names(private$dimensions)] %>%
-          dplyr::mutate(dplyr::across(dplyr::everything(), as.integer))
+          dplyr::mutate(
+            dplyr::across(where(is.numeric), as.integer),
+            dplyr::across(where(is.factor), as.character)
+          )
 
         rownames(value) <- NULL
 
-        if (nrow(value) != dplyr::n_distinct(value)) {
-          stop("non-unique rows in exclude")
-        }
+        assertthat::assert_that(nrow(value) == dplyr::n_distinct(value),
+          msg = "non-unique rows in exclude"
+        )
 
-        if (nrow(value) >= self$n_elements) {
-          stop("All the elements of the container cannot be excluded")
-        }
+        assertthat::assert_that(nrow(value) < self$n_locations,
+          msg = "All locations in a container cannot be excluded"
+        )
 
         for (dim_name in names(private$dimensions)) {
-          if (any(value[[dim_name]] > private$dimensions[[dim_name]]$size |
-            value[[dim_name]] < 1)) {
-            stop(stringr::str_glue("Some values are outside range in dimension '{dim_name}'"))
-          }
+          assertthat::assert_that(
+            all(value[[dim_name]] %in% private$dimensions[[dim_name]]$values),
+            msg = stringr::str_glue("Some values are outside range in dimension '{dim_name}'")
+          )
         }
 
         private$exclude_df <- tibble::as_tibble(value)
