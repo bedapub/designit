@@ -47,6 +47,8 @@ anno <- tribble(
    "KO", "nontreated",   "B",    1,
    "KO", "nontreated",   "B",    2,  
 )
+```
+
 
 ### Plate layout two factors
 
