@@ -8,7 +8,9 @@
 #' @export
 #'
 #' @examples
+#'
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
+  # TODO: deprecate batch1 and batch2 properly (use `lifecycle`)
   # generate vars
   vars <- rlang::enquos(...)
   combinations <- .tbl %>%

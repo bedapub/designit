@@ -8,6 +8,7 @@
 #' @export
 #'
 #' @examples
+#'
 generate_terms <- function(.tbl, ...) {
   if (!tibble::is_tibble(.tbl)) .tbl <- tibble::as_tibble(.tbl)
   .tbl <- dplyr::select(.tbl, tidyselect::everything(), ...)
@@ -44,6 +45,7 @@ generate_terms <- function(.tbl, ...) {
 #' @export
 #'
 #' @examples
+#'
 drop_order <- function(.terms, m = -1) {
   if (m == -1) m <- max(attr(.terms, "order"))
   if (m < 2) stop("there are no interactions left in the model.", call. = FALSE)
@@ -58,6 +60,7 @@ drop_order <- function(.terms, m = -1) {
 #' @export
 #'
 #' @examples
+#'
 get_order <- function(.terms) {
   max(attr(.terms, "order"))
 }

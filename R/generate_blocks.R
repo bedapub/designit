@@ -20,7 +20,7 @@ generate_blocks <- function(.tbl,
                             .control = list()) {
   variables <- rlang::enquos(...)
   .tbl <- .tbl %>%
-    dplyr::mutate(.id_for_samples = 1:n())
+    dplyr::mutate(.id_for_samples = 1:dplyr::n())
   x <- .tbl %>%
     dplyr::select(..., .id_for_samples)
   mt <- generate_terms(x)
@@ -59,16 +59,16 @@ generate_blocks <- function(.tbl,
     dplyr::group_by(Block) %>%
     dplyr::mutate(OrderWithin = sample(OrderWithin)) %>%
     dplyr::ungroup()
-  res <- dplyr::left_join(.tbl, des_blk_tbl,
-                          by = c(
-                            sapply(variables, rlang::quo_name),
-                            ".id_for_samples")
-  ) %>%
+  res <- .tbl %>%
+    dplyr::left_join(des_blk_tbl,
+                     by = c(
+                       sapply(variables, rlang::quo_name),
+                       ".id_for_samples"
+                       )
+                     ) %>%
     dplyr::mutate(Block = stringr::str_c(.prefix,
-                                         stringr::str_remove(Block, "B")
-    ),
-    .id_for_samples = NULL
-    ) %>%
+                                         stringr::str_remove(Block, "B")),
+                  .id_for_samples = NULL) %>%
     dplyr::rename({{.name}} := Block)
   des$design <- NULL
   des$args.data <- NULL

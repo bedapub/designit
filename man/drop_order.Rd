@@ -17,3 +17,6 @@ drop_order(.terms, m = -1)
 \description{
 Drop highest order interactions
 }
+\examples{
+
+}
