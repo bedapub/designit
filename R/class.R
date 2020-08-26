@@ -268,9 +268,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @return Any extra results provided by the assignment function. E.g.,
     #' optimization trajectory or optimization score.
     assign_samples = function(samples = NULL,
-                                  assignment_function = assign_random,
-                                  assignment_function_args = list(),
-                                  random_seed = NULL) {
+                              assignment_function = assign_random,
+                              assignment_function_args = list(),
+                              random_seed = NULL) {
       assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
         msg = "samples argument is NULL"
       )
@@ -317,8 +317,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
         saved_seed <- NULL
       }
 
-      res <- do.call(assignment_function,
-                     c(list(samples, self), assignment_function_args))
+      res <- do.call(
+        assignment_function,
+        c(list(samples, self), assignment_function_args)
+      )
 
       assertthat::assert_that(is.list(res),
         msg = "Assignment function should return a list"
