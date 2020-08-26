@@ -16,12 +16,12 @@ R6 Class representing a batch container dimension.
 \item{\code{values}}{vector of dimension values.}
 
 \item{\code{weight}}{dimension weight. This can be interpreted
-by the sample distribution function.}
+by the sample assignment function.}
 
 \item{\code{parent_dimension}}{name of the parent dimension.
 E.g., plate rows and columns belong to the plate.
 However, there is no nesting between rows and columns.
-This could be used by a sample distribution function
+This could be used by a sample assignment function
 taking plate effect into account.}
 }
 \if{html}{\out{</div>}}

@@ -1,9 +1,9 @@
-#' Dummy distribution function which distributes samples randomly.
+#' Dummy assignment function which distributes samples randomly.
 #'
 #' @export
 #' @param samples data.frame with samples and unique .sample_id field.
 #' @param batch_container Instance of BatchContainer class
-distribute_random <- function(samples, batch_container) {
+assign_random <- function(samples, batch_container) {
   assertthat::assert_that(assertthat::has_name(samples, ".sample_id"))
 
   locations <- batch_container$locations_df
@@ -54,13 +54,13 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     values = NULL,
 
     #' @field weight dimension weight. This can be interpreted
-    #' by the sample distribution function.
+    #' by the sample assignment function.
     weight = NULL,
 
     #' @field parent_dimension name of the parent dimension.
     #' E.g., plate rows and columns belong to the plate.
     #' However, there is no nesting between rows and columns.
-    #' This could be used by a sample distribution function
+    #' This could be used by a sample assignment function
     #' taking plate effect into account.
     parent_dimension = NULL,
 
@@ -262,14 +262,14 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' General method for performing sample assignment.
     #'
     #' @param samples data.frame with samples and unique .sample_id field.
-    #' @param ditribution_function Function performing sample distribution
-    #' @param ditribution_function_args Arguments for the distribution function
+    #' @param assignment_function Function performing sample assignment
+    #' @param assignment_function_args Arguments for the assignment function
     #' @param random_seed If set will fix random seed and then return the original value
-    #' @return Any extra results provided by the distribution function. E.g.,
+    #' @return Any extra results provided by the assignment function. E.g.,
     #' optimization trajectory or optimization score.
-    distribute_samples = function(samples = NULL,
-                                  distribution_function = distribute_random,
-                                  distribution_function_args = list(),
+    assign_samples = function(samples = NULL,
+                                  assignment_function = assign_random,
+                                  assignment_function_args = list(),
                                   random_seed = NULL) {
       assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
         msg = "samples argument is NULL"
@@ -317,22 +317,22 @@ BatchContainer <- R6::R6Class("BatchContainer",
         saved_seed <- NULL
       }
 
-      res <- do.call(distribution_function,
-                     c(list(samples, self), distribution_function_args))
+      res <- do.call(assignment_function,
+                     c(list(samples, self), assignment_function_args))
 
       assertthat::assert_that(is.list(res),
-        msg = "Distribution function should return a list"
+        msg = "Assignment function should return a list"
       )
 
-      # distribution function should return a list.
-      # if l$assignment is NULL, it means that distribution was impossible
-      # distribution function can assign other member of the list such as
+      # assignment function should return a list.
+      # if l$assignment is NULL, it means that assignment was impossible
+      # assignment function can assign other member of the list such as
       # optimization trajectory, final score value, etc.
       if (!is.null(res$assignment)) {
         assertthat::assert_that(is.data.frame(res$assignment))
         assertthat::assert_that(nrow(res$assignment) == self$n_available,
           msg = stringr::str_c(
-            "Distribution function assingment should include all available locations. ",
+            "Assignment function assingment should include all available locations. ",
             "Empty location should have .sample_id equal to NA."
           )
         )
@@ -343,7 +343,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         res$assignment <- NULL
         private$samples <- samples
       } else {
-        warning("Sample distribution did not succeed")
+        warning("Sample assignment did not succeed")
       }
 
       invisible(res)

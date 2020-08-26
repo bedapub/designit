@@ -83,7 +83,7 @@ bc$locations_df
 #> 15     3 c          1
 #> 16     3 c          3
 
-bc$distribute_samples(samples, random_seed=1)
+bc$assign_samples(samples, random_seed=1)
 
 head(bc$get_samples())
 #> # A tibble: 6 x 6
@@ -104,7 +104,7 @@ bc$get_samples(remove_empty_locations=TRUE)
 #> 3     2 b          3 a     c     c
 
 # You can reassign samples starting from the current assignment.
-bc$distribute_samples(random_seed=2)
+bc$assign_samples(random_seed=2)
 head(bc$get_samples())
 #> # A tibble: 6 x 6
 #>   plate row   column a     b     c    
@@ -117,7 +117,7 @@ head(bc$get_samples())
 #> 6     2 a          3 a     a     b
 
 # Results should be reproducible if the seed is set.
-bc$distribute_samples(random_seed=1)
+bc$assign_samples(random_seed=1)
 bc$get_samples(remove_empty_locations=TRUE)
 #> # A tibble: 3 x 6
 #>   plate row   column a     b     c    
@@ -126,3 +126,7 @@ bc$get_samples(remove_empty_locations=TRUE)
 #> 2     2 a          1 a     b     b    
 #> 3     2 b          3 a     c     c
 ```
+
+## Examples
+
+See vignettes `vignette("basic_examples")`.
