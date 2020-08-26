@@ -8,6 +8,24 @@ R6 Class representing a batch container.
 
 R6 Class representing a batch container.
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{Main}}{scoring function used for optimization.}
+
+\item{\code{Additional}}{scoring functions to compute}
+}
+\if{html}{\out{</div>}}
+}
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{Main}}{scoring function used for optimization.}
+
+\item{\code{Additional}}{scoring functions to compute}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
@@ -15,6 +33,7 @@ R6 Class representing a batch container.
 \item \href{#method-has_samples}{\code{BatchContainer$has_samples()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
 \item \href{#method-assign_samples}{\code{BatchContainer$assign_samples()}}
+\item \href{#method-score}{\code{BatchContainer$score()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
 \item \href{#method-clone}{\code{BatchContainer$clone()}}
 }
@@ -103,6 +122,27 @@ General method for performing sample assignment.
 \subsection{Returns}{
 Any extra results provided by the assignment function. E.g.,
 optimization trajectory or optimization score.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-score"></a>}}
+\if{latex}{\out{\hypertarget{method-score}{}}}
+\subsection{Method \code{score()}}{
+Score current sample assignment,
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score(aux = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{aux}}{compute auxiliary scoring functions}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+In case \code{aux} is FALSE returns the value of the main scoring function.
+Otherwise a vector of all scoring functions starting from the first one.
 }
 }
 \if{html}{\out{<hr>}}

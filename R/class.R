@@ -157,6 +157,14 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 #' @export
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
+    #' @field
+    #' Main scoring function used for optimization.
+    scoring_f = NULL,
+
+    #' @field
+    #' Additional scoring functions to compute
+    aux_scoring_f = NULL,
+
     initialize = function(
                           dimensions,
                           interactions = FALSE,
@@ -351,6 +359,39 @@ BatchContainer <- R6::R6Class("BatchContainer",
       invisible(res)
     },
 
+    #' @description
+    #' Score current sample assignment,
+    #' @param aux compute auxiliary scoring functions
+    #' @return In case `aux` is FALSE returns the value of the main scoring function.
+    #' Otherwise a vector of all scoring functions starting from the first one.
+    score = function(aux = FALSE) {
+      assertthat::assert_that(assertthat::is.flag(aux), msg = "aux should be TRUE or FALSE")
+      assertthat::assert_that(!is.null(self$scoring_f),
+        msg = "Scoring function needs to be assigned"
+      )
+      assertthat::assert_that(!is.null(private$samples),
+        msg = "No samples in the batch container, cannot compute score"
+      )
+
+      res <- self$scoring_f(self)
+      assertthat::assert_that(assertthat::is.number(res),
+        msg = "Scoring function should return a single number"
+      )
+
+      if (aux) {
+        assertthat::assert_that(!is.null(self$aux_scoring_f) && is.list(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1,
+          msg = "Auxillary scoring functions should be a non-empty list"
+        )
+
+        aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(self))
+        assertthat::assert_that(is.double(aux_res))
+        assertthat::assert_that(length(aux_res) == length(self$aux_scoring_f))
+
+        res <- c(res, aux_res)
+      }
+
+      return(res)
+    },
 
     print = function(...) {
       cat(stringr::str_glue(
