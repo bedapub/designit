@@ -1,6 +1,6 @@
 #' Compute OSAT score for sample assignment.
 #'
-#' @param sample_assingment
+#' @param sample_assignment
 #' @param batch_vars
 #' @param feature_vars
 #' @param expected_df
@@ -25,12 +25,8 @@
 #'   batch_vars = vars(plate),
 #'   feature_vars = vars(SampleType, Race)
 #' )
-osat_score <- function(sample_assingment, batch_vars, feature_vars, expected_df = NULL) {
-  stopifnot(
-    is.list(batch_vars),
-    is.list(feature_vars)
-  )
-  assertthat::assert_that(is.data.frame(sample_assingment) && nrow(sample_assingment) > 0)
+osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df = NULL) {
+  assertthat::assert_that(is.data.frame(sample_assignment) && nrow(sample_assignment) > 0)
   special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
   special_col_names_str <- stringr::str_c(special_col_names, collapse = ", ")
   assertthat::assert_that(length(intersect(special_col_names, colnames(sample_assignment))) == 0,
@@ -38,13 +34,12 @@ osat_score <- function(sample_assingment, batch_vars, feature_vars, expected_df 
   )
   if (is.null(expected_df)) {
     batch_df <- sample_assignment %>%
-      select(!!!batch_vars) %>%
-      count(!!!batch_vars, name = ".n_batch") %>%
+      count(across({{ batch_vars }}), name = ".n_batch") %>%
       mutate(.freq_batch = .n_batch / sum(.n_batch)) %>%
       select(-.n_batch)
 
     features_df <- sample_assignment %>%
-      count(!!!feature_vars, name = ".n_samples") %>%
+      count(across({{ feature_vars }}), name = ".n_samples") %>%
       drop_na()
 
     expected_df <- crossing(batch_df, features_df) %>%
@@ -52,19 +47,15 @@ osat_score <- function(sample_assingment, batch_vars, feature_vars, expected_df 
       select(-.n_samples, -.freq_batch)
   } else {
     assertthat::assert_that(is.data.frame(expected_df) && nrow(expected_df) > 0)
-    expected_colnames <- c(feature_vars, batch_vars) %>%
-      map_chr(as_label) %>%
-      c(".n_expected") %>%
-      sort()
-    expected_colnames_str <- stringr::str_c(expected_colnames, collapse = ", ")
-    assertthat::assert_that(all(sort(colnames(expected_df)) == expected_colnames),
-      msg = glue::glue("expecting column names in expected_df: {expected_colnames_str}")
-    )
+    # I do not know how to check that columns parsed using tidy select are present
   }
+  join_col_names <- sample_assignment %>%
+    select(c({{ feature_vars }}, {{ batch_vars }})) %>%
+    names()
   score <- sample_assignment %>%
-    count(!!!feature_vars, !!!batch_vars, name = ".n") %>%
+    count(across(c({{ feature_vars }}, {{ batch_vars }})), name = ".n") %>%
     drop_na() %>%
-    full_join(expected_df, by = map_chr(c(feature_vars, batch_vars), as_label)) %>%
+    full_join(expected_df, by = join_col_names) %>%
     mutate(.n = replace_na(.n, 0)) %>%
     select(.n, .n_expected) %>%
     mutate(sq_diff = (.n - .n_expected)^2) %>%
