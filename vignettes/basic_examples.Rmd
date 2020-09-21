@@ -111,9 +111,11 @@ bc$exclude
 Use random assignment function to place samples to plate locations
 
 ```{r}
-bc$distribute_samples(samples = samples, 
-                      distribution_function = distribute_random, 
-                      random_seed = 42)
+bc$assign_samples(
+  samples = samples,
+  assignment_function = assign_random,
+  random_seed = 42
+)
 
 bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
