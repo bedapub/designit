@@ -32,7 +32,6 @@ R6 Class representing a batch container.
 \item \href{#method-new}{\code{BatchContainer$new()}}
 \item \href{#method-has_samples}{\code{BatchContainer$has_samples()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
-\item \href{#method-assign_samples}{\code{BatchContainer$assign_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
 \item \href{#method-clone}{\code{BatchContainer$clone()}}
@@ -90,38 +89,6 @@ from the result tibble.}
 }
 \subsection{Returns}{
 tibble with samples and sample assignment.
-General method for performing sample assignment.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-assign_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-assign_samples}{}}}
-\subsection{Method \code{assign_samples()}}{
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$assign_samples(
-  samples = NULL,
-  assignment_function = assign_random,
-  assignment_function_args = list(),
-  random_seed = NULL
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{samples}}{data.frame with samples and unique .sample_id field.}
-
-\item{\code{assignment_function}}{Function performing sample assignment}
-
-\item{\code{assignment_function_args}}{Arguments for the assignment function}
-
-\item{\code{random_seed}}{If set will fix random seed and then return the original value}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Any extra results provided by the assignment function. E.g.,
-optimization trajectory or optimization score.
 }
 }
 \if{html}{\out{<hr>}}

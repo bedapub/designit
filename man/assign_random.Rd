@@ -4,12 +4,12 @@
 \alias{assign_random}
 \title{Dummy assignment function which distributes samples randomly.}
 \usage{
-assign_random(samples, batch_container)
+assign_random(batch_container, samples = NULL)
 }
 \arguments{
-\item{samples}{data.frame with samples and unique .sample_id field.}
-
 \item{batch_container}{Instance of BatchContainer class}
+
+\item{samples}{data.frame with samples and unique .sample_id field.}
 }
 \description{
 Dummy assignment function which distributes samples randomly.
