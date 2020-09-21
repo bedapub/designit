@@ -379,12 +379,15 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
     locations_df = function(value) {
       if (missing(value)) {
-        private$dimensions %>%
+        ldf <- private$dimensions %>%
           purrr::map(~ .x$values) %>%
           expand.grid() %>%
           dplyr::arrange(dplyr::across(dplyr::everything())) %>%
-          tibble::as_tibble() %>%
-          dplyr::anti_join(self$exclude, by = self$dimension_names)
+          tibble::as_tibble()
+        if (!is.null(self$exclude)) {
+          ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
+        }
+        ldf
       } else {
         stop("Cannot set locations data.frame (read-only).")
       }
