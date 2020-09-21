@@ -3,25 +3,28 @@
 #' @export
 #' @param samples data.frame with samples and unique .sample_id field.
 #' @param batch_container Instance of BatchContainer class
-assign_random <- function(samples, batch_container) {
-  assertthat::assert_that(assertthat::has_name(samples, ".sample_id"))
+assign_random <- function(batch_container, samples = NULL) {
+  if (is.null(samples)) {
+    assertthat::assert_that(batch_container$has_samples(),
+      msg = "batch-container is empty and no samples provided"
+    )
+  } else {
+    batch_container$samples_df <- samples
+  }
 
-  locations <- batch_container$locations_df
+  n_samples <- nrow(batch_container$samples_df)
+  n_available <- batch_container$n_available
 
-  assertthat::assert_that(nrow(locations) >= nrow(samples))
-
-  n_samples <- nrow(samples)
+  assertthat::assert_that(n_available >= n_samples)
 
   expanded_ids <- c(
-    samples$.sample_id,
-    rep(NA_integer_, nrow(locations) - nrow(samples))
+    1:n_samples,
+    rep(NA_integer_, n_available - n_samples)
   )
 
-  locations$.sample_id <- sample(expanded_ids)
+  batch_container$assignment_vec <- sample(expanded_ids)
 
-  list(
-    assignment = locations
-  )
+  invisible(batch_container)
 }
 
 #' Validates sample data.frame.
@@ -225,20 +228,11 @@ BatchContainer <- R6::R6Class("BatchContainer",
       assertthat::assert_that(!is.null(private$samples),
         msg = "Cannot return samples for empty batch container."
       )
-      assertthat::assert_that(!is.null(private$assignment),
-        msg = "If samples are present they should be assigned to location in the batch container"
-      )
 
       assertthat::assert_that(names(private$samples)[ncol(private$samples)] == ".sample_id",
         msg = "Last column of private$samples should be .sample_id"
       )
-      assertthat::assert_that(names(private$assignment)[ncol(private$assignment)] == ".sample_id",
-        msg = "Last column of private$assignment should be .sample_id"
-      )
 
-      assertthat::assert_that(all(names(private$assignment)[-ncol(private$assignment)] == self$dimension_names),
-        msg = "private$assignment column names should match dimension names"
-      )
 
       assertthat::assert_that(assertthat::is.flag(assignment))
       assertthat::assert_that(assertthat::is.flag(include_id))
@@ -250,7 +244,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
       }
       if (assignment) {
-        res <- private$assignment %>%
+        private$validate_assignment(private$assignment)
+        res <- self$locations_df %>%
+          dplyr::mutate(.sample_id = private$assignment) %>%
           dplyr::left_join(private$samples, by = ".sample_id")
         if (remove_empty_locations) {
           res <- res %>%
@@ -267,97 +263,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       res
     },
 
-    #' General method for performing sample assignment.
-    #'
-    #' @param samples data.frame with samples and unique .sample_id field.
-    #' @param assignment_function Function performing sample assignment
-    #' @param assignment_function_args Arguments for the assignment function
-    #' @param random_seed If set will fix random seed and then return the original value
-    #' @return Any extra results provided by the assignment function. E.g.,
-    #' optimization trajectory or optimization score.
-    assign_samples = function(samples = NULL,
-                              assignment_function = assign_random,
-                              assignment_function_args = list(),
-                              random_seed = NULL) {
-      assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
-        msg = "samples argument is NULL"
-      )
-
-      assertthat::assert_that(!(!is.null(samples) && !is.null(private$samples)),
-        msg = stringr::str_c(
-          "Batch container already has samples, cannot assign new samples table. ",
-          "You can however continue optimization for samples in the container."
-        )
-      )
-
-      if (!is.null(samples)) {
-        validate_samples(samples)
-
-        assertthat::assert_that(nrow(samples) <= self$n_available,
-          msg = "More samples than availble locations in the batch container"
-        )
-
-        assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
-          msg = "Some of the samples columns match batch container dimension names"
-        )
-
-        assertthat::assert_that(!".sample_id" %in% colnames(samples),
-          msg = "Samples data.frame has a column with reserved name .sample_id"
-        )
-
-        samples$.sample_id <- 1:nrow(samples)
-      } else {
-        samples <- private$samples
-
-        assertthat::assert_that(".sample_id" %in% colnames(samples))
-      }
-
-      if (!is.null(random_seed)) {
-        if (!exists(".Random.seed")) {
-          set.seed(NULL)
-        }
-        saved_seed <- .Random.seed
-        on.exit({
-          .Random.seed <<- saved_seed
-        })
-        set.seed(random_seed)
-      } else {
-        saved_seed <- NULL
-      }
-
-      res <- do.call(
-        assignment_function,
-        c(list(samples, self), assignment_function_args)
-      )
-
-      assertthat::assert_that(is.list(res),
-        msg = "Assignment function should return a list"
-      )
-
-      # assignment function should return a list.
-      # if l$assignment is NULL, it means that assignment was impossible
-      # assignment function can assign other member of the list such as
-      # optimization trajectory, final score value, etc.
-      if (!is.null(res$assignment)) {
-        assertthat::assert_that(is.data.frame(res$assignment))
-        assertthat::assert_that(nrow(res$assignment) == self$n_available,
-          msg = stringr::str_c(
-            "Assignment function assingment should include all available locations. ",
-            "Empty location should have .sample_id equal to NA."
-          )
-        )
-        assertthat::assert_that(names(res$assignment)[ncol(res$assignment)] == ".sample_id",
-          msg = "Last column of sample assignment should be .sample_id"
-        )
-        private$assignment <- res$assignment
-        res$assignment <- NULL
-        private$samples <- samples
-      } else {
-        warning("Sample assignment did not succeed")
-      }
-
-      invisible(res)
-    },
 
     #' @description
     #' Score current sample assignment,
@@ -415,7 +320,19 @@ BatchContainer <- R6::R6Class("BatchContainer",
     samples = NULL,
     #' @description
     #' Tibble with sample ids and assignment to batch container locations.
-    assignment = NULL
+    assignment = NULL,
+    validate_assignment = function(assignment) {
+      assertthat::assert_that(is.integer(assignment),
+        msg = "sample assignment should an integer vector"
+      )
+      assertthat::assert_that(length(assignment) == self$n_available,
+        msg = "sample assignment length doesn't match the number of available locations"
+      )
+      assertthat::assert_that(!any(duplicated(na.omit(assignment))))
+      assertthat::assert_that(length(intersect(1:nrow(self$samples_df), na.omit(assignment))) == sum(!is.na(assignment)),
+        msg = "sample assignment does not match sample_ids (1..N_samples)"
+      )
+    }
   ),
 
   active = list(
@@ -511,6 +428,51 @@ BatchContainer <- R6::R6Class("BatchContainer",
         }
 
         private$exclude_df <- tibble::as_tibble(value)
+      }
+    },
+
+    #' @description
+    #' Samples in the batch container.
+    #' When assigning data.frame should not have column named .sample_id column.
+    samples_df = function(samples) {
+      if (missing(samples)) {
+        private$samples
+      } else {
+        assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
+          msg = "samples argument is NULL"
+        )
+
+        assertthat::assert_that(is.null(private$samples),
+          msg = stringr::str_c("batch container already has samples")
+        )
+
+        validate_samples(samples)
+
+        assertthat::assert_that(nrow(samples) <= self$n_available,
+          msg = "more samples than availble locations in the batch container"
+        )
+
+        assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
+          msg = "some of the samples columns match batch container dimension names"
+        )
+
+        assertthat::assert_that(!".sample_id" %in% colnames(samples),
+          msg = "samples data.frame has a column with reserved name .sample_id"
+        )
+
+        samples$.sample_id <- 1:nrow(samples)
+
+        private$samples <- samples
+      }
+    },
+    #' @description
+    #' Sample assignment vector. Should contain NAs for empty spaces.
+    assignment_vec = function(assignment) {
+      if (missing(assignment)) {
+        return(private$assignment)
+      } else {
+        private$validate_assignment(assignment)
+        private$assignment <- assignment
       }
     }
   )
