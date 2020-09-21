@@ -60,17 +60,20 @@ bc$n_excluded
 bc$n_available
 bc$locations_df
 
-bc$assign_samples(samples, random_seed=1)
+set.seed(1)
+assign_random(bc, samples)
 
 head(bc$get_samples())
 bc$get_samples(remove_empty_locations=TRUE)
 
 # You can reassign samples starting from the current assignment.
-bc$assign_samples(random_seed=2)
+set.seed(2)
+assign_random(bc)
 head(bc$get_samples())
 
 # Results should be reproducible if the seed is set.
-bc$assign_samples(random_seed=1)
+set.seed(1)
+assign_random(bc)
 bc$get_samples(remove_empty_locations=TRUE)
 ```
 
