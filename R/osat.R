@@ -63,3 +63,73 @@ osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df 
     sum()
   list(score = score, expected_df = expected_df)
 }
+
+
+#' Compute OSAT score for sample assignment. This implementation is using datatable.
+#'
+#' @param sample_assignment
+#' @param batch_vars
+#' @param feature_vars
+#' @param expected_df
+#'
+#' @return a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
+#' @export
+#'
+#' @examples
+#' sample_assignment <- tibble::tribble(
+#'   ~ID, ~SampleType, ~Race, ~plate,
+#'   1, "Case", "Hispanic", 1,
+#'   2, "Case", "Hispanic", 1,
+#'   3, "Case", "European", 2,
+#'   4, "Control", "Hispanic", 2,
+#'   5, "Control", "European", 1,
+#'   6, "Control", "European", 2,
+#'   NA, NA, NA, 1,
+#'   NA, NA, NA, 2,
+#' )
+#'
+#' osat_score_datatable(sample_assignment,
+#'   batch_vars = "plate",
+#'   feature_vars = c("SampleType", "Race")
+#' )
+osat_score_datatable <- function(df, batch_vars, feature_vars, expected_df = NULL) {
+  stopifnot(
+    is.character(batch_vars),
+    is.character(feature_vars)
+  )
+  assertthat::assert_that(is.data.frame(df) && nrow(df) > 0)
+  special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
+  special_col_names_str <- stringr::str_c(special_col_names, collapse = ", ")
+  assertthat::assert_that(length(intersect(special_col_names, colnames(df))) == 0,
+    msg = glue::glue("special names ({special_col_names_str}) cannot be used as column names")
+  )
+  if (is.null(expected_df)) {
+    batch_df <- df[, .(.n_batch = .N), by = batch_vars]
+    batch_df[, .freq_batch := .n_batch / sum(.n_batch), .SD]
+    batch_df[, .n_batch := NULL]
+
+    features_df <- na.omit(df)[, .(.n_samples = .N), by = feature_vars]
+
+    # https://stackoverflow.com/a/14165493
+    expected_df <- data.table::setkey(batch_df[, c(k = 1, .SD)], k)[features_df[, c(k = 1, .SD)], allow.cartesian = TRUE][, k := NULL]
+    expected_df[, .n_expected := .n_samples * .freq_batch]
+    expected_df[, c(".n_samples", ".freq_batch") := NULL]
+
+    data.table::setkeyv(expected_df, c(batch_vars, feature_vars))
+  } else {
+    assertthat::assert_that(is.data.frame(expected_df) && nrow(expected_df) > 0)
+    expected_colnames <- c(feature_vars, batch_vars) %>%
+      c(".n_expected") %>%
+      sort()
+    expected_colnames_str <- stringr::str_c(expected_colnames, collapse = ", ")
+    assertthat::assert_that(all(sort(colnames(expected_df)) == expected_colnames),
+      msg = glue::glue("expecting column names in expected_df: {expected_colnames_str}")
+    )
+  }
+  sample_count_df <- na.omit(df)[, .N, by = c(feature_vars, batch_vars)]
+  data.table::setkeyv(sample_count_df, c(feature_vars, batch_vars))
+  merged_df <- merge(sample_count_df, expected_df, all = TRUE)
+  merged_df[is.na(N), N := 0]
+  score <- with(merged_df, sum((N - .n_expected)^2))
+  list(score = score, expected_df = expected_df)
+}
