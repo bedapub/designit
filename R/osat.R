@@ -74,6 +74,7 @@ osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df 
 #'
 #' @return a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
 #' @export
+#' @import data.table
 #'
 #' @examples
 #' sample_assignment <- tibble::tribble(
@@ -105,7 +106,7 @@ osat_score_datatable <- function(df, batch_vars, feature_vars, expected_df = NUL
   )
   if (is.null(expected_df)) {
     batch_df <- df[, .(.n_batch = .N), by = batch_vars]
-    batch_df[, .freq_batch := .n_batch / sum(.n_batch), .SD]
+    batch_df[, .freq_batch := .n_batch / sum(.n_batch), data.table::.SD]
     batch_df[, .n_batch := NULL]
 
     features_df <- na.omit(df)[, .(.n_samples = .N), by = feature_vars]
