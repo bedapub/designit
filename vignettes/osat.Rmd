@@ -1,0 +1,278 @@
+---
+title: "OSAT and scoring function"
+output: rmarkdown::html_vignette
+params:
+  iterations: 1000
+vignette: >
+  %\VignetteIndexEntry{Basic examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE,
+  fig.width=6,
+  fig.height=6
+)
+```
+
+```{r setup}
+library(designit)
+library(tidyverse)
+requireNamespace("OSAT")
+```
+
+Loading samples. We add two dummy columns to demonstrate how to choose batch columns of interest.
+```{r}
+osat_data_path <- system.file("extdata", package = "OSAT")
+samples <- read_tsv(file.path(osat_data_path, "samples.txt"),
+  col_types = cols(SampleType = col_factor(), Race = col_factor(), AgeGrp = col_factor())
+) %>%
+  mutate(dummy_var1 = rnorm(n()), dummy_var2 = str_c(SampleType, Race, sep = " "))
+```
+
+# Running OSAT optimization
+Here we use OSAT to optimize setup.
+```{r}
+gs <- OSAT::setup.sample(samples, optimal = c("SampleType", "Race", "AgeGrp"))
+
+gc <- OSAT::setup.container(OSAT::IlluminaBeadChip96Plate, 7, batch = "plates")
+
+set.seed(1234)
+
+bench::system_time(
+  g_setup <- OSAT::create.optimized.setup(sample = gs, container = gc, nSim = params$iterations)
+)
+
+OSAT::QC(g_setup)
+```
+
+Saving starting point of optimization
+```{r}
+set.seed(1234)
+
+g_setup_start <- OSAT::create.optimized.setup(sample = gs, container = gc, nSim = 1) %>%
+  OSAT::get.experiment.setup()
+```
+
+
+Visualize various batch factors. OSAT score is optimized only for `plates` in this case.
+```{r}
+OSAT::get.experiment.setup(g_setup) %>%
+  select(AgeGrp, plates, chipRows, chipColumns, chips, rows, columns, wells) %>%
+  pivot_longer(-AgeGrp) %>%
+  count(AgeGrp, value, name) %>%
+  ggplot(aes(AgeGrp, n, fill = factor(value))) +
+  geom_col(position = "dodge") +
+  facet_wrap(~name, scales = "free_y")
+```
+
+## Visualize for plates
+```{r}
+plot_batch <- function(df) {
+  df %>%
+    select(plates, SampleType, Race, AgeGrp) %>%
+    pivot_longer(c(SampleType, Race, AgeGrp), names_to = "variable", values_to = "level") %>%
+    count(plates, variable, level) %>%
+    ggplot(aes(level, n, fill = factor(plates))) +
+    geom_col(position = "dodge") +
+    facet_wrap(~variable, scales = "free", ncol=1)
+}
+```
+
+Before the optimization.
+```{r}
+g_setup_start %>% plot_batch()
+```
+
+After the optimization.
+```{r}
+OSAT::get.experiment.setup(g_setup) %>%
+  plot_batch()
+```
+
+
+# Compare scores with various implementations
+Compare OSAT score generated using various methods.
+```{r}
+# scores using tidy implementation
+OSAT::getLayout(gc) %>%
+  left_join(OSAT::get.experiment.setup(g_setup)) %>%
+  osat_score(plates, c(SampleType, Race, AgeGrp)) %>%
+  .$score
+
+# scores using datatable implementation
+OSAT::getLayout(gc) %>%
+  left_join(OSAT::get.experiment.setup(g_setup)) %>%
+  data.table::data.table() %>%
+  osat_score_datatable("plates", c("SampleType", "Race", "AgeGrp")) %>%
+  .$score
+
+# score using OSAT
+g_setup@metadata$optValue %>% tail(1)
+```
+
+
+# Run using BatchContainer
+First let's create a BatchContainer with same dimensions.
+```{r}
+bc <- BatchContainer$new(
+  dimensions = c(plates = 7, chips = 8, rows = 6, columns = 2)
+)
+bc
+
+bc$n_available
+```
+
+Assign samples and get initial setup.
+```{r}
+bc$samples_df <- samples
+
+starting_assignment <- bc$locations_df %>%
+  left_join(g_setup_start) %>%
+  pull(ID) %>%
+  as.integer()
+
+bc$assignment_vec <- starting_assignment
+
+bc$get_samples(remove_empty_locations = TRUE) %>%
+  plot_batch()
+```
+
+## Simple OSAT score implementation
+```{r}
+bc$scoring_f <- function(bc) osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$score
+
+bc$score()
+g_setup@metadata$optValue %>% head(1)
+# should be identical
+
+bench::system_time({
+  set.seed(123)
+  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+})
+```
+
+```{r}
+# final score
+bc$score()
+plot(trace, main = str_glue("Final score={bc$score()}"))
+bc$get_samples(remove_empty_locations = TRUE) %>%
+  plot_batch()
+```
+## Optimization
+
+### Cache `expected_df`
+```{r}
+bc$assignment_vec <- starting_assignment
+
+# precompute expected_df
+edf <- osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$expected_df
+
+bc$scoring_f <- function(bc) osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
+
+bench::system_time({
+  set.seed(123)
+  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+})
+```
+
+### Using `data.table` implementation
+```{r}
+bc$assignment_vec <- starting_assignment
+
+# precompute expected_df
+edf <- osat_score_datatable(data.table::data.table(bc$get_samples()), "plates", c("SampleType", "Race", "AgeGrp"))$expected_df
+
+bc$scoring_f <- function(bc) osat_score_datatable(data.table::data.table(bc$get_samples()), "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
+
+bench::system_time({
+  set.seed(123)
+  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+})
+```
+
+### Replace `get_samples`
+```{r}
+bc$assignment_vec <- starting_assignment
+
+fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
+  ldf <- data.table::data.table(bc$locations_df)[, c("plates")][, ".sample_id" := bc$assignment_vec]
+  fcols <- c(".sample_id", feature_vars)
+  smp <- data.table::data.table(bc$samples_df)[, ..fcols]
+  df <- smp[ldf, on = ".sample_id"]
+
+  v <- osat_score_datatable(df, batch_vars, feature_vars)
+  edf <- v$expected_df
+  current_score <- v$score
+  scores <- numeric(length = iterations)
+  n_avail <- nrow(df)
+
+  for (i in 1:iterations) {
+    repeat {
+      pos <- sample(n_avail, 2)
+
+      # does not make sense to shuffle NAs
+      if (any(!is.na(df[pos, feature_vars[1]]))) {
+        break
+      }
+    }
+
+    val <- df[c(pos[2], pos[1]), fcols, with = FALSE]
+    df[c(pos[1], pos[2]), (fcols) := val]
+
+    new_score <- osat_score_datatable(df, batch_vars, feature_vars, edf)$score
+    if (new_score <= current_score) {
+      current_score <- new_score
+    } else {
+      df[c(pos[2], pos[1]), (fcols) := val]
+    }
+
+    scores[i] <- current_score
+  }
+
+  bc$assignment_vec <- df$.sample_id
+
+  scores
+}
+
+bench::system_time({
+  set.seed(123)
+  trace <- fast_osat_optimize(bc, "plates", c("SampleType", "Race", "AgeGrp"), iterations = params$iterations)
+})
+```
+
+
+# Score demonstration
+```{r}
+bc$score()
+bc$scoring_f <- function(...) rnorm(1)
+bc$score()
+```
+
+```{r}
+assign_random(bc)
+
+bc$get_samples()
+bc$get_samples(remove_empty_locations = TRUE)
+
+bc$score()
+bc$score(aux = TRUE)
+
+bc$aux_scoring_f <- list(
+  function(...) rnorm(1, 100),
+  function(...) -7
+)
+
+bc$scoring_f <- function(bc) rnorm(1) + 2 * rexp(1)
+
+bc$aux_scoring_f <- list(
+  fc1 = function(...) rnorm(1, 100),
+  fc2 = function(...) -7
+)
+
+bc$score(aux = TRUE)
+```
