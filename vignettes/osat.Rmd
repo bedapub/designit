@@ -163,6 +163,7 @@ plot(trace, main = str_glue("Final score={bc$score()}"))
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
 ```
+
 ## Optimization
 
 ### Cache `expected_df`
