@@ -1,10 +1,10 @@
 ---
-title: "OSAT and scoring function"
+title: "OSAT and scoring functions"
 output: rmarkdown::html_vignette
 params:
   iterations: 1000
 vignette: >
-  %\VignetteIndexEntry{Basic examples}
+  %\VignetteIndexEntry{OSAT and scoring functions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
