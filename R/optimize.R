@@ -6,8 +6,19 @@ swap_elements <- function(vec, pos) {
   vec
 }
 
-#' @description
 #' Shuffles samples trying to improve the scoring function.
+#'
+#' In every iteration shuffles several samples in the container. If the `bc$score()` worsens,
+#' reverts to the previous state.
+#'
+#' @param batch_container An instance of `BatchContainer`.
+#' @param samples A `data.frame` with sample information. Should be `NULL` if the `BatchContainer`
+#' already has samples in it.
+#' @param n_shuffle Number of elements to swap in every iteration. *Note*: at the moment only 2 is
+#' supported.
+#' @param iterations Number of iterations.
+#' @return A matrix with scores. Every row is an iteration. The matrix size is
+#' `c(iterations, 1 + length(bc$aux_scoring_f))`.
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = 2, iterations = 1000) {
   if (is.null(samples)) {
