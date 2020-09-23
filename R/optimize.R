@@ -35,7 +35,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   assertthat::assert_that(n_shuffle == 2, msg = "n_shuffle > 2 not implemented yet")
 
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
-  current_score <- batch_container$score(aux=TRUE)
+  current_score <- batch_container$score(aux = TRUE)
   scores <- matrix(0, nrow = iterations, ncol = length(current_score), dimnames = list(NULL, names(current_score)))
 
   for (i in 1:iterations) {
