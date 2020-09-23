@@ -283,9 +283,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "Scoring function should return a single number"
       )
 
-      if (aux) {
-        assertthat::assert_that(!is.null(self$aux_scoring_f) && is.list(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1,
-          msg = "Auxillary scoring functions should be a non-empty list"
+      if (aux && !is.null(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1) {
+        assertthat::assert_that(is.list(self$aux_scoring_f),
+          msg = "auxillary scoring functions should be a list"
         )
 
         aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(self))
