@@ -12,10 +12,22 @@ osat_score_tibble(
 )
 }
 \arguments{
-\item{expected_df}{}
+\item{sample_assignment}{\code{tibble} or \code{data.frame} where every row is a location
+in a container and a sample in this location.}
+
+\item{batch_vars}{vector with batch variables to take into account for the
+score computation.}
+
+\item{feature_vars}{vector with sample variables to take into account for
+score comptutation.}
+
+\item{expected_df}{A \code{tibble} with expected number of samples sample variables and
+batch variables combination. This is not required, however it does not change during the
+optimization proccess. So it is a good idea to cache this value.}
 }
 \value{
-a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
+a list with two attributes: res$score (numeric score value), res$expected_df
+(expected counts \code{tibble} for potential)
 }
 \description{
 Compute OSAT score for sample assignment. This implementation uses tibble.

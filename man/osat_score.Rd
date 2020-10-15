@@ -4,13 +4,25 @@
 \alias{osat_score}
 \title{Compute OSAT score for sample assignment.}
 \usage{
-osat_score(df, batch_vars, feature_vars, expected_df = NULL)
+osat_score(df, batch_vars, feature_vars, expected_dt = NULL)
 }
 \arguments{
-\item{expected_df}{}
+\item{batch_vars}{\code{character} vector with batch variable names to take into account for the
+score computation.}
+
+\item{feature_vars}{\code{character} vector with sample variable names to take into account for
+score comptation.}
+
+\item{expected_dt}{A \code{data.table} with expected number of samples sample variables and
+batch variables combination. This is not required, however it does not change during the
+optimization proccess. So it is a good idea to cache this value.}
+
+\item{sample_assignment}{\code{data.table} or \code{data.frame} where every row is a location
+in a container and a sample in this location.}
 }
 \value{
-a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
+a list with two attributes: \code{$score} (numeric score value), \code{$expected_dt}
+(expected counts \code{data.table} for reuse)
 }
 \description{
 Compute OSAT score for sample assignment.

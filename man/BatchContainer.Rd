@@ -4,25 +4,76 @@
 \alias{BatchContainer}
 \title{R6 Class representing a batch container.}
 \description{
-R6 Class representing a batch container.
+Describes container dimensions and samples to container location assignment.
+}
+\details{
+A typical workflow starts with creating a \code{BatchContainer}. Then
+samples can be assigned to locations in that container.
+}
+\examples{
 
-R6 Class representing a batch container.
+## ------------------------------------------------
+## Method `BatchContainer$new`
+## ------------------------------------------------
+
+bc <- BatchContainer$new(
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+)
+
+bc
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{Main}}{scoring function used for optimization.}
+\item{\code{scoring_f}}{Main scoring function used for optimization.
+Scoring function should receive a \code{data.table} with columns from
+the samples \code{data.frame}, locations \code{data.frame}, and
+\code{.sample_id} column. This function should return a floating
+point score value for the assignment.}
 
-\item{\code{Additional}}{scoring functions to compute}
+\item{\code{aux_scoring_f}}{Additional scoring functions to compute.}
 }
 \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
-\item{\code{Main}}{scoring function used for optimization.}
+\item{\code{n_locations}}{Returns number of available locations in a \code{BatchContainer}.
+This field cannot be assigned.}
 
-\item{\code{Additional}}{scoring functions to compute}
+\item{\code{n_excluded}}{Returns number of excluded locations in a \code{BatchContainer}.
+This field cannot be assigned.}
+
+\item{\code{n_available}}{Returns number of available locations in a \code{BatchContainer}.
+This field cannot be assigned.}
+
+\item{\code{n_dimension}}{Returns number of dimensions in a \code{BatchContainer}.
+This field cannot be assigned.}
+
+\item{\code{dimension_names}}{\code{character} vector with dimension names.
+This field cannot be assigned.}
+
+\item{\code{locations_df}}{Get a \code{tibble} with all the locations in a \code{BatchContainer}.
+This field cannot be assigned.}
+
+\item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
+
+\item{\code{samples_df}}{Samples in the batch container.
+When assigning data.frame should not have column named .sample_id column.}
+
+\item{\code{samples_dt}}{Sample assignment \code{data.table}.
+This data.table includes columns for all the \code{BatchContainer}
+locations, all the samples and a \code{".sample_id"} column.
+
+The most efficient way of updating this \code{data.table} is using
+the \code{BatchContainer$exchange_samples()} method.}
+
+\item{\code{assignment_vec}}{Sample assignment vector. Should contain NAs for empty locations.}
 }
 \if{html}{\out{</div>}}
 }
@@ -42,13 +93,38 @@ R6 Class representing a batch container.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+Create a new BatchContainer object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(
-  dimensions,
-  interactions = FALSE,
-  interaction_weights = NULL,
-  exclude = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(dimensions, exclude = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{dimensions}}{A vector or list of dimensions. Every dimension
+should have a name. Could be an integer vector of dimensions or
+a named list. Every value of a list could be either dimension size
+or parameters for \code{BatchContainerDimension$new()}.}
+
+\item{\code{exclude}}{\code{data.frame} with excluded locations of a container.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{bc <- BatchContainer$new(
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+)
+
+bc
+}
+\if{html}{\out{</div>}}
+
 }
 
 }
@@ -105,6 +181,9 @@ Exchange samples between locations
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{src}}{integer vector of source locations}
+
+\item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).
+If NULL, generated from \code{src}: \code{src[c(2:length(src), 1)]}.}
 }
 \if{html}{\out{</div>}}
 }
@@ -134,6 +213,13 @@ Otherwise a vector of all scoring functions starting from the first one.
 \if{html}{\out{<a id="method-print"></a>}}
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
+Prints information about \code{BatchContainer}.
+List of BatchContainerDimension elements.
+Tibble with excluded locations.
+Tibble with sample information and sample ids.
+Tibble with sample ids and assignment to batch container locations.
+Cached data.table with samples assignment.
+Validate sample assignment.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
 }

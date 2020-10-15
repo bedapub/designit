@@ -9,7 +9,7 @@ assign_random(batch_container, samples = NULL)
 \arguments{
 \item{batch_container}{Instance of BatchContainer class}
 
-\item{samples}{data.frame with samples and unique .sample_id field.}
+\item{samples}{data.frame with samples.}
 }
 \description{
 Dummy assignment function which distributes samples randomly.
