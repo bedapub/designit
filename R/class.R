@@ -1,7 +1,7 @@
 #' Dummy assignment function which distributes samples randomly.
 #'
 #' @export
-#' @param samples data.frame with samples and unique .sample_id field.
+#' @param samples data.frame with samples.
 #' @param batch_container Instance of BatchContainer class
 assign_random <- function(batch_container, samples = NULL) {
   if (is.null(samples)) {

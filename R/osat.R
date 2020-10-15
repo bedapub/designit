@@ -1,9 +1,14 @@
 #' Compute OSAT score for sample assignment. This implementation uses tibble.
 #'
-#' @param sample_assignment
-#' @param batch_vars
-#' @param feature_vars
-#' @param expected_df
+#' @param sample_assignment \code{data.table} or \code{data.frame} where every row is a location
+#' in a container and a sample in this location.
+#' @param batch_vars \code{character} vector with batch variable names to take into account for the
+#' score computation.
+#' @param feature_vars \code{character} vector with sample variable names to take into account for
+#' score comptutation.
+#' @param expected_df A \code{data.table} with expected number of samples sample variables and
+#' batch variables combination. This is not required, however it does not change during the
+#' optimization proccess. So it is a good idea to cache this value.
 #'
 #' @return a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
 #'
