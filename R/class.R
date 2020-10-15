@@ -157,17 +157,45 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 
 #' R6 Class representing a batch container.
 #'
+#' @description
+#' Describes container dimensions and samples to container location assignment.
+#'
+#' @details
+#' A typical workflow starts with creating a \code{BatchContainer}. Then
+#' samples can be assigned to locations in that container.
+#'
 #' @export
+
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
-    #' @field
+    #' @field scoring_f
     #' Main scoring function used for optimization.
     scoring_f = NULL,
 
-    #' @field
+    #' @field aux_scoring_f
     #' Additional scoring functions to compute
     aux_scoring_f = NULL,
 
+    #' @description
+    #' Create a new BatchContainer object.
+    #' @param dimensions A vector or list of dimensions. Every dimension
+    #' should have a name. Could be an integer vector of dimensions or
+    #' a named list. Every value of a list could be either dimension size
+    #' or parameters for \code{BatchContainerDimension$new()}.
+    #' @param interactions deprecated
+    #' @param interaction_weights deprecated
+    #' @param exclude \code{data.frame} with excluded locations of a container.
+    #' @examples
+    #' bc <- BatchContainer$new(
+    #'   dimensions = list(
+    #'     "plate" = 3,
+    #'     "row" = list(values = letters[1:3]),
+    #'     "column" = list(values = c(1, 3))
+    #'   ),
+    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+    #' )
+    #'
+    #' bc
     initialize = function(
                           dimensions,
                           interactions = FALSE,
@@ -267,7 +295,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Exchange samples between locations
     #' @param src integer vector of source locations
     #' @param dst integer vector of destination locations (the same length as \code{src}).
-    #' If NULL, generated from \code{src}: \code{src[c(2:length(src), 1)].
+    #' If NULL, generated from \code{src}: \code{src[c(2:length(src), 1)]}.
     exchange_samples = function(src, dst = NULL) {
       assertthat::assert_that(is.integer(src),
         msg = "src should be integer vector"
@@ -324,6 +352,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
       return(res)
     },
 
+    #' @description
+    #' Prints information about \code{BatchContainer}.
     print = function(...) {
       cat(stringr::str_glue(
         "Batch container with {self$n_locations} locations and {self$n_excluded} excluded.\n",
@@ -499,8 +529,14 @@ BatchContainer <- R6::R6Class("BatchContainer",
         private$samples_dt_cache <- NULL
       }
     },
+
     #' @description
-    #' Sample assignment data.table.
+    #' Sample assignment \code{data.table}.
+    #' This data.table includes columns for all the \code{BatchContainer}
+    #' locations, all the samples and a \code{".sample_id"} column.
+    #'
+    #' The most efficient way of updating this \code{data.table} is using
+    #' the \code{$exchange_samples()} method.
     samples_dt = function(value) {
       if (missing(value)) {
         if (is.null(private$samples_dt_cache)) {
@@ -513,8 +549,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stop("samples_dt is read-only.")
       }
     },
+
     #' @description
-    #' Sample assignment vector. Should contain NAs for empty spaces.
+    #' Sample assignment vector. Should contain NAs for empty locations.
     assignment_vec = function(assignment) {
       if (missing(assignment)) {
         return(private$assignment)
