@@ -21,6 +21,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(designit)
+library(data.table)
 library(tidyverse)
 requireNamespace("OSAT")
 ```
