@@ -278,7 +278,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "No samples in the batch container, cannot compute score"
       )
 
-      samples <- self$get_samples()
+      samples <- self$samples_dt
       res <- self$scoring_f(samples)
       assertthat::assert_that(assertthat::is.number(res),
         msg = "Scoring function should return a single number"
@@ -322,6 +322,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @description
     #' Tibble with sample ids and assignment to batch container locations.
     assignment = NULL,
+    #' @description
+    #' Cached data.table with samples assignment.
+    samples_dt_cache = NULL,
     validate_assignment = function(assignment) {
       assertthat::assert_that(is.integer(assignment),
         msg = "sample assignment should an integer vector"
@@ -467,6 +470,22 @@ BatchContainer <- R6::R6Class("BatchContainer",
         samples$.sample_id <- 1:nrow(samples)
 
         private$samples <- samples
+
+        private$samples_dt_cache <- NULL
+      }
+    },
+    #' @description
+    #' Sample assignment data.table.
+    samples_dt = function(value) {
+      if (missing(value)) {
+        if (is.null(private$samples_dt_cache)) {
+          private$samples_dt_cache <- data.table::data.table(
+            self$get_samples(include_id = TRUE)
+          )
+        }
+        private$samples_dt_cache
+      } else {
+        stop("samples_dt is read-only.")
       }
     },
     #' @description
@@ -477,6 +496,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       } else {
         private$validate_assignment(assignment)
         private$assignment <- assignment
+        private$samples_dt_cache <- NULL
       }
     }
   )
