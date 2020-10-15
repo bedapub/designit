@@ -69,7 +69,7 @@ generate_blocks <- function(.tbl,
     dplyr::mutate(Block = stringr::str_c(.prefix,
                                          stringr::str_remove(Block, "B")),
                   .id_for_samples = NULL) %>%
-    dplyr::rename({{.name}} := Block)
+    dplyr::rename(rlang::`:=`({{.name}}, Block))
   des$design <- NULL
   des$args.data <- NULL
   des_blk$design <- NULL

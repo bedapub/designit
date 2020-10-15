@@ -93,6 +93,7 @@ osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df 
 #'   batch_vars = "plate",
 #'   feature_vars = c("SampleType", "Race")
 #' )
+#' @importFrom data.table :=
 osat_score_datatable <- function(df, batch_vars, feature_vars, expected_df = NULL) {
   stopifnot(
     is.character(batch_vars),
