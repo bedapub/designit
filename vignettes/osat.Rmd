@@ -186,10 +186,10 @@ bench::system_time({
 ```{r}
 bc$assignment_vec <- starting_assignment
 
-# precompute expected_df
-edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_df
+# precompute expected_dt
+edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
 
-bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
+bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
 
 bench::system_time({
   set.seed(123)
@@ -208,7 +208,7 @@ fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
   df <- smp[ldf, on = ".sample_id"]
 
   v <- osat_score(df, batch_vars, feature_vars)
-  edf <- v$expected_df
+  edf <- v$expected_dt
   current_score <- v$score
   scores <- numeric(length = iterations)
   n_avail <- nrow(df)
