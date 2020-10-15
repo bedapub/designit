@@ -265,15 +265,15 @@ bc$score()
 bc$score(aux = TRUE)
 
 bc$aux_scoring_f <- list(
-  function(...) rnorm(1, 100),
-  function(...) -7
+  function(samples) rnorm(1, 100),
+  function(samples) -7
 )
 
-bc$scoring_f <- function(bc) rnorm(1) + 2 * rexp(1)
+bc$scoring_f <- function(samples) rnorm(1) + 2 * rexp(1)
 
 bc$aux_scoring_f <- list(
-  fc1 = function(...) rnorm(1, 100),
-  fc2 = function(...) -7
+  fc1 = function(samples) rnorm(1, 100),
+  fc2 = function(samples) -7
 )
 
 bc$score(aux = TRUE)
