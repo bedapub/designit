@@ -278,7 +278,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "No samples in the batch container, cannot compute score"
       )
 
-      res <- self$scoring_f(self)
+      samples <- self$get_samples()
+      res <- self$scoring_f(samples)
       assertthat::assert_that(assertthat::is.number(res),
         msg = "Scoring function should return a single number"
       )
@@ -288,7 +289,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "auxillary scoring functions should be a list"
         )
 
-        aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(self))
+        aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(samples))
         assertthat::assert_that(is.double(aux_res))
         assertthat::assert_that(length(aux_res) == length(self$aux_scoring_f))
 

@@ -144,7 +144,7 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 
 ## Simple OSAT score implementation
 ```{r}
-bc$scoring_f <- function(bc) osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$score
+bc$scoring_f <- function(samples) osat_score(samples, plates, c(SampleType, Race, AgeGrp))$score
 
 bc$score()
 g_setup@metadata$optValue %>% head(1)
@@ -173,7 +173,7 @@ bc$assignment_vec <- starting_assignment
 # precompute expected_df
 edf <- osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$expected_df
 
-bc$scoring_f <- function(bc) osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
+bc$scoring_f <- function(samples) osat_score(samples, plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
 
 bench::system_time({
   set.seed(123)
@@ -188,7 +188,7 @@ bc$assignment_vec <- starting_assignment
 # precompute expected_df
 edf <- osat_score_datatable(data.table::data.table(bc$get_samples()), "plates", c("SampleType", "Race", "AgeGrp"))$expected_df
 
-bc$scoring_f <- function(bc) osat_score_datatable(data.table::data.table(bc$get_samples()), "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
+bc$scoring_f <- function(samples) osat_score_datatable(data.table::data.table(samples), "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
 
 bench::system_time({
   set.seed(123)
