@@ -182,8 +182,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' should have a name. Could be an integer vector of dimensions or
     #' a named list. Every value of a list could be either dimension size
     #' or parameters for \code{BatchContainerDimension$new()}.
-    #' @param interactions deprecated
-    #' @param interaction_weights deprecated
     #' @param exclude \code{data.frame} with excluded locations of a container.
     #' @examples
     #' bc <- BatchContainer$new(
@@ -198,8 +196,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' bc
     initialize = function(
                           dimensions,
-                          interactions = FALSE,
-                          interaction_weights = NULL,
                           exclude = NULL) {
       assertthat::assert_that(length(dimensions) >= 1)
 
