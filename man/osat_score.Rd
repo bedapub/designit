@@ -4,7 +4,7 @@
 \alias{osat_score}
 \title{Compute OSAT score for sample assignment.}
 \usage{
-osat_score(sample_assignment, batch_vars, feature_vars, expected_df = NULL)
+osat_score(df, batch_vars, feature_vars, expected_df = NULL)
 }
 \arguments{
 \item{expected_df}{}
@@ -28,8 +28,8 @@ sample_assignment <- tibble::tribble(
   NA, NA, NA, 2,
 )
 
-osat_score(sample_assignment,
-  batch_vars = vars(plate),
-  feature_vars = vars(SampleType, Race)
+osat_score_datatable(sample_assignment,
+  batch_vars = "plate",
+  feature_vars = c("SampleType", "Race")
 )
 }

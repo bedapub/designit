@@ -17,8 +17,7 @@ assign_score_optimize_shuffle(
 \item{samples}{A \code{data.frame} with sample information. Should be \code{NULL} if the \code{BatchContainer}
 already has samples in it.}
 
-\item{n_shuffle}{Number of elements to swap in every iteration. \emph{Note}: at the moment only 2 is
-supported.}
+\item{n_shuffle}{Number of elements to swap in every iteration.}
 
 \item{iterations}{Number of iterations.}
 }

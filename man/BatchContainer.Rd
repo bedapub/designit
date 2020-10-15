@@ -32,6 +32,7 @@ R6 Class representing a batch container.
 \item \href{#method-new}{\code{BatchContainer$new()}}
 \item \href{#method-has_samples}{\code{BatchContainer$has_samples()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
+\item \href{#method-exchange_samples}{\code{BatchContainer$exchange_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
 \item \href{#method-clone}{\code{BatchContainer$clone()}}
@@ -89,6 +90,23 @@ from the result tibble.}
 }
 \subsection{Returns}{
 tibble with samples and sample assignment.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-exchange_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-exchange_samples}{}}}
+\subsection{Method \code{exchange_samples()}}{
+Exchange samples between locations
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$exchange_samples(src, dst = NULL)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{src}}{integer vector of source locations}
+}
+\if{html}{\out{</div>}}
 }
 }
 \if{html}{\out{<hr>}}
