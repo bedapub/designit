@@ -100,6 +100,7 @@ osat_score_datatable <- function(df, batch_vars, feature_vars, expected_df = NUL
     is.character(feature_vars)
   )
   assertthat::assert_that(is.data.frame(df) && nrow(df) > 0)
+  df <- data.table::as.data.table(df)
   special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
   special_col_names_str <- stringr::str_c(special_col_names, collapse = ", ")
   assertthat::assert_that(length(intersect(special_col_names, colnames(df))) == 0,
