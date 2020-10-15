@@ -22,6 +22,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(designit)
 library(tidyverse)
+osat_score_tibble <- designit:::osat_score_tibble
 requireNamespace("OSAT")
 ```
 
@@ -101,14 +102,14 @@ Compare OSAT score generated using various methods.
 # scores using tidy implementation
 OSAT::getLayout(gc) %>%
   left_join(OSAT::get.experiment.setup(g_setup)) %>%
-  osat_score(plates, c(SampleType, Race, AgeGrp)) %>%
+  osat_score_tibble(plates, c(SampleType, Race, AgeGrp)) %>%
   .$score
 
 # scores using datatable implementation
 OSAT::getLayout(gc) %>%
   left_join(OSAT::get.experiment.setup(g_setup)) %>%
   data.table::data.table() %>%
-  osat_score_datatable("plates", c("SampleType", "Race", "AgeGrp")) %>%
+  osat_score("plates", c("SampleType", "Race", "AgeGrp")) %>%
   .$score
 
 # score using OSAT
@@ -144,7 +145,7 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 
 ## Simple OSAT score implementation
 ```{r}
-bc$scoring_f <- function(samples) osat_score(samples, plates, c(SampleType, Race, AgeGrp))$score
+bc$scoring_f <- function(samples) osat_score_tibble(samples, plates, c(SampleType, Race, AgeGrp))$score
 
 bc$score()
 g_setup@metadata$optValue %>% head(1)
@@ -171,9 +172,9 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 bc$assignment_vec <- starting_assignment
 
 # precompute expected_df
-edf <- osat_score(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$expected_df
+edf <- osat_score_tibble(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$expected_df
 
-bc$scoring_f <- function(samples) osat_score(samples, plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
+bc$scoring_f <- function(samples) osat_score_tibble(samples, plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
 
 bench::system_time({
   set.seed(123)
@@ -186,9 +187,9 @@ bench::system_time({
 bc$assignment_vec <- starting_assignment
 
 # precompute expected_df
-edf <- osat_score_datatable(data.table::data.table(bc$get_samples()), "plates", c("SampleType", "Race", "AgeGrp"))$expected_df
+edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_df
 
-bc$scoring_f <- function(samples) osat_score_datatable(data.table::data.table(samples), "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
+bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_df = edf)$score
 
 bench::system_time({
   set.seed(123)
@@ -206,7 +207,7 @@ fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
   smp <- data.table::data.table(bc$samples_df)[, ..fcols]
   df <- smp[ldf, on = ".sample_id"]
 
-  v <- osat_score_datatable(df, batch_vars, feature_vars)
+  v <- osat_score(df, batch_vars, feature_vars)
   edf <- v$expected_df
   current_score <- v$score
   scores <- numeric(length = iterations)
@@ -225,7 +226,7 @@ fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
     val <- df[c(pos[2], pos[1]), fcols, with = FALSE]
     df[c(pos[1], pos[2]), (fcols) := val]
 
-    new_score <- osat_score_datatable(df, batch_vars, feature_vars, edf)$score
+    new_score <- osat_score(df, batch_vars, feature_vars, edf)$score
     if (new_score <= current_score) {
       current_score <- new_score
     } else {

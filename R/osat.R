@@ -1,4 +1,4 @@
-#' Compute OSAT score for sample assignment.
+#' Compute OSAT score for sample assignment. This implementation uses tibble.
 #'
 #' @param sample_assignment
 #' @param batch_vars
@@ -6,7 +6,6 @@
 #' @param expected_df
 #'
 #' @return a list with two attributes: res$score (numberic score value), res$expected_df (expected counts dataframe for potential reuse)
-#' @export
 #'
 #' @examples
 #' sample_assignment <- tibble::tribble(
@@ -25,7 +24,7 @@
 #'   batch_vars = vars(plate),
 #'   feature_vars = vars(SampleType, Race)
 #' )
-osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df = NULL) {
+osat_score_tibble <- function(sample_assignment, batch_vars, feature_vars, expected_df = NULL) {
   assertthat::assert_that(is.data.frame(sample_assignment) && nrow(sample_assignment) > 0)
   special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
   special_col_names_str <- stringr::str_c(special_col_names, collapse = ", ")
@@ -65,7 +64,7 @@ osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df 
 }
 
 
-#' Compute OSAT score for sample assignment. This implementation is using datatable.
+#' Compute OSAT score for sample assignment.
 #'
 #' @param sample_assignment
 #' @param batch_vars
@@ -94,7 +93,7 @@ osat_score <- function(sample_assignment, batch_vars, feature_vars, expected_df 
 #'   feature_vars = c("SampleType", "Race")
 #' )
 #' @importFrom data.table :=
-osat_score_datatable <- function(df, batch_vars, feature_vars, expected_df = NULL) {
+osat_score <- function(df, batch_vars, feature_vars, expected_df = NULL) {
   stopifnot(
     is.character(batch_vars),
     is.character(feature_vars)
