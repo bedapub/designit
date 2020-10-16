@@ -2,6 +2,7 @@
 .Rhistory
 doc
 Meta
+tmp
 
 # do not store generated docs
 docs
