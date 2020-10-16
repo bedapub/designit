@@ -14,8 +14,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   error = TRUE,
-  fig.width=6,
-  fig.height=6
+  fig.width = 6,
+  fig.height = 6
 )
 ```
 
@@ -79,7 +79,7 @@ plot_batch <- function(df) {
     count(plates, variable, level) %>%
     ggplot(aes(level, n, fill = factor(plates))) +
     geom_col(position = "dodge") +
-    facet_wrap(~variable, scales = "free", ncol=1)
+    facet_wrap(~variable, scales = "free", ncol = 1)
 }
 ```
 
