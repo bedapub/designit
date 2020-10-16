@@ -233,6 +233,44 @@ bench::system_time({
 })
 ```
 
+# Shuffle optimization with burn-in
+```{r}
+bc$assignment_vec <- starting_assignment
+
+# precompute expected_dt
+edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
+
+bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
+
+burn_in_it <- floor(params$iterations * 0.1)
+burn_in_it
+
+bench::system_time({
+  set.seed(123)
+  trace_burn_in <- assign_score_optimize_shuffle(bc,
+    n_shuffle = c(
+      rep(10, burn_in_it),
+      rep(
+        2,
+        params$iterations - burn_in_it
+      )
+    ),
+    iterations = params$iterations
+  )
+})
+```
+
+```{r}
+tibble(
+  i = 1:length(trace),
+  normal = trace,
+  burnin = trace_burn_in
+) %>%
+  pivot_longer(-i, names_to = "method", values_to = "score") %>%
+  ggplot(aes(i, score, col = method)) +
+  geom_line()
+```
+
 
 # Score demonstration
 ```{r}
