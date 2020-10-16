@@ -1,0 +1,132 @@
+---
+title: "Basic examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Basic examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(designit)
+library(tidyverse)
+```
+
+## Example 1
+
+This is a basic example:
+
+```{r example1}
+anno <- tribble(
+  ~Cell,         ~Trt, ~Type, ~Rep,
+   "WT",    "treated",   "A",    1,
+   "WT",    "treated",   "A",    2,  
+   "WT", "nontreated",   "A",    1,
+   "WT", "nontreated",   "A",    2,
+   "WT",    "control",   "A",    1,
+   "WT",    "control",   "A",    2,
+   "WT",    "treated",   "B",    1,
+   "WT",    "treated",   "B",    2,  
+   "WT", "nontreated",   "B",    1,
+   "WT", "nontreated",   "B",    2,
+   "WT",    "control",   "A",    1,
+   "WT",    "control",   "A",    2,
+   "KO",    "treated",   "A",    1,
+   "KO",    "treated",   "A",    2,  
+   "KO", "nontreated",   "A",    1,
+   "KO", "nontreated",   "A",    2,
+   "KO",    "treated",   "B",    1,
+   "KO",    "treated",   "B",    2,  
+   "KO", "nontreated",   "B",    1,
+   "KO", "nontreated",   "B",    2,  
+)
+```
+
+
+## Plate layout with two factors
+
+Samples of a 2-condition invivo experiment are to be
+placed on 48 well plates.
+
+These are the conditions
+
+```{r}
+
+# conditions to use
+conditions <- data.frame(group = c(1, 2, 3, 4, 5),
+                      treatment = c("vehicle", "TRT1", "TRT2",
+                                    "TRT1", "TRT2"),
+                      dose = c(0, 25, 25, 50, 50))
+
+knitr::kable(conditions)
+```
+
+We will have 3 animals per groups with 4 replicates each
+
+```{r}
+# sample table (2 animals per group with 3 replicates)
+n_reps <- 4
+n_animals <- 3
+samples <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), .id = 'animal') 
+samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 'replicate') %>%
+  dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
+                AnimalID = paste0(treatment,'_',animal))
+
+DT::datatable(samples)
+```
+
+Corner wells of the plates should be left empty.
+This means on a 48 well plate we can place 44 samples.
+Since we have `r nrow(samples)` samples, they will fit on
+`r ceiling(nrow(samples)/44)` plates
+
+```{r}
+n_samp <- nrow(samples)
+n_loc_per_plate <- 48 - 4
+n_plates <- ceiling(n_samp / n_loc_per_plate)
+
+exclude_wells <- expand.grid(plate = seq(n_plates), column = c(1,8), row = c(1,6))
+```
+
+Create a BatchContainer object that provides all possible locations
+
+```{r}
+bc <- BatchContainer$new(
+  dimensions = c('plate' = n_plates, 'column' = 8, 'row' = 6),
+  exclude = exclude_wells
+)
+bc
+
+bc$n_available
+bc$exclude
+```
+
+Use random assignment function to place samples to plate locations
+
+```{r}
+assign_random(bc, samples)
+
+bc$get_samples()
+bc$get_samples(remove_empty_locations = TRUE)
+
+```
+
+Plot of the result
+
+```{r}
+library(ggplot2)
+bc$get_samples(remove_empty_locations = TRUE) %>% 
+  ggplot(aes(x = factor(column), y = factor(-row), fill = treatment, alpha = factor(dose))) + 
+  geom_tile() +
+  facet_wrap(~plate) + 
+  theme_bw() 
+  
+```
+

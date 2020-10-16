@@ -1,5 +1,7 @@
 ---
 output: github_document
+editor_options: 
+  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -19,58 +21,62 @@ knitr::opts_chunk$set(
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of designit is to ... **TODO** fill this!
-
-## skeleton
-
-* a metric of how balanced?
-* check ^2 and ^3, it should be different (3 better)
-
-### algorithm
-
-- generate formula
-  - .^m m = number of factors
-  - check model.matrix
-  - check how many to remove, and what order
-  - if one order is not complete, then do random draw from that?
-  - or use optMonteCarlo <-- this doesn't work
-- optFederov
-- optBlock
-- rename Block and levels
-- do it again
-
-**should we support more than 2 levels?**
-
-**what to do with numeric covariates**
-
-
-```{r}
-a <- readxl::read_excel('inst/extdata/CEA-PRIT_CEAmodels_for randomization.xlsx')
-```
-
+The goal of designit is to generate optimal sample allocations for experimental designs.
 
 ## Installation
 
-TODO
+You can install the development version from Roche GitHub with:
 
-## Example
-
-```{r}
-library(tidyverse)
-x <- expand.grid(b = paste0('b', 1:4),
-                 a = LETTERS[1:4]) %>% 
-  slice(-3:-4)
+```{r echo=TRUE, eval=FALSE}
+# install.packages("devtools")
+devtools::install_gitlab("BEDA/designit", host = "code.roche.com")
 ```
 
+## Usage
 
-Example dataset:
+The main class used is `BatchContainer`, which holds the dimensions for sample allocation.
+After creating such a container, a list of samples can be allocated in it using a given assignment function.
 
-Cell: 5 levels (A, B, C, D, E)
-Trt: 2 levels (N, T)
-Time: 2 levels (24, 48)
+```{r message=FALSE}
+library(designit)
+# define samples data.frame
+samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
+samples
 
-2 batches:
-Extract: 5 levels (1-5)
-Prep: 2 levels (1-2)
+bc <- BatchContainer$new(
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+)
 
-all combinations, 80 expt
+bc
+
+bc$exclude
+bc$n_locations
+bc$n_excluded
+bc$n_available
+bc$locations_df
+
+set.seed(1)
+assign_random(bc, samples)
+
+head(bc$get_samples())
+bc$get_samples(remove_empty_locations=TRUE)
+
+# You can reassign samples starting from the current assignment.
+set.seed(2)
+assign_random(bc)
+head(bc$get_samples())
+
+# Results should be reproducible if the seed is set.
+set.seed(1)
+assign_random(bc)
+bc$get_samples(remove_empty_locations=TRUE)
+```
+
+## Examples
+
+See vignettes `vignette("basic_examples")`.
