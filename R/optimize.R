@@ -39,7 +39,15 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   scores <- matrix(0, nrow = iterations, ncol = length(current_score), dimnames = list(NULL, names(current_score)))
 
   for (i in 1:iterations) {
-    src <- sample(n_avail, n_shuffle[i])
+    repeat {
+      src <- sample(n_avail, n_shuffle[i])
+
+      # any of the locations is non-empty
+      if (any(!is.na(batch_container$samples_dt$.sample_id[src]))) {
+        break
+      }
+    }
+
     bc$exchange_samples(src)
 
     new_score <- batch_container$score(aux = TRUE)
