@@ -2,3 +2,6 @@
 .Rhistory
 doc
 Meta
+
+# do not store generated docs
+docs/
