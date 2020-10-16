@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(designit)
 library(tidyverse)
-osat_score_tibble <- designit:::osat_score_tibble
 requireNamespace("OSAT")
 ```
 
@@ -99,17 +98,17 @@ OSAT::get.experiment.setup(g_setup) %>%
 # Compare scores with various implementations
 Compare OSAT score generated using various methods.
 ```{r}
-# scores using tidy implementation
-OSAT::getLayout(gc) %>%
-  left_join(OSAT::get.experiment.setup(g_setup)) %>%
-  osat_score_tibble(plates, c(SampleType, Race, AgeGrp)) %>%
-  .$score
-
 # scores using datatable implementation
 OSAT::getLayout(gc) %>%
   left_join(OSAT::get.experiment.setup(g_setup)) %>%
   data.table::data.table() %>%
   osat_score("plates", c("SampleType", "Race", "AgeGrp")) %>%
+  .$score
+
+# scores using slower tibble implementation
+OSAT::getLayout(gc) %>%
+  left_join(OSAT::get.experiment.setup(g_setup)) %>%
+  designit:::osat_score_tibble(plates, c(SampleType, Race, AgeGrp)) %>%
   .$score
 
 # score using OSAT
@@ -143,9 +142,9 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
 ```
 
-## Simple OSAT score implementation
+## Using designit OSAT score implementation
 ```{r}
-bc$scoring_f <- function(samples) osat_score_tibble(samples, plates, c(SampleType, Race, AgeGrp))$score
+bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"))$score
 
 bc$score()
 g_setup@metadata$optValue %>% head(1)
@@ -165,24 +164,9 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
 ```
 
-## Optimization
+## Cache `expected_dt`
+Caching `expected_dt` should improve the performance.
 
-### Cache `expected_df`
-```{r}
-bc$assignment_vec <- starting_assignment
-
-# precompute expected_df
-edf <- osat_score_tibble(bc$get_samples(), plates, c(SampleType, Race, AgeGrp))$expected_df
-
-bc$scoring_f <- function(samples) osat_score_tibble(samples, plates, c(SampleType, Race, AgeGrp), expected_df = edf)$score
-
-bench::system_time({
-  set.seed(123)
-  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
-})
-```
-
-### Using `data.table` implementation
 ```{r}
 bc$assignment_vec <- starting_assignment
 
@@ -197,7 +181,9 @@ bench::system_time({
 })
 ```
 
-### Replace `get_samples`
+## Manually work with `data.table`
+Instead of relying on `BatchContainer`, here we have a manual optimization process using `data.table`.
+
 ```{r}
 bc$assignment_vec <- starting_assignment
 
