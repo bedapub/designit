@@ -177,7 +177,7 @@ bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", 
 
 bench::system_time({
   set.seed(123)
-  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+  trace_reference <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
 })
 ```
 
@@ -249,7 +249,7 @@ bench::system_time({
   set.seed(123)
   trace_burn_in <- assign_score_optimize_shuffle(bc,
     n_shuffle = c(
-      rep(10, burn_in_it),
+      rep(20, burn_in_it),
       rep(
         2,
         params$iterations - burn_in_it
@@ -263,7 +263,7 @@ bench::system_time({
 ```{r}
 tibble(
   i = 1:length(trace),
-  normal = trace,
+  normal = trace_reference,
   burnin = trace_burn_in
 ) %>%
   pivot_longer(-i, names_to = "method", values_to = "score") %>%
