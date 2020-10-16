@@ -25,8 +25,9 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
 
   n_avail <- batch_container$n_available
-  assertthat::assert_that(is.numeric(n_shuffle) &&
-    (length(n_shuffle) == 1 || length(n_shuffle) == iterations),
+  assertthat::assert_that(
+    is.numeric(n_shuffle) &&
+      (length(n_shuffle) == 1 || length(n_shuffle) == iterations),
     msg = "n_shuffle should be an integer vector of length iteration or a single integer value"
   )
 
