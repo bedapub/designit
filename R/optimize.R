@@ -6,7 +6,9 @@
 #' @param batch_container An instance of `BatchContainer`.
 #' @param samples A `data.frame` with sample information. Should be `NULL` if the `BatchContainer`
 #' already has samples in it.
-#' @param n_shuffle Number of elements to swap in every iteration.
+#' @param n_shuffle Number of elements to swap in every iteration. Could be either a number or a
+#' vector of length iteration. In the later case, number of samples to shuffle could be precisely
+#' set for every iteration.
 #' @param iterations Number of iterations.
 #' @return A matrix with scores. Every row is an iteration. The matrix size is
 #' `c(iterations, 1 + length(bc$aux_scoring_f))`.
@@ -23,7 +25,14 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
 
   n_avail <- batch_container$n_available
-  assertthat::assert_that(n_shuffle > 1, msg = "n_shuffle should be more than 1")
+  assertthat::assert_that(is.numeric(n_shuffle) &&
+    (length(n_shuffle) == 1 || length(n_shuffle) == iterations),
+    msg = "n_shuffle should be an integer vector of length iteration or a single integer value"
+  )
+
+  if (length(n_shuffle) == 1) n_shuffle <- rep(n_shuffle, iterations)
+
+  assertthat::assert_that(all(n_shuffle > 1), msg = "n_shuffle values should be more than 1")
 
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
   current_score <- batch_container$score(aux = TRUE)
