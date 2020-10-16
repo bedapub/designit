@@ -10,7 +10,8 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 The goal of designit is to generate optimal sample allocations for
-experimental designs.
+experimental designs. Documentation is available
+[here](http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/).
 
 ## Installation
 
@@ -83,12 +84,13 @@ bc$locations_df
 #> 15     3 c          1
 #> 16     3 c          3
 
-bc$assign_samples(samples, random_seed=1)
+set.seed(1)
+assign_random(bc, samples)
 
 head(bc$get_samples())
 #> # A tibble: 6 x 6
 #>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <fct> <fct> <fct>
+#>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 b          1 <NA>  <NA>  <NA> 
 #> 2     1 b          3 <NA>  <NA>  <NA> 
 #> 3     1 c          1 <NA>  <NA>  <NA> 
@@ -98,17 +100,18 @@ head(bc$get_samples())
 bc$get_samples(remove_empty_locations=TRUE)
 #> # A tibble: 3 x 6
 #>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <fct> <fct> <fct>
+#>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 c          3 a     a     b    
 #> 2     2 a          1 a     b     b    
 #> 3     2 b          3 a     c     c
 
 # You can reassign samples starting from the current assignment.
-bc$assign_samples(random_seed=2)
+set.seed(2)
+assign_random(bc)
 head(bc$get_samples())
 #> # A tibble: 6 x 6
 #>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <fct> <fct> <fct>
+#>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 b          1 <NA>  <NA>  <NA> 
 #> 2     1 b          3 <NA>  <NA>  <NA> 
 #> 3     1 c          1 <NA>  <NA>  <NA> 
@@ -117,11 +120,12 @@ head(bc$get_samples())
 #> 6     2 a          3 a     a     b
 
 # Results should be reproducible if the seed is set.
-bc$assign_samples(random_seed=1)
+set.seed(1)
+assign_random(bc)
 bc$get_samples(remove_empty_locations=TRUE)
 #> # A tibble: 3 x 6
 #>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <fct> <fct> <fct>
+#>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 c          3 a     a     b    
 #> 2     2 a          1 a     b     b    
 #> 3     2 b          3 a     c     c
