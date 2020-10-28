@@ -28,3 +28,36 @@ assign_random <- function(batch_container, samples = NULL) {
 
   invisible(batch_container)
 }
+
+#' Distributes samples in order.
+#'
+#' First sample is assigned to the first location, second
+#' sample is assigned to the second location, etc.
+#'
+#' @export
+#' @param samples data.frame with samples.
+#' @param batch_container Instance of BatchContainer class
+#'
+#' @return Returns `BatchContainer`, invisibly.
+#' @example man/examples/assignment.R
+assign_in_order <- function(batch_container, samples = NULL) {
+  if (is.null(samples)) {
+    assertthat::assert_that(batch_container$has_samples(),
+      msg = "batch-container is empty and no samples provided"
+    )
+  } else {
+    batch_container$samples_df <- samples
+  }
+
+  n_samples <- nrow(batch_container$samples_df)
+  n_available <- batch_container$n_available
+
+  assertthat::assert_that(n_available >= n_samples)
+
+  batch_container$assignment_vec <- c(
+    1:n_samples,
+    rep(NA_integer_, n_available - n_samples)
+  )
+
+  invisible(batch_container)
+}
