@@ -3,6 +3,8 @@
 #' @export
 #' @param samples data.frame with samples.
 #' @param batch_container Instance of BatchContainer class
+#'
+#' @return Returns `BatchContainer`, invisibly.
 assign_random <- function(batch_container, samples = NULL) {
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples(),
