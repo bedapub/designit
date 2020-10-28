@@ -1,4 +1,4 @@
-#' Dummy assignment function which distributes samples randomly.
+#' Assignment function which distributes samples randomly.
 #'
 #' @export
 #' @param samples data.frame with samples.
