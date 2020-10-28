@@ -16,20 +16,20 @@
 #'
 #' @examples
 #' sample_assignment <- tibble::tribble(
-#'   ~ID, ~SampleType, ~Race, ~plate,
-#'   1, "Case", "Hispanic", 1,
-#'   2, "Case", "Hispanic", 1,
-#'   3, "Case", "European", 2,
-#'   4, "Control", "Hispanic", 2,
-#'   5, "Control", "European", 1,
-#'   6, "Control", "European", 2,
+#'   ~ID, ~SampleType, ~Sex, ~plate,
+#'   1, "Case", "Female", 1,
+#'   2, "Case", "Female", 1,
+#'   3, "Case", "Male", 2,
+#'   4, "Control", "Female", 2,
+#'   5, "Control", "Female", 1,
+#'   6, "Control", "Male", 2,
 #'   NA, NA, NA, 1,
 #'   NA, NA, NA, 2,
 #' )
 #'
 #' osat_score(sample_assignment,
 #'   batch_vars = "plate",
-#'   feature_vars = c("SampleType", "Race")
+#'   feature_vars = c("SampleType", "Sex")
 #' )
 #' @importFrom data.table :=
 osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
