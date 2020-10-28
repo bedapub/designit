@@ -40,7 +40,7 @@ sample_assignment <- tibble::tribble(
   NA, NA, NA, 2,
 )
 
-osat_score_datatable(sample_assignment,
+osat_score(sample_assignment,
   batch_vars = "plate",
   feature_vars = c("SampleType", "Race")
 )

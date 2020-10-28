@@ -99,7 +99,7 @@ osat_score_tibble <- function(sample_assignment, batch_vars, feature_vars, expec
 #'   NA, NA, NA, 2,
 #' )
 #'
-#' osat_score_datatable(sample_assignment,
+#' osat_score(sample_assignment,
 #'   batch_vars = "plate",
 #'   feature_vars = c("SampleType", "Race")
 #' )
