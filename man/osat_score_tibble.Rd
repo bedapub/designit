@@ -45,8 +45,9 @@ sample_assignment <- tibble::tribble(
   NA, NA, NA, 2,
 )
 
-osat_score(sample_assignment,
+designit:::osat_score_tibble(sample_assignment,
   batch_vars = vars(plate),
   feature_vars = vars(SampleType, Race)
 )
 }
+\keyword{internal}

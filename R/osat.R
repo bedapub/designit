@@ -13,6 +13,7 @@
 #' @return a list with two attributes: res$score (numeric score value), res$expected_df
 #' (expected counts \code{tibble} for potential)
 #'
+#' @keywords internal
 #' @examples
 #' sample_assignment <- tibble::tribble(
 #'   ~ID, ~SampleType, ~Race, ~plate,
@@ -26,7 +27,7 @@
 #'   NA, NA, NA, 2,
 #' )
 #'
-#' osat_score(sample_assignment,
+#' designit:::osat_score_tibble(sample_assignment,
 #'   batch_vars = vars(plate),
 #'   feature_vars = vars(SampleType, Race)
 #' )
