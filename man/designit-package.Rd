@@ -9,6 +9,15 @@
 Blocking and randomization for experimental design.
     TODO: expand this.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/}
+  \item \url{https://code.roche.com/BEDA/designit/}
+  \item Report bugs at \url{https://code.roche.com/BEDA/designit/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID})
 
