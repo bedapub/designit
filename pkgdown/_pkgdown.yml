@@ -1,6 +1,16 @@
-url: https://pages.code.roche.com/BEDA/DesignIt
+url: http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/
+
+repo:
+  url:
+    home: https://code.roche.com/BEDA/designit
+    source: https://code.roche.com/BEDA/designit/blob/master/
+    issue: https://code.roche.com/BEDA/designit/issues/
 
 destination: docs
 
 template:
   assets: pkgdown/assets
+
+development:
+  mode: auto
+  destination: docs
