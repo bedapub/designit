@@ -6,8 +6,6 @@ repo:
     source: https://code.roche.com/BEDA/designit/blob/master/
     issue: https://code.roche.com/BEDA/designit/issues/
 
-destination: docs
-
 template:
   assets: pkgdown/assets
 
