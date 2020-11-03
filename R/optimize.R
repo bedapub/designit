@@ -62,7 +62,8 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       } else {
         non_empty_loc <- which(!is.na(batch_container$samples_dt$.sample_id))
         assertthat::assert_that(length(non_empty_loc) > 0,
-                                msg = "all locations are empty in BatchContainer")
+          msg = "all locations are empty in BatchContainer"
+        )
         pos1 <- sample(non_empty_loc, 1)
         pos2 <- sample(which(seq(n_avail) != pos1), 1)
         src <- c(pos1, pos2)

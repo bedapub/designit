@@ -191,6 +191,7 @@ res <- assign_score_optimize_shuffle(bc,
 plot(res)
 bc$score()
 ```
+
 Now we have a much more even distribution of weights and treatment/control balance.
 ```{r}
 males_per_cage(bc)

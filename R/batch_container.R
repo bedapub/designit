@@ -267,8 +267,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @return `BatchContainer`, invisibly
     exchange_samples = function(src, dst) {
       assertthat::assert_that(is.integer(src), length(src) > 0,
-                              is.integer(dst), length(dst) > 0,
-                              length(src) == length(dst),
+        is.integer(dst), length(dst) > 0,
+        length(src) == length(dst),
         msg = "src & dst should be non-empty integer vectors of equal size"
       )
       # ensure private$samples_dt_cache is set
