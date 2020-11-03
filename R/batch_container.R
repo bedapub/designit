@@ -543,7 +543,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
             self$get_samples(include_id = TRUE)
           )
         }
-        private$samples_dt_cache
+        data.table::copy(private$samples_dt_cache)
       } else {
         stop("samples_dt is read-only.")
       }
