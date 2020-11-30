@@ -97,7 +97,7 @@ are used to select first and second locations to exchange. `change_batch_variabl
 to enforce change of batch variable values between the two locations.
 
 ```{r}
-shuffle_with_constraints <- function(src, dst = TRUE, change_batch_variable = NULL) {
+shuffle_with_constraints <- function(src, dst = TRUE) {
   src <- enquo(src)
   dst <- enquo(dst)
   function(dt, i) {
@@ -108,10 +108,9 @@ shuffle_with_constraints <- function(src, dst = TRUE, change_batch_variable = NU
     src_pos <- sample(src_ind, 1)
     # different from src
     dst_log <- seq(nrow(dt)) != src_pos
-    dst_log <- dst_log & rlang::eval_tidy(dst, dt)
-    if (!is.null(change_batch_variable)) {
-      dst_log <- dst_log & dt[[change_batch_variable]] != dt[[src_pos, change_batch_variable]]
-    }
+    env <- as.list(dt)
+    env$.src <- dt[src_pos,]
+    dst_log <- dst_log & rlang::eval_tidy(dst, env)
     dst_ind <- which(dst_log)
     if (length(dst_ind) == 0) {
       warning("Cannot find destanation matching the constraints")
@@ -146,7 +145,7 @@ res <- assign_score_optimize_shuffle(
   bc,
   shuffle_proposal = shuffle_with_constraints(
     sex == "M",
-    change_batch_variable = "cage"
+    cage != .src$cage
   ),
   iterations = 10
 )
@@ -182,8 +181,7 @@ set.seed(12)
 res <- assign_score_optimize_shuffle(bc,
   shuffle_proposal = shuffle_with_constraints(
     sex == "F",
-    is.na(sex) | sex != "M",
-    "cage"
+    cage != .src$cage  & (is.na(sex) | sex != "M")
   ),
   n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
   iterations = 200
