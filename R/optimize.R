@@ -1,7 +1,7 @@
 #' Shuffles samples trying to improve the scoring function.
 #'
-#' In every iteration shuffles several samples in the container. If the `bc$score()` worsens,
-#' reverts to the previous state.
+#' In every iteration shuffles several samples in the container.
+#' If the `batch_container$score()` worsens, reverts to the previous state.
 #'
 #' @param batch_container An instance of `BatchContainer`.
 #' @param samples A `data.frame` with sample information. Should be `NULL` if the `BatchContainer`
@@ -70,7 +70,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
         dst <- c(pos2, pos1)
       }
       perm[dst] <- perm[src]
-      bc$exchange_samples(src, dst)
+      batch_container$exchange_samples(src, dst)
     }
     non_trivial <- which(perm != seq_along(perm))
     if (length(non_trivial) == 0) {
@@ -80,7 +80,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
     new_score <- batch_container$score(aux = TRUE)
     if (new_score[1] >= current_score[1]) {
-      bc$exchange_samples(non_trivial, perm[non_trivial])
+      batch_container$exchange_samples(non_trivial, perm[non_trivial])
     } else {
       current_score <- new_score
     }
