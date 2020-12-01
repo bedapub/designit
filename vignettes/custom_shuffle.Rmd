@@ -148,7 +148,7 @@ set.seed(12)
 res <- assign_score_optimize_shuffle(bc,
   shuffle_proposal = shuffle_with_constraints(
     sex == "F",
-    cage != .src$cage  & (is.na(sex) | sex != "M")
+    cage != .src$cage & (is.na(sex) | sex != "M")
   ),
   n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
   iterations = 200
