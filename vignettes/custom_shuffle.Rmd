@@ -92,39 +92,6 @@ males_per_cage(bc)
 weight_d(bc)
 group_d(bc)
 ```
-This function can be used to provide shuffling schedule. `src` and `dst` are expressions which
-are used to select first and second locations to exchange. `change_batch_variable` can be used
-to enforce change of batch variable values between the two locations.
-
-```{r}
-shuffle_with_constraints <- function(src, dst = TRUE) {
-  src <- enquo(src)
-  dst <- enquo(dst)
-  function(dt, i) {
-    src_ind <- which(rlang::eval_tidy(src, dt))
-    assertthat::assert_that(length(src_ind) > 0,
-      msg = "source conditions not satisfied"
-    )
-    src_pos <- sample(src_ind, 1)
-    # different from src
-    dst_log <- seq(nrow(dt)) != src_pos
-    env <- as.list(dt)
-    env$.src <- dt[src_pos,]
-    dst_log <- dst_log & rlang::eval_tidy(dst, env)
-    dst_ind <- which(dst_log)
-    if (length(dst_ind) == 0) {
-      warning("Cannot find destanation matching the constraints")
-      list(src = NULL)
-    } else {
-      dst_pos <- sample(dst_ind, 1)
-      list(
-        src = c(src_pos, dst_pos),
-        dst = c(dst_pos, src_pos)
-      )
-    }
-  }
-}
-```
 
 First, we use OSAT scoring function to ensure even distribution of males among cages. Only `cage`
 and `sex` interactions are considered in the scoring function. We only use 10 iterations, since
