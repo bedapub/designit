@@ -37,6 +37,6 @@ A matrix with scores. Every row is an iteration. The matrix size is
 \code{c(iterations, 1 + length(bc$aux_scoring_f))}.
 }
 \description{
-In every iteration shuffles several samples in the container. If the \code{bc$score()} worsens,
-reverts to the previous state.
+In every iteration shuffles several samples in the container.
+If the \code{batch_container$score()} worsens, reverts to the previous state.
 }
