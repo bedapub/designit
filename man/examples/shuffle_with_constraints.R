@@ -1,8 +1,9 @@
 set.seed(43)
-samples <- tibble(
+
+samples <- data.frame(
   id = 1:100,
   sex = sample(c("F", "M"), 100, replace = TRUE),
-  group = sample(c("treatment", "control"), 100, replace = TRUE),
+  group = sample(c("treatment", "control"), 100, replace = TRUE)
 )
 
 bc <- BatchContainer$new(
