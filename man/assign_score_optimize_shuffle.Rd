@@ -7,7 +7,8 @@
 assign_score_optimize_shuffle(
   batch_container,
   samples = NULL,
-  n_shuffle = 2,
+  n_shuffle = 1,
+  shuffle_proposal = NULL,
   iterations = 1000
 )
 }
@@ -17,9 +18,17 @@ assign_score_optimize_shuffle(
 \item{samples}{A \code{data.frame} with sample information. Should be \code{NULL} if the \code{BatchContainer}
 already has samples in it.}
 
-\item{n_shuffle}{Number of elements to swap in every iteration. Could be either a number or a
-vector of length iteration. In the later case, number of samples to shuffle could be precisely
-set for every iteration.}
+\item{n_shuffle}{Number of times shuffling performed at each iterations.
+Could be a number or a vector of length \code{iterations}.
+In the later case, number of samples to shuffle could be precisely
+set for every iteration. \code{n_shuffle == 1} indicates that two elements
+are swapped one time. If \code{shuffle_proposal} function is provided, it will be
+callend \code{n_shuffle} times at an iteration.}
+
+\item{shuffle_proposal}{A function used to propose two or more elements to shuffle in every step.
+If non-\code{NULL} a function receives two arguments on every iteration:
+\code{bc$samples_dt} and the iteration number. This function should return a list with attributes
+\code{src} and \code{dst} (see \code{\link[=BatchContainer$exchange_samples]{BatchContainer$exchange_samples()}}).}
 
 \item{iterations}{Number of iterations.}
 }
