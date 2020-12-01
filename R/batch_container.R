@@ -264,14 +264,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Exchange samples between locations
     #' @param src integer vector of source locations
     #' @param dst integer vector of destination locations (the same length as \code{src}).
-    #' If NULL, generated from \code{src}: \code{src[c(2:length(src), 1)]}.
-    exchange_samples = function(src, dst = NULL) {
-      assertthat::assert_that(is.integer(src),
-        msg = "src should be integer vector"
-      )
-      if (is.null(dst)) dst <- src[c(2:length(src), 1)]
-      assertthat::assert_that(is.integer(dst) && length(src) == length(dst),
-        msg = "src and dst should be integer vectors of the same length"
+    #' @return `BatchContainer`, invisibly
+    exchange_samples = function(src, dst) {
+      assertthat::assert_that(is.integer(src), length(src) > 0,
+        is.integer(dst), length(dst) > 0,
+        length(src) == length(dst),
+        msg = "src & dst should be non-empty integer vectors of equal size"
       )
       # ensure private$samples_dt_cache is set
       self$samples_dt
@@ -279,11 +277,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
       fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
       val <- private$samples_dt_cache[src, fcols, with = FALSE]
       private$samples_dt_cache[dst, (fcols) := val]
-      if (any(1:nrow(private$samples) != sort(private$samples_dt_cache$.sample_id))) {
+      if (any(seq(nrow(private$samples)) != sort(private$samples_dt_cache$.sample_id))) {
         private$samples_dt_cache <- NULL
         stop("Samples lost or duplicated during exchange; check src and dst")
       }
       private$assignment <- private$samples_dt_cache$.sample_id
+      invisible(self)
     },
 
     #' @description
@@ -544,7 +543,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
             self$get_samples(include_id = TRUE)
           )
         }
-        private$samples_dt_cache
+        data.table::copy(private$samples_dt_cache)
       } else {
         stop("samples_dt is read-only.")
       }

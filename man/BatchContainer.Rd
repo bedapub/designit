@@ -174,7 +174,7 @@ tibble with samples and sample assignment.
 \subsection{Method \code{exchange_samples()}}{
 Exchange samples between locations
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$exchange_samples(src, dst = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$exchange_samples(src, dst)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -182,10 +182,12 @@ Exchange samples between locations
 \describe{
 \item{\code{src}}{integer vector of source locations}
 
-\item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).
-If NULL, generated from \code{src}: \code{src[c(2:length(src), 1)]}.}
+\item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).}
 }
 \if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{BatchContainer}, invisibly
 }
 }
 \if{html}{\out{<hr>}}
