@@ -43,6 +43,16 @@ taking plate effect into account.}
 }
 \if{html}{\out{</div>}}
 }
+\section{Active bindings}{
+\if{html}{\out{<div class="r6-active-bindings">}}
+\describe{
+\item{\code{size}}{Returns size of a dimension.}
+
+\item{\code{short_info}}{Returns a string summarizing the dimension.
+E.g., "mydim<size=10>".}
+}
+\if{html}{\out{</div>}}
+}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{

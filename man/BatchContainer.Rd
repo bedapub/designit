@@ -216,16 +216,23 @@ Otherwise a vector of all scoring functions starting from the first one.
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Prints information about \code{BatchContainer}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used.d
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
 Tibble with sample ids and assignment to batch container locations.
 Cached data.table with samples assignment.
-Validate sample assignment.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
+Validate sample assignment.}
 }
-
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}
