@@ -216,6 +216,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' @description
     #' Prints information about \code{BatchContainer}.
+    #' @param ... not used.
     print = function(...) {
       cat(stringr::str_glue(
         "Batch container with {self$n_locations} locations and {self$n_excluded} excluded.\n",
@@ -227,6 +228,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         stringr::str_c(collapse = ", ") %>%
         cat()
       cat("\n")
+      invisible(self)
     }
   ),
 
