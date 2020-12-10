@@ -1,0 +1,19 @@
+# based on https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
+image: methodsconsultants/r-packaging
+variables:
+  R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
+  CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
+  BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+
+test:
+  script:
+  - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  - R -e 'devtools::install_deps(dep = T, lib = Sys.getenv("R_LIBS_USER"))'
+  - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"))'
+  - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
+  cache:
+    paths:
+    - $R_LIBS_USER
+
+after_script:
+  - R -e 'covr::package_coverage(Sys.getenv("CI_PROJECT_DIR"))'
