@@ -1,6 +1,6 @@
 #' Compute OSAT score for sample assignment.
 #'
-#' @param sample_assignment \code{data.table} or \code{data.frame} where every row is a location
+#' @param df \code{data.table} or \code{data.frame} where every row is a location
 #' in a container and a sample in this location.
 #' @param batch_vars \code{character} vector with batch variable names to take into account for the
 #' score computation.
