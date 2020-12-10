@@ -53,7 +53,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #'     "row" = list(values = letters[1:3]),
     #'     "column" = list(values = c(1, 3))
     #'   ),
-    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
     #' )
     #'
     #' bc

@@ -40,7 +40,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #'
     #' bc <- BatchContainer$new(
     #'   dimensions = list(plate_dimension, row_dimension, column_dimension),
-    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
     #' )
     #'
     #' bc
