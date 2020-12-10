@@ -301,10 +301,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field n_dimension
+    #' @field n_dimensions
     #' Returns number of dimensions in a \code{BatchContainer}.
     #' This field cannot be assigned.
-    n_dimension = function(value) {
+    n_dimensions = function(value) {
       if (missing(value)) {
         length(private$dimensions)
       } else {
