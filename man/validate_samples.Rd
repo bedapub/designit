@@ -6,6 +6,9 @@
 \usage{
 validate_samples(samples)
 }
+\arguments{
+\item{samples}{A \code{data.frame} having a sample annotation per row.}
+}
 \description{
 Validates sample data.frame.
 }

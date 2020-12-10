@@ -28,7 +28,7 @@ callend \code{n_shuffle} times at an iteration.}
 \item{shuffle_proposal}{A function used to propose two or more elements to shuffle in every step.
 If non-\code{NULL} a function receives two arguments on every iteration:
 \code{bc$samples_dt} and the iteration number. This function should return a list with attributes
-\code{src} and \code{dst} (see \code{\link[=BatchContainer$exchange_samples]{BatchContainer$exchange_samples()}}).}
+\code{src} and \code{dst} (see \link[=BatchContainer]{BatchContainer$exchange_samples()}).}
 
 \item{iterations}{Number of iterations.}
 }

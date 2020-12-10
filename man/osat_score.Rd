@@ -7,6 +7,9 @@
 osat_score(df, batch_vars, feature_vars, expected_dt = NULL)
 }
 \arguments{
+\item{df}{\code{data.table} or \code{data.frame} where every row is a location
+in a container and a sample in this location.}
+
 \item{batch_vars}{\code{character} vector with batch variable names to take into account for the
 score computation.}
 
@@ -16,9 +19,6 @@ score comptation.}
 \item{expected_dt}{A \code{data.table} with expected number of samples sample variables and
 batch variables combination. This is not required, however it does not change during the
 optimization proccess. So it is a good idea to cache this value.}
-
-\item{sample_assignment}{\code{data.table} or \code{data.frame} where every row is a location
-in a container and a sample in this location.}
 }
 \value{
 a list with two attributes: \code{$score} (numeric score value), \code{$expected_dt}
