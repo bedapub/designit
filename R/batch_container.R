@@ -62,6 +62,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
                           exclude = NULL) {
       assertthat::assert_that(length(dimensions) >= 1)
 
+      if (all(purrr::map_lgl(dimensions, inherits, "BatchContainerDimension")) &&
+          is.null(names(dimensions)))
+        names(dimensions) <- purrr::map_chr(dimensions, ~ .$name)
+
       assertthat::assert_that(!is.null(names(dimensions)),
         msg = "Dimensions should have names"
       )
