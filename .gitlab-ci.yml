@@ -1,5 +1,5 @@
 # based on https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
-image: methodsconsultants/r-packaging
+image: rocker/tidyverse:3.6.3
 variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
@@ -16,6 +16,3 @@ test:
   cache:
     paths:
     - $R_LIBS_USER
-
-after_script:
-  - R -e 'covr::package_coverage(Sys.getenv("CI_PROJECT_DIR"))'
