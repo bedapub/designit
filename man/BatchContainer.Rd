@@ -52,7 +52,7 @@ This field cannot be assigned.}
 \item{\code{n_available}}{Returns number of available locations in a \code{BatchContainer}.
 This field cannot be assigned.}
 
-\item{\code{n_dimension}}{Returns number of dimensions in a \code{BatchContainer}.
+\item{\code{n_dimensions}}{Returns number of dimensions in a \code{BatchContainer}.
 This field cannot be assigned.}
 
 \item{\code{dimension_names}}{\code{character} vector with dimension names.
