@@ -16,7 +16,7 @@
 #' A function used to propose two or more elements to shuffle in every step.
 #' If non-`NULL` a function receives two arguments on every iteration:
 #' `bc$samples_dt` and the iteration number. This function should return a list with attributes
-#' `src` and `dst` (see [BatchContainer$exchange_samples()]).
+#' `src` and `dst` (see [BatchContainer$exchange_samples()][BatchContainer]).
 #' @param iterations Number of iterations.
 #' @return A matrix with scores. Every row is an iteration. The matrix size is
 #' `c(iterations, 1 + length(bc$aux_scoring_f))`.
