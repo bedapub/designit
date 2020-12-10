@@ -23,7 +23,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' @description
     #' Create a new BatchContainerDimension object.
     #'
-    #' This is usually used implicitly via [BatchContainer$new()][BatchContainer].
+    #' This is usually used implicitly via [`BatchContainer$new()`][BatchContainer].
     #'
     #' @param name Dimension name, a character string. Requiered.
     #' @param size Dimension size. Setting this implies that dimension values are 1:`size`.

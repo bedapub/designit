@@ -31,7 +31,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     #' @field scoring_f
     #' Main scoring function used for optimization.
-    #' Scoring function should receive a [data.table::data.table] with columns from
+    #' Scoring function should receive a [`data.table`][data.table::data.table] with columns from
     #' the samples [data.frame], locations [data.frame], and
     #' `.sample_id` column. This function should return a floating
     #' point score value for the assignment.
@@ -329,7 +329,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field locations_df
-    #' Get a [tibble::tibble()] with all the locations in a `BatchContainer`.
+    #' Get a [`tibble`][tibble::tibble()] with all the locations in a `BatchContainer`.
     #' This field cannot be assigned.
     locations_df = function(value) {
       if (missing(value)) {
@@ -429,11 +429,11 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field samples_dt
-    #' Sample assignment [data.table::data.table].
+    #' Sample assignment [`data.table`][data.table::data.table].
     #' This data.table includes columns for all the `BatchContainer`
     #' locations, all the samples and a `".sample_id"` column.
     #'
-    #' The most efficient way of updating this [data.table::data.table] is using
+    #' The most efficient way of updating this [`data.table`][data.table::data.table] is using
     #' the `BatchContainer$exchange_samples()` method.
     samples_dt = function(value) {
       if (missing(value)) {
