@@ -20,6 +20,30 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' taking plate effect into account.
     parent_dimension = NULL,
 
+    #' @description
+    #' Create a new BatchContainerDimension object.
+    #'
+    #' This is usually used implicitly via [BatchContainer][BatchContainer$new()].
+    #'
+    #' @param name Dimension name, a character string. Requiered.
+    #' @param size Dimension size. Setting this implies that dimension values are 1:`size`.
+    #' @param values Explicit list of dimension values. Could be numeric, character or factor.
+    #' @param weight Dimension weight. Currently this is not used.
+    #' @param parent_dimension Name of the parent dimension. Currently this is not used.
+    #'
+    #' It is required to provide dimension namd and either size of values.
+    #'
+    #' @examples
+    #' plate_dimension <- BatchContainerDimension$new("plate", size=3)
+    #' row_dimension <- BatchContainerDimension$new("row", values = letters[1:3])
+    #' column_dimension <- BatchContainerDimension$new("column", values = 1:3)
+    #'
+    #' bc <- BatchContainer$new(
+    #'   dimensions = list(plate_dimension, row_dimension, column_dimension),
+    #'   exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+    #' )
+    #'
+    #' bc
     initialize = function(
                           name,
                           size = NULL,
@@ -51,6 +75,8 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
           is.factor(values),
         msg = "values should be numeric, factor or character vector"
         )
+        assertthat::assert_that(!any(is.na(values)),
+                                msg = "NA values are not allowed")
         assertthat::assert_that(length(values) > 0)
 
         if (is.numeric(values)) {
@@ -62,7 +88,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
         }
 
         if (is.factor(values)) {
-          values <- levels(x)[levels(x) %in% x]
+          values <- levels(values)[levels(values) %in% values]
           assertthat::assert_that(is.character(values), length(values) > 0)
         }
 
