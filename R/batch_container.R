@@ -23,7 +23,7 @@ validate_samples <- function(samples) {
 #' Describes container dimensions and samples to container location assignment.
 #'
 #' @details
-#' A typical workflow starts with creating a \code{BatchContainer}. Then
+#' A typical workflow starts with creating a `BatchContainer`. Then
 #' samples can be assigned to locations in that container.
 #'
 #' @export
@@ -31,9 +31,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     #' @field scoring_f
     #' Main scoring function used for optimization.
-    #' Scoring function should receive a \code{data.table} with columns from
-    #' the samples \code{data.frame}, locations \code{data.frame}, and
-    #' \code{.sample_id} column. This function should return a floating
+    #' Scoring function should receive a [data.table::data.table] with columns from
+    #' the samples [data.frame], locations [data.frame], and
+    #' `.sample_id` column. This function should return a floating
     #' point score value for the assignment.
     scoring_f = NULL,
 
@@ -46,8 +46,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @param dimensions A vector or list of dimensions. Every dimension
     #' should have a name. Could be an integer vector of dimensions or
     #' a named list. Every value of a list could be either dimension size
-    #' or parameters for \code{BatchContainerDimension$new()}.
-    #' @param exclude \code{data.frame} with excluded locations of a container.
+    #' or parameters for [BatchContainerDimension$new()][BatchContainerDimension].
+    #' @param exclude [data.frame] with excluded locations of a container.
     #' @examples
     #' bc <- BatchContainer$new(
     #'   dimensions = list(
@@ -159,7 +159,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @description
     #' Exchange samples between locations
     #' @param src integer vector of source locations
-    #' @param dst integer vector of destination locations (the same length as \code{src}).
+    #' @param dst integer vector of destination locations (the same length as `src`).
     #' @return `BatchContainer`, invisibly
     exchange_samples = function(src, dst) {
       assertthat::assert_that(is.integer(src), length(src) > 0,
@@ -217,7 +217,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @description
-    #' Prints information about \code{BatchContainer}.
+    #' Prints information about `BatchContainer`.
     #' @param ... not used.
     print = function(...) {
       cat(stringr::str_glue(
@@ -268,7 +268,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
   active = list(
     #' @field n_locations
-    #' Returns number of available locations in a \code{BatchContainer}.
+    #' Returns number of available locations in a `BatchContainer`.
     #' This field cannot be assigned.
     n_locations = function(value) {
       if (missing(value)) {
@@ -281,7 +281,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field n_excluded
-    #' Returns number of excluded locations in a \code{BatchContainer}.
+    #' Returns number of excluded locations in a `BatchContainer`.
     #' This field cannot be assigned.
     n_excluded = function(value) {
       if (missing(value)) {
@@ -296,7 +296,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field n_available
-    #' Returns number of available locations in a \code{BatchContainer}.
+    #' Returns number of available locations in a `BatchContainer`.
     #' This field cannot be assigned.
     n_available = function(value) {
       if (missing(value)) {
@@ -307,7 +307,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field n_dimensions
-    #' Returns number of dimensions in a \code{BatchContainer}.
+    #' Returns number of dimensions in a `BatchContainer`.
     #' This field cannot be assigned.
     n_dimensions = function(value) {
       if (missing(value)) {
@@ -318,7 +318,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field dimension_names
-    #' \code{character} vector with dimension names.
+    #' [character] vector with dimension names.
     #' This field cannot be assigned.
     dimension_names = function(value) {
       if (missing(value)) {
@@ -329,7 +329,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field locations_df
-    #' Get a \code{tibble} with all the locations in a \code{BatchContainer}.
+    #' Get a [tibble::tibble()] with all the locations in a `BatchContainer`.
     #' This field cannot be assigned.
     locations_df = function(value) {
       if (missing(value)) {
@@ -348,7 +348,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field exclude
-    #' Get or set excluded locations in the \code{BatchContainer}.
+    #' Get or set excluded locations in the `BatchContainer`.
     exclude = function(value) {
       if (missing(value)) {
         private$exclude_df
@@ -429,12 +429,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field samples_dt
-    #' Sample assignment \code{data.table}.
-    #' This data.table includes columns for all the \code{BatchContainer}
-    #' locations, all the samples and a \code{".sample_id"} column.
+    #' Sample assignment [data.table::data.table].
+    #' This data.table includes columns for all the `BatchContainer`
+    #' locations, all the samples and a `".sample_id"` column.
     #'
-    #' The most efficient way of updating this \code{data.table} is using
-    #' the \code{BatchContainer$exchange_samples()} method.
+    #' The most efficient way of updating this [data.table::data.table] is using
+    #' the `BatchContainer$exchange_samples()` method.
     samples_dt = function(value) {
       if (missing(value)) {
         if (is.null(private$samples_dt_cache)) {

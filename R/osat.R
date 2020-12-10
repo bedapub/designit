@@ -1,17 +1,17 @@
 #' Compute OSAT score for sample assignment.
 #'
-#' @param df \code{data.table} or \code{data.frame} where every row is a location
+#' @param df [data.table::data.table] or [data.frame] where every row is a location
 #' in a container and a sample in this location.
-#' @param batch_vars \code{character} vector with batch variable names to take into account for the
+#' @param batch_vars [character] vector with batch variable names to take into account for the
 #' score computation.
-#' @param feature_vars \code{character} vector with sample variable names to take into account for
+#' @param feature_vars [character] vector with sample variable names to take into account for
 #' score comptation.
-#' @param expected_dt A \code{data.table} with expected number of samples sample variables and
+#' @param expected_dt A [data.table::data.table] with expected number of samples sample variables and
 #' batch variables combination. This is not required, however it does not change during the
 #' optimization proccess. So it is a good idea to cache this value.
 #'
-#' @return a list with two attributes: \code{$score} (numeric score value), \code{$expected_dt}
-#' (expected counts \code{data.table} for reuse)
+#' @return a list with two attributes: `$score` (numeric score value), `$expected_dt`
+#' (expected counts `data.table` for reuse)
 #' @export
 #'
 #' @examples
