@@ -22,7 +22,7 @@ bc <- BatchContainer$new(
     "row" = list(values = letters[1:3]),
     "column" = list(values = c(1, 3))
   ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
@@ -118,7 +118,7 @@ or parameters for \code{BatchContainerDimension$new()}.}
     "row" = list(values = letters[1:3]),
     "column" = list(values = c(1, 3))
   ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
@@ -223,7 +223,7 @@ Prints information about \code{BatchContainer}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{not used.d
+\item{\code{...}}{not used.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.

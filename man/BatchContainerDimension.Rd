@@ -20,7 +20,7 @@ column_dimension <- BatchContainerDimension$new("column", values = 1:3)
 
 bc <- BatchContainer$new(
   dimensions = list(plate_dimension, row_dimension, column_dimension),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
@@ -102,7 +102,7 @@ column_dimension <- BatchContainerDimension$new("column", values = 1:3)
 
 bc <- BatchContainer$new(
   dimensions = list(plate_dimension, row_dimension, column_dimension),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
