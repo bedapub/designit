@@ -116,6 +116,8 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   ),
 
   active = list(
+    #' @field size
+    #' Returns size of a dimension.
     size = function(value) {
       if (missing(value)) {
         length(self$values)
@@ -123,6 +125,9 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
         stop("size is a read-only field")
       }
     },
+    #' @field short_info
+    #' Returns a string summarizing the dimension.
+    #' E.g., "mydim<size=10>".
     short_info = function(value) {
       if (missing(value)) {
         stringr::str_glue("{self$name}<size={self$size}>")
