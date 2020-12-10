@@ -33,7 +33,7 @@ Depends:
 Imports: 
     magrittr,
     rlang (>= 0.4.0),
-    dplyr,
+    dplyr (>= 1.0.0),
     purrr,
     ggplot2,
     tibble,
