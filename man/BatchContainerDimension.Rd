@@ -66,7 +66,7 @@ E.g., "mydim<size=10>".}
 \subsection{Method \code{new()}}{
 Create a new BatchContainerDimension object.
 
-This is usually used implicitly via \link[=BatchContainer]{BatchContainer$new()}.
+This is usually used implicitly via \code{\link[=BatchContainer]{BatchContainer$new()}}.
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(
   name,
