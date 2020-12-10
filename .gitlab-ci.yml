@@ -8,6 +8,8 @@ variables:
 test:
   script:
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  - R -e 'install.packages("BiocManager")'
+  - R -e 'BiocManager::install("OSAT")'
   - R -e 'devtools::install_deps(dep = T, lib = Sys.getenv("R_LIBS_USER"))'
   - R -e 'devtools::check(check_dir = Sys.getenv("CHECK_DIR"))'
   - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE)) > 0) stop()'
