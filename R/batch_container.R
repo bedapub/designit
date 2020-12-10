@@ -1,4 +1,6 @@
 #' Validates sample data.frame.
+#'
+#' @param samples A `data.frame` having a sample annotation per row.
 validate_samples <- function(samples) {
   assertthat::assert_that(is.data.frame(samples),
     msg = "Samples should be a data.frame or tibble"
