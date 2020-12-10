@@ -1,4 +1,5 @@
-# based on https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
+# This CI file is based on
+# https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
 image: rocker/tidyverse:4.0.3
 variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
