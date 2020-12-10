@@ -32,6 +32,7 @@
 #'   feature_vars = c("SampleType", "Sex")
 #' )
 #' @importFrom data.table :=
+#' @importFrom stats na.omit
 osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
   stopifnot(
     is.character(batch_vars),

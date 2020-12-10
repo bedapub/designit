@@ -249,6 +249,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     samples_dt_cache = NULL,
 
     #' Validate sample assignment.
+    #' @importFrom stats na.omit
     validate_assignment = function(assignment) {
       assertthat::assert_that(is.integer(assignment),
         msg = "sample assignment should an integer vector"
