@@ -103,12 +103,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
 
     #' @description
-    #' Returns TRUE if batch has samples.
-    has_samples = function() {
-      !is.null(private$samples)
-    },
-
-    #' @description
     #' Return table with samples and sample assignment.
     #' @param assignment Return sample assignment. If FALSE, only
     #' samples table is returned, with out batch assignment.
@@ -267,6 +261,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   active = list(
+    #' @field
+    #' Returns TRUE if `BatchContainer` has samples.
+    has_samples = function() {
+      if (missing(value)) {
+        !is.null(private$samples)
+      } else {
+        stop("Cannot set has_samples (read-only).")
+      }
+    },
+
     #' @field n_locations
     #' Returns number of available locations in a `BatchContainer`.
     #' This field cannot be assigned.
