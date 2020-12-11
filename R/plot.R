@@ -2,15 +2,14 @@
 #'
 #' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`).
 #' @param ... columns to select for `x` axis (see [dplyr::select()]).
-#' @param batch1 first batch variable (color).
-#' @param batch2 second batch variable (transparency).
+#' @param .color the variable used for coloring
+#' @param .alpha the variable used for transparency
 #'
 #' @export
 #'
 #' @examples
 #'
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
-  # TODO: deprecate batch1 and batch2 properly (use `lifecycle`)
   # generate vars
   vars <- rlang::enquos(...)
   combinations <- .tbl %>%
