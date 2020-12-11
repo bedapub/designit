@@ -52,7 +52,6 @@ test_that("Test locations_df", {
   expect_equal(nrow(bc4_excl$locations_df), bc4_excl$n_available)
 })
 
-context("Test BatchContainer sampel assignment")
 samples <- data.frame(a=1:10, b=rnorm(10))
 
 test_that("Test adding samples and then assigning them", {
