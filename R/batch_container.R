@@ -262,7 +262,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   active = list(
-    #' @field
+    #' @field has_samples
     #' Returns TRUE if `BatchContainer` has samples.
     has_samples = function() {
       if (missing(value)) {
