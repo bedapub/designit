@@ -76,7 +76,8 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
         msg = "values should be numeric, factor or character vector"
         )
         assertthat::assert_that(!any(is.na(values)),
-                                msg = "NA values are not allowed")
+          msg = "NA values are not allowed"
+        )
         assertthat::assert_that(length(values) > 0)
 
         if (is.numeric(values)) {
