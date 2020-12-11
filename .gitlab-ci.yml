@@ -1,0 +1,19 @@
+# This CI file is based on
+# https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
+image: rocker/tidyverse:4.0.3
+variables:
+  R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
+  CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
+  BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+
+test:
+  script:
+  - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  - R -e 'install.packages("BiocManager")'
+  - R -e 'BiocManager::install("OSAT")'
+  - R -e 'devtools::install_dev_deps(dep = T, lib = Sys.getenv("R_LIBS_USER"))'
+  - R -e 'devtools::check(cran = FALSE, error_on = "error", check_dir = Sys.getenv("CHECK_DIR"))'
+  - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE, warning = FALSE)) > 0) stop()'
+  cache:
+    paths:
+    - $R_LIBS_USER

@@ -22,7 +22,7 @@ bc <- BatchContainer$new(
     "row" = list(values = letters[1:3]),
     "column" = list(values = c(1, 3))
   ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
@@ -31,8 +31,8 @@ bc
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{scoring_f}}{Main scoring function used for optimization.
-Scoring function should receive a \code{data.table} with columns from
-the samples \code{data.frame}, locations \code{data.frame}, and
+Scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
+the samples \link{data.frame}, locations \link{data.frame}, and
 \code{.sample_id} column. This function should return a floating
 point score value for the assignment.}
 
@@ -52,13 +52,13 @@ This field cannot be assigned.}
 \item{\code{n_available}}{Returns number of available locations in a \code{BatchContainer}.
 This field cannot be assigned.}
 
-\item{\code{n_dimension}}{Returns number of dimensions in a \code{BatchContainer}.
+\item{\code{n_dimensions}}{Returns number of dimensions in a \code{BatchContainer}.
 This field cannot be assigned.}
 
-\item{\code{dimension_names}}{\code{character} vector with dimension names.
+\item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
 
-\item{\code{locations_df}}{Get a \code{tibble} with all the locations in a \code{BatchContainer}.
+\item{\code{locations_df}}{Get a \code{\link[tibble:tibble]{tibble}} with all the locations in a \code{BatchContainer}.
 This field cannot be assigned.}
 
 \item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
@@ -66,11 +66,11 @@ This field cannot be assigned.}
 \item{\code{samples_df}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
-\item{\code{samples_dt}}{Sample assignment \code{data.table}.
+\item{\code{samples_dt}}{Sample assignment \code{\link[data.table:data.table]{data.table}}.
 This data.table includes columns for all the \code{BatchContainer}
 locations, all the samples and a \code{".sample_id"} column.
 
-The most efficient way of updating this \code{data.table} is using
+The most efficient way of updating this \code{\link[data.table:data.table]{data.table}} is using
 the \code{BatchContainer$exchange_samples()} method.}
 
 \item{\code{assignment_vec}}{Sample assignment vector. Should contain NAs for empty locations.}
@@ -104,9 +104,9 @@ Create a new BatchContainer object.
 \item{\code{dimensions}}{A vector or list of dimensions. Every dimension
 should have a name. Could be an integer vector of dimensions or
 a named list. Every value of a list could be either dimension size
-or parameters for \code{BatchContainerDimension$new()}.}
+or parameters for \link[=BatchContainerDimension]{BatchContainerDimension$new()}.}
 
-\item{\code{exclude}}{\code{data.frame} with excluded locations of a container.}
+\item{\code{exclude}}{\link{data.frame} with excluded locations of a container.}
 }
 \if{html}{\out{</div>}}
 }
@@ -118,7 +118,7 @@ or parameters for \code{BatchContainerDimension$new()}.}
     "row" = list(values = letters[1:3]),
     "column" = list(values = c(1, 3))
   ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = FALSE)
 )
 
 bc
@@ -216,16 +216,23 @@ Otherwise a vector of all scoring functions starting from the first one.
 \if{latex}{\out{\hypertarget{method-print}{}}}
 \subsection{Method \code{print()}}{
 Prints information about \code{BatchContainer}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{...}}{not used.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
 Tibble with sample ids and assignment to batch container locations.
 Cached data.table with samples assignment.
-Validate sample assignment.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
+Validate sample assignment.}
 }
-
+\if{html}{\out{</div>}}
+}
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-clone"></a>}}

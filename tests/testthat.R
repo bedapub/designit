@@ -1,4 +1,4 @@
-# library(testthat)
-# library(designit)
-#
-# test_check("designit")
+library(testthat)
+library(designit)
+
+test_check("designit")

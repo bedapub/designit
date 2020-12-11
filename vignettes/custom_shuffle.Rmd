@@ -22,7 +22,6 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(designit)
-devtools::load_all("..")
 library(tidyverse)
 ```
 

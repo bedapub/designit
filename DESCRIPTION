@@ -33,7 +33,7 @@ Depends:
 Imports: 
     magrittr,
     rlang (>= 0.4.0),
-    dplyr,
+    dplyr (>= 1.0.0),
     purrr,
     ggplot2,
     tibble,
@@ -43,13 +43,19 @@ Imports:
     AlgDesign,
     R6,
     ineq,
-    data.table
+    data.table,
+    glue
 Suggests: 
     testthat,
     roxygen2,
     pkgdown,
     knitr,
-    markdown
+    markdown,
+    bench,
+    OSAT,
+    tidyverse,
+    DT,
+    devtools (>= 2.0.0)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
