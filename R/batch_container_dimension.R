@@ -68,7 +68,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
           msg = "Dimension size should be a positive integer"
         )
 
-        self$values <- 1:size
+        self$values <- seq_len(size)
       } else {
         assertthat::assert_that(is.numeric(values) ||
           is.character(values) ||

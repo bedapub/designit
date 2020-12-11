@@ -79,7 +79,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         } else if (inherits(dm, "BatchContainerDimension")) {
           assertthat::assert_that(
             dm$name == name,
-            msg = "Dimension names should match the list names"
+            msg = "dimension names should match the list names"
           )
           dm
         } else {
