@@ -264,7 +264,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
   active = list(
     #' @field has_samples
     #' Returns TRUE if `BatchContainer` has samples.
-    has_samples = function() {
+    has_samples = function(value) {
       if (missing(value)) {
         !is.null(private$samples)
       } else {
