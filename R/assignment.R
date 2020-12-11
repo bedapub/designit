@@ -7,7 +7,7 @@
 #' @return Returns `BatchContainer`, invisibly.
 assign_random <- function(batch_container, samples = NULL) {
   if (is.null(samples)) {
-    assertthat::assert_that(batch_container$has_samples(),
+    assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
     )
   } else {
@@ -42,7 +42,7 @@ assign_random <- function(batch_container, samples = NULL) {
 #' @example man/examples/assignment.R
 assign_in_order <- function(batch_container, samples = NULL) {
   if (is.null(samples)) {
-    assertthat::assert_that(batch_container$has_samples(),
+    assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
     )
   } else {

@@ -23,7 +23,7 @@
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = 1, shuffle_proposal = NULL, iterations = 1000) {
   if (is.null(samples)) {
-    assertthat::assert_that(batch_container$has_samples(),
+    assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
     )
   } else {
