@@ -11,9 +11,9 @@ plot_design(.tbl, ..., .color, .alpha = NULL)
 
 \item{...}{columns to select for \code{x} axis (see \code{\link[dplyr:select]{dplyr::select()}}).}
 
-\item{batch1}{first batch variable (color).}
+\item{.color}{the variable used for coloring}
 
-\item{batch2}{second batch variable (transparency).}
+\item{.alpha}{the variable used for transparency}
 }
 \description{
 Plot batch design

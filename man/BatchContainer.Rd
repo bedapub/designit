@@ -43,6 +43,8 @@ point score value for the assignment.}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
+\item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
+
 \item{\code{n_locations}}{Returns number of available locations in a \code{BatchContainer}.
 This field cannot be assigned.}
 
@@ -81,7 +83,6 @@ the \code{BatchContainer$exchange_samples()} method.}
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{BatchContainer$new()}}
-\item \href{#method-has_samples}{\code{BatchContainer$has_samples()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
 \item \href{#method-exchange_samples}{\code{BatchContainer$exchange_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
@@ -125,16 +126,6 @@ bc
 }
 \if{html}{\out{</div>}}
 
-}
-
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-has_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-has_samples}{}}}
-\subsection{Method \code{has_samples()}}{
-Returns TRUE if batch has samples.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$has_samples()}\if{html}{\out{</div>}}
 }
 
 }
