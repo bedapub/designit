@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Pipeline
+Status](https://code.roche.com/BEDA/designit/badges/master/pipeline.svg)](https://code.roche.com/BEDA/designit/commits/master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
