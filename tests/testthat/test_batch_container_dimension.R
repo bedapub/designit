@@ -1,6 +1,5 @@
 library(designit)
 
-context("Test BatchContainerDimension")
 
 bcd1 <- BatchContainerDimension$new("d1", size = 10)
 bcd2 <- BatchContainerDimension$new("d2", values = 1:10)
