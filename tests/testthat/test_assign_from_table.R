@@ -48,6 +48,26 @@ test_that("assign samples from sample sheet", {
           expect_equal(nrow(sample_sheet2), nrow(bc$samples$df))
 })
 
+test_that("assign samples from sample sheet works when samples are added/assigned", {
+          bc <- bc1$clone()
+          expect_null(bc$samples_df)
+          bc$samples_df <- subset(sample_sheet1, select=sampleID)
+          expect_success(assign_from_table(bc, sample_sheet1))
+
+          bc <- bc2$clone()
+          expect_null(bc$samples_df)
+          expect_success(assign_from_table(bc, sample_sheet2))
+          expect_success(assign_random(bc))
+          expect_success(assign_from_table(bc, sample_sheet2))
+})
+
+
+test_that("assign samples from sample sheet works only when samples match what's in the container", {
+          bc <- bc1$clone()
+          expect_null(bc$samples_df)
+          expect_success(assign_from_table(bc, sample_sheet1))
+          expect_failure(assign_from_table(bc, sample_sheet2))
+})
 
 test_that("assign into excluded locations should fail", {
           bc <- bc2$clone()
