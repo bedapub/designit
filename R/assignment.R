@@ -135,7 +135,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #'   1, "a", 1, 1, "TRT",
 #'   1, "b", 2, 2, "CNTRL",
 #'   2, "a", 1, 3, "TRT",
-#'   2, "b", 2, 4, "CNTR",
+#'   2, "b", 2, 4, "CNTRL",
 #'   2, "a", 3, 5, "TRT",
 #' )
 #' # assign samples from the sample sheet
