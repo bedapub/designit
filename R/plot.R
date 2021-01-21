@@ -76,5 +76,5 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
     ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
     ggplot2::geom_tile()
 
-  print(g)
+  return(g)
 }
