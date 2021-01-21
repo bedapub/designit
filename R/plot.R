@@ -108,15 +108,14 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
     add_pattern <- TRUE
 
     .tbl <- .tbl %>%
-      dplyr::mutate(Pattern = factor({{ .pattern }}))
+      dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
   }
 
-  #TODO: make sure that if any of these are numeric, they get the right levels!
   .tbl <- .tbl %>%
     dplyr::mutate(
-      Plate = factor({{ Plate }}),
-      Column = factor({{ Column }}),
-      Row = factor({{ Row }})
+      Plate = forcats::as_factor({{ Plate }}),
+      Column = forcats::as_factor({{ Column }}),
+      Row = forcats::as_factor({{ Row }})
     )
 
   # make plot
