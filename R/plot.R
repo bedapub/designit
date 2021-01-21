@@ -46,8 +46,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @export
 #'
 #' @examples
-plot_plate <- function(.tbl, Plate = "Plate", Row = "Row", Column = "Column",
-                       color, .alpha = NULL) {
+#'
+plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
+                       .color, .alpha = NULL) {
   # check dimensions
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Plate))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Row))))
@@ -57,10 +58,12 @@ plot_plate <- function(.tbl, Plate = "Plate", Row = "Row", Column = "Column",
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.alpha))))
   }
 
-  # Make helper columns for plot
-  .tbl$Plate <- .tbl[, Plate]
-  .tbl$Row <- .tbl[, Row]
-  .tbl$Column <- .tbl[, Column]
+  .tbl <- .tbl %>%
+    dplyr::mutate(
+      Plate = factor({{Plate}}),
+      Column = factor({{Column}}),
+      Row = factor({{Row}})
+           )
 
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(x = Column, y = Row,
