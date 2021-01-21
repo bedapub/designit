@@ -10,3 +10,7 @@
 ^pkgdown$
 ^doc$
 ^Meta$
+
+# gitlab ci files and directories
+^ci$
+^\.gitlab-ci\.yml$

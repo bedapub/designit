@@ -54,6 +54,8 @@ test_that("Test locations_df", {
 
 samples <- data.frame(a=1:10, b=rnorm(10))
 
+samples_with_na <- rbind(samples, data.frame(a=NA, b=NA))
+
 test_that("Test adding samples and then assigning them", {
   bc1_copy <- bc1$clone()
   bc1_copy$samples_df <- samples
@@ -97,4 +99,16 @@ test_that("Test double sample assignment", {
   expect_error(bc4_copy$samples_df <- samples)
   expect_error(assign_in_order(bc4_copy, samples))
   expect_error(assign_random(bc4_copy, samples))
+})
+
+test_that("Test assignment of samples with all-NA attributes", {
+  bc3_copy <- bc3_excl$clone()
+  expect_error(bc3_copy$samples_df <- samples_with_na)
+  expect_error(assign_in_order(bc3_copy, samples_with_na))
+  expect_error(assign_random(bc3_copy, samples_with_na))
+  bc4_copy <- bc4_excl$clone()
+  expect_error(bc4_copy$samples_df <- samples_with_na)
+  expect_error(bc4_copy$samples_df <- samples_with_na)
+  expect_error(assign_in_order(bc4_copy, samples_with_na))
+  expect_error(assign_random(bc4_copy, samples_with_na))
 })

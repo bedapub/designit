@@ -13,6 +13,9 @@ validate_samples <- function(samples) {
   assertthat::assert_that(nrow(samples) >= 1,
     msg = "Samples should have at least one row"
   )
+
+  assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(everything(), is.na))) == 0,
+                          msg = "Samples contain all-NA rows")
 }
 
 
@@ -403,12 +406,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (missing(samples)) {
         private$samples
       } else {
-        assertthat::assert_that(!is.null(samples) || !is.null(private$samples),
+        assertthat::assert_that(!is.null(samples),
           msg = "samples argument is NULL"
         )
 
         assertthat::assert_that(is.null(private$samples),
-          msg = stringr::str_c("batch container already has samples")
+          msg = "batch container already has samples"
         )
 
         validate_samples(samples)
@@ -416,6 +419,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
         assertthat::assert_that(nrow(samples) <= self$n_available,
           msg = "more samples than availble locations in the batch container"
         )
+
+        assertthat::assert_that(nrow(samples) > 0 && ncol(samples) > 0,
+                                msg = "samples should be a non-empty data.frame")
 
         assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
           msg = "some of the samples columns match batch container dimension names"

@@ -109,3 +109,78 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
     }
   }
 }
+
+#' Distributes samples based on a sample sheet.
+#'
+#' @export
+#' @param batch_container Instance of BatchContainer class
+#' @param samples `data.frame` with samples (a sample sheet). This `data.frame`
+#' (or `tibble::tibble()`) should contain samples together with their locations. No `.sample_id`
+#' column can be present in the sample sheet. In `batch_container` already has samples assigned,
+#' the function will check if samples in `batch_container` are identical to the ones in the
+#' `samples` argument.
+#'
+#' @return Returns `BatchContainer`, invisibly.
+#' @examples
+#' bc <- BatchContainer$new(
+#'   dimensions = list(
+#'     plate = 2,
+#'     column = list(values = letters[1:3]),
+#'     row = 3
+#'   )
+#' )
+#'
+#' sample_sheet <- tibble::tribble(
+#'   ~plate, ~column, ~row, ~sampleID, ~group,
+#'   1, "a", 1, 1, "TRT",
+#'   1, "b", 2, 2, "CNTRL",
+#'   2, "a", 1, 3, "TRT",
+#'   2, "b", 2, 4, "CNTRL",
+#'   2, "a", 3, 5, "TRT",
+#' )
+#' # assign samples from the sample sheet
+#' assign_from_table(bc, sample_sheet)
+#'
+#' bc$get_samples(remove_empty_locations = TRUE)
+assign_from_table <- function(batch_container, samples) {
+  # sample sheet has all the batch variable
+  assertthat::assert_that(is.data.frame(samples) && nrow(samples) > 0,
+    msg = "samples should be non-empty data.frame"
+  )
+  assertthat::assert_that(all(batch_container$dimension_names %in% colnames(samples)),
+    msg = "not all batch-container columns are present in the sample sheet"
+  )
+  assertthat::assert_that(!".sample_id" %in% colnames(samples),
+    msg = "sample sheet should not have a reserved .sample_id column"
+  )
+  location_columns <- batch_container$dimension_names
+  sample_columns <- setdiff(colnames(samples), batch_container$dimension_names)
+  only_samples <- samples[sample_columns] %>%
+    # remove all-NA rows, i.e. unassigned locations
+    dplyr::filter(!dplyr::across(everything(), is.na))
+  if (is.null(batch_container$samples_df)) {
+    batch_container$samples_df <- only_samples
+  } else {
+    assertthat::assert_that(dplyr::all_equal(only_samples,
+      batch_container$get_samples(assignment = FALSE),
+      ignore_col_order = TRUE,
+      ignore_row_order = TRUE,
+      convert = TRUE
+    ),
+    msg = "sample sheet should be compatible with samples inside the batch container"
+    )
+  }
+  only_locations <- samples[location_columns]
+  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$locations_df,
+    by = location_columns
+  )) == 0,
+  msg = "sample sheed has locations not available in the batch container"
+  )
+  samples_with_id <- batch_container$locations_df %>%
+    dplyr::left_join(samples, by = location_columns) %>%
+    dplyr::left_join(batch_container$samples_df, by = sample_columns)
+
+  batch_container$assignment_vec <- samples_with_id$.sample_id
+
+  invisible(batch_container)
+}
