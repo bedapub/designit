@@ -55,7 +55,8 @@ Suggests:
     OSAT,
     tidyverse,
     DT,
-    devtools (>= 2.0.0)
+    devtools (>= 2.0.0),
+    ggpattern
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
