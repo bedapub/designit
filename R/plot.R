@@ -121,9 +121,10 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
   # make plot
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(x = Column, y = Row) +
-    ggplot2::facet_wrap(dplyr::vars(Plate)) +
+    ggplot2::facet_wrap(dplyr::vars(Plate), strip.position = "bottom") +
     ggplot2::theme_minimal() +
-    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row))))
+    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
+    ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
