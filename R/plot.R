@@ -31,3 +31,51 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   }
   print(g)
 }
+
+
+#' Plot plate layouts
+#'
+#' @param .tbl  a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations
+#' @param Plate the dimension variable used for the plate ids
+#' @param Row the dimension variable used for the row ids
+#' @param Column the dimension variable used for the column ids
+#' @param color the variable to color by
+#' @param .alpha the variable for transparency
+#'
+#' @return
+#' @export
+#'
+#' @examples
+plot_plate <- function(.tbl, Plate = "Plate", Row = "Row", Column = "Column",
+                       color, .alpha = NULL) {
+  # check dimensions
+  assertthat::has_name(.tbl, Plate)
+  assertthat::has_name(.tbl, Row)
+  assertthat::has_name(.tbl, Column)
+
+  # Make helper columns for plot
+  .tbl$Plate <- .tbl[, Plate]
+  .tbl$Row <- .tbl[, Row]
+  .tbl$Column <- .tbl[, Column]
+
+  g <- ggplot2::ggplot(.tbl) +
+    ggplot2::aes(x = Column, y = Row,
+                 fill = {{.color}},
+                 color = {{.color}}
+    ) +
+    ggplot2::tile() +
+    ggplot2::facet_wrap(~Plate) +
+    ggplot2::theme_minimal() +
+    ggplot2::scale_x_continuous(breaks = unique(.tbl$Column)) +
+    ggplot2::scale_y_reverse(breaks = rev(unique(.tbl$Row))) +
+    # scale alpha
+    if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
+      alpha_levels <- .tbl %>% dplyr::select({{.alpha}}) %>% unique() %>% length()
+      alpha_range <- c(1 / min(5, alpha_levels), 1)
+      g <- g +
+        ggplot2::aes(alpha = {{.alpha}}) +
+        ggplot2::scale_alpha_ordinal(range = alpha_range)
+    }
+
+  print(g)
+}
