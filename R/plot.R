@@ -65,24 +65,16 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
       Row = factor({{Row}})
            )
 
+  # make plot
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(x = Column, y = Row,
                  fill = {{.color}},
                  color = {{.color}}
     ) +
-    ggplot2::tile() +
-    ggplot2::facet_wrap(~Plate) +
+    ggplot2::facet_wrap(dplyr::vars(Plate)) +
     ggplot2::theme_minimal() +
-    ggplot2::scale_x_continuous(breaks = unique(.tbl$Column)) +
-    ggplot2::scale_y_reverse(breaks = rev(unique(.tbl$Row))) +
-    # scale alpha
-    if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-      alpha_levels <- .tbl %>% dplyr::select({{.alpha}}) %>% unique() %>% length()
-      alpha_range <- c(1 / min(5, alpha_levels), 1)
-      g <- g +
-        ggplot2::aes(alpha = {{.alpha}}) +
-        ggplot2::scale_alpha_ordinal(range = alpha_range)
-    }
+    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
+    ggplot2::geom_tile()
 
   print(g)
 }
