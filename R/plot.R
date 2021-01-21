@@ -39,8 +39,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @param Plate the dimension variable used for the plate ids
 #' @param Row the dimension variable used for the row ids
 #' @param Column the dimension variable used for the column ids
-#' @param .color the variable to color by
-#' @param .alpha a continuous variable for transparency
+#' @param .color the continuous or discrete variable to color by
+#' @param .alpha a continuous variable encoding transparency
+#' @param .pattern a discrete variable encoding tile pattern
 #'
 #' @return
 #' @export
@@ -48,7 +49,8 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @examples
 #'
 plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
-                       .color, .alpha = NULL) {
+                       .color, .alpha = NULL, .pattern = NULL) {
+  add_pattern <- FALSE
   # check dimensions
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Plate))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Row))))
