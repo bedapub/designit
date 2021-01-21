@@ -16,17 +16,21 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
     dplyr::mutate(combinations = interaction(!!!vars, lex.order = T)) %>%
     dplyr::pull(combinations)
   g <- ggplot2::ggplot(.tbl) +
-    ggplot2::aes(x = combinations,
-                 fill = {{.color}},
-                 color = {{.color}}
-                 ) +
+    ggplot2::aes(
+      x = combinations,
+      fill = {{ .color }},
+      color = {{ .color }}
+    ) +
     ggplot2::geom_histogram(stat = "count") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-    alpha_levels <- .tbl %>% dplyr::select({{.alpha}}) %>% unique() %>% length()
+    alpha_levels <- .tbl %>%
+      dplyr::select({{ .alpha }}) %>%
+      unique() %>%
+      length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)
     g <- g +
-      ggplot2::aes(alpha = {{.alpha}}) +
+      ggplot2::aes(alpha = {{ .alpha }}) +
       ggplot2::scale_alpha_ordinal(range = alpha_range)
   }
   print(g)
@@ -53,7 +57,7 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' nColumn <- 4
 #' nRow <- 6
 #'
-#' treatments <- c('CTRL', 'TRT1', 'TRT2')
+#' treatments <- c("CTRL", "TRT1", "TRT2")
 #' timepoints <- c(1, 2, 3)
 #'
 #'
@@ -67,8 +71,8 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'
 #' sample_sheet <- tibble::tibble(
 #'   sampleID = 1:(nPlate * nColumn * nRow),
-#'   Treatment = rep(treatments, each = floor(nPlate * nColumn * nRow)/ length(treatments)),
-#'   Timepoint = rep(timepoints, floor(nPlate * nColumn * nRow)/ length(treatments))
+#'   Treatment = rep(treatments, each = floor(nPlate * nColumn * nRow) / length(treatments)),
+#'   Timepoint = rep(timepoints, floor(nPlate * nColumn * nRow) / length(treatments))
 #' )
 #'
 #' # assign samples from the sample sheet
@@ -76,12 +80,15 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'
 #' bc$get_samples()
 #'
-#' plot_plate(bc$get_samples(), Plate = plate, Column = column, Row = row,
-#'            .color = Treatment, .alpha = Timepoint)
+#' plot_plate(bc$get_samples(),
+#'   Plate = plate, Column = column, Row = row,
+#'   .color = Treatment, .alpha = Timepoint
+#' )
 #'
-#' plot_plate(bc$get_samples(), Plate = plate, Column = column, Row = row,
-#'            .color = Treatment, .pattern = Timepoint)
-#'
+#' plot_plate(bc$get_samples(),
+#'   Plate = plate, Column = column, Row = row,
+#'   .color = Treatment, .pattern = Timepoint
+#' )
 plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
                        .color, .alpha = NULL, .pattern = NULL) {
   add_pattern <- FALSE
@@ -90,25 +97,26 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Row))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Column))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.color))))
-  if(!rlang::quo_is_null(rlang::enquo(.alpha))) {
+  if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.alpha))))
   }
-  if(!rlang::quo_is_null(rlang::enquo(.pattern))) {
+  if (!rlang::quo_is_null(rlang::enquo(.pattern))) {
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
     assertthat::assert_that(requireNamespace("ggpattern", quietly = TRUE),
-                            msg = "Please install ggpattern to use patterns in the plot")
+      msg = "Please install ggpattern to use patterns in the plot"
+    )
     add_pattern <- TRUE
 
     .tbl <- .tbl %>%
-      dplyr::mutate(Pattern = factor({{.pattern}}))
+      dplyr::mutate(Pattern = factor({{ .pattern }}))
   }
 
   .tbl <- .tbl %>%
     dplyr::mutate(
-      Plate = factor({{Plate}}),
-      Column = factor({{Column}}),
-      Row = factor({{Row}})
-      )
+      Plate = factor({{ Plate }}),
+      Column = factor({{ Column }}),
+      Row = factor({{ Row }})
+    )
 
   # make plot
   g <- ggplot2::ggplot(.tbl) +
@@ -119,29 +127,35 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
 
   # scale alpha
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-    alpha_levels <- .tbl %>% dplyr::pull({{.alpha}}) %>% unique() %>% length()
+    alpha_levels <- .tbl %>%
+      dplyr::pull({{ .alpha }}) %>%
+      unique() %>%
+      length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)
     g <- g +
-      ggplot2::aes(alpha = {{.alpha}}) +
+      ggplot2::aes(alpha = {{ .alpha }}) +
       ggplot2::scale_alpha(range = alpha_range)
-      #ggplot2::scale_alpha_ordinal(range = alpha_range) # visually not a good idea
+    # ggplot2::scale_alpha_ordinal(range = alpha_range) # visually not a good idea
   }
 
   # set labels as original variables
   g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(Column))) +
     ggplot2::ylab(rlang::as_name(rlang::enquo(Row))) +
-    ggplot2::ggtitle(paste("Layout by",  rlang::as_name(rlang::enquo(Plate))))
+    ggplot2::ggtitle(paste("Layout by", rlang::as_name(rlang::enquo(Plate))))
 
   # make tiles
-  if(add_pattern){
+  if (add_pattern) {
     g <- g + ggpattern::geom_tile_pattern(
-      ggplot2::aes(fill = {{.color}},
-                   pattern = Pattern),
+      ggplot2::aes(
+        fill = {{ .color }},
+        pattern = Pattern
+      ),
       colour = "grey50"
     )
   } else {
-    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{.color}}),
-                                colour = "grey50")
+    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{ .color }}),
+      colour = "grey50"
+    )
   }
 
   return(g)
