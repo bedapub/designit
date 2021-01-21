@@ -41,10 +41,11 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @param Column the dimension variable used for the column ids
 #' @param .color the continuous or discrete variable to color by
 #' @param .alpha a continuous variable encoding transparency
-#' @param .pattern a discrete variable encoding tile pattern
+#' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
 #'
 #' @return
 #' @export
+#' @author siebourj
 #'
 #' @examples
 #'
@@ -111,22 +112,10 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
 
   # make plot
   g <- ggplot2::ggplot(.tbl) +
-    ggplot2::aes(x = Column, y = Row,
-                 color = {{.color}}
-    ) +
+    ggplot2::aes(x = Column, y = Row) +
     ggplot2::facet_wrap(dplyr::vars(Plate)) +
     ggplot2::theme_minimal() +
     ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row))))
-
-  if(add_pattern){
-    g <- g + ggpattern::geom_tile_pattern(
-      ggplot2::aes(pattern = Pattern,
-                   fill = {{.color}}),
-      colour = "grey50"
-    )
-  } else {
-    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{.color}}))
-  }
 
   # scale alpha
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
@@ -138,7 +127,22 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
       #ggplot2::scale_alpha_ordinal(range = alpha_range) # visually not a good idea
   }
 
-  #g <- g + ggplot2::xlab(Column) + ggplot2::ylab(Row)
+  # set labels as original variables
+  g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(Column))) +
+    ggplot2::ylab(rlang::as_name(rlang::enquo(Row))) +
+    ggplot2::ggtitle(paste("Layout by",  rlang::as_name(rlang::enquo(Plate))))
+
+  # make tiles
+  if(add_pattern){
+    g <- g + ggpattern::geom_tile_pattern(
+      ggplot2::aes(fill = {{.color}},
+                   pattern = Pattern),
+      colour = "grey50"
+    )
+  } else {
+    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{.color}}),
+                                colour = "grey50")
+  }
 
   return(g)
 }
