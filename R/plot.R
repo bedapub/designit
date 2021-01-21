@@ -59,6 +59,15 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
   if(!rlang::quo_is_null(rlang::enquo(.alpha))) {
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.alpha))))
   }
+  if(!rlang::quo_is_null(rlang::enquo(.pattern))) {
+    assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
+    assertthat::assert_that(requireNamespace("ggpattern", quietly = TRUE),
+                            msg = "Please install ggpattern to use patterns in the plot")
+    add_pattern <- TRUE
+
+    .tbl <- .tbl %>%
+      dplyr::mutate(Pattern = factor({{.pattern}}))
+  }
 
   .tbl <- .tbl %>%
     dplyr::mutate(
