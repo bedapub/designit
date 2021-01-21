@@ -39,8 +39,8 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @param Plate the dimension variable used for the plate ids
 #' @param Row the dimension variable used for the row ids
 #' @param Column the dimension variable used for the column ids
-#' @param color the variable to color by
-#' @param .alpha the variable for transparency
+#' @param .color the variable to color by
+#' @param .alpha a continuous variable for transparency
 #'
 #' @return
 #' @export
