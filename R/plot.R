@@ -76,5 +76,15 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
     ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
     ggplot2::geom_tile()
 
+  # scale alpha
+  if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
+    alpha_levels <- .tbl %>% dplyr::pull({{.alpha}}) %>% unique() %>% length()
+    alpha_range <- c(1 / min(5, alpha_levels), 1)
+    g <- g +
+      ggplot2::aes(alpha = {{.alpha}}) +
+      ggplot2::scale_alpha(range = alpha_range)
+      #ggplot2::scale_alpha_ordinal(range = alpha_range)
+  }
+
   return(g)
 }
