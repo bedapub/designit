@@ -49,9 +49,13 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 plot_plate <- function(.tbl, Plate = "Plate", Row = "Row", Column = "Column",
                        color, .alpha = NULL) {
   # check dimensions
-  assertthat::has_name(.tbl, Plate)
-  assertthat::has_name(.tbl, Row)
-  assertthat::has_name(.tbl, Column)
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Plate))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Row))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Column))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.color))))
+  if(!rlang::quo_is_null(rlang::enquo(.alpha))) {
+    assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.alpha))))
+  }
 
   # Make helper columns for plot
   .tbl$Plate <- .tbl[, Plate]
