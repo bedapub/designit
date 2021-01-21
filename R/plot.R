@@ -111,6 +111,7 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
       dplyr::mutate(Pattern = factor({{ .pattern }}))
   }
 
+  #TODO: make sure that if any of these are numeric, they get the right levels!
   .tbl <- .tbl %>%
     dplyr::mutate(
       Plate = factor({{ Plate }}),
