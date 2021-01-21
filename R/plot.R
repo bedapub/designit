@@ -48,6 +48,39 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'
 #' @examples
 #'
+#' nPlate <- 3
+#' nColumn <- 4
+#' nRow <- 6
+#'
+#' treatments <- c('CTRL', 'TRT1', 'TRT2')
+#' timepoints <- c(1, 2, 3)
+#'
+#'
+#' bc <- BatchContainer$new(
+#'   dimensions = list(
+#'     plate = nPlate,
+#'     column = list(values = letters[1:nColumn]),
+#'     row = nRow
+#'   )
+#' )
+#'
+#' sample_sheet <- tibble::tibble(
+#'   sampleID = 1:(nPlate * nColumn * nRow),
+#'   Treatment = rep(treatments, each = floor(nPlate * nColumn * nRow)/ length(treatments)),
+#'   Timepoint = rep(timepoints, floor(nPlate * nColumn * nRow)/ length(treatments))
+#' )
+#'
+#' # assign samples from the sample sheet
+#' assign_random(bc, samples = sample_sheet)
+#'
+#' bc$get_samples()
+#'
+#' plot_plate(bc$get_samples(), Plate = plate, Column = column, Row = row,
+#'            .color = Treatment, .alpha = Timepoint)
+#'
+#' plot_plate(bc$get_samples(), Plate = plate, Column = column, Row = row,
+#'            .color = Treatment, .pattern = Timepoint)
+#'
 plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
                        .color, .alpha = NULL, .pattern = NULL) {
   add_pattern <- FALSE
@@ -74,18 +107,26 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
       Plate = factor({{Plate}}),
       Column = factor({{Column}}),
       Row = factor({{Row}})
-           )
+      )
 
   # make plot
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(x = Column, y = Row,
-                 fill = {{.color}},
                  color = {{.color}}
     ) +
     ggplot2::facet_wrap(dplyr::vars(Plate)) +
     ggplot2::theme_minimal() +
-    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
-    ggplot2::geom_tile()
+    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row))))
+
+  if(add_pattern){
+    g <- g + ggpattern::geom_tile_pattern(
+      ggplot2::aes(pattern = Pattern,
+                   fill = {{.color}}),
+      colour = "grey50"
+    )
+  } else {
+    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{.color}}))
+  }
 
   # scale alpha
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
@@ -94,8 +135,10 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
     g <- g +
       ggplot2::aes(alpha = {{.alpha}}) +
       ggplot2::scale_alpha(range = alpha_range)
-      #ggplot2::scale_alpha_ordinal(range = alpha_range)
+      #ggplot2::scale_alpha_ordinal(range = alpha_range) # visually not a good idea
   }
+
+  #g <- g + ggplot2::xlab(Column) + ggplot2::ylab(Row)
 
   return(g)
 }
