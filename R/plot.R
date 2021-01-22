@@ -123,7 +123,7 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
     ggplot2::aes(x = Column, y = Row) +
     ggplot2::facet_wrap(dplyr::vars(Plate), strip.position = "bottom") +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_discrete(limits = rev(unique(.tbl %>% dplyr::pull(Row)))) +
+    ggplot2::scale_y_discrete(limits = rev(levels(.tbl %>% dplyr::pull(Row)))) +
     ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
