@@ -44,7 +44,8 @@ Imports:
     R6,
     ineq,
     data.table,
-    glue
+    glue,
+    forcats
 Suggests: 
     testthat,
     roxygen2,
