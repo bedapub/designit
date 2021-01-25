@@ -92,7 +92,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
     )
     src_pos <- sample(src_ind, 1)
     # different from src
-    dst_log <- seq(nrow(dt)) != src_pos
+    dst_log <- seq_len(nrow(dt)) != src_pos
     env <- as.list(dt)
     env$.src <- dt[src_pos, ]
     dst_log <- dst_log & rlang::eval_tidy(dst, env)

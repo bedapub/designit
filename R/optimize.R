@@ -59,10 +59,10 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   scores <- matrix(NA_real_, nrow = iterations, ncol = length(current_score), dimnames = list(NULL, names(current_score)))
   no_proposal <- FALSE
 
-  for (i in seq(iterations)) {
-    perm <- seq(n_avail)
+  for (i in seq_len(iterations)) {
+    perm <- seq_len(n_avail)
     if (is.function(shuffle_proposal)) {
-      for (j in seq(n_shuffle[i])) {
+      for (j in seq_len(n_shuffle[i])) {
         sh <- shuffle_proposal(batch_container$samples_dt, i)
         src <- sh$src
         dst <- sh$dst
@@ -81,7 +81,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       assertthat::assert_that(length(non_empty_loc) > 0,
         msg = "all locations are empty in BatchContainer"
       )
-      pos_rest <- sample(which(seq(n_avail) != pos1), n_shuffle[i] - 1)
+      pos_rest <- sample(which(seq_len(n_avail) != pos1), n_shuffle[i] - 1)
       src <- c(pos1, pos_rest)
       if (length(src) == 2) {
         # there is only one way to shuffle when there are two locations
