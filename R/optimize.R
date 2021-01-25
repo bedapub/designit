@@ -35,8 +35,9 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
   n_avail <- batch_container$n_available
   min_n_shuffle <- if (is.null(shuffle_proposal)) 2 else 1
-  if (is.null(n_shuffle))
+  if (is.null(n_shuffle)) {
     n_shuffle <- min_n_shuffle
+  }
   assertthat::assert_that(
     is.numeric(n_shuffle) &&
       (length(n_shuffle) == 1 || length(n_shuffle) == iterations),
@@ -50,7 +51,8 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   if (length(n_shuffle) == 1) n_shuffle <- rep(n_shuffle, iterations)
 
   assertthat::assert_that(all(n_shuffle >= min_n_shuffle),
-                          msg = stringr::str_glue("n_shuffle values should be at least {min_n_shuffle}"))
+    msg = stringr::str_glue("n_shuffle values should be at least {min_n_shuffle}")
+  )
 
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
   current_score <- batch_container$score(aux = TRUE)
@@ -65,8 +67,9 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
         src <- sh$src
         dst <- sh$dst
         if (is.null(src)) {
-          if (j == 1)
+          if (j == 1) {
             no_proposal <- TRUE
+          }
           break
         }
         perm[dst] <- perm[src]
@@ -76,22 +79,23 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       non_empty_loc <- which(!is.na(batch_container$samples_dt$.sample_id))
       pos1 <- sample(non_empty_loc, 1)
       assertthat::assert_that(length(non_empty_loc) > 0,
-          msg = "all locations are empty in BatchContainer"
-        )
+        msg = "all locations are empty in BatchContainer"
+      )
       pos_rest <- sample(which(seq(n_avail) != pos1), n_shuffle[i] - 1)
       src <- c(pos1, pos_rest)
-      if (length(src) == 2)
+      if (length(src) == 2) {
         # there is only one way to shuffle when there are two locations
         dst <- rev(src)
-      else
+      } else {
         dst <- sample(src)
+      }
       perm[dst] <- perm[src]
       batch_container$exchange_samples(src, dst)
     }
 
     if (no_proposal) {
       message("no shuffling proposed, stopping the optimization")
-      scores <- scores[seq_len(i - 1),]
+      scores <- scores[seq_len(i - 1), ]
       break
     }
 
