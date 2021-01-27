@@ -5,6 +5,7 @@ variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
   BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+  RSTUDIO_PANDOC: "/usr/local/bin/pandoc"
 
 test:
   script:
