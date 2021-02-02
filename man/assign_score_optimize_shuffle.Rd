@@ -7,7 +7,7 @@
 assign_score_optimize_shuffle(
   batch_container,
   samples = NULL,
-  n_shuffle = 1,
+  n_shuffle = NULL,
   shuffle_proposal = NULL,
   iterations = 1000
 )
@@ -21,9 +21,10 @@ already has samples in it.}
 \item{n_shuffle}{Number of times shuffling performed at each iterations.
 Could be a number or a vector of length \code{iterations}.
 In the later case, number of samples to shuffle could be precisely
-set for every iteration. \code{n_shuffle == 1} indicates that two elements
-are swapped one time. If \code{shuffle_proposal} function is provided, it will be
-callend \code{n_shuffle} times at an iteration.}
+set for every iteration. Please not that \code{n_shuffle} has a slightly different meaning depending
+on whether you use \code{shuffle_proposal} or not. If \code{shuffle_proposal} is not set, this parameter
+sets the number of items to shuffle (default 2). When \code{shuffle_proposal} is used, it will be
+called \code{n_shuffle} times at an iteration (default 1).}
 
 \item{shuffle_proposal}{A function used to propose two or more elements to shuffle in every step.
 If non-\code{NULL} a function receives two arguments on every iteration:

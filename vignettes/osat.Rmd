@@ -96,19 +96,12 @@ OSAT::get.experiment.setup(g_setup) %>%
 
 
 # Compare scores with various implementations
-Compare OSAT score generated using various methods.
+Compare OSAT score generated using designit.
 ```{r}
-# scores using datatable implementation
 OSAT::getLayout(gc) %>%
   left_join(OSAT::get.experiment.setup(g_setup)) %>%
   data.table::data.table() %>%
   osat_score("plates", c("SampleType", "Race", "AgeGrp")) %>%
-  .$score
-
-# scores using slower tibble implementation
-OSAT::getLayout(gc) %>%
-  left_join(OSAT::get.experiment.setup(g_setup)) %>%
-  designit:::osat_score_tibble(plates, c(SampleType, Race, AgeGrp)) %>%
   .$score
 
 # score using OSAT
