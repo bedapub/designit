@@ -9,15 +9,13 @@
 #'
 #' @return sample list with the batch
 #' @export
-#'
-#' @examples
-#'
 generate_blocks <- function(.tbl,
                             k,
                             ...,
                             .name = "Batch",
                             .prefix = "B",
                             .control = list()) {
+  .id_for_samples <- Block <- OrderWithin <- NULL # silence R check warning
   variables <- rlang::enquos(...)
   .tbl <- .tbl %>%
     dplyr::mutate(.id_for_samples = 1:dplyr::n())
