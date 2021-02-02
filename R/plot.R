@@ -44,7 +44,7 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @param .alpha a continuous variable encoding transparency
 #' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
 #'
-#' @return
+#' @return the ggplot object
 #' @export
 #' @author siebourj
 #'
@@ -100,7 +100,7 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
   if (!rlang::quo_is_null(rlang::enquo(.pattern))) {
     add_pattern <- requireNamespace("ggpattern", quietly = TRUE)
     if (!add_pattern){
-      msg = "Please install ggpattern to use patterns in the plot"
+       message("Please install ggpattern to use patterns in the plot")
     } else {
       assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
       .tbl <- .tbl %>%
