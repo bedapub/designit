@@ -46,6 +46,8 @@ Imports:
     data.table,
     glue,
     forcats
+Remotes:
+    coolbutuseless/ggpattern
 Suggests: 
     testthat,
     roxygen2,
