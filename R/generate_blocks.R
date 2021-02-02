@@ -15,6 +15,7 @@ generate_blocks <- function(.tbl,
                             .name = "Batch",
                             .prefix = "B",
                             .control = list()) {
+  .id_for_samples <- Block <- OrderWithin <- NULL # silence R check warning
   variables <- rlang::enquos(...)
   .tbl <- .tbl %>%
     dplyr::mutate(.id_for_samples = 1:dplyr::n())
