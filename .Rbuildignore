@@ -10,6 +10,7 @@
 ^pkgdown$
 ^doc$
 ^Meta$
+^tmp$
 
 # gitlab ci files and directories
 ^ci$

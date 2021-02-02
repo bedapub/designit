@@ -11,12 +11,6 @@ drop_order(.terms, m = -1)
 
 \item{m}{order of interaction (highest available if -1)}
 }
-\value{
-
-}
 \description{
 Drop highest order interactions
-}
-\examples{
-
 }

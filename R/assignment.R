@@ -92,7 +92,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
     )
     src_pos <- sample(src_ind, 1)
     # different from src
-    dst_log <- seq(nrow(dt)) != src_pos
+    dst_log <- seq_len(nrow(dt)) != src_pos
     env <- as.list(dt)
     env$.src <- dt[src_pos, ]
     dst_log <- dst_log & rlang::eval_tidy(dst, env)
@@ -157,7 +157,7 @@ assign_from_table <- function(batch_container, samples) {
   sample_columns <- setdiff(colnames(samples), batch_container$dimension_names)
   only_samples <- samples[sample_columns] %>%
     # remove all-NA rows, i.e. unassigned locations
-    dplyr::filter(!dplyr::across(everything(), is.na))
+    dplyr::filter(!dplyr::across(tidyselect::everything(), is.na))
   if (is.null(batch_container$samples_df)) {
     batch_container$samples_df <- only_samples
   } else {

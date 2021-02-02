@@ -31,9 +31,10 @@
 #'   batch_vars = "plate",
 #'   feature_vars = c("SampleType", "Sex")
 #' )
-#' @importFrom data.table :=
 #' @importFrom stats na.omit
 osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
+  . <- .N <- `:=` <- .SD <- NULL # silence R check warnings
+  .freq_batch <- .n_batch <- k <- .n_expected <- .n_samples <- N <- NULL # silence R check warnings
   stopifnot(
     is.character(batch_vars),
     is.character(feature_vars)
