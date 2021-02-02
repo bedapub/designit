@@ -18,6 +18,3 @@ plot_design(.tbl, ..., .color, .alpha = NULL)
 \description{
 Plot batch design
 }
-\examples{
-
-}
