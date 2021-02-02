@@ -6,9 +6,6 @@
 #' @param .alpha the variable used for transparency
 #'
 #' @export
-#'
-#' @examples
-#'
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)

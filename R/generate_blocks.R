@@ -9,9 +9,6 @@
 #'
 #' @return sample list with the batch
 #' @export
-#'
-#' @examples
-#'
 generate_blocks <- function(.tbl,
                             k,
                             ...,
