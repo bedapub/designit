@@ -37,9 +37,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' Plot plate layouts
 #'
 #' @param .tbl  a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations
-#' @param Plate the dimension variable used for the plate ids
-#' @param Row the dimension variable used for the row ids
-#' @param Column the dimension variable used for the column ids
+#' @param plate the dimension variable used for the plate ids
+#' @param row the dimension variable used for the row ids
+#' @param column the dimension variable used for the column ids
 #' @param .color the continuous or discrete variable to color by
 #' @param .alpha a continuous variable encoding transparency
 #' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
@@ -76,21 +76,21 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' assign_random(bc, samples = sample_sheet)
 #'
 #' plot_plate(bc$get_samples(),
-#'   Plate = plate, Column = column, Row = row,
+#'   plate = plate, column = column, row = row,
 #'   .color = Treatment, .alpha = Timepoint
 #' )
 #'
 #' plot_plate(bc$get_samples(),
-#'   Plate = plate, Column = column, Row = row,
+#'   plate = plate, column = column, row = row,
 #'   .color = Treatment, .pattern = Timepoint
 #' )
-plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
+plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
   add_pattern <- FALSE
   # check dimensions
-  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Plate))))
-  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Row))))
-  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(Column))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(row))))
+  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(column))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.color))))
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.alpha))))
@@ -108,17 +108,17 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
 
   .tbl <- .tbl %>%
     dplyr::mutate(
-      Plate = forcats::as_factor({{ Plate }}),
-      Column = forcats::as_factor({{ Column }}),
-      Row = forcats::as_factor({{ Row }})
+      plate = forcats::as_factor({{ plate }}),
+      column = forcats::as_factor({{ column }}),
+      row = forcats::as_factor({{ row }})
     )
 
   # make plot
   g <- ggplot2::ggplot(.tbl) +
-    ggplot2::aes(x = Column, y = Row) +
-    ggplot2::facet_wrap(dplyr::vars(Plate), strip.position = "bottom") +
+    ggplot2::aes(x = column, y = row) +
+    ggplot2::facet_wrap(dplyr::vars(plate), strip.position = "bottom") +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_discrete(limits = rev(levels(.tbl %>% dplyr::pull(Row)))) +
+    ggplot2::scale_y_discrete(limits = rev(levels(.tbl %>% dplyr::pull(row)))) +
     ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
@@ -135,9 +135,9 @@ plot_plate <- function(.tbl, Plate = Plate, Row = Row, Column = Column,
   }
 
   # set labels as original variables
-  g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(Column))) +
-    ggplot2::ylab(rlang::as_name(rlang::enquo(Row))) +
-    ggplot2::ggtitle(paste("Layout by", rlang::as_name(rlang::enquo(Plate))))
+  g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(column))) +
+    ggplot2::ylab(rlang::as_name(rlang::enquo(row))) +
+    ggplot2::ggtitle(paste("Layout by", rlang::as_name(rlang::enquo(plate))))
 
   # make tiles
   if (add_pattern) {
