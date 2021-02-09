@@ -45,7 +45,8 @@ Imports:
     ineq,
     data.table,
     glue,
-    forcats
+    forcats,
+    checkmate
 Suggests: 
     testthat,
     roxygen2,
