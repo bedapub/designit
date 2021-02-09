@@ -98,7 +98,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   if (!rlang::quo_is_null(rlang::enquo(.pattern))) {
     add_pattern <- requireNamespace("ggpattern", quietly = TRUE)
     if (!add_pattern){
-       message("Please install ggpattern to use patterns in the plot")
+       warning("Please install ggpattern to use patterns in the plot")
     } else {
       assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
       .tbl <- .tbl %>%
