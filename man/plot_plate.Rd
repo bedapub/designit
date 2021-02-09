@@ -6,22 +6,22 @@
 \usage{
 plot_plate(
   .tbl,
-  Plate = Plate,
-  Row = Row,
-  Column = Column,
+  plate = plate,
+  row = row,
+  column = column,
   .color,
   .alpha = NULL,
   .pattern = NULL
 )
 }
 \arguments{
-\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations}
+\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations. Alternatively a \link[designit:BatchContainer]{BatchContainter} with samples can be supplied here.}
 
-\item{Plate}{the dimension variable used for the plate ids}
+\item{plate}{the dimension variable used for the plate ids}
 
-\item{Row}{the dimension variable used for the row ids}
+\item{row}{the dimension variable used for the row ids}
 
-\item{Column}{the dimension variable used for the column ids}
+\item{column}{the dimension variable used for the column ids}
 
 \item{.color}{the continuous or discrete variable to color by}
 
@@ -30,7 +30,7 @@ plot_plate(
 \item{.pattern}{a discrete variable encoding tile pattern (needs ggpattern)}
 }
 \value{
-
+the ggplot object
 }
 \description{
 Plot plate layouts
@@ -62,15 +62,13 @@ sample_sheet <- tibble::tibble(
 # assign samples from the sample sheet
 assign_random(bc, samples = sample_sheet)
 
-bc$get_samples()
-
 plot_plate(bc$get_samples(),
-  Plate = plate, Column = column, Row = row,
+  plate = plate, column = column, row = row,
   .color = Treatment, .alpha = Timepoint
 )
 
 plot_plate(bc$get_samples(),
-  Plate = plate, Column = column, Row = row,
+  plate = plate, column = column, row = row,
   .color = Treatment, .pattern = Timepoint
 )
 }
