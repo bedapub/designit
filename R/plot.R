@@ -36,7 +36,7 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 
 #' Plot plate layouts
 #'
-#' @param .tbl  a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations
+#' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations. Alternatively a [BatchContainter][designit::BatchContainer()] with samples can be supplied here.
 #' @param plate the dimension variable used for the plate ids
 #' @param row the dimension variable used for the row ids
 #' @param column the dimension variable used for the column ids
@@ -86,6 +86,13 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
+
+  if (checkmate::test_r6(.tbl, "BatchContainer")) {
+    .tbl = .tbl$get_samples()
+  } else {
+    assertthat::assert_that(is.data.frame(.tbl))
+  }
+
   add_pattern <- FALSE
   # check dimensions
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
