@@ -75,8 +75,6 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' # assign samples from the sample sheet
 #' assign_random(bc, samples = sample_sheet)
 #'
-#' bc$get_samples()
-#'
 #' plot_plate(bc$get_samples(),
 #'   Plate = plate, Column = column, Row = row,
 #'   .color = Treatment, .alpha = Timepoint
