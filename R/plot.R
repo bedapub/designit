@@ -125,7 +125,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     ggplot2::aes(x = column, y = row) +
     ggplot2::facet_wrap(dplyr::vars(plate), strip.position = "bottom") +
     ggplot2::theme_bw() +
-    ggplot2::scale_y_discrete(limits = rev(levels(.tbl %>% dplyr::pull(row)))) +
+    ggplot2::scale_y_discrete(limits = rev(levels(.tbl$row))) +
     ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
@@ -138,7 +138,6 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     g <- g +
       ggplot2::aes(alpha = {{ .alpha }}) +
       ggplot2::scale_alpha(range = alpha_range)
-    # ggplot2::scale_alpha_ordinal(range = alpha_range) # visually not a good idea
   }
 
   # set labels as original variables
