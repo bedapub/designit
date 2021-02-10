@@ -121,7 +121,7 @@ bc$get_samples(remove_empty_locations = TRUE)
 Plot of the result using the `plot_plate` function
 
 ```{r}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), Plate = plate, Column = column, Row = row,
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 
 ```
