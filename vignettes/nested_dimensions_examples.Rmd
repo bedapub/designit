@@ -26,7 +26,7 @@ library(tidyverse)
 data("multi_trt_day_samples")
 ```
 
-Samples are grouped by Treatment and Time with the following group sizes:
+Samples are grouped by Treatment and Collection time with the following group sizes:
 
 ```{r}
 multi_trt_day_samples %>% count(Time, Treatment) %>% 
@@ -35,10 +35,14 @@ multi_trt_day_samples %>% count(Time, Treatment) %>%
 
 Total number of samples is: `r nrow(multi_trt_day_samples)`
 
-Samples are to be blocked in batches for scRNA-seq. 
-8 samples can be processed per day-batch and are split into 2 parallel runs (4 + 4). 
+# Task
 
-# Batch optimization
+Samples are to be blocked in batches for scRNA-seq. 
+
+* 8 samples can be processed per day (batch)
+* Within day they need to be split into 2 parallel runs (4 + 4). 
+
+# Optimize batch
 
 ```{r}
 # Setting up the batch container
@@ -59,7 +63,7 @@ The samples are distributed to 4 batches (processing days).
 This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling.
 
 ```{r}
-n_shuffle <- rep(c(32, 10, 5, 2), c(100, 100, 300, 500)) 
+n_shuffle <- rep(c(32, 10, 2), c(100, 100, 100)) 
 n_iterations <- length(n_shuffle)
 
 set.seed(42) # should we have conventions for this?
@@ -98,11 +102,45 @@ bc$get_samples(assignment = TRUE) %>%
   mutate(batch = factor(batch)) %>% 
   ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
   geom_bar()
-
 ```
 
+# Repeat but use shuffle with contraints 
 
-# Within batch runs 
+This does not work yet: 
+
+```{r}
+bc2 <- BatchContainer$new(
+  dimensions = c(batch = ceiling(nrow(multi_trt_day_samples) / 8), 
+                 run=2, position=4)
+)
+bc2$samples_df <- multi_trt_day_samples
+assign_in_order(bc2)
+bc2$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
+
+set.seed(42) # should we have conventions for this?
+
+trace2 <- assign_score_optimize_shuffle(
+   bc2,
+   n_shuffle = n_shuffle, 
+   # This is added to reduce the search space: 
+   # BUT THEN IT DOES NOT REACH OPTIMAL SOLUTION
+   shuffle_proposal = shuffle_with_constraints(
+    src = TRUE,
+    # batch needs to change for shuffle to be accepted
+    dst=.src$batch != batch
+   ),
+   iterations = n_iterations) # default is 1000?
+
+qplot(x = 1:n_iterations, y = trace2, color = factor(n_shuffle), 
+      main = str_glue("Final score={bc2$score()}"), geom = "point")
+
+bc2$get_samples(assignment = TRUE) %>%
+  mutate(batch = factor(batch)) %>% 
+  ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
+  geom_bar()
+```
+
+# Optimize runs within batch
 
 Using shuffle with constraints
 
@@ -125,20 +163,13 @@ trace_run <- assign_score_optimize_shuffle(
 )
 ```
 
-"no shuffling proposed, stopping the optimization" ? But is actually does something?
-
 ```{r, fig.width=5, fig.height= 4}
 qplot(x = 1:n_iterations, y = trace_run, color = factor(n_iterations), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
-
-## Final batch layout
+## Final run layout
 ```{r}
-bc$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>% 
-  ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
-  geom_bar()
 
 bc$get_samples() %>% 
  mutate(run = factor(run)) %>% 
@@ -148,7 +179,8 @@ bc$get_samples() %>%
 
 ```
 
-# Optimize in one go? Not working 
+
+# Optimize in one go? How
 
 ```{r}
 # Setting up the batch container
@@ -160,16 +192,14 @@ bc <- BatchContainer$new(
 # Add sample_sheet to container
 bc$samples_df <- multi_trt_day_samples
 # Initial random assignment
-assign_random(bc)
-
-bc
+assign_in_order(bc)
 ```
 
 The samples are distributed to 4 batches (processing days).
 This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling.
 
 ```{r}
-n_shuffle <- rep(c(32, 10, 5, 2), c(100, 100, 300, 500)) 
+n_shuffle <- rep(c(32, 10, 5, 2), c(100, 100, 100, 100)) 
 #n_shuffle <- rep(c(32, 10, 5, 2), c(50, 50, 50, 200)) 
 n_iterations <- length(n_shuffle)
 
@@ -197,15 +227,14 @@ qplot(x = 1:n_iterations, y = trace2, color = factor(n_shuffle),
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
-## Final batch layouts
+## Final batch layout
 ```{r}
 bc$get_samples(assignment = TRUE) %>%
   mutate(batch = factor(batch)) %>% 
   ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
   geom_bar()
 
-
-bc$get_samples() %>% 
+bc$get_samples(assignment = TRUE) %>% 
  mutate(run = factor(run)) %>% 
   ggplot(aes(x = run, fill =  Treatment, alpha = factor(Time))) + 
   geom_bar() +
