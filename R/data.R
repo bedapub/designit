@@ -1,0 +1,30 @@
+#' Mice sorted into cages
+#'
+#' Original arrival data of 40 mice, their treatment assignments, and
+#' their assignments into cages.
+#'
+#' @name cages
+#' @author Guido Steiner
+#' @docType data
+#' @keywords data
+#'
+#' @format A tibble with 40 rows and 15 variables:
+#' \describe{
+#' \item{Box}{Litter box}
+#' \item{BoxSection}{Section of litter box}
+#' \item{Litter}{Box&BoxSection}
+#' \item{Sex}{Female (F) or Male (M)}
+#' \item{Earmark}{Side (_L_ left, _R_ right, or _B_ both),
+#'   and quantity (1-3, unspecified if only 1) of earmarks}
+#' \item{AnimalID}{}
+#' \item{BirthDate}{Date of birth (date)}
+#' \item{Genotype}{Genotype (MUT - mutant, WT - wild type)}
+#' \item{Comment}{Comments about the animal}
+#' \item{Gen}{SNPs of the animal}
+#' \item{ArrivalWeight}{Weight of the animal at arrival (g)}
+#' \item{Group}{Blinded treatment group (1 or 2)}
+#' \item{CageNr}{Cage number}
+#' \item{CageCol}{Column of cage rack}
+#' \item{CageRow}{Row of cage rack}
+#' }
+"cages"
