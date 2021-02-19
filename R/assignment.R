@@ -90,7 +90,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
     assertthat::assert_that(length(src_ind) > 0,
       msg = "source conditions not satisfied"
     )
-    src_ind <- which(rep_len(TRUE, nrow(dt)) & rlang::eval_tidy(src, dt))
+    src_pos <- sample(src_ind, 1)
     # different from src
     dst_log <- seq_len(nrow(dt)) != src_pos
     env <- as.list(dt)
