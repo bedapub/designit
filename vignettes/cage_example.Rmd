@@ -12,7 +12,9 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.height = 6,
+  fig.width = 8
 )
 has_printr <- requireNamespace("printr") # for printing help pages nicely
 
@@ -26,9 +28,9 @@ library(tidyverse)
 if (has_printr) {
   help("cages", package = "designit")
 } else {
-  help("cages", package = "designit") %>% 
-    as.character() %>% 
-    utils:::.getHelpFile() %>% 
+  help("cages", package = "designit") %>%
+    as.character() %>%
+    utils:::.getHelpFile() %>%
     tools:::Rd2txt(outputEncoding = "UTF-8")
 }
 ```
@@ -84,18 +86,18 @@ plot_cages(cages, Group, colors = c("darkorange", "cornflowerblue")) +
 # Inspect solution
 
 ```{r}
-ggplot(cages,aes(x=CageNr,y=Litter,color=Sex)) +
-  facet_wrap(~Group,scales = "free_x", ncol=4) +
-  geom_jitter(width=0.2,height=0) +
+ggplot(cages, aes(x = CageNr, y = Litter, color = Sex)) +
+  facet_wrap(~Group, scales = "free_x", ncol = 4) +
+  geom_jitter(width = 0.2, height = 0) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   scale_color_manual(values = c("violet", "dodgerblue")) +
-  geom_label(aes(label=Earmark),hjust=0,size=3, nudge_x = 0.2, nudge_y = 0.2)
+  geom_label(aes(label = Earmark), hjust = 0, size = 3, nudge_x = 0.2, nudge_y = 0.2)
 ```
 
 ```{r}
-ggplot(cages,aes(x=CageNr,y=BirthDate,color=Sex)) +
-  facet_wrap(~Group,scales = "free_x",ncol=4) +
-  geom_jitter(width=0.2,height=0.2) +
+ggplot(cages, aes(x = CageNr, y = BirthDate, color = Sex)) +
+  facet_wrap(~Group, scales = "free_x", ncol = 4) +
+  geom_jitter(width = 0.2, height = 0.2) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
@@ -105,9 +107,30 @@ ggplot(cages, aes(x = Group, y = ArrivalWeight, color = Sex, fill = Sex)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   geom_boxplot(aes(group = Group), alpha = 0.2) +
   geom_jitter(width = 0.2, height = 0.2) +
-  stat_summary(fun = "mean", colour = "red",
-               size = 10, geom = "point",
-               aes(group = Genotype),
-               shape = 18, alpha = 0.3, show.legend = F)
+  stat_summary(
+    fun = "mean", colour = "red",
+    size = 10, geom = "point",
+    aes(group = Genotype),
+    shape = 18, alpha = 0.3, show.legend = F
+  )
 ```
 
+# Reproducing this solution
+
+Goal: same number of animals get the same treatments (_Group1_ and _Group2_) for each `Genotype` and `Sex` based on the covariates (`Litter`, `Age`, `Weight`)
+
+1) start with males (more constraints):
+  * cages with constant treatment and males from one litter
+  * as few isolated males as possible
+    (2 animals per cage, but not more than 3-4)
+  * don't mix sexes
+  * take into account covariates as much as possible
+2) females
+  * distribute based on all covariates
+  
+Problems:
+ 
+  * number of cages is not fixed
+  * number of cages per treatment is also not fixed
+  * earmarks have to be unique within each cage
+  
