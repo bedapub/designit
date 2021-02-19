@@ -55,8 +55,13 @@ bc <- BatchContainer$new(
 bc$samples_df <- multi_trt_day_samples
 # Initial random assignment
 assign_in_order(bc)
+# Set scoring function
+bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
 
 bc
+
+# clone batch container for second optimization
+bc2 <- bc$clone()
 ```
 
 The samples are distributed to 4 batches (processing days).
@@ -67,9 +72,6 @@ n_shuffle <- rep(c(32, 10, 2), c(100, 100, 100))
 n_iterations <- length(n_shuffle)
 
 set.seed(42) # should we have conventions for this?
-
-# Set scoring function
-bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
 
 # initial score
 #bc$score()
@@ -97,7 +99,7 @@ qplot(x = 1:n_iterations, y = trace, color = factor(n_shuffle),
 ```
 
 ## Final batch layout
-```{r}
+```{r, fig.width=6, fig.height=5}
 bc$get_samples(assignment = TRUE) %>%
   mutate(batch = factor(batch)) %>% 
   ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
@@ -108,15 +110,7 @@ bc$get_samples(assignment = TRUE) %>%
 
 This does not work yet: 
 
-```{r}
-bc2 <- BatchContainer$new(
-  dimensions = c(batch = ceiling(nrow(multi_trt_day_samples) / 8), 
-                 run=2, position=4)
-)
-bc2$samples_df <- multi_trt_day_samples
-assign_in_order(bc2)
-bc2$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
-
+```{r, fig.width=6, fig.height= 4}
 set.seed(42) # should we have conventions for this?
 
 trace2 <- assign_score_optimize_shuffle(
@@ -151,6 +145,10 @@ For this we keep the optimized `batch` and now only optimize `run` with constrai
 n_shuffle <- rep(c(32, 10, 5, 2), c(50, 50, 100, 200)) 
 n_iterations <- length(n_shuffle)
 
+# assing new optimization function
+bc$scoring_f <- function(samples) osat_score(samples, c("run"), c("Treatment", "Time"))$score
+
+
 trace_run <- assign_score_optimize_shuffle(
   bc,
   n_shuffle = n_shuffle,
@@ -163,13 +161,13 @@ trace_run <- assign_score_optimize_shuffle(
 )
 ```
 
-```{r, fig.width=5, fig.height= 4}
+```{r, fig.width=6, fig.height= 4}
 qplot(x = 1:n_iterations, y = trace_run, color = factor(n_iterations), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
 ## Final run layout
-```{r}
+```{r, fig.width=6, fig.height= 4}
 
 bc$get_samples() %>% 
  mutate(run = factor(run)) %>% 
@@ -222,13 +220,13 @@ trace2 <- assign_score_optimize_shuffle(bc,
 ### hide
 ### show
 
-```{r, fig.width=5, fig.height= 4}
+```{r, fig.width=6, fig.height= 4}
 qplot(x = 1:n_iterations, y = trace2, color = factor(n_shuffle), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
 ## Final batch layout
-```{r}
+```{r,  fig.width=6, fig.height= 4}
 bc$get_samples(assignment = TRUE) %>%
   mutate(batch = factor(batch)) %>% 
   ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
