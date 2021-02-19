@@ -9,20 +9,19 @@ A tibble with 40 rows and 15 variables:
 \describe{
 \item{Box}{Litter box}
 \item{BoxSection}{Section of litter box}
-\item{Litter}{Box&BoxSection}
-\item{Sex}{Female (F) or Male (M)}
+\item{*Litter}{\code{Box} & \code{BoxSection}}
+\item{*Sex}{Female (F) or Male (M)}
 \item{Earmark}{Side (\emph{L} left, \emph{R} right, or \emph{B} both),
 and quantity (1-3, unspecified if only 1) of earmarks}
-\item{AnimalID}{}
-\item{BirthDate}{Date of birth (date)}
-\item{Genotype}{Genotype (MUT - mutant, WT - wild type)}
-\item{Comment}{Comments about the animal}
-\item{Gen}{SNPs of the animal}
-\item{ArrivalWeight}{Weight of the animal at arrival (g)}
-\item{Group}{Blinded treatment group (1 or 2)}
-\item{CageNr}{Cage number}
-\item{CageCol}{Column of cage rack}
-\item{CageRow}{Row of cage rack}
+\item{*AnimalID}{\code{Sex} - \code{Litter} - \code{Earmark}}
+\item{*BirthDate}{Date of birth (date)}
+\item{*Genotype}{Genotype (MUT - mutant, WT - wild type)}
+\item{Comment}{Comments about the animal (two of them are deformed)}
+\item{*ArrivalWeight}{Weight of the animal at arrival (g)}
+\item{*Group}{\emph{(assigned)} Blinded treatment group (1 or 2)}
+\item{CageNr}{\emph{(generated)} Cage number}
+\item{CageCol}{\emph{(generated)} Column of cage rack}
+\item{CageRow}{\emph{(generated)} Row of cage rack}
 }
 }
 \usage{
@@ -30,7 +29,12 @@ cages
 }
 \description{
 Original arrival data of 40 mice, their treatment assignments, and
-their assignments into cages.
+their assignments into cages. Variables \code{Box}-\code{ArrivalWeight} are
+based on the arrival data of the animals. \code{Group} variable is the
+assigned treatment group, and \code{CageNr}, \code{CageCol}, and \code{CageRow}
+variables are the generated cage layout.
+Variables marked with an asterisk are important for the cage layout
+generation.
 }
 \author{
 Guido Steiner

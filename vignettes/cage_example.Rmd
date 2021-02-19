@@ -35,7 +35,7 @@ if (has_printr) {
 
 # Plots of cage layout
 
-```{r}
+```{r, include=FALSE}
 plot_cages <- function(data, var, colors, .row = CageRow, .col = CageCol) {
   varname <- as_label(enquo(var))
   data %>%
