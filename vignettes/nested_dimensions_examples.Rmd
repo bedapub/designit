@@ -147,6 +147,10 @@ n_iterations <- length(n_shuffle)
 
 # assing new optimization function
 bc$scoring_f <- function(samples) osat_score(samples, c("run"), c("Treatment", "Time"))$score
+# like this the optimization score is wrong because it tries to optimize across Batches.
+# Possible ways to go:
+# - we'd need something like c("batch", batch/run") for optimize by batch and run within batch.
+# - or we add "batch/run" to the constraints somehow.
 
 
 trace_run <- assign_score_optimize_shuffle(
