@@ -43,15 +43,15 @@ test_that("n_shuffle could be >=1 for shuffling with proposal function", {
 })
 
 test_that("mismatch between number of iterations and n_shuffle", {
-  expect_silent(assign_score_optimize_shuffle(bc, iterations = 10, n_shuffle = 2))
-  expect_length(assign_score_optimize_shuffle(bc, iterations = 10, n_shuffle = 2), 10)
+  expect_silent(trace <- assign_score_optimize_shuffle(bc, iterations = 10, n_shuffle = 2))
+  expect_length(trace, 10)
   expect_error(assign_score_optimize_shuffle(bc, iterations = 10, n_shuffle = c(2, 2)))
   expect_error(assign_score_optimize_shuffle(bc, iterations = 10, n_shuffle = rep(2, 200)))
 })
 
 test_that("inferring iterations from n_shuffle", {
-  expect_silent(assign_score_optimize_shuffle(bc, n_shuffle = rep(2, 10)))
-  expect_equal(assign_score_optimize_shuffle(bc, n_shuffle = rep(2, 10)), 10)
+  expect_silent(trace <- assign_score_optimize_shuffle(bc, n_shuffle = rep(2, 10)))
+  expect_length(trace, 10)
 })
 
 test_that("default number of iterations", {
