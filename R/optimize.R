@@ -19,10 +19,11 @@
 #' `bc$samples_dt` and the iteration number. This function should return a list with attributes
 #' `src` and `dst` (see [`BatchContainer$exchange_samples()`][BatchContainer]).
 #' @param iterations Number of iterations. If not provided set to 1000.
-#' @return A matrix with scores. Every row is an iteration. The matrix size is
-#' `c(iterations, 1 + length(bc$aux_scoring_f))`.
+#' @return An [OptimizationTrace] object..
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL) {
+  start_time <- Sys.time()
+  save_random_seed <- .Random.seed
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
@@ -62,8 +63,13 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   )
 
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
+  trace <- OptimizationTrace$new(
+    iterations + 1,
+    length(batch_container$aux_scoring_f),
+    names(batch_container$aux_scoring_f)
+  )
   current_score <- batch_container$score(aux = TRUE)
-  scores <- matrix(NA_real_, nrow = iterations, ncol = length(current_score), dimnames = list(NULL, names(current_score)))
+  trace$set_scores(1, current_score)
   no_proposal <- FALSE
 
   for (i in seq_len(iterations)) {
@@ -71,7 +77,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
     if (is.function(shuffle_proposal)) {
       for (j in seq_len(n_shuffle[i])) {
         sh <- shuffle_proposal(batch_container$samples_dt, i)
-        assertthat::assert_that(is.list(sh), msg="Shuffle proposal function should return a list")
+        assertthat::assert_that(is.list(sh), msg = "Shuffle proposal function should return a list")
         src <- sh$src
         dst <- sh$dst
         if (is.null(src)) {
@@ -103,14 +109,14 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
     if (no_proposal) {
       message("no shuffling proposed, stopping the optimization")
-      scores <- scores[seq_len(i - 1), ]
+      trace$shrink(i)
       break
     }
 
     non_trivial <- which(perm != seq_along(perm))
     if (length(non_trivial) == 0) {
       # the shuffling is a trivial permutation, go to the next iteration
-      scores[i, ] <- current_score
+      trace$set_scores(i + 1, current_score)
       next
     }
 
@@ -121,10 +127,12 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       current_score <- new_score
     }
 
-    scores[i, ] <- current_score
+    trace$set_scores(i + 1, current_score)
   }
 
-  return(scores)
+  trace$seed <- save_random_seed
+  trace$elapsed <- Sys.time() - start_time
+  return(trace)
 }
 
 #' OptimizationTrace represents optimization trace.
