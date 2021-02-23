@@ -35,6 +35,10 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
   n_avail <- batch_container$n_available
   min_n_shuffle <- if (is.null(shuffle_proposal)) 2 else 1
+  if (is.null(n_shuffle) && is.null(iterations)) {
+    message("Number of iterations cannot be inferred; setting to 1000 iterations")
+    iterations <- 1000
+  }
   if (is.null(n_shuffle)) {
     n_shuffle <- min_n_shuffle
   }
