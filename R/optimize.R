@@ -64,6 +64,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
     if (is.function(shuffle_proposal)) {
       for (j in seq_len(n_shuffle[i])) {
         sh <- shuffle_proposal(batch_container$samples_dt, i)
+        assertthat::assert_that(is.list(sh), msg="Shuffle proposal function should return a list")
         src <- sh$src
         dst <- sh$dst
         if (is.null(src)) {
