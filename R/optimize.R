@@ -19,7 +19,7 @@
 #' `bc$samples_dt` and the iteration number. This function should return a list with attributes
 #' `src` and `dst` (see [`BatchContainer$exchange_samples()`][BatchContainer]).
 #' @param iterations Number of iterations. If not provided set to 1000.
-#' @return An [OptimizationTrace] object..
+#' @return An [OptimizationTrace] object.
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL) {
   start_time <- Sys.time()

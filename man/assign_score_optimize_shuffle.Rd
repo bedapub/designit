@@ -34,7 +34,7 @@ If non-\code{NULL} a function receives two arguments on every iteration:
 \item{iterations}{Number of iterations. If not provided set to 1000.}
 }
 \value{
-An \link{OptimizationTrace} object..
+An \link{OptimizationTrace} object.
 }
 \description{
 In every iteration shuffles several samples in the container.
