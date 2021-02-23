@@ -9,7 +9,7 @@ assign_score_optimize_shuffle(
   samples = NULL,
   n_shuffle = NULL,
   shuffle_proposal = NULL,
-  iterations = 1000
+  iterations = NULL
 )
 }
 \arguments{
@@ -31,11 +31,10 @@ If non-\code{NULL} a function receives two arguments on every iteration:
 \code{bc$samples_dt} and the iteration number. This function should return a list with attributes
 \code{src} and \code{dst} (see \code{\link[=BatchContainer]{BatchContainer$exchange_samples()}}).}
 
-\item{iterations}{Number of iterations.}
+\item{iterations}{Number of iterations. If not provided set to 1000.}
 }
 \value{
-A matrix with scores. Every row is an iteration. The matrix size is
-\code{c(iterations, 1 + length(bc$aux_scoring_f))}.
+An \link{OptimizationTrace} object..
 }
 \description{
 In every iteration shuffles several samples in the container.
