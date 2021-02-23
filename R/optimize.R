@@ -22,7 +22,7 @@
 #' @return A matrix with scores. Every row is an iteration. The matrix size is
 #' `c(iterations, 1 + length(bc$aux_scoring_f))`.
 #' @export
-assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = 1000) {
+assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL) {
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
@@ -41,6 +41,9 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   }
   if (is.null(n_shuffle)) {
     n_shuffle <- min_n_shuffle
+  }
+  if (length(n_shuffle) > 1 & is.null(iterations)) {
+    iterations <- length(n_shuffle)
   }
   assertthat::assert_that(
     is.numeric(n_shuffle) &&
