@@ -86,7 +86,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
   src <- enquo(src)
   dst <- enquo(dst)
   function(dt, i) {
-    src_ind <- which(rlang::eval_tidy(src, dt))
+    src_ind <- which(rep_len(TRUE, nrow(dt)) & rlang::eval_tidy(src, dt))
     assertthat::assert_that(length(src_ind) > 0,
       msg = "source conditions not satisfied"
     )
