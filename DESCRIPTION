@@ -44,7 +44,9 @@ Imports:
     R6,
     ineq,
     data.table,
-    glue
+    glue,
+    forcats,
+    checkmate
 Suggests: 
     testthat,
     roxygen2,
@@ -55,9 +57,13 @@ Suggests:
     OSAT,
     tidyverse,
     DT,
-    devtools (>= 2.0.0)
+    devtools (>= 2.0.0),
+    ggpattern
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+Remotes:
+    bioc::release/OSAT,
+    github::coolbutuseless/ggpattern

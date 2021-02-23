@@ -118,15 +118,11 @@ bc$get_samples(remove_empty_locations = TRUE)
 
 ```
 
-Plot of the result
+Plot of the result using the `plot_plate` function
 
 ```{r}
-library(ggplot2)
-bc$get_samples(remove_empty_locations = TRUE) %>% 
-  ggplot(aes(x = factor(column), y = factor(-row), fill = treatment, alpha = factor(dose))) + 
-  geom_tile() +
-  facet_wrap(~plate) + 
-  theme_bw() 
-  
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose)
+
 ```
 
