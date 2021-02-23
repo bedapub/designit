@@ -197,6 +197,9 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @description
     #' Print `OptimizationTrace`.
     #'
+    #' @param ...
+    #' Unused.
+    #'
     #' @return `OptimizationTrace` invisibly.
     print = function(...) {
       start_score <- self$scores[1, 1]
@@ -209,11 +212,15 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
 
     #' @description
     #' Plot `OptimizationTrace`. Only the main score at the moment.
+    #'
+    #' @param ...
+    #' Extra arguments passed to [ggplot2::qplot()].
     plot = function(...) {
       ggplot2::qplot(
         x = seq_len(nrow(self$scores)), y = self$scores[, 1],
         geom = c("point", "line"),
-        xlab = "step", ylab = "score"
+        xlab = "step", ylab = "score",
+        ...
       )
     }
   ),
