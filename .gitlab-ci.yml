@@ -15,3 +15,14 @@ test:
   cache:
     paths:
     - $R_LIBS_USER
+
+pages:
+  stage: deploy
+  script:
+    - Rscript -e 'pkgdown::build_site()'
+    - mv docs public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
