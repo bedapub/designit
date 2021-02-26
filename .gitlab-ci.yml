@@ -6,19 +6,23 @@ variables:
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
   BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
 
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - "$R_LIBS_USER"
+
 test:
   script:
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
   - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_dev_deps(dep = TRUE))'
   - R -e 'devtools::check(cran = FALSE, error_on = "error", check_dir = Sys.getenv("CHECK_DIR"))'
   - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE, warning = FALSE)) > 0) stop()'
-  cache:
-    paths:
-    - $R_LIBS_USER
 
 pages:
   stage: deploy
   script:
+    - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+    - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
     - Rscript -e 'pkgdown::build_site()'
     - mv docs public
   artifacts:
