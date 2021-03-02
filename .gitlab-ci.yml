@@ -5,6 +5,7 @@ variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
   BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+  VERSION: "${CI_COMMIT_TAG#v}"
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -25,7 +26,7 @@ pages:
     - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
     - Rscript -e 'pkgdown::build_site()'
     - zip -r ci/docs.zip docs/
-    - curl -X POST -F "file=@ci/docs.zip" http://docs.roche.com/api/designit/latest
+    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/${VERSION:-latest}"
     - mv docs public
   artifacts:
     paths:
