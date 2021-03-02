@@ -19,6 +19,7 @@ test:
   - R -e 'devtools::check(cran = FALSE, error_on = "error", check_dir = Sys.getenv("CHECK_DIR"))'
   - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE, warning = FALSE)) > 0) stop()'
 
+# Upload pages & devel docs
 pages:
   stage: deploy
   script:
@@ -26,10 +27,23 @@ pages:
     - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
     - Rscript -e 'pkgdown::build_site()'
     - (cd docs && zip -r ../ci/docs.zip .)
-    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/${VERSION:-latest}"
+    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/devel"
     - mv docs public
   artifacts:
     paths:
       - public
   only:
     - master
+
+# upload versioned docs
+docs:
+  stage: deploy
+  script:
+    - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+    - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
+    - Rscript -e 'pkgdown::build_site()'
+    - (cd docs && zip -r ../ci/docs.zip .)
+    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/$VERSION"
+    - curl -X PUT http://docs.roche.com/api/designit/$VERSION/tags/latest
+  only:
+    - tags
