@@ -25,7 +25,7 @@ pages:
     - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
     - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
     - Rscript -e 'pkgdown::build_site()'
-    - zip -r ci/docs.zip docs/
+    - (cd docs && zip -r ../ci/docs.zip .)
     - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/${VERSION:-latest}"
     - mv docs public
   artifacts:
