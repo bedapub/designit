@@ -84,7 +84,7 @@ I practice you will have to run for a much higher number of iterations.
 ## Optimization trace 
 
 ```{r, fig.width=5, fig.height= 4}
-qplot(x = 1:n_iterations, y = trace, color = factor(n_shuffle), 
+qplot(x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
@@ -119,7 +119,7 @@ trace2 <- assign_score_optimize_shuffle(
    ),
    iterations = n_iterations)
 
-qplot(x = 1:n_iterations, y = trace2, # color = factor(n_shuffle), 
+qplot(x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle), 
       main = str_glue("Final score={bc2$score()}"), geom = "point")
 
 bc2$get_samples(assignment = TRUE) %>%
@@ -160,7 +160,7 @@ trace_run <- assign_score_optimize_shuffle(
 ```
 
 ```{r, fig.width=6, fig.height= 4}
-qplot(x = 1:n_iterations, y = trace_run, color = factor(n_iterations), 
+qplot(x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
@@ -180,6 +180,8 @@ bc$get_samples() %>%
 
 
 # Optimize in one go? How
+
+... from here it's not working
 
 ```{r}
 # Setting up the batch container
@@ -209,7 +211,7 @@ bc$scoring_f <- function(samples) osat_score(samples, c("batch", "run"), c("Trea
 
 # initial score
 #bc$score()
-trace2 <- assign_score_optimize_shuffle(bc, 
+trace <- assign_score_optimize_shuffle(bc, 
                                        n_shuffle = n_shuffle, 
                                        iterations = n_iterations) # can we simplify?
 # final score
@@ -219,7 +221,7 @@ trace2 <- assign_score_optimize_shuffle(bc,
 ## Optimization trace
 
 ```{r, fig.width=6, fig.height= 4}
-qplot(x = 1:n_iterations, y = trace2, color = factor(n_shuffle), 
+qplot(x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)), 
       main = str_glue("Final score={bc$score()}"), geom = "point")
 ```
 
