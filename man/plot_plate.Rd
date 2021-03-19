@@ -15,7 +15,7 @@ plot_plate(
 )
 }
 \arguments{
-\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations. Alternatively a \link[=BatchContainer]{BatchContainter} with samples can be supplied here.}
+\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations. Alternatively a \link[designit:BatchContainer]{BatchContainter} with samples can be supplied here.}
 
 \item{plate}{the dimension variable used for the plate ids}
 
