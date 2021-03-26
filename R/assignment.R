@@ -101,7 +101,11 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
       warning("Cannot find destanation matching the constraints")
       list(src = NULL)
     } else {
-      dst_pos <- sample(dst_ind, 1)
+      if (length(dst_ind) == 1) {
+        dst_pos <- dst_ind
+      } else {
+        dst_pos <- sample(dst_ind, 1)
+      }
       list(
         src = c(src_pos, dst_pos),
         dst = c(dst_pos, src_pos)
