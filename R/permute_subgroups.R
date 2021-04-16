@@ -222,7 +222,7 @@ mk_subgroup_shuffle_function = function(subgroup_object, subgroup_allocations,
   # Values refer to the levels of the allocation variable
   # All constraints are guaranteed to be satisfied
 
-  function(onlyShuffleIndex = FALSE) {
+  function(onlyShuffleIndex = TRUE, ...) {
     idx<<-idx+1
     if (idx>length(alloc_vectors)) {
       idx<<-1
@@ -253,7 +253,8 @@ mk_subgroup_shuffle_function = function(subgroup_object, subgroup_allocations,
     shuffle_index = order(alloc_var_assigned, subgroup_labels) # indices to bring orig. sample list into shuffled order
 
     if (onlyShuffleIndex) {
-      return(shuffle_index)
+      return(list(src = seq_along(shuffle_index),
+                  dst = shuffle_index))
     }
 
     list(shuffle_index = shuffle_index, alloc_var_index=alloc_var_assigned,
@@ -277,127 +278,6 @@ shuffle_grouped_data = function(samples, allocate_var,
 
   sa = compile_possible_subgroup_allocation(sg, fullTree = fullTree, maxCalls = maxCalls)
 
-  mk_subgroup_shuffle_function( sg, sa, keep_separate_vars=keep_separate_vars)
+  mk_subgroup_shuffle_function(sg, sa, keep_separate_vars = keep_separate_vars)
 
 }
-
-
-# ----------------------------------------------------------------------------------------------------
-# Load example data (mockup)
-
-library(tidyverse)
-library(openxlsx)
-
-# This would be the sample list
-ani = read.xlsx("data/ani_list.xlsx",1) %>%
-  mutate(Litter_alloc = ifelse(Sex=="F","female_all",Litter))
-
-# This would be the container
-treatments = rep( c("T1","T2"), each=10)
-
-# ----------------------------------------------------------------------------------------------------
-# Example 1
-
-# Produce a shuffling function, all in one go
-# It is assumed that the sample list internally remains static, as ordered initially
-# Groups represent pools of animals that can be potentially put into the same subgroup (here: cage)
-shuffle_proposal = shuffle_grouped_data(samples = ani, allocate_var=treatments,
-                                        keep_together_vars=c("Sex","Genotype"),
-                                        #keep_separate_vars=c(),
-                                        n_min=2, n_max=4, n_ideal=NA,
-                                        prefer_big_groups=FALSE, strict=T,
-                                        fullTree = F, maxCalls = 1e6)
-
-# The shuffle proposal returns: - shuffle_index: indices referring to the sample list,
-#                                                 samples should be mapped to the static container in this order for the scoring
-#                               - alloc_var_index: index of the treatment list (general: allocation variable) that can be
-#                                                 column-bound to the (static) sample list for
-shuffle_proposal(onlyShuffleIndex = T)
-
-table(shuffle_proposal()$subgroup) # subgroup (cage) sizes
-
-# ----------------------------------------------------------------------------------------------------
-# Example 2 - not solvable under 'strict' rule application; have to loosen constraints on subgroup sizes
-
-shuffle_proposal2 = shuffle_grouped_data(samples = ani, allocate_var=treatments,
-                                         keep_together_vars=c("Sex","Genotype","Litter_alloc"),
-                                         #keep_separate_vars=c(),
-                                         n_min=2, n_max=4, n_ideal=NA,
-                                         prefer_big_groups=FALSE, strict=T,
-                                         fullTree = F, maxCalls = 1e6)
-
-
-shuffle_proposal2()
-
-table(shuffle_proposal2()$subgroup) # isolated animals!
-
-# ----------------------------------------------------------------------------------------------------
-# Example 3 - earmarks cannot be perfectly singled out by cage
-shuffle_proposal3 = shuffle_grouped_data(samples = ani, allocate_var=treatments,
-                                         keep_together_vars=c("Sex","Genotype"),
-                                         keep_separate_vars=c("Earmark"),
-                                         n_min=2, n_max=4, n_ideal=3,
-                                         prefer_big_groups=F, strict=T,
-                                         fullTree = F, maxCalls = 1e6)
-
-shuffle_proposal3()
-
-# Explore violations of the earmark constraint
-with( bind_cols(ani, Cage=shuffle_proposal3()$subgroup), table(Cage, Earmark))
-
-# ----------------------------------------------------------------------------------------------------
-
-# Split the whole procedure into several calls
-
-subg = form_homogeneous_subgroups(samples = ani, allocate_var=treatments,
-                                  keep_together_vars=c("Study"), #,"Litter_alloc"),
-                                  n_min=5, n_ideal=5, prefer_big_groups=FALSE, strict=T)
-
-possible = compile_possible_subgroup_allocation( subg)
-
-shuffle_proposal = mk_subgroup_shuffle_function( subg, possible)
-
-
-# Check it
-for (i in 1:36) {
-  s = shuffle_proposal3()
-  tmp = bind_cols(ani, Treatment = s$alloc_var_level, Subgroup = s$subgroup)
-
-  print(table(tmp$Subgroup))
-
-  print(table(tmp$Treatment, tmp$Genotype))
-  print(table(tmp$Treatment, tmp$Sex))
-  print(table(tmp$Subgroup, tmp$Earmark))
-
-  print(arrange(tmp, Subgroup))
-
-}
-
-grp_levels = levels(subg$Allocate_Var)
-alloc_vectors = purrr::map(possible, rep.int, times=unlist(subg$Subgroup_Sizes))
-
-group_vec = rep.int( seq_along(subg$Subgroup_Sizes), map_dbl(subg$Subgroup_Sizes, sum) )
-
-permute_vec = purrr::map( alloc_vectors, split, f=group_vec)
-
-# Quick sanity check
-counts = purrr::map( possible, ~ tapply(X=unlist(subg$Subgroup_Sizes), INDEX=.x, sum))
-group_data(subg$Grouped_Samples)
-
-
-find_possible_block_allocations( unlist(subg$Subgroup_Sizes), table(treatments))
-
-
-trt_nums = c(10,10,10,10,10,10) # ,10,10)
-block_sizes=c(2,2,3,3,3,3,5,4,3,2,5,5,5,5,5,5) #,5,5,5,5)
-block_sizes=c(5,5,5,5,5,5,5,5,5,5,5,5) #,5,5,5,5)
-
-
-trt_nums = c(5,5)
-block_sizes=c(2,2,3,3)
-
-possible = find_possible_block_allocations(block_sizes = block_sizes, group_nums = trt_nums, fullTree = F)
-
-counts = purrr::map( possible, ~ tapply(X=block_sizes, INDEX=.x, sum))
-
-sum(purrr::map_lgl(counts, ~ all(.x==10)))
