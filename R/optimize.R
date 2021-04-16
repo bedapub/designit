@@ -70,7 +70,6 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   )
   current_score <- batch_container$score(aux = TRUE)
   trace$set_scores(1, current_score)
-  no_proposal <- FALSE
 
   for (i in seq_len(iterations)) {
     perm <- seq_len(n_avail)
@@ -81,9 +80,6 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
         src <- sh$src
         dst <- sh$dst
         if (is.null(src)) {
-          if (j == 1) {
-            no_proposal <- TRUE
-          }
           break
         }
         perm[dst] <- perm[src]
@@ -105,12 +101,6 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       }
       perm[dst] <- perm[src]
       batch_container$exchange_samples(src, dst)
-    }
-
-    if (no_proposal) {
-      message("no shuffling proposed, stopping the optimization")
-      trace$shrink(i)
-      break
     }
 
     non_trivial <- which(perm != seq_along(perm))
