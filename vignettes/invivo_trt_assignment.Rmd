@@ -1,0 +1,303 @@
+---
+title: "Optimize in-vivo treatment and cage assignment"
+output: rmarkdown::html_vignette
+params:
+  iterations: 100
+  n_samples: 50
+vignette: >
+  %\VignetteIndexEntry{Optimize in-vivo treatment and cage assignment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE,
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+```{r setup}
+library(designit)
+library(tidyverse)
+```
+
+In this example we would like to distribute animals among cages with constraints:
+
+* There should be not more than one male per cage.
+* Number of treatment/control animals should be comparable per cage
+* Average weight per cage should be comparable between cages
+
+```{r}
+set.seed(43)
+samples <- read_tsv("../data/ani_list.tsv") %>%
+  mutate(Litter_alloc = ifelse(Sex=="F","female_all",Litter))
+
+samples %>%
+  head()
+```
+
+```{r}
+samples %>%
+  count(Sex)
+```
+
+We create a `BatchContainer` with 2 Treatment groups and 20 each. Note that positions do not
+actually matter; this is just to limit the number of animals per cage.
+
+We start by assigning samples randomly.
+
+```{r}
+set.seed(42)
+bc <- BatchContainer$new(
+  dimensions = c("Treatment" = 2, "position" = 10)
+)
+assign_random(bc, samples)
+bc
+```
+
+
+
+First, we use OSAT scoring function to ensure even distribution of males among cages. Only `cage`
+and `sex` interactions are considered in the scoring function. We only use 10 iterations, since
+shuffling is limited to locations with males and enforces change of cage on every iteration.
+
+```{r}
+bc$scoring_f <- function(samples) {
+  osat_score(
+    samples,
+    batch_vars = "Treatment",
+    feature_vars = c("Sex", "Genotype"),
+  )$score
+}
+```
+set.seed(10)
+
+## Example 1
+
+Produce a shuffling function, all in one go
+It is assumed that the sample list internally remains static, as ordered initially
+Groups represent pools of animals that can be potentially put into the same subgroup (here: cage)
+
+```{r}
+
+shuffle_proposal  <-  shuffle_grouped_data(samples = samples, allocate_var= rep(1:2, each = 10),
+                                        keep_together_vars=c("Sex","Genotype"),
+                                        #keep_separate_vars=c(),
+                                        n_min=2, n_max=4, n_ideal=NA,
+                                        prefer_big_groups=FALSE, strict=T,
+                                        fullTree = F, maxCalls = 1e6)
+
+
+res <- assign_score_optimize_shuffle(
+  bc,
+  shuffle_proposal = shuffle_proposal,
+  iterations = 10
+)
+
+plot(res)
+```
+We expect the distribution of males become even, while other variables are not significantly
+affected.
+
+
+Functions to plot number of males per cage, weights per cage and treatment/control ratios.
+```{r}
+males_per_cage <- function(bc) {
+  bc$get_samples() %>%
+    filter(sex == "M") %>%
+    count(cage) %>%
+    ggplot(aes(cage, n)) +
+    geom_col()
+}
+
+weight_d <- function(bc) {
+  bc$get_samples() %>%
+    ggplot(aes(factor(cage), weight)) +
+    geom_violin() +
+    geom_point() +
+    stat_summary(fun = mean, geom = "point", size = 2, shape = 23, color = "red")
+}
+
+group_d <- function(bc) {
+  bc$get_samples(remove_empty_locations = TRUE) %>%
+    ggplot(aes(factor(cage), fill = group)) +
+    geom_bar(position = "fill")
+}
+```
+
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```
+
+Here we only define our custom scoring function which ensures even distribution of weights and
+treatment/control groups. Only female samples are shuffled and male samples are kept in their
+locations. We also ensure that on every iteration the cage number is changed; we do this because
+`position` dimension does affect actual animal allocation.
+
+```{r}
+bc$scoring_f <- function(samples) {
+  avg_w <- samples[, mean(weight, na.rm = TRUE)]
+  avg_w_per_cage <- samples[!is.na(weight), mean(weight), by = cage]$V1
+  trt_per_cage <- samples[!is.na(group), sum(group == "treatment") / .N, by = cage]$V1
+
+  w_score <- mean((avg_w - avg_w_per_cage)**2)
+  trt_score <- mean((trt_per_cage - 0.5)**2)
+  w_score + 10 * trt_score
+}
+
+set.seed(12)
+res <- assign_score_optimize_shuffle(bc,
+  shuffle_proposal = shuffle_with_constraints(
+    sex == "F",
+    cage != .src$cage & (is.na(sex) | sex != "M")
+  ),
+  n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
+  iterations = 200
+)
+plot(res)
+bc$score()
+```
+
+Now we have a much more even distribution of weights and treatment/control balance.
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```
+
+
+new stuff
+
+
+
+
+# ----------------------------------------------------------------------------------------------------
+# Load example data (mockup)
+
+library(tidyverse)
+library(openxlsx)
+
+# This would be the sample list
+ani = read.xlsx("data/ani_list.xlsx",1) %>%
+  mutate(Litter_alloc = ifelse(Sex=="F","female_all",Litter))
+
+# This would be the container
+treatments = rep( c("T1","T2"), each=10)
+
+# ----------------------------------------------------------------------------------------------------
+# Example 1
+
+# Produce a shuffling function, all in one go
+# It is assumed that the sample list internally remains static, as ordered initially
+# Groups represent pools of animals that can be potentially put into the same subgroup (here: cage)
+shuffle_proposal = shuffle_grouped_data(samples = ani, allocate_var=treatments,
+                                        keep_together_vars=c("Sex","Genotype"),
+                                        #keep_separate_vars=c(),
+                                        n_min=2, n_max=4, n_ideal=NA,
+                                        prefer_big_groups=FALSE, strict=T,
+                                        fullTree = F, maxCalls = 1e6)
+
+# The shuffle proposal returns: - shuffle_index: indices referring to the sample list,
+#                                                 samples should be mapped to the static container in this order for the scoring
+#                               - alloc_var_index: index of the treatment list (general: allocation variable) that can be
+#                                                 column-bound to the (static) sample list for
+shuffle_proposal(onlyShuffleIndex = T)
+
+table(shuffle_proposal()$subgroup) # subgroup (cage) sizes
+
+# ----------------------------------------------------------------------------------------------------
+# Example 2 - not solvable under 'strict' rule application; have to loosen constraints on subgroup sizes
+
+shuffle_proposal2 = shuffle_grouped_data(samples = ani, allocate_var=treatments,
+                                         keep_together_vars=c("Sex","Genotype","Litter_alloc"),
+                                         #keep_separate_vars=c(),
+                                         n_min=2, n_max=4, n_ideal=NA,
+                                         prefer_big_groups=FALSE, strict=T,
+                                         fullTree = F, maxCalls = 1e6)
+
+
+shuffle_proposal2()
+
+table(shuffle_proposal2()$subgroup) # isolated animals!
+
+# ----------------------------------------------------------------------------------------------------
+# Example 3 - earmarks cannot be perfectly singled out by cage
+shuffle_proposal3 = shuffle_grouped_data(samples = ani, allocate_var=treatments,
+                                         keep_together_vars=c("Sex","Genotype"),
+                                         keep_separate_vars=c("Earmark"),
+                                         n_min=2, n_max=4, n_ideal=3,
+                                         prefer_big_groups=F, strict=T,
+                                         fullTree = F, maxCalls = 1e6)
+
+shuffle_proposal3()
+
+# Explore violations of the earmark constraint
+with( bind_cols(ani, Cage=shuffle_proposal3()$subgroup), table(Cage, Earmark))
+
+# ----------------------------------------------------------------------------------------------------
+
+# Split the whole procedure into several calls
+
+subg = form_homogeneous_subgroups(samples = ani, allocate_var=treatments,
+                                  keep_together_vars=c("Study"), #,"Litter_alloc"),
+                                  n_min=5, n_ideal=5, prefer_big_groups=FALSE, strict=T)
+
+possible = compile_possible_subgroup_allocation( subg)
+
+shuffle_proposal = mk_subgroup_shuffle_function( subg, possible)
+
+
+# Check it
+for (i in 1:36) {
+  s = shuffle_proposal3()
+  tmp = bind_cols(ani, Treatment = s$alloc_var_level, Subgroup = s$subgroup)
+
+  print(table(tmp$Subgroup))
+
+  print(table(tmp$Treatment, tmp$Genotype))
+  print(table(tmp$Treatment, tmp$Sex))
+  print(table(tmp$Subgroup, tmp$Earmark))
+
+  print(arrange(tmp, Subgroup))
+
+}
+
+grp_levels = levels(subg$Allocate_Var)
+alloc_vectors = purrr::map(possible, rep.int, times=unlist(subg$Subgroup_Sizes))
+
+group_vec = rep.int( seq_along(subg$Subgroup_Sizes), map_dbl(subg$Subgroup_Sizes, sum) )
+
+permute_vec = purrr::map( alloc_vectors, split, f=group_vec)
+
+# Quick sanity check
+counts = purrr::map( possible, ~ tapply(X=unlist(subg$Subgroup_Sizes), INDEX=.x, sum))
+group_data(subg$Grouped_Samples)
+
+
+find_possible_block_allocations( unlist(subg$Subgroup_Sizes), table(treatments))
+
+
+trt_nums = c(10,10,10,10,10,10) # ,10,10)
+block_sizes=c(2,2,3,3,3,3,5,4,3,2,5,5,5,5,5,5) #,5,5,5,5)
+block_sizes=c(5,5,5,5,5,5,5,5,5,5,5,5) #,5,5,5,5)
+
+
+trt_nums = c(5,5)
+block_sizes=c(2,2,3,3)
+
+possible = find_possible_block_allocations(block_sizes = block_sizes, group_nums = trt_nums, fullTree = F)
+
+counts = purrr::map( possible, ~ tapply(X=block_sizes, INDEX=.x, sum))
+
+sum(purrr::map_lgl(counts, ~ all(.x==10)))
