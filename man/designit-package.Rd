@@ -12,7 +12,7 @@ Blocking and randomization for experimental design.
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/}
+  \item \url{https://docs.roche.com/#/designit/latest}
   \item \url{https://code.roche.com/BEDA/designit/}
   \item Report bugs at \url{https://code.roche.com/BEDA/designit/issues}
 }
