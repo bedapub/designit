@@ -18,7 +18,7 @@ score comptation.}
 
 \item{expected_dt}{A \code{\link[data.table:data.table]{data.table}} with expected number of samples sample
 variables and batch variables combination. This is not required, however it does not change
-during the optimization proccess. So it is a good idea to cache this value.}
+during the optimization process. So it is a good idea to cache this value.}
 }
 \value{
 a list with two attributes: \verb{$score} (numeric score value), \verb{$expected_dt}

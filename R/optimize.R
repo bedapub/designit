@@ -255,15 +255,20 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   start_time <- Sys.time()
   save_random_seed <- .Random.seed
 
-  # Check that samples are available and their number is in valid range
+  # Check that samples are available and their number is in valid range.
+  # We will use only the unchanged sample list from the batch container (samples_df, NOT samples_dt)
+  # and manage the permutation index in this function
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
                             msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
-    assign_random(batch_container, samples)
+    assign_in_order(batch_container, samples) # don't change initial sample order! side effect: samples are undergoing some checks
   }
+
+  assertthat::assert_that(nrow(batch_container$samples_df)==nrow(batch_container$locations_df),
+                          msg = "Situation with non-available container locations is not tested yet!")
 
   # Check presence of scoring function
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
@@ -297,31 +302,37 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     names(batch_container$aux_scoring_f)
   )
 
-  starting_perm <- seq_len(batch_container$n_available) # Every iteration starts from this in orig. code ???
+  #starting_perm <- seq_len(batch_container$n_available) # Every iteration starts from this in orig. code ???
+  # New index management: we just need one index to reflect sample order
+  # Ideally we could avoid the cbind operation
+  perm = best_perm = 1:nrow(batch_container$samples_df)
+  best_score = batch_container$scoring_f( bind_cols( batch_container$locations_df, batch_container$samples_df))
 
-  curr_shuffle=shuffle_proposal_func(iteration) # R while loop does not allow variable assignment !? :(
-
-  current_score <- batch_container$score(aux = TRUE)
+  curr_shuffle = shuffle_proposal_func(iteration) # R while loop does not allow variable assignment !? :(
 
   while (!is.null(curr_shuffle)) { # Some shuffling functions may return NULL to indicate end of permutation protocol
 
-    perm = starting_perm
+    perm = 1:nrow(batch_container$samples_df) # Get rid of this later
     perm[curr_shuffle$dst] <- perm[curr_shuffle$src]
-    batch_container$exchange_samples(curr_shuffle$src, curr_shuffle$dst) # Very inefficient; also: has to be back-transformed later
 
-    trace$set_scores(iteration, current_score)
+    # avoid sample exchange and scoring functions from container and construct object that is required for scoring directly
+    # batch_container$exchange_samples(curr_shuffle$src, curr_shuffle$dst) # Very inefficient; also: has to be back-transformed later
+    # new_score <- batch_container$score(aux = TRUE)
 
-    new_score <- batch_container$score(aux = TRUE)
-    if (new_score[1] >= current_score[1]) { # why index 1?
-      batch_container$exchange_samples(curr_shuffle$src, curr_shuffle$dst) # permute back!!
-    } else {
-      current_score <- new_score # and keep order!
-      cat(current_score,"\n")
-    }
+    new_score = batch_container$scoring_f( bind_cols( batch_container$locations_df, batch_container$samples_df[perm,]))
 
+    if (new_score < best_score) { # only look at main scoring function here
+      best_score = new_score
+      best_perm = perm
+      cat(best_score,"\n")
+    } #else { # no need to permute anything back!
+      #batch_container$exchange_samples(curr_shuffle$src, curr_shuffle$dst) # permute back!!
+    #}
+
+    trace$set_scores(iteration, best_score)
 
     # Test some stopping criteria
-    if (!is.na(min_score) && current_score<=min_score) {
+    if (!is.na(min_score) && best_score<=min_score) {
       if (!quiet) { message("Reached min_score in ",iteration," iterations.") }
       break
     }
@@ -337,7 +348,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   # Previous code! Should have a deeper look - some of the logic seems unclear
   # for (i in seq_len(iterations)) {
-  #   perm <- seq_len(n_avail)
+  #   perm <- seq_len(n_avail) # Every iteration starts from original arrangement??
   #   if (is.function(shuffle_proposal)) {
   #     for (j in seq_len(n_shuffle[i])) {
   #       sh <- shuffle_proposal(batch_container$samples_dt, i)
