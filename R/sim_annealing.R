@@ -7,11 +7,12 @@
 #' @param current_score Score from the current optimizing iteration (scalar value, double)
 #' @param best_score Score from the current optimizing iteration (scalar value, double)
 #' @param temp Current value of annealing temperature
+#' @param eps Small parameter eps(ilon), achieving that not always the new solution is taken when scores are exactly equal
 #'
 #' @return Probability with which to accept the new score as the best one
 #'
 #' @keywords internal
-simanneal_acceptance_prob = function(current_score, best_score, temp) {
+simanneal_acceptance_prob = function(current_score, best_score, temp, eps=0.1) {
   # Selected according to default function in
   # https://en.wikipedia.org/wiki/Simulated_annealing
   # but should stay fixed probably and could be included in the SA function to save one frequent function call
@@ -19,7 +20,7 @@ simanneal_acceptance_prob = function(current_score, best_score, temp) {
   if (current_score<best_score) {
     return(1)
   }
-  exp((best_score-current_score)/temp)
+  exp((best_score-current_score-eps)/temp)
 }
 
 
@@ -76,7 +77,7 @@ mk_simanneal_temp_func = function(T0, alpha, type="Quadratic multiplicative") {
 #'
 #' @return A function that takes parameters (current_score, best_score, iteration) for an optimization step and return a Boolean indicating whether the current solution should be accepted or dismissed. Acceptance probability of a worse solution decreases with annealing temperature.
 #' @export
-mk_simanneal_acceptance_func = function(temp_function = mk_simanneal_temp_func(T0 = 50000, alpha=0.1)) {
+mk_simanneal_acceptance_func = function(temp_function = mk_simanneal_temp_func(T0 = 500, alpha=0.8)) {
 
   force(temp_function)
 
