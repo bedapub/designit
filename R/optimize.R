@@ -247,7 +247,7 @@ mk_swapping_function = function(n_samples, n_swaps = 1) {
   draws = NA
   S = 0 # remember last number of swaps (for optimizing speed)
 
-  function(iteration=iter) {
+  function(iteration=iter, ...) { # ignore possible other params passed to a generic shuffle function
     if (iteration>length(n_swaps) || iteration<1) {
       return(NULL)
     }
@@ -326,6 +326,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   samp = batch_container$samples_df
   scoring_func = batch_container$scoring_f
 
+  append_to_data = FALSE
+  shuffle_all = FALSE
 
   # Create shuffle_proposal_func
   # If passed by the user, this one getting priority over n_shuffle.
@@ -334,13 +336,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # Planned: Allow to pass and use functions which instead of returning permutation indices return an entire shuffling
   if (is.null(n_shuffle) && is.null(shuffle_proposal_func)) {
     shuffle_proposal_func = mk_swapping_function(n_samples = nrow(samp), n_swaps = 1)
-    shuffle_all = FALSE
   } else if (is.null(shuffle_proposal_func)) {
     shuffle_proposal_func = mk_swapping_function(n_samples = nrow(samp), n_swaps = n_shuffle)
-    shuffle_all = FALSE
   } else { # apply but test user provided shuffle function!
     assertthat::assert_that(is.function(shuffle_proposal_func), msg = "shuffle_proposal_func should be a function")
-    test_shuffle = shuffle_proposal_func(1) # what would come out in 1st iteration?
+    test_shuffle = shuffle_proposal_func(iteration=1) # what would come out in 1st iteration?
     if (is.numeric(test_shuffle)) { # passes back a complete permutation order
       assertthat::assert_that(length(test_shuffle)==nrow(samp), msg = "shuffle proposal function must return a permutation vector of correct length")
       assertthat::assert_that(all(test_shuffle<=nrow(samp)),
@@ -353,7 +353,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       assertthat::assert_that(all(unlist(test_shuffle)<=nrow(samp)),
                               all(unlist(test_shuffle)>0),
                               msg = "Shuffle proposal function must return valid sample indices")
-      shuffle_all = FALSE
+    }
+
+    test_shuffle = shuffle_proposal_func(onlyShuffleIndex=F, bufferedShuffle=T) # can we get additional columns for the data frame?
+    if (is.list(test_shuffle) && "DATA_APPEND" %in% names(test_shuffle)) {
+      append_to_data = TRUE
     }
   }
 
@@ -375,6 +379,14 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   iteration = 1
 
   curr_shuffle = shuffle_proposal_func(iteration) # R while loop does not allow variable assignment !? :(
+  if (append_to_data) {
+    append_cols = shuffle_proposal_func(onlyShuffleIndex=F, bufferedShuffle=T)[["DATA_APPEND"]]
+  }
+
+  if (!quiet) {
+    message("Initial score: ",best_score, ", shuffling ", ifelse(shuffle_all,"ALL","SUBSETS"),
+            ifelse(append_to_data,", appending extra sample columns",""))
+  }
 
   while (!is.null(curr_shuffle) && (iteration<=max_iter)) { # Some shuffling functions may return NULL to indicate end of permutation protocol
 
@@ -389,11 +401,16 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
     new_score = scoring_func(samp_perm)
 
+    # message("Curr score: ",new_score,"  [", iteration,"]")
+
     if (acceptance_func(new_score, best_score, iteration)) { # only look at main score here, not aux
       best_score = new_score
-      best_perm = samp_perm$.sample_id
+      best_perm = samp_perm$.sample_id # or simply: curr_shuffle !
       if (!quiet) {
-        message("Opt. score: ",best_score)
+        message("Achieved score: ",best_score,"  [", iteration,"]")
+      }
+      if (append_to_data) {
+        append_cols = shuffle_proposal_func(onlyShuffleIndex=F, bufferedShuffle=T)[["DATA_APPEND"]]
       }
     } else {
       if (!shuffle_all) { # have to swap back!
@@ -414,7 +431,18 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   }
 
-  batch_container$assignment_vec = best_perm
+  # Depending on the case, if new sample columns are provided, update the sample table in the batch container,
+  # otherwise, just remember new sample order by resetting the allocation vector.
+  # Not clear if this is the intended way to work with the container though...
+  if (append_to_data) {
+    samples_new = bind_cols( dplyr::select(samp,-c(.sample_id)), append_cols)
+    batch_container$update_samples(samples_new)
+    if (!quiet) {
+      message(ncol(append_cols), " columns added to batch container data frame.")
+    }
+  } else {
+    batch_container$assignment_vec = best_perm
+  }
 
   trace$seed <- save_random_seed
   trace$elapsed <- Sys.time() - start_time
