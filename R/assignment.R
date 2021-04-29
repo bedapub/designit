@@ -10,7 +10,7 @@ assign_random <- function(batch_container, samples = NULL) {
 
   batch_container = assign_in_order(batch_container, samples)
 
-  batch_container$assignment_vec <- sample(expanded_ids)
+  batch_container$assignment_vec <- sample(batch_container$assignment_vec)
 
   invisible(batch_container)
 }
