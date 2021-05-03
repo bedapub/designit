@@ -214,33 +214,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       return(res)
     },
 
-    update_samples = function(samples) {
-
-      assertthat::assert_that(!is.null(samples),
-                              msg = "samples argument is NULL"
-      )
-
-
-      validate_samples(samples)
-
-      assertthat::assert_that(nrow(samples) <= self$n_available,
-                              msg = "more samples than availble locations in the batch container"
-      )
-
-      assertthat::assert_that(nrow(samples) > 0 && ncol(samples) > 0,
-                              msg = "samples should be a non-empty data.frame")
-
-      assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
-                              msg = "some of the samples columns match batch container dimension names"
-      )
-
-      samples$.sample_id <- 1:nrow(samples)
-
-      private$samples <- samples
-
-      private$samples_dt_cache <- NULL
-    },
-
     #' @description
     #' Prints information about `BatchContainer`.
     #' @param ... not used.
@@ -482,7 +455,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         }
         data.table::copy(private$samples_dt_cache)
       } else {
-        stop("samples_dt is read-only.")
+        private$samples_dt_cache = value
+        # stop("samples_dt is read-only.")
       }
     },
 
