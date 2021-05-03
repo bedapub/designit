@@ -194,10 +194,17 @@ BatchContainer <- R6::R6Class("BatchContainer",
       )
 
       samples <- self$samples_dt
-      res <- self$scoring_f(samples)
-      assertthat::assert_that(assertthat::is.number(res),
-        msg = "Scoring function should return a single number"
-      )
+      if (is.list(self$scoring_f)) {
+        res = purrr::map_dbl(self$scoring_f, ~ .x(samples))
+      } else {
+        res <- self$scoring_f(samples)
+      }
+
+      assertthat::assert_that(is.double(res))
+
+      #assertthat::assert_that(assertthat::is.number(res),
+      #  msg = "Scoring function should return a single number"
+      #)
 
       if (aux && !is.null(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1) {
         assertthat::assert_that(is.list(self$aux_scoring_f),
