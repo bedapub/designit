@@ -40,34 +40,33 @@ mk_simanneal_temp_func = function(T0, alpha, type="Quadratic multiplicative") {
   force(T0)
   force(alpha)
 
-  # for simulated annealing
-  # cooling schedule: returns temperature as function of the step number
-  # Should probably re-parameterized so that k is running from 0 to 1 --> depending on maxiter, cooling can be slowed down.
-  # Also, T0 and alpha should be converted to passed parameters
-  # By default uses Quadratic multiplicative cooling as descried in
-  # http://what-when-how.com/artificial-intelligence/a-comparison-of-cooling-schedules-for-simulated-annealing-artificial-intelligence/
+  # May be re-parameterized so that k is within [0, 1] --> depending on maxiter, cooling can be slowed down accordingly
+  # But: can only be done if the number of iterations is known beforehand
 
-  if (type=="Exponential multiplicative") {
-    assertthat::assert_that(alpha>=0.8, alpha<=0.9, msg = "Alpha has to be in interval [0.8, 0.9].")
-    return( function(k) { T0*alpha^k } )
-  }
+  switch( type,
+          "Exponential multiplicative" = {
+            assertthat::assert_that(alpha>=0.8, alpha<=0.9, msg = "Alpha has to be in interval [0.8, 0.9].")
+            return( function(k) { T0*alpha^k } )
+          },
 
-  if (type=="Logarithmic multiplicative") {
-    assertthat::assert_that(alpha>1, msg = "Alpha has to be >1.")
-    return( function(k) { T0/(1+alpha*log(k+1)) } )
-  }
+          "Logarithmic multiplicative" = {
+            assertthat::assert_that(alpha>1, msg = "Alpha has to be >1.")
+            return( function(k) { T0/(1+alpha*log(k+1)) } )
+          },
 
-  if (type=="Quadratic multiplicative") {
-    assertthat::assert_that(alpha>0, msg = "Alpha has to be > 0.")
-    return ( function(k) { T0 /(1+alpha*k*k) } )
-  }
+          "Quadratic multiplicative" = {
+            assertthat::assert_that(alpha>0, msg = "Alpha has to be > 0.")
+            return ( function(k) { T0 /(1+alpha*k*k) } )
+          },
 
-  if (type=="Linear multiplicative") {
-    assertthat::assert_that(alpha>0, msg = "Alpha has to be > 0.")
-    return ( function(k) { T0 /(1+alpha*k) } )
-  }
+          "Linear multiplicative" = {
+            assertthat::assert_that(alpha>0, msg = "Alpha has to be > 0.")
+            return ( function(k) { T0 /(1+alpha*k) } )
+          },
 
-  stop("type of temperature function is not recognized.")
+          stop("type of temperature function is not recognized.")
+  )
+
 }
 
 
