@@ -137,7 +137,7 @@ on the same batch container.
 
 n_shuffle <- rep(c(5, 2, 1), c(100, 100, 200))
 
-trace1 = optimize_design(
+optimize_design(
   bc1,
   n_shuffle = n_shuffle
 )
