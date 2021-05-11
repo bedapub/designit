@@ -505,16 +505,19 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   }
 
-
-  if (append_to_data) {
-    samples_new = bind_cols( dplyr::select(samp,-c(.sample_id))[best_perm,], append_cols)
+  if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
+    best_perm = bind_cols(best_perm, append_cols) %>%
+      dplyr::select(-any_of(c(batch_container$dimension_names, ".sample_id"))) %>% # strip off container names
+      as.data.frame()
     if (!quiet) {
       message(ncol(append_cols), " columns added to batch container data frame.")
     }
+    print(best_perm)
+    batch_container$samples_df = best_perm
+  } else { # If nothing has been added to the sample list (the regular case), just update the container positions
+    batch_container$samples_dt = best_perm # should be safe just to pass the reference, or?
+    batch_container$assignment_vec = best_perm$.sample_id
   }
-
-  batch_container$samples_dt = best_perm # should be safe just to pass the reference, or?
-  batch_container$assignment_vec = best_perm$.sample_id
 
   trace$seed <- save_random_seed
   trace$elapsed <- Sys.time() - start_time
