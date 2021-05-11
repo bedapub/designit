@@ -506,13 +506,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
   if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
-    best_perm = bind_cols(best_perm, append_cols) %>%
-      dplyr::select(-any_of(c(batch_container$dimension_names, ".sample_id"))) %>% # strip off container names
+    best_perm = bind_cols(
+      dplyr::select(best_perm, -any_of(c(batch_container$dimension_names, colnames(append_cols),".sample_id"))),
+      append_cols) %>% # strip off container names and potentially already existing append columns
       as.data.frame()
     if (!quiet) {
       message(ncol(append_cols), " columns added to batch container data frame.")
     }
-    print(best_perm)
     batch_container$samples_df = best_perm
   } else { # If nothing has been added to the sample list (the regular case), just update the container positions
     batch_container$samples_dt = best_perm # should be safe just to pass the reference, or?
