@@ -417,9 +417,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "samples argument is NULL"
         )
 
-          assertthat::assert_that(is.null(private$samples),
-            msg = "batch container already has samples"
-          )
+          #assertthat::assert_that(is.null(private$samples),
+          #  msg = "batch container already has samples"
+          #)
 
         validate_samples(samples)
 
