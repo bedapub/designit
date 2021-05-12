@@ -2,32 +2,33 @@
 title: "Optimizer examples"
 output: rmarkdown::html_vignette
 vignette: >
-%\VignetteIndexEntry{Optimizer examples}
+  %\VignetteIndexEntry{Optimizer examples}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-  ---
+---
   
-  ```{r, include = FALSE}
+  
+```{r, include = FALSE}
   knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
-)
+  collapse = TRUE,
+  comment = "#>"
+  )
 ```
-
+  
 ```{r setup}
-library(designit)
-library(tidyverse)
+  library(designit)
+  library(tidyverse)
 ```
-
-
+  
+  
 # Sample annotation overview
 
 ```{r}
 data("multi_trt_day_samples")
 ```
-
-Samples are grouped by Treatment and Collection time with the following group sizes:
-
+  
+  Samples are grouped by Treatment and Collection time with the following group sizes:
+  
 ```{r}
 multi_trt_day_samples %>% count(Time, Treatment) %>% 
   gt::gt()
