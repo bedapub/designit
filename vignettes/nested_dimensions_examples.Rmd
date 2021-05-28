@@ -1,8 +1,8 @@
 ---
-title: "Basic examples"
+title: "Nested dimension examples"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Basic examples}
+  %\VignetteIndexEntry{Nested dimension example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
