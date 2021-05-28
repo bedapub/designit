@@ -15,7 +15,8 @@ validate_samples <- function(samples) {
   )
 
   assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(tidyselect::everything(), is.na))) == 0,
-                          msg = "Samples contain all-NA rows")
+    msg = "Samples contain all-NA rows"
+  )
 }
 
 
@@ -62,8 +63,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' )
     #'
     #' bc
-    initialize = function(
-                          dimensions,
+    initialize = function(dimensions,
                           exclude = NULL) {
       assertthat::assert_that(length(dimensions) >= 1)
 
@@ -194,10 +194,17 @@ BatchContainer <- R6::R6Class("BatchContainer",
       )
 
       samples <- self$samples_dt
-      res <- self$scoring_f(samples)
-      assertthat::assert_that(assertthat::is.number(res),
-        msg = "Scoring function should return a single number"
-      )
+      if (is.list(self$scoring_f)) {
+        res <- purrr::map_dbl(self$scoring_f, ~ .x(samples))
+      } else {
+        res <- self$scoring_f(samples)
+      }
+
+      assertthat::assert_that(is.double(res))
+
+      # assertthat::assert_that(assertthat::is.number(res),
+      #  msg = "Scoring function should return a single number"
+      # )
 
       if (aux && !is.null(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1) {
         assertthat::assert_that(is.list(self$aux_scoring_f),
@@ -231,7 +238,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       invisible(self)
     }
   ),
-
   private = list(
     #' List of BatchContainerDimension elements.
     dimensions = NULL,
@@ -263,7 +269,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       )
     }
   ),
-
   active = list(
     #' @field has_samples
     #' Returns TRUE if `BatchContainer` has samples.
@@ -410,9 +415,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "samples argument is NULL"
         )
 
-        assertthat::assert_that(is.null(private$samples),
-          msg = "batch container already has samples"
-        )
+        # assertthat::assert_that(is.null(private$samples),
+        #  msg = "batch container already has samples"
+        # )
 
         validate_samples(samples)
 
@@ -421,7 +426,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
 
         assertthat::assert_that(nrow(samples) > 0 && ncol(samples) > 0,
-                                msg = "samples should be a non-empty data.frame")
+          msg = "samples should be a non-empty data.frame"
+        )
 
         assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
           msg = "some of the samples columns match batch container dimension names"
@@ -455,7 +461,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         }
         data.table::copy(private$samples_dt_cache)
       } else {
-        stop("samples_dt is read-only.")
+        private$samples_dt_cache <- value
+        # stop("samples_dt is read-only.")
       }
     },
 

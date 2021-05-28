@@ -46,7 +46,8 @@ Imports:
     data.table,
     glue,
     forcats,
-    checkmate
+    checkmate,
+    rmarkdown
 Suggests: 
     testthat,
     roxygen2,

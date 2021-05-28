@@ -8,7 +8,7 @@
 #' score comptation.
 #' @param expected_dt A [`data.table`][data.table::data.table] with expected number of samples sample
 #' variables and batch variables combination. This is not required, however it does not change
-#' during the optimization proccess. So it is a good idea to cache this value.
+#' during the optimization process. So it is a good idea to cache this value.
 #'
 #' @return a list with two attributes: `$score` (numeric score value), `$expected_dt`
 #' (expected counts `data.table` for reuse)
