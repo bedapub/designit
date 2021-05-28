@@ -5,7 +5,7 @@
 #' based on the arrival data of the animals. `Group` variable is the
 #' assigned treatment group, and `CageNr`, `CageCol`, and `CageRow`
 #' variables are the generated cage layout.
-#' Variables marked with an asterisk are important for the cage layout
+#' Variables marked with an asterisk (*) are important for the cage layout
 #' generation.
 #'
 #' @name cages

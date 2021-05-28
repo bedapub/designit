@@ -33,7 +33,7 @@ their assignments into cages. Variables \code{Box}-\code{ArrivalWeight} are
 based on the arrival data of the animals. \code{Group} variable is the
 assigned treatment group, and \code{CageNr}, \code{CageCol}, and \code{CageRow}
 variables are the generated cage layout.
-Variables marked with an asterisk are important for the cage layout
+Variables marked with an asterisk (*) are important for the cage layout
 generation.
 }
 \author{

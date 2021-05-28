@@ -51,6 +51,7 @@ Suggests:
     pkgdown,
     knitr,
     markdown,
+    rmarkdown,
     bench,
     OSAT,
     tidyverse,
