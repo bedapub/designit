@@ -1,5 +1,5 @@
 ---
-title: "Nested dimension examples"
+title: "Nested dimension example"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Nested dimension example}
@@ -179,63 +179,63 @@ bc$get_samples() %>%
 ```
 
 
-# Optimize in one go? How
+<!-- # Optimize in one go? How -->
 
-... from here it's not working
+<!-- ... from here it's not working -->
 
-```{r}
-# Setting up the batch container
-bc <- BatchContainer$new(
-  dimensions = c(batch = ceiling(nrow(multi_trt_day_samples) / 8), 
-                 run=2, position=4)
-)
+<!-- ```{r} -->
+<!-- # Setting up the batch container -->
+<!-- bc <- BatchContainer$new( -->
+<!--   dimensions = c(batch = ceiling(nrow(multi_trt_day_samples) / 8),  -->
+<!--                  run=2, position=4) -->
+<!-- ) -->
 
-# Add sample_sheet to container
-bc$samples_df <- multi_trt_day_samples
-# Initial random assignment
-assign_in_order(bc)
-```
+<!-- # Add sample_sheet to container -->
+<!-- bc$samples_df <- multi_trt_day_samples -->
+<!-- # Initial random assignment -->
+<!-- assign_in_order(bc) -->
+<!-- ``` -->
 
-The samples are distributed to 4 batches (processing days).
-This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling.
+<!-- The samples are distributed to 4 batches (processing days). -->
+<!-- This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling. -->
 
-```{r}
-n_shuffle <- rep(c(32, 10, 5, 2), c(100, 100, 100, 100)) 
-#n_shuffle <- rep(c(32, 10, 5, 2), c(50, 50, 50, 200)) 
-n_iterations <- length(n_shuffle)
+<!-- ```{r} -->
+<!-- n_shuffle <- rep(c(32, 10, 5, 2), c(100, 100, 100, 100))  -->
+<!-- #n_shuffle <- rep(c(32, 10, 5, 2), c(50, 50, 50, 200))  -->
+<!-- n_iterations <- length(n_shuffle) -->
 
-set.seed(42) # should we have conventions for this?
+<!-- set.seed(42) # should we have conventions for this? -->
 
-# Set scoring function
-bc$scoring_f <- function(samples) osat_score(samples, c("batch", "run"), c("Treatment", "Time"))$score
+<!-- # Set scoring function -->
+<!-- bc$scoring_f <- function(samples) osat_score(samples, c("batch", "run"), c("Treatment", "Time"))$score -->
 
-# initial score
-#bc$score()
-trace <- assign_score_optimize_shuffle(bc, 
-                                       n_shuffle = n_shuffle, 
-                                       iterations = n_iterations) # can we simplify?
-# final score
-#bc$score()
-```
+<!-- # initial score -->
+<!-- #bc$score() -->
+<!-- trace <- assign_score_optimize_shuffle(bc,  -->
+<!--                                        n_shuffle = n_shuffle,  -->
+<!--                                        iterations = n_iterations) # can we simplify? -->
+<!-- # final score -->
+<!-- #bc$score() -->
+<!-- ``` -->
 
-## Optimization trace
+<!-- ## Optimization trace -->
 
-```{r, fig.width=6, fig.height= 4}
-qplot(x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)), 
-      main = str_glue("Final score={bc$score()}"), geom = "point")
-```
+<!-- ```{r, fig.width=6, fig.height= 4} -->
+<!-- qplot(x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)),  -->
+<!--       main = str_glue("Final score={bc$score()}"), geom = "point") -->
+<!-- ``` -->
 
-## Final batch layout
-```{r,  fig.width=6, fig.height= 4}
-bc$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>% 
-  ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
-  geom_bar()
+<!-- ## Final batch layout -->
+<!-- ```{r,  fig.width=6, fig.height= 4} -->
+<!-- bc$get_samples(assignment = TRUE) %>% -->
+<!--   mutate(batch = factor(batch)) %>%  -->
+<!--   ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) +  -->
+<!--   geom_bar() -->
 
-bc$get_samples(assignment = TRUE) %>% 
- mutate(run = factor(run)) %>% 
-  ggplot(aes(x = run, fill =  Treatment, alpha = factor(Time))) + 
-  geom_bar() +
-  facet_wrap(~batch)
-```
+<!-- bc$get_samples(assignment = TRUE) %>%  -->
+<!--  mutate(run = factor(run)) %>%  -->
+<!--   ggplot(aes(x = run, fill =  Treatment, alpha = factor(Time))) +  -->
+<!--   geom_bar() + -->
+<!--   facet_wrap(~batch) -->
+<!-- ``` -->
 
