@@ -1,0 +1,346 @@
+---
+title: "Optimize in-vivo treatment and cage assignment"
+output: rmarkdown::html_vignette
+params:
+  iterations: 100
+  n_samples: 50
+vignette: >
+  %\VignetteIndexEntry{Optimize in-vivo treatment and cage assignment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE,
+  fig.width = 6,
+  fig.height = 6
+)
+```
+  
+```{r setup}
+if (!requireNamespace("tidyverse", quietly = TRUE)) rlang::abort("Tidyverse required!")
+library(designit)
+```
+
+# The design problem
+
+In this example we would like to assign a treatment condition (10 controls, 10 treated) to 20 available animals,
+but with meeting additional constraints.
+
+First, the number of animals in each treatment group has to sum up to the correct total. However, we have to assign
+animals to cages as well. We will tackle both problems at the same time, dealing with all the associated constraints
+in one conceptional framework.
+
+The main idea is to provide a customized shuffling function that ensures that only 'valid' possibilities are generated
+and passed to the scoring function which will then identify a good one.
+
+List of constraints:
+* We want to form cages with ideally 3 animals each (preferred range from 2-4)
+* Variables Genotype, Sex and Treatment must be homogeneous within cage
+* Males of different litters must not be put into the same cage; no constraints exist here for the females
+* Average weight should be comparable between treatment groups and cages
+* If at all possible, avoid putting animals with the same ear markings into one cage
+
+In order to indicate the irrelevance of the litter for the females, a pseudo-litter `female_all` is created
+to group all the females together, marking them as interchangeable within this group.
+
+```{r}
+
+set.seed(43)
+
+treatment_names <- c("Control", "Compound")
+
+treatments <- factor(rep(treatment_names, each = 10))
+
+data("invivo_samples")
+
+invivo_samples <- dplyr::mutate(invivo_samples, Litter_alloc = ifelse(Sex == "F", "female_all", Litter)) %>%
+  dplyr::arrange(Genotype)
+
+invivo_samples %>%
+  head()
+```
+
+```{r}
+invivo_samples %>%
+  dplyr::count(Genotype, Sex)
+```
+
+# Preparatory steps
+
+As usual we create a `BatchContainer` with 2 Treatment groups and 10 animals each, or more generally: we allocate one dimension
+for the treatment with its 2 levels, and assign the required number of positions as a second dimension, making sure
+that all animals will fit.
+
+Note that positions do not actually matter; this is just to fix the number of animals per group.
+
+We assign samples, retaining initially the order given by the sample list.
+
+```{r}
+
+bc <- BatchContainer$new(
+  dimensions = c("Treatment" = nlevels(treatments), "position" = max(table(treatments)))
+)
+
+assign_in_order(bc, invivo_samples)
+
+bc
+```
+
+An OSAT scoring function should ensure even distribution of treatments across Genotype and Sex.
+(The experimenter wants to test compounds and compare results also between genotypes). Only `genotype`
+and `sex` interactions are considered in the scoring function.
+
+```{r}
+bc$scoring_f <- function(samples) {
+  osat_score(
+    samples,
+    batch_vars = "Treatment",
+    feature_vars = c("Genotype", "Sex"),
+  )$score
+}
+
+# Avoid this - it does not take care of the interaction between the variables
+# bc$scoring_f <- list( function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype"))$score },
+#                      function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Sex"))$score }
+#                      )
+```
+
+# Multiple step approach
+
+Let us first proceed slowly and break the whole procedure down into parts that show what is happening at
+each step.
+
+## Form homogeneous subgroups - pools of animals that could go into one cage
+
+We have to divide our animal cohort into subgroups with same genotype and sex, meeting size constraints as 
+stated above. Since 2-4 animals should go into one cage, we specify `n_min`and `n_max`accordingly. `n_ideal`
+would be selected by default as the mean of those two, but we specify it explicitly here, too.
+
+The homogeneity of subgroups regarding genotype and sex is achieved by listing those two parameters as `keep_together_vars`.
+
+Assignment of treatments should be performed as well at some point. We thus specify Treatment as the `allocation variable`.
+
+Note that the `Treatment` variable is technically a batch container location and not a part of the sample list. This
+distinction does not matter at this point. However, all required variables must exist in the batch container object.
+
+The following call to `form_homogeneous_subgroups()` produces an object that holds all relevant information
+about the samples, the allocation variable and the sizes of the subgroups that have to be formed. It is NOT
+decided, however, which animal will end up in which subgroup. This will be a matter of optimization later on.
+
+```{r}
+
+subg <- form_homogeneous_subgroups(
+  batch_container = bc, allocate_var = "Treatment",
+  keep_together_vars = c("Genotype", "Sex"),
+  subgroup_var_name = "Cage",
+  n_min = 2, n_ideal = 3, n_max = 4
+)
+```
+In this example, 8 subgroups have to be formed to meet all constraints.
+
+It is possible to obtain more information from the returned list object. Inspection of element `Subgroup_Sizes`
+tells us that 4 'animal pools' have to be formed which are homogeneous in the relevant parameters (here: genotype
+and sex). Each of those groups happens to be split in subgroups of 3 and 2 animals, which will later constitute
+the individual cages.
+
+```{r}
+subg$Subgroup_Sizes
+```
+## Find all valid ways to allocate treatments to the subgroups
+
+Each subgroup of animals receives one specific treatment. Or more generally: subgroups have to be homogeneous regarding
+the allocation variable.
+
+This introduces another type of constraint, since numbers have to add up to 10 'Control' and 10 'Compound' cases, as
+given by the `treatments` variable. As a next step, we have to find all possible combinations of subgroups which produce
+valid options for the treatment allocation. That's done with the next call.
+
+This will find 36 different ways to assign treatments to subgroups that lead to the correct overall number of
+treated animals.
+
+
+```{r}
+
+possible <- compile_possible_subgroup_allocation(subg)
+```
+
+## Generate shuffling function for potential study designs
+
+So far we only know the sizes of subgroups (i.e. cages). Thus, in a last step we have to assign specific animals to the various
+subgroups. Ideally each group of 'equivalent animals' (in terms of genotype and sex) is split up into more than one subgroup,
+so there's many potential ways to assign animals to those.
+
+To allow optimization as usual, we want to generate a shuffling function that produces only valid solutions in terms of our
+constraints, so that optimization can iterate efficiently over this solution space. The function can be generated by calling
+`mk_subgroup_shuffle_function()` with the previously created subgrouping object and the list of possible treatment allocations. 
+
+Every call to this shuffling function will return a permutation index (of the original samples) that constitutes a valid solution
+to be scored.
+
+```{r}
+
+shuffle_proposal <- mk_subgroup_shuffle_function(subg, possible)
+
+shuffle_proposal()
+
+shuffle_proposal()
+```
+
+## Use shuffling function for optimizing design
+
+We can finally use the customized shuffling function in the optimization and may quickly inspect the solution afterwards.
+
+```{r}
+
+bc2 <- bc$clone()
+
+trace <- optimize_design(
+  bc2,
+  shuffle_proposal_func = shuffle_proposal,
+  max_iter = 200
+)
+
+design <- bc2$get_samples()
+
+design %>% gt::gt()
+
+dplyr::count(design, Treatment, Genotype, Sex) %>% gt::gt()
+
+dplyr::count(design, Treatment, Genotype) %>% gt::gt()
+
+dplyr::count(design, Treatment, Sex) %>% gt::gt()
+```
+
+# Example 1: One-step optimization
+
+For most straightforward use, we produce a shuffling function - all in one go - that
+can be used for the optimization. 
+
+Let's take the chance and add one more scoring function for the equal distribution of body weights across treatment groups.
+
+```{r}
+
+bc3 <- bc$clone()
+
+bc3$scoring_f <- list(
+  function(samples) {
+    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
+  },
+  function(samples) {
+    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
+  }
+)
+
+optimize_design(
+  bc3,
+  shuffle_proposal_func = shuffle_grouped_data(bc3,
+    allocate_var = "Treatment",
+    keep_together_vars = c("Genotype", "Sex"),
+    subgroup_var_name = "Cage",
+    n_min = 2, n_max = 4
+  ),
+  aggregate_scores_func = worst_score_only,
+  max_iter = 200
+)
+
+design <- bc3$get_samples()
+
+design %>% gt::gt()
+```
+The updated sample sheet (enriched by the subgroup information which corresponds to the cages)
+corresponds to our first design step. We have formed cages and assigned treatments to the animals.
+
+One may restore a column with the original treatment names (lost during container formation).
+
+
+```{r}
+
+design %>%
+  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)]) %>%
+  gt::gt()
+```
+
+
+# Example 2 - not solvable under 'strict' rule application; have to loosen constraints on subgroup sizes
+
+We add another constraint to our design problem: Only male animals of the same litter may end up in the same
+subgroup (i.e. cage). It turns out that no solution can be found under these circumstances, since there is
+no way to get at least 2 males in one cage.
+
+```{r}
+
+bc4 <- bc$clone()
+
+optimize_design(
+  bc4,
+  shuffle_proposal_func = shuffle_grouped_data(bc4,
+    allocate_var = "Treatment",
+    keep_together_vars = c("Genotype", "Sex", "Litter_alloc"),
+    subgroup_var_name = "Cage",
+    n_min = 2, n_max = 4, prefer_big_groups = TRUE
+  ),
+  max_iter = 200
+)
+```
+One way to deal with this is to call the subgrouping function with `strict = FALSE`, which will tolerate deviations
+from the size constraints if needed. (Another option is to modify the size constraints directly of course!)
+
+Inspection of the solution indeed shows that we have quite a few isolated male animals now.
+
+```{r}
+
+optimize_design(
+  bc4,
+  shuffle_proposal_func = shuffle_grouped_data(bc4,
+    allocate_var = "Treatment",
+    keep_together_vars = c("Genotype", "Sex", "Litter_alloc"),
+    subgroup_var_name = "Cage",
+    n_min = 2, n_max = 4, prefer_big_groups = TRUE,
+    strict = FALSE
+  ),
+  max_iter = 200
+)
+
+design <- bc4$get_samples() %>%
+  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)])
+
+dplyr::count(design, Condition, Genotype, Sex, Cage) %>% gt::gt()
+```
+
+# Example 3 - earmarks cannot be perfectly singled out by cage
+
+For the subgrouping function we may specify another parameter with variables that should have unique
+values within a subgroup. We demonstrate this with the Earmark column. Indeed it should be avoided to put animals
+with exactly the same earmark into the same cage.
+
+Sometimes it is not possible to meet this additional constraint in any way. That's also the case here.
+As you can see, the 'keep separate' constraint is then automatically loosened step by step until a solution can be found.
+
+One cage will remain with an earmark duplication, which has to be accepted as the best possible option in this case.
+
+```{r}
+
+bc5 <- bc$clone()
+
+optimize_design(
+  bc5,
+  shuffle_proposal_func = shuffle_grouped_data(bc5,
+    allocate_var = "Treatment",
+    keep_together_vars = c("Genotype", "Sex"),
+    keep_separate_vars = c("Earmark"),
+    subgroup_var_name = "Cage",
+    n_min = 2, n_max = 4, prefer_big_groups = TRUE,
+    strict = FALSE
+  ),
+  max_iter = 200
+)
+
+design <- bc5$get_samples() %>%
+  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)])
+
+dplyr::count(design, Cage, Earmark) %>% gt::gt()
+```
