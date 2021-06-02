@@ -58,7 +58,6 @@ Suggests:
     bench,
     OSAT,
     tidyverse,
-    DT,
     printr,
     devtools (>= 2.0.0),
     gridpattern,
