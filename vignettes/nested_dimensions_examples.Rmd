@@ -139,7 +139,7 @@ For this we keep the optimized `batch` and now only optimize `run` with constrai
 ```{r}
 n_iterations <- 100
 
-# assing new optimization function
+# assign new optimization function
 bc$scoring_f <- function(samples) osat_score(samples, c("run"), c("Treatment", "Time"))$score
 # like this the optimization score is wrong because it tries to optimize across Batches.
 # Possible ways to go:
@@ -166,7 +166,7 @@ qplot(x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations
 
 ## Final run layout
 
-This is not giving the expecte mix of treatments across runs.
+This is not giving the expected mix of treatments across runs.
 
 ```{r, fig.width=6, fig.height= 4}
 
