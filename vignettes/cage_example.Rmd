@@ -1,0 +1,136 @@
+---
+title: "Cages"
+author: "Balazs Banfai"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cages}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.height = 6,
+  fig.width = 8
+)
+has_printr <- requireNamespace("printr", quietly = TRUE) # for printing help pages nicely
+
+library(designit)
+library(tidyverse)
+```
+
+# Description of data
+
+```{r echo=FALSE}
+if (has_printr) {
+  help("cages", package = "designit", help_type = "text")
+} else {
+  help("cages", package = "designit", help_type = "text") %>%
+    as.character() %>%
+    utils:::.getHelpFile() %>%
+    tools:::Rd2txt(outputEncoding = "UTF-8")
+}
+```
+
+# Plots of cage layout
+
+```{r, include=FALSE}
+plot_cages <- function(data, var, colors, .row = CageRow, .col = CageCol) {
+  varname <- as_label(enquo(var))
+  data %>%
+    distinct({{ .row }}, {{ .col }}, {{ var }}) %>%
+    ggplot() +
+    aes(x = 1, y = 1, fill = {{ var }}) +
+    facet_grid(rows = vars({{ .row }}), cols = vars({{ .col }})) +
+    geom_raster(alpha = 0.9, position = position_fill()) +
+    scale_fill_manual(values = colors) +
+    labs(title = paste0("Cage by ", varname)) +
+    theme(
+      axis.title.x = element_blank(),
+      axis.text.x = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.y = element_blank(),
+      axis.ticks.y = element_blank(),
+      panel.grid.major = element_blank(),
+      panel.grid.minor = element_blank(),
+      panel.background = element_blank()
+    )
+}
+```
+
+```{r}
+plot_cages(cages, Group, colors = c("darkorange", "cornflowerblue"))
+```
+
+```{r}
+plot_cages(cages, Sex, colors = c("violet", "dodgerblue"))
+```
+
+```{r}
+plot_cages(cages, Genotype, colors = c("orange", "gray"))
+```
+
+```{r}
+plot_cages(cages, Group, colors = c("darkorange", "cornflowerblue")) +
+  geom_text(aes(label = AnimalID),
+    data = cages,
+    position = position_fill(vjust = 0.5, reverse = TRUE)
+  ) +
+  labs(subtitle = "Animals by cages")
+```
+
+# Inspect solution
+
+```{r}
+ggplot(cages, aes(x = CageNr, y = Litter, color = Sex)) +
+  facet_wrap(~Group, scales = "free_x", ncol = 4) +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  scale_color_manual(values = c("violet", "dodgerblue")) +
+  geom_label(aes(label = Earmark), hjust = 0, size = 3, nudge_x = 0.2, nudge_y = 0.2)
+```
+
+```{r}
+ggplot(cages, aes(x = CageNr, y = BirthDate, color = Sex)) +
+  facet_wrap(~Group, scales = "free_x", ncol = 4) +
+  geom_jitter(width = 0.2, height = 0.2) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+```{r}
+ggplot(cages, aes(x = Group, y = ArrivalWeight, color = Sex, fill = Sex)) +
+  facet_wrap(~Genotype, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+  geom_boxplot(aes(group = Group), alpha = 0.2) +
+  geom_jitter(width = 0.2, height = 0.2) +
+  stat_summary(
+    fun = "mean", colour = "red",
+    size = 10, geom = "point",
+    aes(group = Genotype),
+    shape = 18, alpha = 0.3, show.legend = F
+  )
+```
+
+# Reproducing this solution
+
+Goal: same number of animals get the same treatments (_Group1_ and _Group2_) for each `Genotype` and `Sex` based on the covariates (`Litter`, `Age`, `Weight`)
+
+1) start with males (more constraints):
+  * cages with constant treatment and males from one litter
+  * as few isolated males as possible
+    (2 animals per cage, but not more than 3-4)
+  * don't mix sexes
+  * take into account covariates as much as possible
+2) females
+  * distribute based on all covariates
+  
+Problems:
+ 
+  * number of cages is not fixed
+  * number of cages per treatment is also not fixed
+  * earmarks have to be unique within each cage
+  

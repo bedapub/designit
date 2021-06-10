@@ -54,10 +54,12 @@ Suggests:
     pkgdown,
     knitr,
     markdown,
+    rmarkdown,
     bench,
     OSAT,
     tidyverse,
     DT,
+    printr,
     devtools (>= 2.0.0),
     ggpattern,
     rmarkdown
