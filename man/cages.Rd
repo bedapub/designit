@@ -3,7 +3,7 @@
 \docType{data}
 \name{cages}
 \alias{cages}
-\title{Mice sorted into cages}
+\title{Treated mice sorted into cages}
 \format{
 A tibble with 40 rows and 15 variables:
 \describe{
@@ -25,16 +25,17 @@ and quantity (1-3, unspecified if only 1) of earmarks}
 }
 }
 \usage{
-cages
+data(cages)
 }
 \description{
-Original arrival data of 40 mice, their treatment assignments, and
-their assignments into cages. Variables \code{Box}-\code{ArrivalWeight} are
-based on the arrival data of the animals. \code{Group} variable is the
-assigned treatment group, and \code{CageNr}, \code{CageCol}, and \code{CageRow}
-variables are the generated cage layout.
-Variables marked with an asterisk (*) are important for the cage layout
-generation.
+This dataset contains the original arrival data of 40 mice (variables
+\code{Box}--\code{ArrivalWeight}).
+In addition, it contains optimal treatment and cage assignments generated
+by Guido. The \code{Group} variable is the assigned treatment group, and
+\code{CageNr}, \code{CageCol}, and \code{CageRow} variables contain the assigned cage
+number and its position for each animal.
+Variables marked with an asterisk (*) are important for the
+cage layout generation.
 }
 \author{
 Guido Steiner

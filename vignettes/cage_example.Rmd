@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
   fig.height = 6,
   fig.width = 8
 )
-has_printr <- requireNamespace("printr") # for printing help pages nicely
+has_printr <- requireNamespace("printr", quietly = TRUE) # for printing help pages nicely
 
 library(designit)
 library(tidyverse)
@@ -24,11 +24,11 @@ library(tidyverse)
 
 # Description of data
 
-```{r}
+```{r echo=FALSE}
 if (has_printr) {
-  help("cages", package = "designit")
+  help("cages", package = "designit", help_type = "text")
 } else {
-  help("cages", package = "designit") %>%
+  help("cages", package = "designit", help_type = "text") %>%
     as.character() %>%
     utils:::.getHelpFile() %>%
     tools:::Rd2txt(outputEncoding = "UTF-8")
