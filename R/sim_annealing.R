@@ -85,6 +85,6 @@ mk_simanneal_acceptance_func <- function(temp_function = mk_simanneal_temp_func(
     if (current_score < best_score) {
       return(TRUE)
     }
-    simanneal_acceptance_prob(current_score, best_score, temp_function(iteration)) > runif(1)
+    simanneal_acceptance_prob(current_score, best_score, temp_function(iteration)) > stats::runif(1)
   }
 }

@@ -456,8 +456,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
   if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
-    best_perm <- bind_cols(
-      dplyr::select(best_perm, -any_of(c(batch_container$dimension_names, colnames(append_cols), ".sample_id"))),
+    best_perm <- dplyr::bind_cols(
+      dplyr::select(best_perm, -tidyselect::any_of(c(batch_container$dimension_names, colnames(append_cols), ".sample_id"))),
       append_cols
     ) %>% # strip off container names and potentially already existing append columns
       as.data.frame()

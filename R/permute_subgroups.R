@@ -101,7 +101,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   }
 
   # Group sample list by relevant variables
-  grouped_samples <- dplyr::group_by(samples, across(all_of(use_vars)))
+  grouped_samples <- dplyr::group_by(samples, dplyr::across(tidyselect::all_of(use_vars)))
 
   subgroup_sizes <- purrr::map(dplyr::group_size(grouped_samples), ~ best_group_sizes(.x, n_min, n_max, n_ideal, prefer_big_groups))
 
@@ -358,7 +358,7 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
       return(shuffle_index)
     }
 
-    app <- tibble(
+    app <- tibble::tibble(
       alloc_var_level = subgroup_object$Allocate_Levels[alloc_var_assigned[shuffle_index]],
       group = group_labels[shuffle_index],
       subgroup = subgroup_labels[shuffle_index]
