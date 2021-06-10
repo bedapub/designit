@@ -14,7 +14,6 @@
 #' @docType data
 #' @keywords data
 #' @usage data(cages)
-#' @format An object of class \code{"tibble"}
 #'
 #' @format A tibble with 40 rows and 15 variables:
 #' \describe{
