@@ -1,7 +1,7 @@
 #' Mice sorted into cages
 #'
 #' Original arrival data of 40 mice, their treatment assignments, and
-#' their assignments into cages. Variables `Box`-`ArrivalWeight` are
+#' their assignments into cages. Variables `Box`--`ArrivalWeight` are
 #' based on the arrival data of the animals. `Group` variable is the
 #' assigned treatment group, and `CageNr`, `CageCol`, and `CageRow`
 #' variables are the generated cage layout.
