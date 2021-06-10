@@ -86,13 +86,13 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
   src <- enquo(src)
   dst <- enquo(dst)
   function(dt, i) {
-    src_ind <- which(rlang::eval_tidy(src, dt))
+    src_ind <- which(rep_len(TRUE, nrow(dt)) & rlang::eval_tidy(src, dt))
     assertthat::assert_that(length(src_ind) > 0,
       msg = "source conditions not satisfied"
     )
     src_pos <- sample(src_ind, 1)
     # different from src
-    dst_log <- seq(nrow(dt)) != src_pos
+    dst_log <- seq_len(nrow(dt)) != src_pos
     env <- as.list(dt)
     env$.src <- dt[src_pos, ]
     dst_log <- dst_log & rlang::eval_tidy(dst, env)
@@ -101,7 +101,11 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
       warning("Cannot find destanation matching the constraints")
       list(src = NULL)
     } else {
-      dst_pos <- sample(dst_ind, 1)
+      if (length(dst_ind) == 1) {
+        dst_pos <- dst_ind
+      } else {
+        dst_pos <- sample(dst_ind, 1)
+      }
       list(
         src = c(src_pos, dst_pos),
         dst = c(dst_pos, src_pos)
@@ -157,7 +161,7 @@ assign_from_table <- function(batch_container, samples) {
   sample_columns <- setdiff(colnames(samples), batch_container$dimension_names)
   only_samples <- samples[sample_columns] %>%
     # remove all-NA rows, i.e. unassigned locations
-    dplyr::filter(!dplyr::across(everything(), is.na))
+    dplyr::filter(!dplyr::across(tidyselect::everything(), is.na))
   if (is.null(batch_container$samples_df)) {
     batch_container$samples_df <- only_samples
   } else {

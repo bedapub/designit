@@ -9,11 +9,11 @@
 Status](https://code.roche.com/BEDA/designit/badges/master/pipeline.svg)](https://code.roche.com/BEDA/designit/commits/master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
 
 The goal of designit is to generate optimal sample allocations for
-experimental designs. Documentation is available
-[here](http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/).
+experimental designs.
 
 ## Installation
 

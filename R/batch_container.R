@@ -14,7 +14,7 @@ validate_samples <- function(samples) {
     msg = "Samples should have at least one row"
   )
 
-  assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(everything(), is.na))) == 0,
+  assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(tidyselect::everything(), is.na))) == 0,
                           msg = "Samples contain all-NA rows")
 }
 
@@ -171,7 +171,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
       val <- private$samples_dt_cache[src, fcols, with = FALSE]
       private$samples_dt_cache[dst, (fcols) := val]
-      if (any(seq(nrow(private$samples)) != sort(private$samples_dt_cache$.sample_id))) {
+      if (any(seq_len(nrow(private$samples)) != sort(private$samples_dt_cache$.sample_id))) {
         private$samples_dt_cache <- NULL
         stop("Samples lost or duplicated during exchange; check src and dst")
       }
