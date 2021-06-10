@@ -46,7 +46,8 @@ Imports:
     data.table,
     glue,
     forcats,
-    checkmate
+    checkmate,
+    gt
 Suggests: 
     testthat,
     roxygen2,
@@ -58,7 +59,8 @@ Suggests:
     tidyverse,
     DT,
     devtools (>= 2.0.0),
-    ggpattern
+    ggpattern,
+    rmarkdown
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
