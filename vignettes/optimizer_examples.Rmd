@@ -195,7 +195,7 @@ trace3 <- optimize_design(
 ```
 
 Next, we repeat the optimization by using an aggregation function that takes the maximum value of the score vectors to
-decide on tghe best iteration. (It has the same effect in this example though.)
+decide on the best iteration. (It has the same effect in this example though.)
 
 ```{r}
 
