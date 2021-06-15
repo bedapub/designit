@@ -38,6 +38,7 @@ The main idea is to provide a customized shuffling function that ensures that on
 and passed to the scoring function which will then identify a good one.
 
 List of constraints:
+
 * We want to form cages with ideally 3 animals each (preferred range from 2-4)
 * Variables Genotype, Sex and Treatment must be homogeneous within cage
 * Males of different litters must not be put into the same cage; no constraints exist here for the females
@@ -258,7 +259,6 @@ One may restore a column with the original treatment names (lost during containe
 
 
 ```{r}
-
 design %>%
   dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)]) %>%
   gt::gt()
