@@ -63,9 +63,7 @@ bc <- BatchContainer$new(
 )
 
 # Add samples to container
-bc$samples_df <- multi_trt_day_samples
-# Initial random assignment
-assign_in_order(bc)
+assign_in_order(bc, samples = multi_trt_day_samples)
 # Set scoring function
 bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
 
