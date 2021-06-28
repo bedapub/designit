@@ -6,7 +6,7 @@
 #'
 #' @return Returns `BatchContainer`, invisibly.
 assign_random <- function(batch_container, samples = NULL) {
-  batch_container <- assign_in_order(batch_container, samples)
+  assign_in_order(batch_container, samples)
 
   batch_container$move_samples(
     location_assignment = sample(batch_container$assignment)
