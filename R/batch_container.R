@@ -372,7 +372,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "Columns of exclude should match dimensions"
         )
 
-        value <- value[, names(private$dimensions)] %>%
+        value <- value[, names(private$dimensions), drop = FALSE] %>%
           dplyr::mutate(
             dplyr::across(where(is.numeric), as.integer),
             dplyr::across(where(is.factor), as.character)
