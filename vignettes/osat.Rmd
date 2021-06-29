@@ -279,19 +279,12 @@ bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
 
 bc$score()
-bc$score(aux = TRUE)
 
-bc$aux_scoring_f <- list(
-  function(samples) rnorm(1, 100),
-  function(samples) -7
-)
-
-bc$scoring_f <- function(samples) rnorm(1) + 2 * rexp(1)
-
-bc$aux_scoring_f <- list(
+bc$scoring_f <- list(
+  fc0 = function(samples) rnorm(1) + 2 * rexp(1),
   fc1 = function(samples) rnorm(1, 100),
   fc2 = function(samples) -7
 )
 
-bc$score(aux = TRUE)
+bc$score()
 ```

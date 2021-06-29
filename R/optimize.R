@@ -19,9 +19,11 @@
 #' `bc$samples_dt` and the iteration number. This function should return a list with attributes
 #' `src` and `dst` (see [`BatchContainer$exchange_samples()`][BatchContainer]).
 #' @param iterations Number of iterations. If not provided set to 1000.
+#' @param aggregate_scores_func A function to aggregate the scores.
+#' By default one is used that just uses the first score.
 #' @return An [OptimizationTrace] object.
 #' @export
-assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL) {
+assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL, aggregate_scores_func = first_score_only) {
   start_time <- Sys.time()
   save_random_seed <- .Random.seed
   if (is.null(samples)) {
@@ -65,10 +67,10 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
   trace <- OptimizationTrace$new(
     iterations + 1,
-    length(batch_container$aux_scoring_f),
-    names(batch_container$aux_scoring_f)
+    length(batch_container$scoring_f),
+    names(batch_container$scoring_f)
   )
-  current_score <- batch_container$score(aux = TRUE)
+  current_score <- batch_container$score()
   trace$set_scores(1, current_score)
 
   for (i in seq_len(iterations)) {
@@ -110,8 +112,8 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       next
     }
 
-    new_score <- batch_container$score(aux = TRUE)
-    if (new_score[1] >= current_score[1]) {
+    new_score <- batch_container$score()
+    if (aggregate_scores_func(new_score) >= aggregate_scores_func(current_score)) {
       batch_container$exchange_samples(non_trivial, perm[non_trivial])
     } else {
       current_score <- new_score
@@ -131,7 +133,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
   public = list(
     #' @field scores
     #' Contains a matrix of scores. The matrix size is usually
-    #' `c(iterations + 1, 1 + length(bc$aux_scoring_f))`
+    #' `c(iterations + 1, length(bc$scoring_f))`
     scores = NULL,
 
     #' @field seed
@@ -147,14 +149,14 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @param n_steps
     #' Number of values to save. Usually `n_steps == iterations + `.
-    #' @param n_aux
-    #' Number of auxiliary scoring functions.
-    #' @param names_aux
-    #' Names of auxiliary scroring functions.
-    initialize = function(n_steps, n_aux, names_aux) {
-      self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_aux + 1)
-      if (!is.null(names_aux)) {
-        dimnames(self$scores) <- list(NULL, c("", names_aux))
+    #' @param n_scores
+    #' Number of scoring functions.
+    #' @param score_names
+    #' Names of scoring functions.
+    initialize = function(n_steps, n_scores, score_names) {
+      self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
+      if (!is.null(score_names)) {
+        dimnames(self$scores) <- list(NULL, score_names)
       }
     },
 

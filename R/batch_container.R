@@ -32,18 +32,6 @@ validate_samples <- function(samples) {
 #' @export
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
-    #' @field scoring_f
-    #' Main scoring function used for optimization.
-    #' Scoring function should receive a [`data.table`][data.table::data.table] with columns from
-    #' the samples [data.frame], locations [data.frame], and
-    #' `.sample_id` column. This function should return a floating
-    #' point score value for the assignment.
-    scoring_f = NULL,
-
-    #' @field aux_scoring_f
-    #' Additional scoring functions to compute.
-    aux_scoring_f = NULL,
-
     #' @description
     #' Create a new BatchContainer object.
     #' @param dimensions A vector or list of dimensions. Every dimension
@@ -181,35 +169,24 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' @description
     #' Score current sample assignment,
-    #' @param aux compute auxiliary scoring functions
-    #' @return In case `aux` is FALSE returns the value of the main scoring function.
-    #' Otherwise a vector of all scoring functions starting from the first one.
-    score = function(aux = FALSE) {
-      assertthat::assert_that(assertthat::is.flag(aux), msg = "aux should be TRUE or FALSE")
-      assertthat::assert_that(!is.null(self$scoring_f),
+    #' @return Returns a vector of all scoring functions values.
+    score = function() {
+      assertthat::assert_that(!is.null(private$scoring_funcs),
         msg = "Scoring function needs to be assigned"
+      )
+      assertthat::assert_that(is.list(private$scoring_funcs),
+                              length(private$scoring_funcs) >= 1,
+        msg = "Scroring function should be a non-empty list"
       )
       assertthat::assert_that(!is.null(private$samples),
         msg = "No samples in the batch container, cannot compute score"
       )
 
       samples <- self$samples_dt
-      res <- self$scoring_f(samples)
-      assertthat::assert_that(assertthat::is.number(res),
-        msg = "Scoring function should return a single number"
-      )
+      res <- purrr::map_dbl(private$scoring_funcs, ~ .x(samples))
+      assertthat::assert_that(length(res) == length(private$scoring_funcs))
 
-      if (aux && !is.null(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1) {
-        assertthat::assert_that(is.list(self$aux_scoring_f),
-          msg = "auxillary scoring functions should be a list"
-        )
-
-        aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(samples))
-        assertthat::assert_that(is.double(aux_res))
-        assertthat::assert_that(length(aux_res) == length(self$aux_scoring_f))
-
-        res <- c(res, aux_res)
-      }
+      assertthat::assert_that(is.numeric(res), msg="Scoring function should return a number")
 
       return(res)
     },
@@ -233,6 +210,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   private = list(
+    #' List of scoring functions.
+    scoring_funcs = NULL,
+
     #' List of BatchContainerDimension elements.
     dimensions = NULL,
 
@@ -265,6 +245,31 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   active = list(
+    #' @field scoring_f
+    #' Scoring functions used for optimization.
+    #' Each scoring function should receive a [`data.table`][data.table::data.table] with columns from
+    #' the samples [data.frame], locations [data.frame], and
+    #' `.sample_id` column. This function should return a floating
+    #' point score value for the assignment. This a list of functions.
+    #' Upon assignment a single function will be automatically converted to a list
+    #' In the later case each function is called.
+    scoring_f = function(value) {
+      if (missing(value)) {
+        private$scoring_funcs
+      } else {
+        if (is.function(value)) {
+          private$scoring_funcs <- list(value)
+        } else {
+          assertthat::assert_that(is.list(value), length(value) >= 1)
+          assertthat::assert_that(
+            all(purrr::map_lgl(self$scoring_f, is.function)),
+            msg="All elements of scoring_f should be functions"
+          )
+          private$scoring_funcs <- value
+        }
+      }
+    },
+
     #' @field has_samples
     #' Returns TRUE if `BatchContainer` has samples.
     has_samples = function(value) {
