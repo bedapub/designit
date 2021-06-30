@@ -361,6 +361,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (missing(value)) {
         private$exclude_df
       } else {
+        # Change of exclude will also change n_available, which can
+        # lead to the situation when there are more samples than locations.
+        # Or if samples are assigned to location, we can have samples in
+        # excluded locations.
+        # In rare cases when this is really needed, one could create a new
+        # BatchContainer.
+        assertthat::assert_that(
+           is.null(private$samples),
+           msg = "Cannot change excluded locations after samples have been added"
+        )
         if (is.null(value) || nrow(value) == 0) {
           private$exclude_df <- NULL
           return()
