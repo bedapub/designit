@@ -22,14 +22,14 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
   bc$scoring_f <- function(...) 42L
   bc_clone <- bc$clone()
 
-  expect_equal(bc$samples, bc$samples)
+  expect_equal(bc$samples, bc_clone$samples)
   expect_equal(bc$locations, bc_clone$locations)
   expect_equal(bc$n_available, bc_clone$n_available)
   expect_equal(bc$score(), bc_clone$score())
   expect_equal(bc$n_dimensions, bc_clone$n_dimensions)
   expect_equal(bc$dimension_names, bc_clone$dimension_names)
   expect_equal(bc$get_samples(include_id=TRUE), bc_clone$get_samples(include_id=TRUE))
-  expect_equal(bc$samples_dt, bc$samples_dt)
+  expect_equal(bc$samples_dt, bc_clone$samples_dt)
   expect_equal(bc$assignment, bc_clone$assignment)
-  expect_equal(bc$exclude, bc$exclude)
+  expect_equal(bc$exclude, bc_clone$exclude)
 })
