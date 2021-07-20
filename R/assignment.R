@@ -68,11 +68,12 @@ assign_in_order <- function(batch_container, samples = NULL) {
 #'
 #' @export
 #' @param src Expression to define possible source locations in the samples/locations
-#' table. Usually evaluated based on `BatchContainer$samples_dt` as an environment
+#' table. Usually evaluated based on
+#' `BatchContainer$get_samples(include_id = TRUE, as_tibble = FALSE)` as an environment
 #' (see also `with()`). A single source location is selected from rows where the
 #' expression evaluates to`TRUE`.
 #' @param dst Expression to define possible destination locations in the
-#' samples/locations table. Usually evaluated based on `BatchContainer$samples_dt` as an
+#' samples/locations table. Usually evaluated based on `BatchContainer$get_samples()` as an
 #' environment.
 #' Additionally a special variable `.src` is available in this environment which
 #' describes the selected source row from the table.

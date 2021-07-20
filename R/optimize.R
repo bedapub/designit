@@ -16,8 +16,9 @@
 #' @param shuffle_proposal
 #' A function used to propose two or more elements to shuffle in every step.
 #' If non-`NULL` a function receives two arguments on every iteration:
-#' `bc$samples_dt` and the iteration number. This function should return a list with attributes
-#' `src` and `dst` (see [`BatchContainer$exchange_samples()`][BatchContainer]).
+#' `bc$get_samples(include_id = TRUE, as_tibble = FALSE)` and the iteration number.
+#' This function should return a list with attributes `src` and `dst`
+#' (see [`BatchContainer$exchange_samples()`][BatchContainer]).
 #' @param iterations Number of iterations. If not provided set to 1000.
 #' @param aggregate_scores_func A function to aggregate the scores.
 #' By default one is used that just uses the first score.
@@ -77,7 +78,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
     perm <- seq_len(n_avail)
     if (is.function(shuffle_proposal)) {
       for (j in seq_len(n_shuffle[i])) {
-        sh <- shuffle_proposal(batch_container$samples_dt, i)
+        sh <- shuffle_proposal(batch_container$get_samples(include_id = TRUE, as_tibble = FALSE), i)
         assertthat::assert_that(is.list(sh), msg = "Shuffle proposal function should return a list")
         src <- sh$src
         dst <- sh$dst
@@ -88,7 +89,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
         batch_container$exchange_samples(src, dst)
       }
     } else {
-      non_empty_loc <- which(!is.na(batch_container$samples_dt$.sample_id))
+      non_empty_loc <- which(!is.na(batch_container$assignment))
       pos1 <- sample(non_empty_loc, 1)
       assertthat::assert_that(length(non_empty_loc) > 0,
         msg = "all locations are empty in BatchContainer"

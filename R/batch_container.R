@@ -98,12 +98,17 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Return table with samples and sample assignment.
     #' @param assignment Return sample assignment. If FALSE, only
     #' samples table is returned, with out batch assignment.
-    #' @param include_id Keep .sample_id in the tibble.
+    #' @param include_id Keep .sample_id in the table. Use `TRUE` for
+    #' lower overhead.
     #' @param remove_empty_locations Removes empty locations
     #' from the result tibble.
-    #' @return tibble with samples and sample assignment.
+    #' @param as_tibble Return [tibble::tibble()].
+    #' If `FALSE` returns [data.table::data.table()]. This should have
+    #' lower overhead, as internally there is a cached [data.table::data.table()].
+    #' @return table with samples and sample assignment.
     get_samples = function(assignment = TRUE, include_id = FALSE,
-                           remove_empty_locations = FALSE) {
+                           remove_empty_locations = FALSE,
+                           as_tibble = TRUE) {
       assertthat::assert_that(!is.null(private$samples_table),
         msg = "Cannot return samples for empty batch container."
       )
@@ -116,6 +121,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       assertthat::assert_that(assertthat::is.flag(assignment))
       assertthat::assert_that(assertthat::is.flag(include_id))
       assertthat::assert_that(assertthat::is.flag(remove_empty_locations))
+      assertthat::assert_that(assertthat::is.flag(as_tibble))
 
       if (!assignment) {
         assertthat::assert_that(!remove_empty_locations,
@@ -123,23 +129,31 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
       }
       if (assignment) {
-        private$validate_assignment(private$assignment_vector)
-        res <- self$locations %>%
-          dplyr::mutate(.sample_id = private$assignment_vector) %>%
-          dplyr::left_join(private$samples_table, by = ".sample_id")
+        if (is.null(private$samples_dt_cache)) {
+          private$validate_assignment(private$assignment_vector)
+          private$samples_dt_cache <- cbind(
+            self$locations,
+            private$samples_table[private$assignment_vector,]
+          ) %>%
+            data.table::as.data.table()
+        }
+        res <- data.table::copy(private$samples_dt_cache)
         if (remove_empty_locations) {
-          res <- res %>%
-            dplyr::filter(!is.na(.sample_id))
+          res <- res[!is.na(.sample_id), ]
         }
       } else {
-        res <- private$samples_table
+        res <- data.table::as.data.table(private$samples_table)
       }
 
       if (!include_id) {
-        res <- res %>%
-          dplyr::select(-.sample_id)
+        res[,.sample_id := NULL]
       }
-      res
+
+      if (as_tibble && !tibble::is_tibble(res)) {
+        tibble::tibble(res)
+      } else {
+        res
+      }
     },
 
     #' @description
@@ -154,7 +168,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "src & dst should be non-empty integer vectors of equal size"
       )
       # ensure private$samples_dt_cache is set
-      self$samples_dt
+      self$get_samples(include_id = TRUE, as_tibble = FALSE)
       sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
       fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
       val <- private$samples_dt_cache[src, fcols, with = FALSE]
@@ -182,7 +196,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "No samples in the batch container, cannot compute score"
       )
 
-      samples <- self$samples_dt
+      samples <- self$get_samples(include_id = TRUE, as_tibble = FALSE)
       res <- purrr::map_dbl(private$scoring_funcs, ~ .x(samples))
       assertthat::assert_that(length(res) == length(private$scoring_funcs))
 
@@ -453,26 +467,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
         private$samples_table <- samples
 
         private$samples_dt_cache <- NULL
-      }
-    },
-
-    #' @field samples_dt
-    #' Sample assignment [`data.table`][data.table::data.table].
-    #' This data.table includes columns for all the `BatchContainer`
-    #' locations, all the samples and a `".sample_id"` column.
-    #'
-    #' The most efficient way of updating this [`data.table`][data.table::data.table] is using
-    #' the `BatchContainer$exchange_samples()` method.
-    samples_dt = function(value) {
-      if (missing(value)) {
-        if (is.null(private$samples_dt_cache)) {
-          private$samples_dt_cache <- data.table::data.table(
-            self$get_samples(include_id = TRUE)
-          )
-        }
-        data.table::copy(private$samples_dt_cache)
-      } else {
-        stop("samples_dt is read-only.")
       }
     },
 
