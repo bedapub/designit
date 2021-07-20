@@ -257,7 +257,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (missing(value)) {
         private$scoring_funcs
       } else {
-        if (is.function(value)) {
+        if (is.null(value)) {
+          private$scoring_funcs <- NULL
+        } else if (is.function(value)) {
           private$scoring_funcs <- list(value)
         } else {
           assertthat::assert_that(is.list(value), length(value) >= 1)
