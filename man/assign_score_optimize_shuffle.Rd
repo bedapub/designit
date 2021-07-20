@@ -9,7 +9,8 @@ assign_score_optimize_shuffle(
   samples = NULL,
   n_shuffle = NULL,
   shuffle_proposal = NULL,
-  iterations = NULL
+  iterations = NULL,
+  aggregate_scores_func = first_score_only
 )
 }
 \arguments{
@@ -32,6 +33,9 @@ If non-\code{NULL} a function receives two arguments on every iteration:
 \code{src} and \code{dst} (see \code{\link[=BatchContainer]{BatchContainer$exchange_samples()}}).}
 
 \item{iterations}{Number of iterations. If not provided set to 1000.}
+
+\item{aggregate_scores_func}{A function to aggregate the scores.
+By default one is used that just uses the first score.}
 }
 \value{
 An \link{OptimizationTrace} object.

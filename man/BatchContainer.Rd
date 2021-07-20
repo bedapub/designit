@@ -27,22 +27,17 @@ bc <- BatchContainer$new(
 
 bc
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{scoring_f}}{Main scoring function used for optimization.
-Scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
-the samples \link{data.frame}, locations \link{data.frame}, and
-\code{.sample_id} column. This function should return a floating
-point score value for the assignment.}
-
-\item{\code{aux_scoring_f}}{Additional scoring functions to compute.}
-}
-\if{html}{\out{</div>}}
-}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
+\item{\code{scoring_f}}{Scoring functions used for optimization.
+Each scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
+the samples \link{data.frame}, locations \link{data.frame}, and
+\code{.sample_id} column. This function should return a floating
+point score value for the assignment. This a list of functions.
+Upon assignment a single function will be automatically converted to a list
+In the later case each function is called.}
+
 \item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
 
 \item{\code{n_locations}}{Returns number of available locations in a \code{BatchContainer}.
@@ -60,7 +55,7 @@ This field cannot be assigned.}
 \item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
 
-\item{\code{locations_df}}{Get a \code{\link[tibble:tibble]{tibble}} with all the locations in a \code{BatchContainer}.
+\item{\code{locations}}{Get a \code{\link[tibble:tibble]{tibble}} with all the locations in a \code{BatchContainer}.
 This field cannot be assigned.}
 
 \item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
@@ -187,19 +182,11 @@ Exchange samples between locations
 \subsection{Method \code{score()}}{
 Score current sample assignment,
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score(aux = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{aux}}{compute auxiliary scoring functions}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-In case \code{aux} is FALSE returns the value of the main scoring function.
-Otherwise a vector of all scoring functions starting from the first one.
+Returns a vector of all scoring functions values.
 }
 }
 \if{html}{\out{<hr>}}
@@ -215,6 +202,7 @@ Prints information about \code{BatchContainer}.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{...}}{not used.
+List of scoring functions.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
@@ -231,7 +219,7 @@ Validate sample assignment.}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$clone()}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
