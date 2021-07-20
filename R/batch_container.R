@@ -480,5 +480,19 @@ BatchContainer <- R6::R6Class("BatchContainer",
         private$samples_dt_cache <- NULL
       }
     }
-  )
+  ),
+  cloneable = FALSE
 )
+
+BatchContainer$set("public", "clone", function() {
+  bc <- BatchContainer$new(private$dimensions, private$exclude_df)
+  if (!is.null(self$samples_df)) {
+    bc$samples_df <- self$samples_df %>%
+      dplyr::select(-.sample_id)
+  }
+  if (!is.null(self$assignment_vec)) {
+    bc$assignment_vec <- self$assignment_vec
+  }
+  bc$scoring_f <- self$scoring_f
+  bc
+})
