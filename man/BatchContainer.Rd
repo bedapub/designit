@@ -63,13 +63,6 @@ This field cannot be assigned.}
 \item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
-\item{\code{samples_dt}}{Sample assignment \code{\link[data.table:data.table]{data.table}}.
-This data.table includes columns for all the \code{BatchContainer}
-locations, all the samples and a \code{".sample_id"} column.
-
-The most efficient way of updating this \code{\link[data.table:data.table]{data.table}} is using
-the \code{BatchContainer$exchange_samples()} method.}
-
 \item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.}
 }
 \if{html}{\out{</div>}}
@@ -133,7 +126,8 @@ Return table with samples and sample assignment.
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_samples(
   assignment = TRUE,
   include_id = FALSE,
-  remove_empty_locations = FALSE
+  remove_empty_locations = FALSE,
+  as_tibble = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -143,15 +137,20 @@ Return table with samples and sample assignment.
 \item{\code{assignment}}{Return sample assignment. If FALSE, only
 samples table is returned, with out batch assignment.}
 
-\item{\code{include_id}}{Keep .sample_id in the tibble.}
+\item{\code{include_id}}{Keep .sample_id in the table. Use \code{TRUE} for
+lower overhead.}
 
 \item{\code{remove_empty_locations}}{Removes empty locations
 from the result tibble.}
+
+\item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble::tibble()}}.
+If \code{FALSE} returns \code{\link[data.table:data.table]{data.table::data.table()}}. This should have
+lower overhead, as internally there is a cached \code{\link[data.table:data.table]{data.table::data.table()}}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-tibble with samples and sample assignment.
+table with samples and sample assignment.
 }
 }
 \if{html}{\out{<hr>}}

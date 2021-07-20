@@ -8,12 +8,13 @@ shuffle_with_constraints(src = TRUE, dst = TRUE)
 }
 \arguments{
 \item{src}{Expression to define possible source locations in the samples/locations
-table. Usually evaluated based on \code{BatchContainer$samples_dt} as an environment
+table. Usually evaluated based on
+\code{BatchContainer$get_samples(include_id = TRUE, as_tibble = FALSE)} as an environment
 (see also \code{with()}). A single source location is selected from rows where the
 expression evaluates to\code{TRUE}.}
 
 \item{dst}{Expression to define possible destination locations in the
-samples/locations table. Usually evaluated based on \code{BatchContainer$samples_dt} as an
+samples/locations table. Usually evaluated based on \code{BatchContainer$get_samples()} as an
 environment.
 Additionally a special variable \code{.src} is available in this environment which
 describes the selected source row from the table.}

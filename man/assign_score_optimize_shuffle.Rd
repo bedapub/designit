@@ -29,8 +29,9 @@ called \code{n_shuffle} times at an iteration (default 1).}
 
 \item{shuffle_proposal}{A function used to propose two or more elements to shuffle in every step.
 If non-\code{NULL} a function receives two arguments on every iteration:
-\code{bc$samples_dt} and the iteration number. This function should return a list with attributes
-\code{src} and \code{dst} (see \code{\link[=BatchContainer]{BatchContainer$exchange_samples()}}).}
+\code{bc$get_samples(include_id = TRUE, as_tibble = FALSE)} and the iteration number.
+This function should return a list with attributes \code{src} and \code{dst}
+(see \code{\link[=BatchContainer]{BatchContainer$exchange_samples()}}).}
 
 \item{iterations}{Number of iterations. If not provided set to 1000.}
 
