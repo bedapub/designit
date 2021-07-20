@@ -60,7 +60,7 @@ This field cannot be assigned.}
 
 \item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
 
-\item{\code{samples_df}}{Samples in the batch container.
+\item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
 \item{\code{samples_dt}}{Sample assignment \code{\link[data.table:data.table]{data.table}}.
@@ -70,7 +70,7 @@ locations, all the samples and a \code{".sample_id"} column.
 The most efficient way of updating this \code{\link[data.table:data.table]{data.table}} is using
 the \code{BatchContainer$exchange_samples()} method.}
 
-\item{\code{assignment_vec}}{Sample assignment vector. Should contain NAs for empty locations.}
+\item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.}
 }
 \if{html}{\out{</div>}}
 }
@@ -206,7 +206,7 @@ List of scoring functions.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
-Tibble with sample ids and assignment to batch container locations.
+Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
 Validate sample assignment.}
 }
