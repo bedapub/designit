@@ -124,7 +124,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
       if (assignment) {
         private$validate_assignment(private$assignment)
-        res <- self$locations_df %>%
+        res <- self$locations %>%
           dplyr::mutate(.sample_id = private$assignment) %>%
           dplyr::left_join(private$samples, by = ".sample_id")
         if (remove_empty_locations) {
@@ -343,10 +343,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field locations_df
+    #' @field locations
     #' Get a [`tibble`][tibble::tibble()] with all the locations in a `BatchContainer`.
     #' This field cannot be assigned.
-    locations_df = function(value) {
+    locations = function(value) {
       if (missing(value)) {
         ldf <- private$dimensions %>%
           purrr::map(~ .x$values) %>%
