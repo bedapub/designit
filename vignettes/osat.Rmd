@@ -122,7 +122,7 @@ bc$n_available
 
 Assign samples and get initial setup.
 ```{r}
-bc$samples_df <- samples
+bc$samples <- samples
 
 starting_assignment <- bc$locations %>%
   left_join(g_setup_start) %>%
@@ -183,7 +183,7 @@ bc$assignment_vec <- starting_assignment
 fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
   ldf <- data.table::data.table(bc$locations)[, c("plates")][, ".sample_id" := bc$assignment_vec]
   fcols <- c(".sample_id", feature_vars)
-  smp <- data.table::data.table(bc$samples_df)[, ..fcols]
+  smp <- data.table::data.table(bc$samples)[, ..fcols]
   df <- smp[ldf, on = ".sample_id"]
 
   v <- osat_score(df, batch_vars, feature_vars)

@@ -11,10 +11,10 @@ assign_random <- function(batch_container, samples = NULL) {
       msg = "batch-container is empty and no samples provided"
     )
   } else {
-    batch_container$samples_df <- samples
+    batch_container$samples <- samples
   }
 
-  n_samples <- nrow(batch_container$samples_df)
+  n_samples <- nrow(batch_container$samples)
   n_available <- batch_container$n_available
 
   assertthat::assert_that(n_available >= n_samples)
@@ -46,10 +46,10 @@ assign_in_order <- function(batch_container, samples = NULL) {
       msg = "batch-container is empty and no samples provided"
     )
   } else {
-    batch_container$samples_df <- samples
+    batch_container$samples <- samples
   }
 
-  n_samples <- nrow(batch_container$samples_df)
+  n_samples <- nrow(batch_container$samples)
   n_available <- batch_container$n_available
 
   assertthat::assert_that(n_available >= n_samples)
@@ -162,8 +162,8 @@ assign_from_table <- function(batch_container, samples) {
   only_samples <- samples[sample_columns] %>%
     # remove all-NA rows, i.e. unassigned locations
     dplyr::filter(!dplyr::across(tidyselect::everything(), is.na))
-  if (is.null(batch_container$samples_df)) {
-    batch_container$samples_df <- only_samples
+  if (is.null(batch_container$samples)) {
+    batch_container$samples <- only_samples
   } else {
     assertthat::assert_that(dplyr::all_equal(only_samples,
       batch_container$get_samples(assignment = FALSE),
@@ -182,7 +182,7 @@ assign_from_table <- function(batch_container, samples) {
   )
   samples_with_id <- batch_container$locations %>%
     dplyr::left_join(samples, by = location_columns) %>%
-    dplyr::left_join(batch_container$samples_df, by = sample_columns)
+    dplyr::left_join(batch_container$samples, by = sample_columns)
 
   batch_container$assignment_vec <- samples_with_id$.sample_id
 

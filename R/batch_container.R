@@ -104,12 +104,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @return tibble with samples and sample assignment.
     get_samples = function(assignment = TRUE, include_id = FALSE,
                            remove_empty_locations = FALSE) {
-      assertthat::assert_that(!is.null(private$samples),
+      assertthat::assert_that(!is.null(private$samples_table),
         msg = "Cannot return samples for empty batch container."
       )
 
-      assertthat::assert_that(names(private$samples)[ncol(private$samples)] == ".sample_id",
-        msg = "Last column of private$samples should be .sample_id"
+      assertthat::assert_that(names(private$samples_table)[ncol(private$samples_table)] == ".sample_id",
+        msg = "Last column of private$samples_table should be .sample_id"
       )
 
 
@@ -126,13 +126,13 @@ BatchContainer <- R6::R6Class("BatchContainer",
         private$validate_assignment(private$assignment)
         res <- self$locations %>%
           dplyr::mutate(.sample_id = private$assignment) %>%
-          dplyr::left_join(private$samples, by = ".sample_id")
+          dplyr::left_join(private$samples_table, by = ".sample_id")
         if (remove_empty_locations) {
           res <- res %>%
             dplyr::filter(!is.na(.sample_id))
         }
       } else {
-        res <- private$samples
+        res <- private$samples_table
       }
 
       if (!include_id) {
@@ -159,7 +159,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
       val <- private$samples_dt_cache[src, fcols, with = FALSE]
       private$samples_dt_cache[dst, (fcols) := val]
-      if (any(seq_len(nrow(private$samples)) != sort(private$samples_dt_cache$.sample_id))) {
+      if (any(seq_len(nrow(private$samples_table)) != sort(private$samples_dt_cache$.sample_id))) {
         private$samples_dt_cache <- NULL
         stop("Samples lost or duplicated during exchange; check src and dst")
       }
@@ -178,7 +178,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
                               length(private$scoring_funcs) >= 1,
         msg = "Scroring function should be a non-empty list"
       )
-      assertthat::assert_that(!is.null(private$samples),
+      assertthat::assert_that(!is.null(private$samples_table),
         msg = "No samples in the batch container, cannot compute score"
       )
 
@@ -220,7 +220,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     exclude_df = NULL,
 
     #' Tibble with sample information and sample ids.
-    samples = NULL,
+    samples_table = NULL,
 
     #' Tibble with sample ids and assignment to batch container locations.
     assignment = NULL,
@@ -238,7 +238,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "sample assignment length doesn't match the number of available locations"
       )
       assertthat::assert_that(!any(duplicated(na.omit(assignment))))
-      assertthat::assert_that(length(intersect(1:nrow(self$samples_df), na.omit(assignment))) == sum(!is.na(assignment)),
+      assertthat::assert_that(length(intersect(1:nrow(self$samples), na.omit(assignment))) == sum(!is.na(assignment)),
         msg = "sample assignment does not match sample_ids (1..N_samples)"
       )
     }
@@ -276,7 +276,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Returns TRUE if `BatchContainer` has samples.
     has_samples = function(value) {
       if (missing(value)) {
-        !is.null(private$samples)
+        !is.null(private$samples_table)
       } else {
         stop("Cannot set has_samples (read-only).")
       }
@@ -375,7 +375,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         # In rare cases when this is really needed, one could create a new
         # BatchContainer.
         assertthat::assert_that(
-           is.null(private$samples),
+           is.null(private$samples_table),
            msg = "Cannot change excluded locations after samples have been added"
         )
         if (is.null(value) || nrow(value) == 0) {
@@ -416,18 +416,18 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field samples_df
+    #' @field samples
     #' Samples in the batch container.
     #' When assigning data.frame should not have column named .sample_id column.
-    samples_df = function(samples) {
+    samples = function(samples) {
       if (missing(samples)) {
-        private$samples
+        private$samples_table
       } else {
         assertthat::assert_that(!is.null(samples),
           msg = "samples argument is NULL"
         )
 
-        assertthat::assert_that(is.null(private$samples),
+        assertthat::assert_that(is.null(private$samples_table),
           msg = "batch container already has samples"
         )
 
@@ -450,7 +450,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
         samples$.sample_id <- 1:nrow(samples)
 
-        private$samples <- samples
+        private$samples_table <- samples
 
         private$samples_dt_cache <- NULL
       }
@@ -493,8 +493,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
 BatchContainer$set("public", "clone", function() {
   bc <- BatchContainer$new(private$dimensions, private$exclude_df)
-  if (!is.null(self$samples_df)) {
-    bc$samples_df <- self$samples_df %>%
+  if (!is.null(self$samples)) {
+    bc$samples <- self$samples %>%
       dplyr::select(-.sample_id)
   }
   if (!is.null(self$assignment_vec)) {

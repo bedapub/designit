@@ -22,7 +22,7 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
   bc$scoring_f <- function(...) 42L
   bc_clone <- bc$clone()
 
-  expect_equal(bc$samples_df, bc$samples_df)
+  expect_equal(bc$samples, bc$samples)
   expect_equal(bc$locations, bc_clone$locations)
   expect_equal(bc$n_available, bc_clone$n_available)
   expect_equal(bc$score(), bc_clone$score())

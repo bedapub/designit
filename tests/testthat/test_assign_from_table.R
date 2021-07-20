@@ -33,29 +33,29 @@ sample_sheet4 <- rbind(
 
 test_that("assign samples from sample sheet", {
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   assign_from_table(bc, sample_sheet1)
-  expect_equal(nrow(sample_sheet1), nrow(bc$samples_df))
+  expect_equal(nrow(sample_sheet1), nrow(bc$samples))
 
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   assign_from_table(bc, sample_sheet2)
-  expect_equal(nrow(sample_sheet2), nrow(bc$samples_df))
+  expect_equal(nrow(sample_sheet2), nrow(bc$samples))
 
   bc <- bc2$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   assign_from_table(bc, sample_sheet2)
-  expect_equal(nrow(sample_sheet2), nrow(bc$samples_df))
+  expect_equal(nrow(sample_sheet2), nrow(bc$samples))
 })
 
 test_that("assign samples from sample sheet works when samples are added/assigned", {
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
-  bc$samples_df <- subset(sample_sheet1, select = sampleID)
+  expect_null(bc$samples)
+  bc$samples <- subset(sample_sheet1, select = sampleID)
   assign_from_table(bc, sample_sheet1)
 
   bc <- bc2$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   assign_from_table(bc, sample_sheet2)
   assign_random(bc)
   assign_from_table(bc, sample_sheet2)
@@ -64,25 +64,25 @@ test_that("assign samples from sample sheet works when samples are added/assigne
 
 test_that("assign samples from sample sheet works only when samples match what's in the container", {
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   assign_from_table(bc, sample_sheet1)
   expect_error(assign_from_table(bc, sample_sheet2))
 })
 
 test_that("assign into excluded locations should fail", {
   bc <- bc2$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   expect_error(assign_from_table(bc, sample_sheet1))
 })
 
 test_that("assign from table with duplicated rows should fail", {
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   expect_error(assign_from_table(bc, sample_sheet3))
 })
 
 test_that("assign from table with duplicated rows should fail", {
   bc <- bc1$clone()
-  expect_null(bc$samples_df)
+  expect_null(bc$samples)
   expect_error(assign_from_table(bc, sample_sheet3))
 })
