@@ -86,6 +86,8 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
+  # preven undefined variable error
+  Pattern <- NULL
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
     .tbl = .tbl$get_samples()
