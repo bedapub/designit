@@ -30,6 +30,6 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
   expect_equal(bc$dimension_names, bc_clone$dimension_names)
   expect_equal(bc$get_samples(include_id=TRUE), bc_clone$get_samples(include_id=TRUE))
   expect_equal(bc$samples_dt, bc$samples_dt)
-  expect_equal(bc$assignment_vec, bc_clone$assignment_vec)
+  expect_equal(bc$assignment, bc_clone$assignment)
   expect_equal(bc$exclude, bc$exclude)
 })

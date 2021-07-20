@@ -123,9 +123,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
       }
       if (assignment) {
-        private$validate_assignment(private$assignment)
+        private$validate_assignment(private$assignment_vector)
         res <- self$locations %>%
-          dplyr::mutate(.sample_id = private$assignment) %>%
+          dplyr::mutate(.sample_id = private$assignment_vector) %>%
           dplyr::left_join(private$samples_table, by = ".sample_id")
         if (remove_empty_locations) {
           res <- res %>%
@@ -163,7 +163,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         private$samples_dt_cache <- NULL
         stop("Samples lost or duplicated during exchange; check src and dst")
       }
-      private$assignment <- private$samples_dt_cache$.sample_id
+      private$assignment_vector <- private$samples_dt_cache$.sample_id
       invisible(self)
     },
 
@@ -222,8 +222,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Tibble with sample information and sample ids.
     samples_table = NULL,
 
-    #' Tibble with sample ids and assignment to batch container locations.
-    assignment = NULL,
+    #' Vector with assignment of sample ids to locations.
+    assignment_vector = NULL,
 
     #' Cached data.table with samples assignment.
     samples_dt_cache = NULL,
@@ -476,14 +476,14 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field assignment_vec
+    #' @field assignment
     #' Sample assignment vector. Should contain NAs for empty locations.
-    assignment_vec = function(assignment) {
+    assignment = function(assignment) {
       if (missing(assignment)) {
-        return(private$assignment)
+        return(private$assignment_vector)
       } else {
         private$validate_assignment(assignment)
-        private$assignment <- assignment
+        private$assignment_vector <- assignment
         private$samples_dt_cache <- NULL
       }
     }
@@ -497,8 +497,8 @@ BatchContainer$set("public", "clone", function() {
     bc$samples <- self$samples %>%
       dplyr::select(-.sample_id)
   }
-  if (!is.null(self$assignment_vec)) {
-    bc$assignment_vec <- self$assignment_vec
+  if (!is.null(self$assignment)) {
+    bc$assignment <- self$assignment
   }
   bc$scoring_f <- self$scoring_f
   bc

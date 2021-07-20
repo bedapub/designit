@@ -129,7 +129,7 @@ starting_assignment <- bc$locations %>%
   pull(ID) %>%
   as.integer()
 
-bc$assignment_vec <- starting_assignment
+bc$assignment <- starting_assignment
 
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
@@ -161,7 +161,7 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 Caching `expected_dt` should improve the performance.
 
 ```{r}
-bc$assignment_vec <- starting_assignment
+bc$assignment <- starting_assignment
 
 # precompute expected_dt
 edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
@@ -178,10 +178,10 @@ bench::system_time({
 Instead of relying on `BatchContainer`, here we have a manual optimization process using `data.table`.
 
 ```{r}
-bc$assignment_vec <- starting_assignment
+bc$assignment <- starting_assignment
 
 fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
-  ldf <- data.table::data.table(bc$locations)[, c("plates")][, ".sample_id" := bc$assignment_vec]
+  ldf <- data.table::data.table(bc$locations)[, c("plates")][, ".sample_id" := bc$assignment]
   fcols <- c(".sample_id", feature_vars)
   smp <- data.table::data.table(bc$samples)[, ..fcols]
   df <- smp[ldf, on = ".sample_id"]
@@ -215,7 +215,7 @@ fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
     scores[i] <- current_score
   }
 
-  bc$assignment_vec <- df$.sample_id
+  bc$assignment <- df$.sample_id
 
   scores
 }
@@ -228,7 +228,7 @@ bench::system_time({
 
 # Shuffle optimization with burn-in
 ```{r}
-bc$assignment_vec <- starting_assignment
+bc$assignment <- starting_assignment
 
 # precompute expected_dt
 edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt

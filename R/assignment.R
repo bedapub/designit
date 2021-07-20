@@ -24,7 +24,7 @@ assign_random <- function(batch_container, samples = NULL) {
     rep(NA_integer_, n_available - n_samples)
   )
 
-  batch_container$assignment_vec <- sample(expanded_ids)
+  batch_container$assignment <- sample(expanded_ids)
 
   invisible(batch_container)
 }
@@ -54,7 +54,7 @@ assign_in_order <- function(batch_container, samples = NULL) {
 
   assertthat::assert_that(n_available >= n_samples)
 
-  batch_container$assignment_vec <- c(
+  batch_container$assignment <- c(
     1:n_samples,
     rep(NA_integer_, n_available - n_samples)
   )
@@ -184,7 +184,7 @@ assign_from_table <- function(batch_container, samples) {
     dplyr::left_join(samples, by = location_columns) %>%
     dplyr::left_join(batch_container$samples, by = sample_columns)
 
-  batch_container$assignment_vec <- samples_with_id$.sample_id
+  batch_container$assignment <- samples_with_id$.sample_id
 
   invisible(batch_container)
 }

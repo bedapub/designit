@@ -59,24 +59,24 @@ samples_with_na <- rbind(samples, data.frame(a=NA, b=NA))
 test_that("Test adding samples and then assigning them", {
   bc1_copy <- bc1$clone()
   bc1_copy$samples <- samples
-  expect_null(bc1_copy$assignment_vec)
+  expect_null(bc1_copy$assignment)
   assign_in_order(bc1_copy)
-  expect_equal(bc1_copy$assignment_vec,
+  expect_equal(bc1_copy$assignment,
                c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples))))
 
   bc1_copy <- bc1$clone()
   assign_in_order(bc1_copy, samples)
-  expect_equal(bc1_copy$assignment_vec,
+  expect_equal(bc1_copy$assignment,
                c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples))))
 })
 
 
 test_that("Test assigning samples randomly", {
   bc3_copy <- bc3_excl$clone()
-  expect_null(bc3_copy$assignment_vec)
-  expect_false(any(!is.na(bc3_copy$assignment_vec)))
+  expect_null(bc3_copy$assignment)
+  expect_false(any(!is.na(bc3_copy$assignment)))
   assign_random(bc3_copy, samples)
-  expect_true(any(!is.na(bc3_copy$assignment_vec)))
+  expect_true(any(!is.na(bc3_copy$assignment)))
 })
 
 test_that("Test assigning too many or empty samples", {
