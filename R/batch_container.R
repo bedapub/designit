@@ -149,7 +149,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         res[,.sample_id := NULL]
       }
 
-      if (as_tibble && !tibble::is_tibble(res)) {
+      if (as_tibble) {
         tibble::tibble(res)
       } else {
         res
