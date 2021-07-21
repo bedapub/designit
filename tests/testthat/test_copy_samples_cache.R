@@ -1,4 +1,4 @@
-test_that("$clone() does not preserve private$samples_dt_cache", {
+test_that("$copy() does not preserve samples table cache", {
   bc <- BatchContainer$new(
     dimensions = c(row = 3, column = 3)
   )
@@ -6,7 +6,7 @@ test_that("$clone() does not preserve private$samples_dt_cache", {
   assign_in_order(bc, samp)
   # creates cache
   bc$get_samples()
-  bc_clone <- bc$clone()
+  bc_clone <- bc$copy()
   bc_clone$exchange_samples(c(1L, 2L), c(2L, 1L))
 
   expect_equal(bc$get_samples(include_id=TRUE, as_tibble=FALSE)$.sample_id, 1:9)
@@ -20,7 +20,7 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
   samp <- data.frame(i = 1:6)
   assign_in_order(bc, samp)
   bc$scoring_f <- function(...) 42L
-  bc_clone <- bc$clone()
+  bc_clone <- bc$copy()
 
   expect_equal(bc$samples, bc_clone$samples)
   expect_equal(bc$get_locations(), bc_clone$get_locations())

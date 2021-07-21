@@ -100,8 +100,8 @@ bc$get_samples(assignment = TRUE) %>%
 
 ```{r, fig.width=6, fig.height= 4}
 
-# clone batch container for second optimization
-bc2 <- bc$clone()
+# copy batch container for second optimization
+bc2 <- bc$copy()
 # Initial random assignment
 assign_in_order(bc2)
 

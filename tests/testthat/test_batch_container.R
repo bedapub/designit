@@ -57,14 +57,14 @@ samples <- data.frame(a=1:10, b=rnorm(10))
 samples_with_na <- rbind(samples, data.frame(a=NA, b=NA))
 
 test_that("Test adding samples and then assigning them", {
-  bc1_copy <- bc1$clone()
+  bc1_copy <- bc1$copy()
   bc1_copy$samples <- samples
   expect_null(bc1_copy$assignment)
   assign_in_order(bc1_copy)
   expect_equal(bc1_copy$assignment,
                c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples))))
 
-  bc1_copy <- bc1$clone()
+  bc1_copy <- bc1$copy()
   assign_in_order(bc1_copy, samples)
   expect_equal(bc1_copy$assignment,
                c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples))))
@@ -72,7 +72,7 @@ test_that("Test adding samples and then assigning them", {
 
 
 test_that("Test assigning samples randomly", {
-  bc3_copy <- bc3_excl$clone()
+  bc3_copy <- bc3_excl$copy()
   expect_null(bc3_copy$assignment)
   expect_false(any(!is.na(bc3_copy$assignment)))
   assign_random(bc3_copy, samples)
@@ -80,8 +80,8 @@ test_that("Test assigning samples randomly", {
 })
 
 test_that("Test assigning too many or empty samples", {
-  bc3_copy <- bc3_excl$clone()
-  bc4_copy <- bc4_excl$clone()
+  bc3_copy <- bc3_excl$copy()
+  bc4_copy <- bc4_excl$copy()
   expect_error(bc3_copy$samples <- data.frame())
   expect_error(bc3_copy$samples <- data.frame(a=seq_len(bc3_copy$n_available+1)))
   expect_error(bc4_copy$samples <- data.frame())
@@ -89,12 +89,12 @@ test_that("Test assigning too many or empty samples", {
 })
 
 test_that("Test double sample assignment", {
-  bc3_copy <- bc3_excl$clone()
+  bc3_copy <- bc3_excl$copy()
   bc3_copy$samples <- samples
   expect_error(bc3_copy$samples <- samples)
   expect_error(assign_in_order(bc3_copy, samples))
   expect_error(assign_random(bc3_copy, samples))
-  bc4_copy <- bc4_excl$clone()
+  bc4_copy <- bc4_excl$copy()
   bc4_copy$samples <- samples
   expect_error(bc4_copy$samples <- samples)
   expect_error(assign_in_order(bc4_copy, samples))
@@ -102,11 +102,11 @@ test_that("Test double sample assignment", {
 })
 
 test_that("Test assignment of samples with all-NA attributes", {
-  bc3_copy <- bc3_excl$clone()
+  bc3_copy <- bc3_excl$copy()
   expect_error(bc3_copy$samples <- samples_with_na)
   expect_error(assign_in_order(bc3_copy, samples_with_na))
   expect_error(assign_random(bc3_copy, samples_with_na))
-  bc4_copy <- bc4_excl$clone()
+  bc4_copy <- bc4_excl$copy()
   expect_error(bc4_copy$samples <- samples_with_na)
   expect_error(bc4_copy$samples <- samples_with_na)
   expect_error(assign_in_order(bc4_copy, samples_with_na))
