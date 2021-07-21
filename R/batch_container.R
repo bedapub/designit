@@ -145,6 +145,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
         res <- data.table::as.data.table(private$samples_table)
       }
 
+      if (!is.null(private$samples_attributes)) {
+        res <- cbind(res, private$samples_attributes[res$.sample_id])
+      }
+
       if (!include_id) {
         res[,.sample_id := NULL]
       }
@@ -298,6 +302,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' Tibble with sample information and sample ids.
     samples_table = NULL,
+
+    #' Sample attributes, a data.table.
+    samples_attributes = NULL,
 
     #' Vector with assignment of sample ids to locations.
     assignment_vector = NULL,
@@ -512,6 +519,41 @@ BatchContainer <- R6::R6Class("BatchContainer",
           samples, .sample_id, dplyr::everything())
 
         private$samples_dt_cache <- NULL
+      }
+    },
+
+    #' @field samples_attr
+    #' Extra attributes of samples. If set, this is included into
+    #' `BatchContainer$get_samples()` output.
+    samples_attr = function(sattr) {
+      if (missing(sattr)) {
+        tibble::as_tibble(private$samples_attributes)
+      } else {
+        if (!is.null(sattr)) {
+          assertthat::assert_that(
+            is.data.frame(sattr),
+            ncol(sattr) >= 1,
+            msg = "samples_attr should be a non-empty table"
+          )
+
+          assertthat::assert_that(
+            nrow(sattr) == nrow(private$samples_table),
+            msg = "samples_attr number of rows should match samples"
+          )
+
+          assertthat::assert_that(length(intersect(self$dimension_names, colnames(sattr))) == 0,
+            msg = "some of the samples attr columns match batch container dimension names"
+          )
+
+          assertthat::assert_that(length(intersect(colnames(private$samples_table), colnames(sattr))) == 0,
+            msg = "some of the samples attr columns match samples table column names"
+          )
+
+          assertthat::assert_that(!".sample_id" %in% colnames(sattr),
+            msg = "samples data.frame has a column with reserved name .sample_id"
+          )
+        }
+        private$samples_attributes <- data.table::as.data.table(sattr)
       }
     },
 
