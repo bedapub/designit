@@ -55,9 +55,6 @@ This field cannot be assigned.}
 \item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
 
-\item{\code{locations}}{Get a \code{\link[tibble:tibble]{tibble}} with all the locations in a \code{BatchContainer}.
-This field cannot be assigned.}
-
 \item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
 
 \item{\code{samples}}{Samples in the batch container.
@@ -72,6 +69,7 @@ When assigning data.frame should not have column named .sample_id column.}
 \itemize{
 \item \href{#method-new}{\code{BatchContainer$new()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
+\item \href{#method-get_locations}{\code{BatchContainer$get_locations()}}
 \item \href{#method-exchange_samples}{\code{BatchContainer$exchange_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
@@ -143,14 +141,27 @@ lower overhead.}
 \item{\code{remove_empty_locations}}{Removes empty locations
 from the result tibble.}
 
-\item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble::tibble()}}.
-If \code{FALSE} returns \code{\link[data.table:data.table]{data.table::data.table()}}. This should have
-lower overhead, as internally there is a cached \code{\link[data.table:data.table]{data.table::data.table()}}.}
+\item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble}}.
+If \code{FALSE} returns \code{\link[data.table:data.table]{data.table}}. This should have
+lower overhead, as internally there is a cached \code{\link[data.table:data.table]{data.table}}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
 table with samples and sample assignment.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_locations"></a>}}
+\if{latex}{\out{\hypertarget{method-get_locations}{}}}
+\subsection{Method \code{get_locations()}}{
+Get a table with all the locations in a \code{BatchContainer}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_locations()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A \code{\link[tibble:tibble]{tibble}} with all the available locations.
 }
 }
 \if{html}{\out{<hr>}}
