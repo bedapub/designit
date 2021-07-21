@@ -14,11 +14,12 @@
 #' sets the number of items to shuffle (default 2). When `shuffle_proposal` is used, it will be
 #' called `n_shuffle` times at an iteration (default 1).
 #' @param shuffle_proposal
-#' A function used to propose two or more elements to shuffle in every step.
+#' A function used to propose a shuffle in every step.
 #' If non-`NULL` a function receives two arguments on every iteration:
 #' `bc$get_samples(include_id = TRUE, as_tibble = FALSE)` and the iteration number.
 #' This function should return a list with attributes `src` and `dst`
-#' (see [`BatchContainer$exchange_samples()`][BatchContainer]).
+#' (see [`BatchContainer$move_samples()`][BatchContainer]).
+#' There is no support for `location_assignment` currently.
 #' @param iterations Number of iterations. If not provided set to 1000.
 #' @param aggregate_scores_func A function to aggregate the scores.
 #' By default one is used that just uses the first score.
@@ -86,7 +87,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
           break
         }
         perm[dst] <- perm[src]
-        batch_container$exchange_samples(src, dst)
+        batch_container$move_samples(src, dst)
       }
     } else {
       non_empty_loc <- which(!is.na(batch_container$assignment))
@@ -103,7 +104,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
         dst <- sample(src)
       }
       perm[dst] <- perm[src]
-      batch_container$exchange_samples(src, dst)
+      batch_container$move_samples(src, dst)
     }
 
     non_trivial <- which(perm != seq_along(perm))
@@ -115,7 +116,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 
     new_score <- batch_container$score()
     if (aggregate_scores_func(new_score) >= aggregate_scores_func(current_score)) {
-      batch_container$exchange_samples(non_trivial, perm[non_trivial])
+      batch_container$move_samples(non_trivial, perm[non_trivial])
     } else {
       current_score <- new_score
     }

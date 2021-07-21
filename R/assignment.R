@@ -24,7 +24,7 @@ assign_random <- function(batch_container, samples = NULL) {
     rep(NA_integer_, n_available - n_samples)
   )
 
-  batch_container$assignment <- sample(expanded_ids)
+  batch_container$move_samples(location_assignment=expanded_ids)
 
   invisible(batch_container)
 }
@@ -54,10 +54,10 @@ assign_in_order <- function(batch_container, samples = NULL) {
 
   assertthat::assert_that(n_available >= n_samples)
 
-  batch_container$assignment <- c(
+  batch_container$move_samples(location_assignment = c(
     1:n_samples,
     rep(NA_integer_, n_available - n_samples)
-  )
+  ))
 
   invisible(batch_container)
 }
@@ -80,7 +80,7 @@ assign_in_order <- function(batch_container, samples = NULL) {
 #'
 #' @return Returns a function which accepts a data.table (`dt`) and an iteration
 #' number (`i`). This function returns a list with two names: `src` vector of length
-#' 2 and `dst` vector of length two. See `BatchContainer$exchange_samples`.
+#' 2 and `dst` vector of length two. See [`BatchContainer$move_samples()`][BatchContainer].
 #'
 #' @example man/examples/shuffle_with_constraints.R
 shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
@@ -185,7 +185,7 @@ assign_from_table <- function(batch_container, samples) {
     dplyr::left_join(samples, by = location_columns) %>%
     dplyr::left_join(batch_container$samples, by = sample_columns)
 
-  batch_container$assignment <- samples_with_id$.sample_id
+  batch_container$move_samples(location_assignment = samples_with_id$.sample_id)
 
   invisible(batch_container)
 }

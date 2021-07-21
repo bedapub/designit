@@ -7,7 +7,7 @@ test_that("$copy() does not preserve samples table cache", {
   # creates cache
   bc$get_samples()
   bc_clone <- bc$copy()
-  bc_clone$exchange_samples(c(1L, 2L), c(2L, 1L))
+  bc_clone$move_samples(c(1L, 2L), c(2L, 1L))
 
   expect_equal(bc$get_samples(include_id=TRUE, as_tibble=FALSE)$.sample_id, 1:9)
 })

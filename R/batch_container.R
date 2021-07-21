@@ -173,27 +173,55 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
 
     #' @description
-    #' Exchange samples between locations
+    #' Move samples between locations
+    #'
+    #' This method can receive either `src` and `dst` or `locations_assignment`.
+    #'
     #' @param src integer vector of source locations
     #' @param dst integer vector of destination locations (the same length as `src`).
+    #' @param location_assignment integer vector with location assignment.
+    #' The length of the vector should match the number of locations,
+    #' `NA` should be used for empty locations.
     #' @return `BatchContainer`, invisibly
-    exchange_samples = function(src, dst) {
-      assertthat::assert_that(is.integer(src), length(src) > 0,
-        is.integer(dst), length(dst) > 0,
-        length(src) == length(dst),
-        msg = "src & dst should be non-empty integer vectors of equal size"
-      )
-      # ensure private$samples_dt_cache is set
-      self$get_samples(include_id = TRUE, as_tibble = FALSE)
-      sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
-      fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
-      val <- private$samples_dt_cache[src, fcols, with = FALSE]
-      private$samples_dt_cache[dst, (fcols) := val]
-      if (any(seq_len(nrow(private$samples_table)) != sort(private$samples_dt_cache$.sample_id))) {
-        private$samples_dt_cache <- NULL
-        stop("Samples lost or duplicated during exchange; check src and dst")
+    move_samples = function(src, dst, location_assignment) {
+      if (!missing(src) && !is.null(src)) {
+        assertthat::assert_that(missing(location_assignment) ||
+                                  is.null(location_assignment),
+                                msg = "move_samples supports either src & dst, or location_assignment, not both")
+        assertthat::assert_that(is.integer(src), length(src) > 0,
+          is.integer(dst), length(dst) > 0,
+          length(src) == length(dst),
+          msg = "src & dst should be non-empty integer vectors of equal size"
+        )
+        # ensure private$samples_dt_cache is set
+        self$get_samples(include_id = TRUE, as_tibble = FALSE)
+        sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
+        fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
+        val <- private$samples_dt_cache[src, fcols, with = FALSE]
+        private$samples_dt_cache[dst, (fcols) := val]
+        if (any(seq_len(nrow(private$samples_table)) != sort(private$samples_dt_cache$.sample_id))) {
+          private$samples_dt_cache <- NULL
+          stop("Samples lost or duplicated during exchange; check src and dst")
+        }
+        private$assignment_vector <- private$samples_dt_cache$.sample_id
+      } else {
+        assertthat::assert_that(
+          missing(src) || is.null(src),
+          missing(dst) || is.null(dst),
+          msg = "move_samples supports either src & dst, or location_assignment, not both"
+        )
+        private$validate_assignment(location_assignment)
+        # if there is no cache yet
+        if (is.null(private$samples_dt_cache)) {
+          private$assignment_vector <- location_assignment
+        } else {
+          sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
+          fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
+          val <- private$samples_table[location_assignment, ]
+          private$samples_dt_cache[, (fcols) := val]
+          private$assignment_vector <- private$samples_dt_cache$.sample_id
+        }
       }
-      private$assignment_vector <- private$samples_dt_cache$.sample_id
       invisible(self)
     },
 
@@ -234,7 +262,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           dplyr::select(-.sample_id)
       }
       if (!is.null(self$assignment)) {
-        bc$assignment <- self$assignment
+        bc$move_samples(location_assignment=self$assignment)
       }
       bc$scoring_f <- self$scoring_f
       bc
@@ -489,10 +517,13 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' @field assignment
     #' Sample assignment vector. Should contain NAs for empty locations.
+    #'
+    #' Assigning this field is deprecated, please use `$move_samples()` instead.
     assignment = function(assignment) {
       if (missing(assignment)) {
         return(private$assignment_vector)
       } else {
+        warning("this field might become read-only in the future, please use $move_samples() instead")
         private$validate_assignment(assignment)
         private$assignment_vector <- assignment
         private$samples_dt_cache <- NULL
