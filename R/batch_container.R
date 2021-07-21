@@ -102,9 +102,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' lower overhead.
     #' @param remove_empty_locations Removes empty locations
     #' from the result tibble.
-    #' @param as_tibble Return [tibble::tibble()].
-    #' If `FALSE` returns [data.table::data.table()]. This should have
-    #' lower overhead, as internally there is a cached [data.table::data.table()].
+    #' @param as_tibble Return [`tibble`][tibble::tibble()].
+    #' If `FALSE` returns [`data.table`][data.table::data.table()]. This should have
+    #' lower overhead, as internally there is a cached [`data.table`][data.table::data.table()].
     #' @return table with samples and sample assignment.
     get_samples = function(assignment = TRUE, include_id = FALSE,
                            remove_empty_locations = FALSE,
