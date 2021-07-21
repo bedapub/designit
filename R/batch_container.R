@@ -132,7 +132,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         if (is.null(private$samples_dt_cache)) {
           private$validate_assignment(private$assignment_vector)
           private$samples_dt_cache <- cbind(
-            self$locations,
+            self$get_locations(),
             private$samples_table[private$assignment_vector,]
           ) %>%
             data.table::as.data.table()
@@ -155,6 +155,22 @@ BatchContainer <- R6::R6Class("BatchContainer",
         res
       }
     },
+
+    #' @description
+    #' Get a table with all the locations in a `BatchContainer`.
+    #' @return A [`tibble`][tibble::tibble()] with all the available locations.
+    get_locations = function() {
+      ldf <- private$dimensions %>%
+        purrr::map(~ .x$values) %>%
+        expand.grid() %>%
+        dplyr::arrange(dplyr::across(dplyr::everything())) %>%
+        tibble::as_tibble()
+      if (!is.null(self$exclude)) {
+        ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
+      }
+      ldf
+    },
+
 
     #' @description
     #' Exchange samples between locations
@@ -354,25 +370,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
         names(private$dimensions)
       } else {
         stop("Cannot set number of dimensions (read-only).")
-      }
-    },
-
-    #' @field locations
-    #' Get a [`tibble`][tibble::tibble()] with all the locations in a `BatchContainer`.
-    #' This field cannot be assigned.
-    locations = function(value) {
-      if (missing(value)) {
-        ldf <- private$dimensions %>%
-          purrr::map(~ .x$values) %>%
-          expand.grid() %>%
-          dplyr::arrange(dplyr::across(dplyr::everything())) %>%
-          tibble::as_tibble()
-        if (!is.null(self$exclude)) {
-          ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
-        }
-        ldf
-      } else {
-        stop("Cannot set locations data.frame (read-only).")
       }
     },
 

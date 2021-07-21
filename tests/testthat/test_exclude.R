@@ -14,7 +14,7 @@ bc2 <- BatchContainer$new(
 
 test_that("Exclude works in 1-dimensional batch-container", {
   expect_equal(bc2$n_available, 10 - 3)
-  expect_equal(nrow(bc2$locations), 10 - 3)
+  expect_equal(nrow(bc2$get_locations()), 10 - 3)
   expect_equal(nrow(bc2$exclude), 3)
 })
 

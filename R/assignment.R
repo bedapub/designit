@@ -176,12 +176,12 @@ assign_from_table <- function(batch_container, samples) {
     )
   }
   only_locations <- samples[location_columns]
-  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$locations,
+  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$get_locations(),
     by = location_columns
   )) == 0,
   msg = "sample sheed has locations not available in the batch container"
   )
-  samples_with_id <- batch_container$locations %>%
+  samples_with_id <- batch_container$get_locations() %>%
     dplyr::left_join(samples, by = location_columns) %>%
     dplyr::left_join(batch_container$samples, by = sample_columns)
 

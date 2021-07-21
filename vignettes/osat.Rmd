@@ -124,7 +124,7 @@ Assign samples and get initial setup.
 ```{r}
 bc$samples <- samples
 
-starting_assignment <- bc$locations %>%
+starting_assignment <- bc$get_locations() %>%
   left_join(g_setup_start) %>%
   pull(ID) %>%
   as.integer()
@@ -181,7 +181,7 @@ Instead of relying on `BatchContainer`, here we have a manual optimization proce
 bc$assignment <- starting_assignment
 
 fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
-  ldf <- data.table::data.table(bc$locations)[, c("plates")][, ".sample_id" := bc$assignment]
+  ldf <- data.table::data.table(bc$get_locations())[, c("plates")][, ".sample_id" := bc$assignment]
   fcols <- c(".sample_id", feature_vars)
   smp <- data.table::data.table(bc$samples)[, ..fcols]
   df <- smp[ldf, on = ".sample_id"]

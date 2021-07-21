@@ -46,10 +46,10 @@ test_that("Test that numer of dimensions is correct", {
 })
 
 test_that("Test locations", {
-  expect_equal(nrow(bc1$locations), bc1$n_available)
-  expect_equal(nrow(bc2$locations), bc2$n_available)
-  expect_equal(nrow(bc3_excl$locations), bc3_excl$n_available)
-  expect_equal(nrow(bc4_excl$locations), bc4_excl$n_available)
+  expect_equal(nrow(bc1$get_locations()), bc1$n_available)
+  expect_equal(nrow(bc2$get_locations()), bc2$n_available)
+  expect_equal(nrow(bc3_excl$get_locations()), bc3_excl$n_available)
+  expect_equal(nrow(bc4_excl$get_locations()), bc4_excl$n_available)
 })
 
 samples <- data.frame(a=1:10, b=rnorm(10))

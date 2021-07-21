@@ -65,7 +65,7 @@ bc$n_excluded
 #> [1] 2
 bc$n_available
 #> [1] 16
-bc$locations
+bc$get_locations()
 #> # A tibble: 16 x 3
 #>    plate row   column
 #>    <int> <fct>  <int>
