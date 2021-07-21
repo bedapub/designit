@@ -113,8 +113,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "Cannot return samples for empty batch container."
       )
 
-      assertthat::assert_that(names(private$samples_table)[ncol(private$samples_table)] == ".sample_id",
-        msg = "Last column of private$samples_table should be .sample_id"
+      assertthat::assert_that(names(private$samples_table)[1] == ".sample_id",
+        msg = "First column of private$samples_table should be .sample_id"
       )
 
 
@@ -478,9 +478,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "samples data.frame has a column with reserved name .sample_id"
         )
 
-        samples$.sample_id <- 1:nrow(samples)
+        samples$.sample_id <- seq_len(nrow(samples))
 
-        private$samples_table <- samples
+        private$samples_table <- dplyr::select(
+          samples, .sample_id, dplyr::everything())
 
         private$samples_dt_cache <- NULL
       }
