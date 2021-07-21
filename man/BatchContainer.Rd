@@ -60,7 +60,9 @@ This field cannot be assigned.}
 \item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
-\item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.}
+\item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.
+
+Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
 }
 \if{html}{\out{</div>}}
 }
@@ -70,10 +72,10 @@ When assigning data.frame should not have column named .sample_id column.}
 \item \href{#method-new}{\code{BatchContainer$new()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
 \item \href{#method-get_locations}{\code{BatchContainer$get_locations()}}
-\item \href{#method-exchange_samples}{\code{BatchContainer$exchange_samples()}}
+\item \href{#method-move_samples}{\code{BatchContainer$move_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
+\item \href{#method-copy}{\code{BatchContainer$copy()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
-\item \href{#method-clone}{\code{BatchContainer$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -165,12 +167,14 @@ A \code{\link[tibble:tibble]{tibble}} with all the available locations.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-exchange_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-exchange_samples}{}}}
-\subsection{Method \code{exchange_samples()}}{
-Exchange samples between locations
+\if{html}{\out{<a id="method-move_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-move_samples}{}}}
+\subsection{Method \code{move_samples()}}{
+Move samples between locations
+
+This method can receive either \code{src} and \code{dst} or \code{locations_assignment}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$exchange_samples(src, dst)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$move_samples(src, dst, location_assignment)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -179,6 +183,10 @@ Exchange samples between locations
 \item{\code{src}}{integer vector of source locations}
 
 \item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).}
+
+\item{\code{location_assignment}}{integer vector with location assignment.
+The length of the vector should match the number of locations,
+\code{NA} should be used for empty locations.}
 }
 \if{html}{\out{</div>}}
 }
@@ -197,6 +205,19 @@ Score current sample assignment,
 
 \subsection{Returns}{
 Returns a vector of all scoring functions values.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-copy"></a>}}
+\if{latex}{\out{\hypertarget{method-copy}{}}}
+\subsection{Method \code{copy()}}{
+Create an independent copy (clone) of a \code{BatchContainer}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$copy()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a new \code{BatchContainer}
 }
 }
 \if{html}{\out{<hr>}}
@@ -219,23 +240,6 @@ Tibble with sample information and sample ids.
 Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
 Validate sample assignment.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$clone()}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
 }
 \if{html}{\out{</div>}}
 }

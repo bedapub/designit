@@ -22,7 +22,7 @@ describes the selected source row from the table.}
 \value{
 Returns a function which accepts a data.table (\code{dt}) and an iteration
 number (\code{i}). This function returns a list with two names: \code{src} vector of length
-2 and \code{dst} vector of length two. See \code{BatchContainer$exchange_samples}.
+2 and \code{dst} vector of length two. See \code{\link[=BatchContainer]{BatchContainer$move_samples()}}.
 }
 \description{
 Can be used with \code{assign_score_optimize_shuffle} to improve convergence speed.
