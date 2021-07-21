@@ -60,6 +60,9 @@ This field cannot be assigned.}
 \item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
+\item{\code{samples_attr}}{Extra attributes of samples. If set, this is included into
+\code{BatchContainer$get_samples()} output.}
+
 \item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.
 
 Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
@@ -237,6 +240,7 @@ List of scoring functions.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
+Sample attributes, a data.table.
 Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
 Validate sample assignment.}
