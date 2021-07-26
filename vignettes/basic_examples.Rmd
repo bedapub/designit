@@ -155,6 +155,7 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE),
            plate = plate, column = column, row = row,
            .color = .sample_id)
 ```
+
 ## Scoring a layout
 
 To evaluate how good a layout is, we need a scoring function. 
