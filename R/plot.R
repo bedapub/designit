@@ -80,10 +80,13 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'   .color = Treatment, .alpha = Timepoint
 #' )
 #'
-#' plot_plate(bc$get_samples(),
-#'   plate = plate, column = column, row = row,
-#'   .color = Treatment, .pattern = Timepoint
-#' )
+#' if (FALSE) {
+#'   # do not run due to problems in ggpattern
+#'   plot_plate(bc$get_samples(),
+#'     plate = plate, column = column, row = row,
+#'     .color = Treatment, .pattern = Timepoint
+#'   )
+#' }
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
   # preven undefined variable error
