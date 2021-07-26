@@ -35,6 +35,23 @@ test_that("$move_samples() works as expected with src & dst (without $get_sample
   )
 })
 
+test_that("$move_samples() accepts integers without L prexif", {
+  expect_silent(bc$move_samples(src = c(1, 2), dst = c(2, 1)))
+  expect_silent(bc$move_samples(location_assignment=as.double(c(rev(1:8), NA))))
+})
+
+test_that("$move_samples() does not accept non-integers", {
+  expect_error(bc$move_samples(src = c(1.1, 2), dst = c(2, 1)))
+  expect_error(bc$move_samples(src = c(1, 2), dst = c(2, 1.1)))
+  expect_error(bc$move_samples(src = c(Inf, 2), dst = c(2, 1)))
+  expect_error(bc$move_samples(src = c(1, 2), dst = c(2, Inf)))
+  expect_error(bc$move_samples(src = c(NA, 2), dst = c(2, 1)))
+  expect_error(bc$move_samples(src = c(1, 2), dst = c(2, NA)))
+  expect_error(bc$move_samples(location_assignment=c(rev(1:7), 8.1, NA)))
+  expect_error(bc$move_samples(location_assignment=c(rev(1:7), 8, Inf)))
+})
+
+
 assign_in_order(bc)
 
 test_that("$move_samples() works as expected with src & dst (after $get_samples())", {
