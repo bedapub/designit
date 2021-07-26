@@ -61,7 +61,6 @@ Suggests:
     DT,
     printr,
     devtools (>= 2.0.0),
-    gridpattern,
     ggpattern
 Encoding: UTF-8
 LazyData: true
@@ -70,5 +69,4 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Remotes:
     bioc::release/OSAT,
-    github::trevorld/gridpattern,
     github::coolbutuseless/ggpattern
