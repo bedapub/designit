@@ -67,10 +67,13 @@ plot_plate(bc$get_samples(),
   .color = Treatment, .alpha = Timepoint
 )
 
-plot_plate(bc$get_samples(),
-  plate = plate, column = column, row = row,
-  .color = Treatment, .pattern = Timepoint
-)
+if (FALSE) {
+  # do not run due to problems in ggpattern
+  plot_plate(bc$get_samples(),
+    plate = plate, column = column, row = row,
+    .color = Treatment, .pattern = Timepoint
+  )
+}
 }
 \author{
 siebourj

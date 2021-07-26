@@ -24,7 +24,7 @@ assign_random <- function(batch_container, samples = NULL) {
     rep(NA_integer_, n_available - n_samples)
   )
 
-  batch_container$move_samples(location_assignment=sample(expanded_ids))
+  batch_container$move_samples(location_assignment = sample(expanded_ids))
 
   invisible(batch_container)
 }

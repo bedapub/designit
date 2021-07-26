@@ -192,8 +192,15 @@ BatchContainer <- R6::R6Class("BatchContainer",
         assertthat::assert_that(missing(location_assignment) ||
                                   is.null(location_assignment),
                                 msg = "move_samples supports either src & dst, or location_assignment, not both")
-        assertthat::assert_that(is.integer(src), length(src) > 0,
-          is.integer(dst), length(dst) > 0,
+        assertthat::assert_that(
+          # is.integer is much faster, but we want to allow
+          # src = c(1, 2)
+          # as opposed to
+          # src = c(1L, 2L)
+          rlang::is_integerish(src, finite = TRUE),
+          length(src) > 0,
+          rlang::is_integerish(dst, finite = TRUE),
+          length(dst) > 0,
           length(src) == length(dst),
           msg = "src & dst should be non-empty integer vectors of equal size"
         )
@@ -315,8 +322,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Validate sample assignment.
     #' @importFrom stats na.omit
     validate_assignment = function(assignment) {
-      assertthat::assert_that(is.integer(assignment),
-        msg = "sample assignment should an integer vector"
+      assertthat::assert_that(
+        rlang::is_integerish(assignment),
+        all(!is.infinite(assignment)),
+        msg = "sample assignment should an integer vector without Infs"
       )
       assertthat::assert_that(length(assignment) == self$n_available,
         msg = "sample assignment length doesn't match the number of available locations"
