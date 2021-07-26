@@ -69,4 +69,5 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Remotes:
     bioc::release/OSAT,
+    github::trevorld/gridpattern,
     github::coolbutuseless/ggpattern
