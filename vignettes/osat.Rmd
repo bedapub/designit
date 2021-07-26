@@ -13,7 +13,6 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  error = TRUE,
   fig.width = 6,
   fig.height = 6
 )
@@ -129,7 +128,7 @@ starting_assignment <- bc$get_locations() %>%
   pull(ID) %>%
   as.integer()
 
-bc$assignment <- starting_assignment
+bc$move_samples(location_assignment = starting_assignment)
 
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
@@ -161,10 +160,10 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 Caching `expected_dt` should improve the performance.
 
 ```{r}
-bc$assignment <- starting_assignment
+bc$move_samples(location_assignment = starting_assignment)
 
 # precompute expected_dt
-edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
+edf <- osat_score(bc$get_samples(), "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
 
 bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
 
@@ -178,7 +177,7 @@ bench::system_time({
 Instead of relying on `BatchContainer`, here we have a manual optimization process using `data.table`.
 
 ```{r}
-bc$assignment <- starting_assignment
+bc$move_samples(location_assignment = starting_assignment)
 
 fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
   ldf <- data.table::data.table(bc$get_locations())[, c("plates")][, ".sample_id" := bc$assignment]
@@ -228,10 +227,10 @@ bench::system_time({
 
 # Shuffle optimization with burn-in
 ```{r}
-bc$assignment <- starting_assignment
+bc$move_samples(location_assignment = starting_assignment)
 
 # precompute expected_dt
-edf <- osat_score(bc$samples_dt, "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
+edf <- osat_score(bc$get_samples(), "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
 
 bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
 
@@ -255,9 +254,9 @@ bench::system_time({
 
 ```{r}
 tibble(
-  i = 1:length(trace),
-  normal = trace_reference,
-  burnin = trace_burn_in
+  i = seq_len(trace_burn_in$n_steps),
+  normal = trace_reference$scores,
+  burnin = trace_burn_in$scores
 ) %>%
   pivot_longer(-i, names_to = "method", values_to = "score") %>%
   ggplot(aes(i, score, col = method)) +
