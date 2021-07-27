@@ -11,10 +11,10 @@ assign_random <- function(batch_container, samples = NULL) {
       msg = "batch-container is empty and no samples provided"
     )
   } else {
-    batch_container$samples_df <- samples
+    batch_container$samples <- samples
   }
 
-  n_samples <- nrow(batch_container$samples_df)
+  n_samples <- nrow(batch_container$samples)
   n_available <- batch_container$n_available
 
   assertthat::assert_that(n_available >= n_samples)
@@ -24,7 +24,7 @@ assign_random <- function(batch_container, samples = NULL) {
     rep(NA_integer_, n_available - n_samples)
   )
 
-  batch_container$assignment_vec <- sample(expanded_ids)
+  batch_container$move_samples(location_assignment = sample(expanded_ids))
 
   invisible(batch_container)
 }
@@ -46,18 +46,18 @@ assign_in_order <- function(batch_container, samples = NULL) {
       msg = "batch-container is empty and no samples provided"
     )
   } else {
-    batch_container$samples_df <- samples
+    batch_container$samples <- samples
   }
 
-  n_samples <- nrow(batch_container$samples_df)
+  n_samples <- nrow(batch_container$samples)
   n_available <- batch_container$n_available
 
   assertthat::assert_that(n_available >= n_samples)
 
-  batch_container$assignment_vec <- c(
+  batch_container$move_samples(location_assignment = c(
     1:n_samples,
     rep(NA_integer_, n_available - n_samples)
-  )
+  ))
 
   invisible(batch_container)
 }
@@ -68,18 +68,19 @@ assign_in_order <- function(batch_container, samples = NULL) {
 #'
 #' @export
 #' @param src Expression to define possible source locations in the samples/locations
-#' table. Usually evaluated based on `BatchContainer$samples_dt` as an environment
+#' table. Usually evaluated based on
+#' `BatchContainer$get_samples(include_id = TRUE, as_tibble = FALSE)` as an environment
 #' (see also `with()`). A single source location is selected from rows where the
 #' expression evaluates to`TRUE`.
 #' @param dst Expression to define possible destination locations in the
-#' samples/locations table. Usually evaluated based on `BatchContainer$samples_dt` as an
+#' samples/locations table. Usually evaluated based on `BatchContainer$get_samples()` as an
 #' environment.
 #' Additionally a special variable `.src` is available in this environment which
 #' describes the selected source row from the table.
 #'
 #' @return Returns a function which accepts a data.table (`dt`) and an iteration
 #' number (`i`). This function returns a list with two names: `src` vector of length
-#' 2 and `dst` vector of length two. See `BatchContainer$exchange_samples`.
+#' 2 and `dst` vector of length two. See [`BatchContainer$move_samples()`][BatchContainer].
 #'
 #' @example man/examples/shuffle_with_constraints.R
 shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
@@ -162,8 +163,8 @@ assign_from_table <- function(batch_container, samples) {
   only_samples <- samples[sample_columns] %>%
     # remove all-NA rows, i.e. unassigned locations
     dplyr::filter(!dplyr::across(tidyselect::everything(), is.na))
-  if (is.null(batch_container$samples_df)) {
-    batch_container$samples_df <- only_samples
+  if (is.null(batch_container$samples)) {
+    batch_container$samples <- only_samples
   } else {
     assertthat::assert_that(dplyr::all_equal(only_samples,
       batch_container$get_samples(assignment = FALSE),
@@ -175,16 +176,16 @@ assign_from_table <- function(batch_container, samples) {
     )
   }
   only_locations <- samples[location_columns]
-  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$locations_df,
+  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$get_locations(),
     by = location_columns
   )) == 0,
   msg = "sample sheed has locations not available in the batch container"
   )
-  samples_with_id <- batch_container$locations_df %>%
+  samples_with_id <- batch_container$get_locations() %>%
     dplyr::left_join(samples, by = location_columns) %>%
-    dplyr::left_join(batch_container$samples_df, by = sample_columns)
+    dplyr::left_join(batch_container$samples, by = sample_columns)
 
-  batch_container$assignment_vec <- samples_with_id$.sample_id
+  batch_container$move_samples(location_assignment = samples_with_id$.sample_id)
 
   invisible(batch_container)
 }

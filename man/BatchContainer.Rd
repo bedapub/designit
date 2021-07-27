@@ -27,22 +27,17 @@ bc <- BatchContainer$new(
 
 bc
 }
-\section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{scoring_f}}{Main scoring function used for optimization.
-Scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
-the samples \link{data.frame}, locations \link{data.frame}, and
-\code{.sample_id} column. This function should return a floating
-point score value for the assignment.}
-
-\item{\code{aux_scoring_f}}{Additional scoring functions to compute.}
-}
-\if{html}{\out{</div>}}
-}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
+\item{\code{scoring_f}}{Scoring functions used for optimization.
+Each scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
+the samples \link{data.frame}, locations \link{data.frame}, and
+\code{.sample_id} column. This function should return a floating
+point score value for the assignment. This a list of functions.
+Upon assignment a single function will be automatically converted to a list
+In the later case each function is called.}
+
 \item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
 
 \item{\code{n_locations}}{Returns number of available locations in a \code{BatchContainer}.
@@ -60,22 +55,17 @@ This field cannot be assigned.}
 \item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
 
-\item{\code{locations_df}}{Get a \code{\link[tibble:tibble]{tibble}} with all the locations in a \code{BatchContainer}.
-This field cannot be assigned.}
-
 \item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
 
-\item{\code{samples_df}}{Samples in the batch container.
+\item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
-\item{\code{samples_dt}}{Sample assignment \code{\link[data.table:data.table]{data.table}}.
-This data.table includes columns for all the \code{BatchContainer}
-locations, all the samples and a \code{".sample_id"} column.
+\item{\code{samples_attr}}{Extra attributes of samples. If set, this is included into
+\code{BatchContainer$get_samples()} output.}
 
-The most efficient way of updating this \code{\link[data.table:data.table]{data.table}} is using
-the \code{BatchContainer$exchange_samples()} method.}
+\item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.
 
-\item{\code{assignment_vec}}{Sample assignment vector. Should contain NAs for empty locations.}
+Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
 }
 \if{html}{\out{</div>}}
 }
@@ -84,10 +74,11 @@ the \code{BatchContainer$exchange_samples()} method.}
 \itemize{
 \item \href{#method-new}{\code{BatchContainer$new()}}
 \item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
-\item \href{#method-exchange_samples}{\code{BatchContainer$exchange_samples()}}
+\item \href{#method-get_locations}{\code{BatchContainer$get_locations()}}
+\item \href{#method-move_samples}{\code{BatchContainer$move_samples()}}
 \item \href{#method-score}{\code{BatchContainer$score()}}
+\item \href{#method-copy}{\code{BatchContainer$copy()}}
 \item \href{#method-print}{\code{BatchContainer$print()}}
-\item \href{#method-clone}{\code{BatchContainer$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -138,7 +129,8 @@ Return table with samples and sample assignment.
 \if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_samples(
   assignment = TRUE,
   include_id = FALSE,
-  remove_empty_locations = FALSE
+  remove_empty_locations = FALSE,
+  as_tibble = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -148,24 +140,44 @@ Return table with samples and sample assignment.
 \item{\code{assignment}}{Return sample assignment. If FALSE, only
 samples table is returned, with out batch assignment.}
 
-\item{\code{include_id}}{Keep .sample_id in the tibble.}
+\item{\code{include_id}}{Keep .sample_id in the table. Use \code{TRUE} for
+lower overhead.}
 
 \item{\code{remove_empty_locations}}{Removes empty locations
 from the result tibble.}
+
+\item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble}}.
+If \code{FALSE} returns \code{\link[data.table:data.table]{data.table}}. This should have
+lower overhead, as internally there is a cached \code{\link[data.table:data.table]{data.table}}.}
 }
 \if{html}{\out{</div>}}
 }
 \subsection{Returns}{
-tibble with samples and sample assignment.
+table with samples and sample assignment.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-exchange_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-exchange_samples}{}}}
-\subsection{Method \code{exchange_samples()}}{
-Exchange samples between locations
+\if{html}{\out{<a id="method-get_locations"></a>}}
+\if{latex}{\out{\hypertarget{method-get_locations}{}}}
+\subsection{Method \code{get_locations()}}{
+Get a table with all the locations in a \code{BatchContainer}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$exchange_samples(src, dst)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_locations()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+A \code{\link[tibble:tibble]{tibble}} with all the available locations.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-move_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-move_samples}{}}}
+\subsection{Method \code{move_samples()}}{
+Move samples between locations
+
+This method can receive either \code{src} and \code{dst} or \code{locations_assignment}.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$move_samples(src, dst, location_assignment)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -174,6 +186,10 @@ Exchange samples between locations
 \item{\code{src}}{integer vector of source locations}
 
 \item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).}
+
+\item{\code{location_assignment}}{integer vector with location assignment.
+The length of the vector should match the number of locations,
+\code{NA} should be used for empty locations.}
 }
 \if{html}{\out{</div>}}
 }
@@ -187,19 +203,24 @@ Exchange samples between locations
 \subsection{Method \code{score()}}{
 Score current sample assignment,
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score(aux = FALSE)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score()}\if{html}{\out{</div>}}
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{aux}}{compute auxiliary scoring functions}
-}
-\if{html}{\out{</div>}}
-}
 \subsection{Returns}{
-In case \code{aux} is FALSE returns the value of the main scoring function.
-Otherwise a vector of all scoring functions starting from the first one.
+Returns a vector of all scoring functions values.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-copy"></a>}}
+\if{latex}{\out{\hypertarget{method-copy}{}}}
+\subsection{Method \code{copy()}}{
+Create an independent copy (clone) of a \code{BatchContainer}
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$copy()}\if{html}{\out{</div>}}
+}
+
+\subsection{Returns}{
+Returns a new \code{BatchContainer}
 }
 }
 \if{html}{\out{<hr>}}
@@ -215,29 +236,14 @@ Prints information about \code{BatchContainer}.
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{...}}{not used.
+List of scoring functions.
 List of BatchContainerDimension elements.
 Tibble with excluded locations.
 Tibble with sample information and sample ids.
-Tibble with sample ids and assignment to batch container locations.
+Sample attributes, a data.table.
+Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
 Validate sample assignment.}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$clone(deep = FALSE)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
 }
 \if{html}{\out{</div>}}
 }

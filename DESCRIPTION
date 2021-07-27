@@ -1,6 +1,6 @@
 Package: designit
 Title: Blocking and randomization for experimental design
-Version: 0.0.0.9009
+Version: 0.1.1
 Authors@R: c(
     person(given = "Balazs",
            family = "Banfai",
@@ -61,8 +61,8 @@ Suggests:
     DT,
     printr,
     devtools (>= 2.0.0),
-    ggpattern,
-    rmarkdown
+    gridpattern,
+    ggpattern
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

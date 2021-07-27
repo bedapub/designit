@@ -60,7 +60,7 @@ bc$exclude
 bc$n_locations
 bc$n_excluded
 bc$n_available
-bc$locations_df
+bc$get_locations()
 
 set.seed(1)
 assign_random(bc, samples)

@@ -32,18 +32,6 @@ validate_samples <- function(samples) {
 #' @export
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
-    #' @field scoring_f
-    #' Main scoring function used for optimization.
-    #' Scoring function should receive a [`data.table`][data.table::data.table] with columns from
-    #' the samples [data.frame], locations [data.frame], and
-    #' `.sample_id` column. This function should return a floating
-    #' point score value for the assignment.
-    scoring_f = NULL,
-
-    #' @field aux_scoring_f
-    #' Additional scoring functions to compute.
-    aux_scoring_f = NULL,
-
     #' @description
     #' Create a new BatchContainer object.
     #' @param dimensions A vector or list of dimensions. Every dimension
@@ -110,24 +98,30 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Return table with samples and sample assignment.
     #' @param assignment Return sample assignment. If FALSE, only
     #' samples table is returned, with out batch assignment.
-    #' @param include_id Keep .sample_id in the tibble.
+    #' @param include_id Keep .sample_id in the table. Use `TRUE` for
+    #' lower overhead.
     #' @param remove_empty_locations Removes empty locations
     #' from the result tibble.
-    #' @return tibble with samples and sample assignment.
+    #' @param as_tibble Return [`tibble`][tibble::tibble()].
+    #' If `FALSE` returns [`data.table`][data.table::data.table()]. This should have
+    #' lower overhead, as internally there is a cached [`data.table`][data.table::data.table()].
+    #' @return table with samples and sample assignment.
     get_samples = function(assignment = TRUE, include_id = FALSE,
-                           remove_empty_locations = FALSE) {
-      assertthat::assert_that(!is.null(private$samples),
+                           remove_empty_locations = FALSE,
+                           as_tibble = TRUE) {
+      assertthat::assert_that(!is.null(private$samples_table),
         msg = "Cannot return samples for empty batch container."
       )
 
-      assertthat::assert_that(names(private$samples)[ncol(private$samples)] == ".sample_id",
-        msg = "Last column of private$samples should be .sample_id"
+      assertthat::assert_that(names(private$samples_table)[1] == ".sample_id",
+        msg = "First column of private$samples_table should be .sample_id"
       )
 
 
       assertthat::assert_that(assertthat::is.flag(assignment))
       assertthat::assert_that(assertthat::is.flag(include_id))
       assertthat::assert_that(assertthat::is.flag(remove_empty_locations))
+      assertthat::assert_that(assertthat::is.flag(as_tibble))
 
       if (!assignment) {
         assertthat::assert_that(!remove_empty_locations,
@@ -135,83 +129,154 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
       }
       if (assignment) {
-        private$validate_assignment(private$assignment)
-        res <- self$locations_df %>%
-          dplyr::mutate(.sample_id = private$assignment) %>%
-          dplyr::left_join(private$samples, by = ".sample_id")
+        if (is.null(private$samples_dt_cache)) {
+          private$validate_assignment(private$assignment_vector)
+          private$samples_dt_cache <- cbind(
+            self$get_locations(),
+            private$samples_table[private$assignment_vector,]
+          ) %>%
+            data.table::as.data.table()
+        }
+        res <- data.table::copy(private$samples_dt_cache)
         if (remove_empty_locations) {
-          res <- res %>%
-            dplyr::filter(!is.na(.sample_id))
+          res <- res[!is.na(.sample_id), ]
         }
       } else {
-        res <- private$samples
+        res <- data.table::as.data.table(private$samples_table)
+      }
+
+      if (!is.null(private$samples_attributes)) {
+        res <- cbind(res, private$samples_attributes[res$.sample_id])
       }
 
       if (!include_id) {
-        res <- res %>%
-          dplyr::select(-.sample_id)
+        res[,.sample_id := NULL]
       }
-      res
+
+      if (as_tibble) {
+        tibble::tibble(res)
+      } else {
+        res
+      }
     },
 
     #' @description
-    #' Exchange samples between locations
+    #' Get a table with all the locations in a `BatchContainer`.
+    #' @return A [`tibble`][tibble::tibble()] with all the available locations.
+    get_locations = function() {
+      ldf <- private$dimensions %>%
+        purrr::map(~ .x$values) %>%
+        expand.grid() %>%
+        dplyr::arrange(dplyr::across(dplyr::everything())) %>%
+        tibble::as_tibble()
+      if (!is.null(self$exclude)) {
+        ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
+      }
+      ldf
+    },
+
+
+    #' @description
+    #' Move samples between locations
+    #'
+    #' This method can receive either `src` and `dst` or `locations_assignment`.
+    #'
     #' @param src integer vector of source locations
     #' @param dst integer vector of destination locations (the same length as `src`).
+    #' @param location_assignment integer vector with location assignment.
+    #' The length of the vector should match the number of locations,
+    #' `NA` should be used for empty locations.
     #' @return `BatchContainer`, invisibly
-    exchange_samples = function(src, dst) {
-      assertthat::assert_that(is.integer(src), length(src) > 0,
-        is.integer(dst), length(dst) > 0,
-        length(src) == length(dst),
-        msg = "src & dst should be non-empty integer vectors of equal size"
-      )
-      # ensure private$samples_dt_cache is set
-      self$samples_dt
-      sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
-      fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
-      val <- private$samples_dt_cache[src, fcols, with = FALSE]
-      private$samples_dt_cache[dst, (fcols) := val]
-      if (any(seq_len(nrow(private$samples)) != sort(private$samples_dt_cache$.sample_id))) {
-        private$samples_dt_cache <- NULL
-        stop("Samples lost or duplicated during exchange; check src and dst")
+    move_samples = function(src, dst, location_assignment) {
+      if (!missing(src) && !is.null(src)) {
+        assertthat::assert_that(missing(location_assignment) ||
+                                  is.null(location_assignment),
+                                msg = "move_samples supports either src & dst, or location_assignment, not both")
+        assertthat::assert_that(
+          # is.integer is much faster, but we want to allow
+          # src = c(1, 2)
+          # as opposed to
+          # src = c(1L, 2L)
+          rlang::is_integerish(src, finite = TRUE),
+          length(src) > 0,
+          rlang::is_integerish(dst, finite = TRUE),
+          length(dst) > 0,
+          length(src) == length(dst),
+          msg = "src & dst should be non-empty integer vectors of equal size"
+        )
+        # ensure private$samples_dt_cache is set
+        self$get_samples(include_id = TRUE, as_tibble = FALSE)
+        sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
+        fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
+        val <- private$samples_dt_cache[src, fcols, with = FALSE]
+        private$samples_dt_cache[dst, (fcols) := val]
+        if (any(seq_len(nrow(private$samples_table)) != sort(private$samples_dt_cache$.sample_id))) {
+          private$samples_dt_cache <- NULL
+          stop("Samples lost or duplicated during exchange; check src and dst")
+        }
+        private$assignment_vector <- private$samples_dt_cache$.sample_id
+      } else {
+        assertthat::assert_that(
+          missing(src) || is.null(src),
+          missing(dst) || is.null(dst),
+          msg = "move_samples supports either src & dst, or location_assignment, not both"
+        )
+        private$validate_assignment(location_assignment)
+        # if there is no cache yet
+        if (is.null(private$samples_dt_cache)) {
+          private$assignment_vector <- location_assignment
+        } else {
+          sid_ind <- match(".sample_id", colnames(private$samples_dt_cache))
+          fcols <- colnames(private$samples_dt_cache)[sid_ind:ncol(private$samples_dt_cache)]
+          val <- private$samples_table[location_assignment, ]
+          private$samples_dt_cache[, (fcols) := val]
+          private$assignment_vector <- private$samples_dt_cache$.sample_id
+        }
       }
-      private$assignment <- private$samples_dt_cache$.sample_id
       invisible(self)
     },
 
     #' @description
     #' Score current sample assignment,
-    #' @param aux compute auxiliary scoring functions
-    #' @return In case `aux` is FALSE returns the value of the main scoring function.
-    #' Otherwise a vector of all scoring functions starting from the first one.
-    score = function(aux = FALSE) {
-      assertthat::assert_that(assertthat::is.flag(aux), msg = "aux should be TRUE or FALSE")
-      assertthat::assert_that(!is.null(self$scoring_f),
+    #' @return Returns a vector of all scoring functions values.
+    score = function() {
+      assertthat::assert_that(!is.null(private$scoring_funcs),
         msg = "Scoring function needs to be assigned"
       )
-      assertthat::assert_that(!is.null(private$samples),
+      assertthat::assert_that(is.list(private$scoring_funcs),
+                              length(private$scoring_funcs) >= 1,
+        msg = "Scroring function should be a non-empty list"
+      )
+      assertthat::assert_that(!is.null(private$samples_table),
         msg = "No samples in the batch container, cannot compute score"
       )
 
-      samples <- self$samples_dt
-      res <- self$scoring_f(samples)
-      assertthat::assert_that(assertthat::is.number(res),
-        msg = "Scoring function should return a single number"
-      )
+      samples <- self$get_samples(include_id = TRUE, as_tibble = FALSE)
+      res <- purrr::map_dbl(private$scoring_funcs, ~ .x(samples))
+      assertthat::assert_that(length(res) == length(private$scoring_funcs))
 
-      if (aux && !is.null(self$aux_scoring_f) && length(self$aux_scoring_f) >= 1) {
-        assertthat::assert_that(is.list(self$aux_scoring_f),
-          msg = "auxillary scoring functions should be a list"
-        )
-
-        aux_res <- purrr::map_dbl(self$aux_scoring_f, ~ .x(samples))
-        assertthat::assert_that(is.double(aux_res))
-        assertthat::assert_that(length(aux_res) == length(self$aux_scoring_f))
-
-        res <- c(res, aux_res)
-      }
+      assertthat::assert_that(is.numeric(res), msg="Scoring function should return a number")
 
       return(res)
+    },
+
+    #' @description
+    #' Create an independent copy (clone) of a `BatchContainer`
+    #' @return
+    #' Returns a new `BatchContainer`
+    copy = function() {
+      # we do not name this method `clone` to avoid incorrect
+      # autogenerated documentation (via roxygen2)
+      bc <- BatchContainer$new(private$dimensions, private$exclude_df)
+      if (!is.null(self$samples)) {
+        bc$samples <- self$samples %>%
+          dplyr::select(-.sample_id)
+      }
+      if (!is.null(self$assignment)) {
+        bc$move_samples(location_assignment=self$assignment)
+      }
+      bc$scoring_f <- self$scoring_f
+      bc
     },
 
     #' @description
@@ -233,6 +298,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
   ),
 
   private = list(
+    #' List of scoring functions.
+    scoring_funcs = NULL,
+
     #' List of BatchContainerDimension elements.
     dimensions = NULL,
 
@@ -240,10 +308,13 @@ BatchContainer <- R6::R6Class("BatchContainer",
     exclude_df = NULL,
 
     #' Tibble with sample information and sample ids.
-    samples = NULL,
+    samples_table = NULL,
 
-    #' Tibble with sample ids and assignment to batch container locations.
-    assignment = NULL,
+    #' Sample attributes, a data.table.
+    samples_attributes = NULL,
+
+    #' Vector with assignment of sample ids to locations.
+    assignment_vector = NULL,
 
     #' Cached data.table with samples assignment.
     samples_dt_cache = NULL,
@@ -251,25 +322,54 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Validate sample assignment.
     #' @importFrom stats na.omit
     validate_assignment = function(assignment) {
-      assertthat::assert_that(is.integer(assignment),
-        msg = "sample assignment should an integer vector"
+      assertthat::assert_that(
+        rlang::is_integerish(assignment),
+        all(!is.infinite(assignment)),
+        msg = "sample assignment should an integer vector without Infs"
       )
       assertthat::assert_that(length(assignment) == self$n_available,
         msg = "sample assignment length doesn't match the number of available locations"
       )
       assertthat::assert_that(!any(duplicated(na.omit(assignment))))
-      assertthat::assert_that(length(intersect(1:nrow(self$samples_df), na.omit(assignment))) == sum(!is.na(assignment)),
+      assertthat::assert_that(length(intersect(1:nrow(self$samples), na.omit(assignment))) == sum(!is.na(assignment)),
         msg = "sample assignment does not match sample_ids (1..N_samples)"
       )
     }
   ),
 
   active = list(
+    #' @field scoring_f
+    #' Scoring functions used for optimization.
+    #' Each scoring function should receive a [`data.table`][data.table::data.table] with columns from
+    #' the samples [data.frame], locations [data.frame], and
+    #' `.sample_id` column. This function should return a floating
+    #' point score value for the assignment. This a list of functions.
+    #' Upon assignment a single function will be automatically converted to a list
+    #' In the later case each function is called.
+    scoring_f = function(value) {
+      if (missing(value)) {
+        private$scoring_funcs
+      } else {
+        if (is.null(value)) {
+          private$scoring_funcs <- NULL
+        } else if (is.function(value)) {
+          private$scoring_funcs <- list(value)
+        } else {
+          assertthat::assert_that(is.list(value), length(value) >= 1)
+          assertthat::assert_that(
+            all(purrr::map_lgl(self$scoring_f, is.function)),
+            msg="All elements of scoring_f should be functions"
+          )
+          private$scoring_funcs <- value
+        }
+      }
+    },
+
     #' @field has_samples
     #' Returns TRUE if `BatchContainer` has samples.
     has_samples = function(value) {
       if (missing(value)) {
-        !is.null(private$samples)
+        !is.null(private$samples_table)
       } else {
         stop("Cannot set has_samples (read-only).")
       }
@@ -336,25 +436,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field locations_df
-    #' Get a [`tibble`][tibble::tibble()] with all the locations in a `BatchContainer`.
-    #' This field cannot be assigned.
-    locations_df = function(value) {
-      if (missing(value)) {
-        ldf <- private$dimensions %>%
-          purrr::map(~ .x$values) %>%
-          expand.grid() %>%
-          dplyr::arrange(dplyr::across(dplyr::everything())) %>%
-          tibble::as_tibble()
-        if (!is.null(self$exclude)) {
-          ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
-        }
-        ldf
-      } else {
-        stop("Cannot set locations data.frame (read-only).")
-      }
-    },
-
     #' @field exclude
     #' Get or set excluded locations in the `BatchContainer`.
     exclude = function(value) {
@@ -368,7 +449,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         # In rare cases when this is really needed, one could create a new
         # BatchContainer.
         assertthat::assert_that(
-           is.null(private$samples),
+           is.null(private$samples_table),
            msg = "Cannot change excluded locations after samples have been added"
         )
         if (is.null(value) || nrow(value) == 0) {
@@ -409,18 +490,18 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
     },
 
-    #' @field samples_df
+    #' @field samples
     #' Samples in the batch container.
     #' When assigning data.frame should not have column named .sample_id column.
-    samples_df = function(samples) {
+    samples = function(samples) {
       if (missing(samples)) {
-        private$samples
+        private$samples_table
       } else {
         assertthat::assert_that(!is.null(samples),
           msg = "samples argument is NULL"
         )
 
-        assertthat::assert_that(is.null(private$samples),
+        assertthat::assert_that(is.null(private$samples_table),
           msg = "batch container already has samples"
         )
 
@@ -441,58 +522,64 @@ BatchContainer <- R6::R6Class("BatchContainer",
           msg = "samples data.frame has a column with reserved name .sample_id"
         )
 
-        samples$.sample_id <- 1:nrow(samples)
+        samples$.sample_id <- seq_len(nrow(samples))
 
-        private$samples <- samples
+        private$samples_table <- dplyr::select(
+          samples, .sample_id, dplyr::everything())
 
         private$samples_dt_cache <- NULL
       }
     },
 
-    #' @field samples_dt
-    #' Sample assignment [`data.table`][data.table::data.table].
-    #' This data.table includes columns for all the `BatchContainer`
-    #' locations, all the samples and a `".sample_id"` column.
-    #'
-    #' The most efficient way of updating this [`data.table`][data.table::data.table] is using
-    #' the `BatchContainer$exchange_samples()` method.
-    samples_dt = function(value) {
-      if (missing(value)) {
-        if (is.null(private$samples_dt_cache)) {
-          private$samples_dt_cache <- data.table::data.table(
-            self$get_samples(include_id = TRUE)
+    #' @field samples_attr
+    #' Extra attributes of samples. If set, this is included into
+    #' `BatchContainer$get_samples()` output.
+    samples_attr = function(sattr) {
+      if (missing(sattr)) {
+        tibble::as_tibble(private$samples_attributes)
+      } else {
+        if (!is.null(sattr)) {
+          assertthat::assert_that(
+            is.data.frame(sattr),
+            ncol(sattr) >= 1,
+            msg = "samples_attr should be a non-empty table"
+          )
+
+          assertthat::assert_that(
+            nrow(sattr) == nrow(private$samples_table),
+            msg = "samples_attr number of rows should match samples"
+          )
+
+          assertthat::assert_that(length(intersect(self$dimension_names, colnames(sattr))) == 0,
+            msg = "some of the samples attr columns match batch container dimension names"
+          )
+
+          assertthat::assert_that(length(intersect(colnames(private$samples_table), colnames(sattr))) == 0,
+            msg = "some of the samples attr columns match samples table column names"
+          )
+
+          assertthat::assert_that(!".sample_id" %in% colnames(sattr),
+            msg = "samples data.frame has a column with reserved name .sample_id"
           )
         }
-        data.table::copy(private$samples_dt_cache)
-      } else {
-        stop("samples_dt is read-only.")
+        private$samples_attributes <- data.table::as.data.table(sattr)
       }
     },
 
-    #' @field assignment_vec
+    #' @field assignment
     #' Sample assignment vector. Should contain NAs for empty locations.
-    assignment_vec = function(assignment) {
+    #'
+    #' Assigning this field is deprecated, please use `$move_samples()` instead.
+    assignment = function(assignment) {
       if (missing(assignment)) {
-        return(private$assignment)
+        return(private$assignment_vector)
       } else {
+        warning("this field might become read-only in the future, please use $move_samples() instead")
         private$validate_assignment(assignment)
-        private$assignment <- assignment
+        private$assignment_vector <- assignment
         private$samples_dt_cache <- NULL
       }
     }
   ),
   cloneable = FALSE
 )
-
-BatchContainer$set("public", "clone", function() {
-  bc <- BatchContainer$new(private$dimensions, private$exclude_df)
-  if (!is.null(self$samples_df)) {
-    bc$samples_df <- self$samples_df %>%
-      dplyr::select(-.sample_id)
-  }
-  if (!is.null(self$assignment_vec)) {
-    bc$assignment_vec <- self$assignment_vec
-  }
-  bc$scoring_f <- self$scoring_f
-  bc
-})

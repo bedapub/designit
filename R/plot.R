@@ -86,6 +86,8 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
+  # preven undefined variable error
+  Pattern <- NULL
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
     .tbl = .tbl$get_samples()
@@ -153,7 +155,9 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
         pattern = Pattern
       ),
       colour = "grey50"
-    )
+    ) +
+      # this is required, see https://github.com/coolbutuseless/ggpattern/issues/50
+      ggpattern::scale_pattern_discrete()
   } else {
     g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{ .color }}),
       colour = "grey50"

@@ -52,7 +52,7 @@ bc <- BatchContainer$new(
 )
 
 # Add samples to container
-bc$samples_df <- multi_trt_day_samples
+bc$samples <- multi_trt_day_samples
 # Initial random assignment
 assign_in_order(bc)
 # Set scoring function
@@ -100,8 +100,8 @@ bc$get_samples(assignment = TRUE) %>%
 
 ```{r, fig.width=6, fig.height= 4}
 
-# clone batch container for second optimization
-bc2 <- bc$clone()
+# copy batch container for second optimization
+bc2 <- bc$copy()
 # Initial random assignment
 assign_in_order(bc2)
 
@@ -191,7 +191,7 @@ bc$get_samples() %>%
 <!-- ) -->
 
 <!-- # Add sample_sheet to container -->
-<!-- bc$samples_df <- multi_trt_day_samples -->
+<!-- bc$samples <- multi_trt_day_samples -->
 <!-- # Initial random assignment -->
 <!-- assign_in_order(bc) -->
 <!-- ``` -->

@@ -1,8 +1,8 @@
 ---
-title: "Basic examples"
+title: "Basic example"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Basic examples}
+  %\VignetteIndexEntry{Basic example}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -19,40 +19,42 @@ library(designit)
 library(tidyverse)
 ```
 
-## Example 1
+<!-- ## Example 1 -->
 
-This is a basic example:
+<!-- This is a basic example: -->
 
-```{r example1}
-anno <- tribble(
-  ~Cell,         ~Trt, ~Type, ~Rep,
-   "WT",    "treated",   "A",    1,
-   "WT",    "treated",   "A",    2,  
-   "WT", "nontreated",   "A",    1,
-   "WT", "nontreated",   "A",    2,
-   "WT",    "control",   "A",    1,
-   "WT",    "control",   "A",    2,
-   "WT",    "treated",   "B",    1,
-   "WT",    "treated",   "B",    2,  
-   "WT", "nontreated",   "B",    1,
-   "WT", "nontreated",   "B",    2,
-   "WT",    "control",   "A",    1,
-   "WT",    "control",   "A",    2,
-   "KO",    "treated",   "A",    1,
-   "KO",    "treated",   "A",    2,  
-   "KO", "nontreated",   "A",    1,
-   "KO", "nontreated",   "A",    2,
-   "KO",    "treated",   "B",    1,
-   "KO",    "treated",   "B",    2,  
-   "KO", "nontreated",   "B",    1,
-   "KO", "nontreated",   "B",    2,  
-)
-```
+<!-- ```{r example1} -->
+<!-- anno <- tribble( -->
+<!--   ~Cell,         ~Trt, ~Type, ~Rep, -->
+<!--    "WT",    "treated",   "A",    1, -->
+<!--    "WT",    "treated",   "A",    2,   -->
+<!--    "WT", "nontreated",   "A",    1, -->
+<!--    "WT", "nontreated",   "A",    2, -->
+<!--    "WT",    "control",   "A",    1, -->
+<!--    "WT",    "control",   "A",    2, -->
+<!--    "WT",    "treated",   "B",    1, -->
+<!--    "WT",    "treated",   "B",    2,   -->
+<!--    "WT", "nontreated",   "B",    1, -->
+<!--    "WT", "nontreated",   "B",    2, -->
+<!--    "WT",    "control",   "A",    1, -->
+<!--    "WT",    "control",   "A",    2, -->
+<!--    "KO",    "treated",   "A",    1, -->
+<!--    "KO",    "treated",   "A",    2,   -->
+<!--    "KO", "nontreated",   "A",    1, -->
+<!--    "KO", "nontreated",   "A",    2, -->
+<!--    "KO",    "treated",   "B",    1, -->
+<!--    "KO",    "treated",   "B",    2,   -->
+<!--    "KO", "nontreated",   "B",    1, -->
+<!--    "KO", "nontreated",   "B",    2,   -->
+<!-- ) -->
+<!-- ``` -->
 
 
-## Plate layout with two factors
+# Plate layout with two factors
 
-Samples of a 2-condition invivo experiment are to be
+## The samples
+
+Samples of a 2-condition in-vivo experiment are to be
 placed on 48 well plates.
 
 These are the conditions
@@ -81,6 +83,7 @@ samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 
 
 DT::datatable(samples)
 ```
+## Plate layout requirements
 
 Corner wells of the plates should be left empty.
 This means on a 48 well plate we can place 44 samples.
@@ -95,6 +98,8 @@ n_plates <- ceiling(n_samp / n_loc_per_plate)
 exclude_wells <- expand.grid(plate = seq(n_plates), column = c(1,8), row = c(1,6))
 ```
 
+## Setting up a Batch container
+
 Create a BatchContainer object that provides all possible locations
 
 ```{r}
@@ -106,7 +111,10 @@ bc
 
 bc$n_available
 bc$exclude
+bc$get_locations() %>% head()
 ```
+
+## Moving samples
 
 Use random assignment function to place samples to plate locations
 
@@ -118,11 +126,80 @@ bc$get_samples(remove_empty_locations = TRUE)
 
 ```
 
+
 Plot of the result using the `plot_plate` function
 
-```{r}
+```{r, fig.width=6, fig.height=3.5}
 plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 
 ```
 
+To move individual samples or manually assigning all locations we can use the 
+`batchContainer$move_samples()` method
+
+To swap two or more samples use
+```{r, fig.width=6, fig.height=3.5}
+bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
+
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose)
+```
+
+To assign all samples in one go, use the option `location_assignment`.
+The example below orders samples by ID and adds the empty locations afterwards
+```{r, fig.width=6, fig.height=3.5}
+bc$move_samples(location_assignment = as.integer(c(1:nrow(samples), rep(NA, (bc$n_available - nrow(samples))))))
+
+plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE), 
+           plate = plate, column = column, row = row,
+           .color = .sample_id)
+```
+
+## Scoring a layout
+
+To evaluate how good a layout is, we need a scoring function. 
+This we also assign to the batch container.
+
+This function will assess how well treatment 
+and dose are balanced across the two plates.
+
+```{r}
+bc$scoring_f <- function(samples) osat_score(samples, batch_vars = "plate", 
+                                             feature_vars = c("treatment", "dose"))$score
+```
+
+## Run an optimization
+
+The optimization procedure is invoked with e.g. `assign_score_optimize_shuffle`.
+Here we use a simple shuffling schedule: 
+swap 10 samples for 100 times, then swap 2 samples for 400 times.
+
+```{r}
+trace <- assign_score_optimize_shuffle(bc,
+                              # shuffling schedule
+                              n_shuffle=c(rep(10, 200), rep(2, 400))
+)
+```
+
+Development of the score can be viewed with
+
+```{r, fig.width=3.5, fig.height=3}
+trace$plot()
+```
+
+
+The layout after plate batching looks the following
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose)
+```
+
+Looking at treatment, we see it's evenly distributed across the plates
+
+```{r, fig.width=4, fig.height=3.5}
+ggplot(bc$get_samples(remove_empty_locations = TRUE),
+       aes(x = treatment, fill = treatment)) + geom_bar() +  
+   facet_wrap(~plate)
+```

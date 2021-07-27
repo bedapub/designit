@@ -14,7 +14,7 @@ bc2 <- BatchContainer$new(
 
 test_that("Exclude works in 1-dimensional batch-container", {
   expect_equal(bc2$n_available, 10 - 3)
-  expect_equal(nrow(bc2$locations_df), 10 - 3)
+  expect_equal(nrow(bc2$get_locations()), 10 - 3)
   expect_equal(nrow(bc2$exclude), 3)
 })
 
@@ -42,7 +42,7 @@ test_that("Exclude only works before samples where assigned", {
   expect_equal(bc3$n_available, 100 - 2)
   bc3$exclude <- data.frame(column = 1, row=2)
   expect_equal(bc3$n_available, 100 - 1)
-  bc3$samples_df <- samples
+  bc3$samples <- samples
   expect_error(bc3$exclude <- data.frame(column = c(1,3), row=2))
   expect_equal(bc3$n_available, 100 - 1)
 })

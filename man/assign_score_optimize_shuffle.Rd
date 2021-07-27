@@ -9,7 +9,8 @@ assign_score_optimize_shuffle(
   samples = NULL,
   n_shuffle = NULL,
   shuffle_proposal = NULL,
-  iterations = NULL
+  iterations = NULL,
+  aggregate_scores_func = first_score_only
 )
 }
 \arguments{
@@ -26,12 +27,17 @@ on whether you use \code{shuffle_proposal} or not. If \code{shuffle_proposal} is
 sets the number of items to shuffle (default 2). When \code{shuffle_proposal} is used, it will be
 called \code{n_shuffle} times at an iteration (default 1).}
 
-\item{shuffle_proposal}{A function used to propose two or more elements to shuffle in every step.
+\item{shuffle_proposal}{A function used to propose a shuffle in every step.
 If non-\code{NULL} a function receives two arguments on every iteration:
-\code{bc$samples_dt} and the iteration number. This function should return a list with attributes
-\code{src} and \code{dst} (see \code{\link[=BatchContainer]{BatchContainer$exchange_samples()}}).}
+\code{bc$get_samples(include_id = TRUE, as_tibble = FALSE)} and the iteration number.
+This function should return a list with attributes \code{src} and \code{dst}
+(see \code{\link[=BatchContainer]{BatchContainer$move_samples()}}).
+There is no support for \code{location_assignment} currently.}
 
 \item{iterations}{Number of iterations. If not provided set to 1000.}
+
+\item{aggregate_scores_func}{A function to aggregate the scores.
+By default one is used that just uses the first score.}
 }
 \value{
 An \link{OptimizationTrace} object.
