@@ -80,13 +80,10 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'   .color = Treatment, .alpha = Timepoint
 #' )
 #'
-#' if (FALSE) {
-#'   # do not run due to problems in ggpattern
-#'   plot_plate(bc$get_samples(),
-#'     plate = plate, column = column, row = row,
-#'     .color = Treatment, .pattern = Timepoint
-#'   )
-#' }
+#' plot_plate(bc$get_samples(),
+#'   plate = plate, column = column, row = row,
+#'   .color = Treatment, .pattern = Timepoint
+#' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL) {
   # preven undefined variable error
@@ -158,7 +155,9 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
         pattern = Pattern
       ),
       colour = "grey50"
-    )
+    ) +
+      # this is required, see https://github.com/coolbutuseless/ggpattern/issues/50
+      ggpattern::scale_pattern_discrete()
   } else {
     g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{ .color }}),
       colour = "grey50"
