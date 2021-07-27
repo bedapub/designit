@@ -21,7 +21,11 @@ You can install the development version from Roche GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_gitlab("BEDA/designit", host = "code.roche.com")
+devtools::install_gitlab(
+  "BEDA/designit",
+  host = "code.roche.com",
+  auth_token = "LUNaFrSzdHsdxmP-pQGh"
+)
 ```
 
 ## Usage
@@ -54,7 +58,7 @@ bc
 #>   Dimensions: plate<size=3>, row<size=3>, column<size=2>
 
 bc$exclude
-#> # A tibble: 2 x 3
+#> # A tibble: 2 × 3
 #>   plate row   column
 #>   <int> <chr>  <int>
 #> 1     1 a          1
@@ -66,7 +70,7 @@ bc$n_excluded
 bc$n_available
 #> [1] 16
 bc$get_locations()
-#> # A tibble: 16 x 3
+#> # A tibble: 16 × 3
 #>    plate row   column
 #>    <int> <fct>  <int>
 #>  1     1 b          1
@@ -90,7 +94,7 @@ set.seed(1)
 assign_random(bc, samples)
 
 head(bc$get_samples())
-#> # A tibble: 6 x 6
+#> # A tibble: 6 × 6
 #>   plate row   column a     b     c    
 #>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 b          1 <NA>  <NA>  <NA> 
@@ -100,7 +104,7 @@ head(bc$get_samples())
 #> 5     2 a          1 a     b     b    
 #> 6     2 a          3 <NA>  <NA>  <NA>
 bc$get_samples(remove_empty_locations=TRUE)
-#> # A tibble: 3 x 6
+#> # A tibble: 3 × 6
 #>   plate row   column a     b     c    
 #>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 c          3 a     a     b    
@@ -111,7 +115,7 @@ bc$get_samples(remove_empty_locations=TRUE)
 set.seed(2)
 assign_random(bc)
 head(bc$get_samples())
-#> # A tibble: 6 x 6
+#> # A tibble: 6 × 6
 #>   plate row   column a     b     c    
 #>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 b          1 <NA>  <NA>  <NA> 
@@ -125,7 +129,7 @@ head(bc$get_samples())
 set.seed(1)
 assign_random(bc)
 bc$get_samples(remove_empty_locations=TRUE)
-#> # A tibble: 3 x 6
+#> # A tibble: 3 × 6
 #>   plate row   column a     b     c    
 #>   <int> <fct>  <int> <chr> <chr> <chr>
 #> 1     1 c          3 a     a     b    
