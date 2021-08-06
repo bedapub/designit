@@ -30,7 +30,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   save_random_seed <- .Random.seed
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
-      msg = "batch-container is empty and no samples provided"
+                            msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
@@ -63,7 +63,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
   if (length(n_shuffle) == 1) n_shuffle <- rep(n_shuffle, iterations)
 
   assertthat::assert_that(all(n_shuffle >= min_n_shuffle),
-    msg = stringr::str_glue("n_shuffle values should be at least {min_n_shuffle}")
+                          msg = stringr::str_glue("n_shuffle values should be at least {min_n_shuffle}")
   )
 
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
@@ -93,7 +93,7 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
       non_empty_loc <- which(!is.na(batch_container$assignment))
       pos1 <- sample(non_empty_loc, 1)
       assertthat::assert_that(length(non_empty_loc) > 0,
-        msg = "all locations are empty in BatchContainer"
+                              msg = "all locations are empty in BatchContainer"
       )
       pos_rest <- sample(which(seq_len(n_avail) != pos1), n_shuffle[i] - 1)
       src <- c(pos1, pos_rest)
@@ -191,18 +191,17 @@ mk_constant_swapping_function <- function(n_samples, n_swaps) {
 #'
 #' This function was just added to test early on the functionality of optimize_design() to accept a permutation vector rather than a list with src and dst indices.
 #'
-#' @param n_samples Total number of samples (i.e. max of permutation index)
+#' @param batch_container A batch container with samples assigned that should be permuted randomly
 #'
-#' @return Parameter-less function to return a random permutation of the indices in the range 1:n_samples
+#' @return Parameter-less function to return a random permutation of the sample locations in the container
 #'
 #' @export
-mk_complete_random_shuffling_function <- function(n_samples) {
+mk_complete_random_shuffling_function <- function(batch_container) {
   # Function factory for creator of a complete random reshuffling of samples
 
-  n <- round(n_samples, 0)
-  assertthat::assert_that(n > 1, msg = "at least 1 sample needed for defining a meaningful shuffling function")
+  assertthat::assert_that(batch_container$has_samples, msg = "Batch container has to have samples assigned")
 
-  pos_vec <- 1:n
+  pos_vec <- batch_container$assignment
 
   function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
     sample(pos_vec)
@@ -323,166 +322,178 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
-      msg = "batch-container is empty and no samples provided"
+                            msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
-    assign_in_order(batch_container, samples) # don't change initial sample order! side effect: samples are undergoing some checks
+    assign_in_order(batch_container, samples)
   }
 
 
-  # Check presence of scoring function; convert to a list if needed since we evaluate with map_dbl
+  # Check presence of scoring function and that it's a list of functions
   assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
-  scoring_func <- batch_container$scoring_f
-  if (!is.list(scoring_func)) {
-    scoring_func <- list(scoring_func)
-  }
-  assertthat::assert_that(all(purrr::map_lgl(scoring_func, is.function)), msg = "All scoring functions have to be function definitions")
+  assertthat::assert_that(is.list(batch_container$scoring_f), msg = "scoring function is expected to be a list")
+  assertthat::assert_that(all(purrr::map_lgl(batch_container$scoring_f, is.function)), msg = "All scoring functions have to be function definitions")
 
-  # Get some stuff just once from the batch container
-  loc <- batch_container$locations_df
-  samp_perm <- data.table::copy(batch_container$samples_dt) # includes empty positions!
-  assertthat::assert_that(".sample_id" %in% colnames(samp_perm),
-    all(sort(samp_perm$.sample_id, na.last = NA) == 1:nrow(batch_container$samples_df)),
-    msg = stringr::str_glue(
-      ".sample_id from batch container must exist and numerate samples from 1 to ",
-      nrow(batch_container$samples_df)
-    )
+
+  # Get assigned samples and locations from the batch container
+  samp <- batch_container$get_samples(include_id = TRUE, assignment = TRUE, remove_empty_locations = FALSE)
+  n_samples <- length(stats::na.exclude(samp$.sample_id))
+  n_locations <- nrow(samp)
+
+  assertthat::assert_that(".sample_id" %in% colnames(samp),
+                          all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
+                          msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
-
-  append_to_data <- FALSE
-  shuffle_all <- FALSE
 
   # Create shuffle_proposal_func
   # If passed by the user, this one getting priority over n_shuffle.
   # If nothing is passed, default shuffling function is to swap 2 random elements per iteration, which
   # is implemented by an especially efficient function.
-
   if (is.null(n_shuffle) && is.null(shuffle_proposal_func)) {
-    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp_perm), n_swaps = 1)
+    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp), n_swaps = 1)
   } else if (is.null(shuffle_proposal_func)) {
-    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp_perm), n_swaps = n_shuffle)
+    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp), n_swaps = n_shuffle)
     if (length(n_shuffle) > 1) {
-      # Restrict number if iters, so that also trace object is appropriately sized
+      # Restrict number if iters, so that also trace object will be appropriately sized
       max_iter <- min(max_iter, length(n_shuffle), na.rm = T)
-    }
-  } else { # apply but test user provided shuffle function!
-    assertthat::assert_that(is.function(shuffle_proposal_func), msg = "shuffle_proposal_func should be a function")
-    test_shuffle <- shuffle_proposal_func(iteration = 1) # what would come out in 1st iteration?
-    if (is.numeric(test_shuffle)) { # passes back a complete permutation order
-      assertthat::assert_that(length(test_shuffle) == nrow(samp_perm),
-        msg = "shuffle proposal function must return a permutation vector of correct length"
-      )
-      assertthat::assert_that(all(test_shuffle <= nrow(samp_perm)),
-        all(test_shuffle > 0),
-        msg = "shuffle proposal function must return valid sample indices"
-      )
-      shuffle_all <- TRUE
-    } else { # passes back a list with src and dst for the sample swapping
-      assertthat::assert_that(is.list(test_shuffle), msg = "Shuffle proposal function must return either a numeric vector or a list")
-      assertthat::assert_that(all(sort(names(test_shuffle)) == c("dst", "src")), msg = "Shuffle proposal function should return a list with names 'src' and 'dst'")
-      assertthat::assert_that(all(unlist(test_shuffle) <= nrow(samp_perm)),
-        all(unlist(test_shuffle) > 0),
-        msg = "Shuffle proposal function must return valid sample indices"
-      )
-    }
-
-    test_shuffle <- shuffle_proposal_func(onlyShuffleIndex = F, bufferedShuffle = T) # can we get additional columns for the data frame?
-    if (is.list(test_shuffle) && "DATA_APPEND" %in% names(test_shuffle)) {
-      append_to_data <- TRUE
     }
   }
 
-  # Data table for rapid permutation of samples
-  fcols <- which(!colnames(samp_perm) %in% colnames(loc)) # Indices of sample annotation columns to be quickly reshuffled at each iter
+  assertthat::assert_that(is.function(shuffle_proposal_func), msg = "shuffle_proposal_func should be a function")
+
+
+  using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
+
+  extract_shuffle_params = function(shuffle) {
+    # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
+    # Tried to avoid redundant checks that are performed on batch container level
+
+    # Any shuffling function should return one of the following
+    # 1. atomic index vector for a direct location assignment
+    # 2. a list with src and dst vectors
+    # 3. a list with loc vector (for location assignment) and optional attr data frame/tibble
+
+    if (is.null(shuffle)) { # marks end of iteration schedule
+      return(NULL)
+    }
+
+    if (rlang::is_atomic(shuffle)) {
+      loc = shuffle
+      src = dst = attrib = NULL
+      assertthat::assert_that(!using_attributes,
+                              msg = "sample attributes must be consistently supplied by shuffle function once started")
+    } else {
+      assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
+      if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
+        loc = NULL
+        src = shuffle[["src"]]
+        dst = shuffle[["dst"]]
+      } else {
+        assertthat::assert_that(!is.null(shuffle[["loc"]]), msg="shuffle function must return either a src/dst pair or a location vector")
+        loc = shuffle[["loc"]]
+        src = dst = NULL
+      }
+      if (is.null(shuffle[["attrib"]])) {
+        assertthat::assert_that(!using_attributes,
+                                msg = "sample attributes must be consistently supplied by shuffle function once started")
+        attrib = NULL
+      } else {
+        attrib = shuffle[["attrib"]]
+        using_attributes <<- TRUE
+      }
+    }
+
+    list( src=src, dst=dst, loc=loc, attrib=attrib)
+  }
 
   # Remember initial sample order as best permutation so far and calculate multi-variate score
-  best_perm <- samp_perm # just makes a reference at this point
-  best_score <- purrr::map_dbl(scoring_func, ~ .x(best_perm))
+  best_perm <- batch_container$assignment
+  best_score <- batch_container$score()
   best_agg <- aggregate_scores_func(best_score)
   score_dim <- length(best_score)
 
   trace <- OptimizationTrace$new(
-    max_iter, # Memory usage???
-    length(batch_container$aux_scoring_f),
-    names(batch_container$aux_scoring_f)
+    max_iter + 1, # + 1 to accommodate initial score
+    length(batch_container$scoring_f),
+    names(batch_container$scoring_f)
   )
 
-  iteration <- 1
-
-  curr_shuffle <- shuffle_proposal_func(iteration) # R while loop does not allow variable assignment !? :(
-  if (append_to_data) { # Note that these columns are NOT reshuffled, but can be joined to the initial data frame!
-    append_cols <- shuffle_proposal_func(onlyShuffleIndex = F, bufferedShuffle = T)[["DATA_APPEND"]]
-  }
+  trace$set_scores(1, best_score)
 
   if (!quiet) {
-    message(
-      "Initial aggregated score: ", best_agg, " (", score_dim, "-dim), shuffling ", ifelse(shuffle_all, "ALL", "SUBSETS"),
-      ifelse(append_to_data, ", appending extra sample columns", "")
-    )
+    message("Initial aggregated score: ", best_agg, " (", score_dim, "-dim)",
+            ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]")))
   }
 
-  while (!is.null(curr_shuffle) && (iteration <= max_iter)) { # Some shuffling functions may return NULL to indicate end of permutation protocol
+  iteration <- 1
+  shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
+  attrib_msg_made <- FALSE
 
-    # avoid sample exchange and scoring functions from container and construct object that is required for scoring directly
+  while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
 
-    if (shuffle_all) {
-      samp_perm[1:nrow(samp_perm), (fcols) := samp_perm[match(curr_shuffle, samp_perm$.sample_id), fcols, with = FALSE]]
-    } else {
-      samp_perm[curr_shuffle$dst, (fcols) := samp_perm[curr_shuffle$src, fcols, with = FALSE]]
+    if (!quiet && !attrib_msg_made && !is.null(shuffle_params[["attrib"]])) {
+      message( "Adding attributes to samples!")
+      attrib_msg_made <- TRUE
     }
 
-    new_score <- purrr::map_dbl(scoring_func, ~ .x(samp_perm))
+    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst , location_assignment = shuffle_params$loc )
+
+    new_score <- batch_container$score()
 
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
       best_agg <- aggregate_scores_func(best_score)
-      best_perm <- data.table::copy(samp_perm) # make a physical copy in memory!
+      best_perm <- batch_container$assignment
       if (!quiet) {
         message(
           "Achieved score: ", best_agg,
           ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]")),
           " in iter ", iteration
         )
+
       }
-      if (append_to_data) {
-        append_cols <- shuffle_proposal_func(onlyShuffleIndex = F, bufferedShuffle = T)[["DATA_APPEND"]]
-      }
+      # To be added: setting of sample attributes
+      #if (append_to_data) {
+      #  append_cols <- shuffle_proposal_func(onlyShuffleIndex = F, bufferedShuffle = T)[["DATA_APPEND"]]
+      #}
     } else {
-      if (!shuffle_all) { # have to swap back!
-        samp_perm[curr_shuffle$dst, (fcols) := samp_perm[curr_shuffle$src, fcols, with = FALSE]]
+      if (is.null(shuffle_params[["loc"]])) { # have to swap back!
+        batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst)
       }
     }
 
-    trace$set_scores(iteration, best_agg) # propose to store vector of scores, too
+    iteration <- iteration + 1
+    trace$set_scores(iteration, best_score)
 
     # Test stopping criteria
     if (!is.na(min_score) && best_agg <= min_score) {
       if (!quiet) {
-        message("Reached min_score in ", iteration, " iterations.")
+        message("Reached min_score in ", iteration-1, " iterations.")
       }
       break
     }
 
-    iteration <- iteration + 1
-    curr_shuffle <- shuffle_proposal_func(iteration)
+    shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
+
   }
 
-  if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
-    best_perm <- dplyr::bind_cols(
-      dplyr::select(best_perm, -tidyselect::any_of(c(batch_container$dimension_names, colnames(append_cols), ".sample_id"))),
-      append_cols
-    ) %>% # strip off container names and potentially already existing append columns
-      as.data.frame()
-    if (!quiet) {
-      message(ncol(append_cols), " columns added to batch container data frame.")
-    }
-    batch_container$samples_df <- best_perm
-  } else { # If nothing has been added to the sample list (the regular case), just update the container positions
-    batch_container$samples_dt <- best_perm # should be safe just to pass the reference, or?
-    batch_container$assignment_vec <- best_perm$.sample_id
-  }
+  # if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
+  #   best_perm <- dplyr::bind_cols(
+  #     dplyr::select(best_perm, -tidyselect::any_of(c(batch_container$dimension_names, colnames(append_cols), ".sample_id"))),
+  #     append_cols
+  #   ) %>% # strip off container names and potentially already existing append columns
+  #     as.data.frame()
+  #   if (!quiet) {
+  #     message(ncol(append_cols), " columns added to batch container data frame.")
+  #   }
+  #   batch_container$samples_df <- best_perm
+  # } else { # If nothing has been added to the sample list (the regular case), just update the container positions
+  #   batch_container$samples_dt <- best_perm # should be safe just to pass the reference, or?
+  #   batch_container$assignment_vec <- best_perm$.sample_id
+  # }
 
+  trace$shrink(iteration)
   trace$seed <- save_random_seed
   trace$elapsed <- Sys.time() - start_time
   trace

@@ -53,7 +53,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @return `OptimizationTrace` invisibly.
     shrink = function(last_step) {
-      self$scores <- self$scores[seq_len(last_step), ]
+      self$scores <- head(self$scores, last_step) # self$scores[seq_len(last_step), ] returns vector if we have a 1-dim matrix!
       invisible(self)
     },
 
@@ -67,7 +67,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     print = function(...) {
       start_score <- self$scores[1, 1]
       final_score <- self$scores[nrow(self$scores), 1]
-      cat(stringr::str_glue("Optimization trace ({self$n_steps}) score values, elapsed {format(self$elapsed)}).\n\n"))
+      cat(stringr::str_glue("Optimization trace ({self$n_steps} score values, elapsed {format(self$elapsed)}).\n\n"))
       cat("  Starting score: ", start_score, "\n", sep = "")
       cat("  Final score   : ", final_score, "\n", sep = "")
       invisible(self)

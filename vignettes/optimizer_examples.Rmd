@@ -88,7 +88,7 @@ n_shuffle <- rep(c(32, 10, 5, 2, 1), c(100, 200, 200, 300, 300))
 
 set.seed(42)
 
-bc1 <- bc$clone()
+bc1 <- bc$copy()
 
 trace1 <- optimize_design(
   bc1,
@@ -153,16 +153,15 @@ criterion or by reaching a specific target score.
 
 ```{r}
 
-bc2 <- bc$clone()
+bc2 <- bc$copy()
 
-trace2 <- optimize_design(
+optimize_design(
   bc2,
   n_shuffle = 3, # will implicitly generate a shuffling function that will do 3 swaps at each iteration
   max_iter = 1000,
-  min_score = 2.3
+  min_score = 3.0
 )
 
-trace2$elapsed
 ```
 
 
@@ -178,7 +177,7 @@ The second scoring function used here is rather redundant and just serves as ill
 
 ```{r}
 
-bc3 <- bc$clone()
+bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
   function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
@@ -186,7 +185,7 @@ bc3$scoring_f <- list(
 )
 
 
-trace3 <- optimize_design(
+optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 500,
@@ -199,7 +198,7 @@ decide on the best iteration. (It has the same effect in this example though.)
 
 ```{r}
 
-bc4 <- bc$clone()
+bc4 <- bc$copy()
 
 bc4$scoring_f <- list(
   function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
@@ -207,7 +206,7 @@ bc4$scoring_f <- list(
 )
 
 
-trace4 <- optimize_design(
+optimize_design(
   bc4,
   n_shuffle = 3,
   aggregate_scores_func = worst_score_only,
@@ -224,15 +223,15 @@ We omit the `n_shuffle` parameter here, which will lead by default to pairwise s
 
 ```{r}
 
-bc4 <- bc$clone()
+bc5 <- bc$copy()
 
-bc4$scoring_f <- list(
+bc5$scoring_f <- list(
   function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
   function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
 )
 
-trace4 <- optimize_design(
-  bc4,
+optimize_design(
+  bc5,
   aggregate_scores_func = L2s_norm,
   max_iter = 500,
   min_score = 2.6
@@ -250,11 +249,11 @@ Note that this is usually not a good strategy for converging to a solution.
 
 ```{r}
 
-bc5 <- bc$clone()
+bc6 <- bc$copy()
 
-trace5 <- optimize_design(
-  bc5,
-  shuffle_proposal_func = mk_complete_random_shuffling_function(n_samples = nrow(bc4$get_samples())),
+optimize_design(
+  bc6,
+  shuffle_proposal_func = mk_complete_random_shuffling_function(batch_container = bc6),
   max_iter = 500,
   min_score = 2.6
 )
@@ -272,10 +271,10 @@ It is generally recommended for SA to make small changes at each step, like allo
 
 ```{r}
 
-bc6 <- bc$clone()
+bc7 <- bc$copy()
 
-trace6 <- optimize_design(
-  bc6,
+trace7 <- optimize_design(
+  bc7,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(),
   max_iter = 500
@@ -285,7 +284,7 @@ The trace may show a non strictly monotonic behavior now, reflecting the SA prot
 
 ```{r, fig.width=5, fig.height= 4}
 
-trace6$plot()
+trace7$plot()
 ```
 
 Better results and quicker convergence may be achieved by playing with the starting temperature (T0) and
@@ -293,14 +292,16 @@ cooling speed (alpha) in a specific case.
 
 ```{r}
 
-bc6 <- bc$clone()
+bc8 <- bc$copy()
 
-trace6 <- optimize_design(
-  bc6,
+trace8 <- optimize_design(
+  bc8,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 100, alpha = 2)),
   max_iter = 200
 )
+
+trace8$plot()
 ```
 
 # Full blown example
@@ -309,9 +310,7 @@ The following example puts together all possible options to illustrate the flexi
 
 ```{r}
 
-bc7 <- bc$clone()
-
-bc7$scoring_f <- list(
+bc$scoring_f <- list(
   function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
   function(samples) osat_score(samples, c("batch"), c("Treatment"))$score,
   function(samples) osat_score(samples, c("batch"), c("Time"))$score
@@ -319,8 +318,8 @@ bc7$scoring_f <- list(
 
 n_shuffle <- rep(c(3, 2, 1), c(100, 100, 400))
 
-trace7 <- optimize_design(
-  bc7,
+trace <- optimize_design(
+  bc,
   n_shuffle = n_shuffle,
   aggregate_scores_func = worst_score_only,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 1)),
@@ -328,9 +327,9 @@ trace7 <- optimize_design(
   min_score = 2.3
 )
 
-trace7$plot()
+trace$plot()
 
-bc7$get_samples(assignment = TRUE) %>%
+bc$get_samples(assignment = TRUE) %>%
   dplyr::mutate(batch = factor(batch)) %>%
   ggplot2::ggplot(ggplot2::aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   ggplot2::geom_bar()
