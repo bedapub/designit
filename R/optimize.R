@@ -317,8 +317,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # This is an alternative implementation to assign_score_optimize_shuffle()
 
   start_time <- Sys.time()
-  save_random_seed <- .Random.seed # Symbol not defined unless user has called set.seed() !! Should change.
-
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
@@ -372,7 +370,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     # Any shuffling function should return one of the following
     # 1. atomic index vector for a direct location assignment
     # 2. a list with src and dst vectors
-    # 3. a list with loc vector (for location assignment) and optional attr data frame/tibble
+    # 3. a list with locations vector (for location assignment) and optional sample_attr data frame/tibble
 
     if (is.null(shuffle)) { # marks end of iteration schedule
       return(NULL)
@@ -390,21 +388,51 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
         src = shuffle[["src"]]
         dst = shuffle[["dst"]]
       } else {
-        assertthat::assert_that(!is.null(shuffle[["loc"]]), msg="shuffle function must return either a src/dst pair or a location vector")
-        loc = shuffle[["loc"]]
+        assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg="shuffle function must return either a src/dst pair or a location vector")
+        loc = shuffle[["location_assignment"]]
         src = dst = NULL
       }
-      if (is.null(shuffle[["attrib"]])) {
+      if (is.null(shuffle[["samples_attr"]])) {
         assertthat::assert_that(!using_attributes,
                                 msg = "sample attributes must be consistently supplied by shuffle function once started")
         attrib = NULL
       } else {
-        attrib = shuffle[["attrib"]]
+        attrib = shuffle[["samples_attr"]]
         using_attributes <<- TRUE
       }
     }
 
-    list( src=src, dst=dst, loc=loc, attrib=attrib)
+    list( src=src, dst=dst, location_assignment=loc, samples_attr=attrib)
+  }
+
+  attrib_msg_made <- FALSE
+
+  update_batchcontainer = function(shuffle_params) {
+
+    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst , location_assignment = shuffle_params$location_assignment )
+
+    # Add sample attributes to container if necessary
+    if (!is.null(shuffle_params[["samples_attr"]])) {
+      batch_container$samples_attr = shuffle_params[["samples_attr"]]
+      if (!quiet && !attrib_msg_made) {
+        message( "Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
+        attrib_msg_made <<- TRUE
+      }
+    }
+  }
+
+
+  iteration <- 1
+  shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
+
+
+  # If sample attributes are provided, frontload first bc update since additional variables may be actually used in the scoring function(s)!
+  # Would be nice in principle to check whether any of these variable is ACTUALLY used in a scoring function
+  if (using_attributes) {
+    if (!quiet) {
+      message("Permutation function uses sample attributes. Frontloading sample permutation before scoring.")
+    }
+    update_batchcontainer(shuffle_params)
   }
 
   # Remember initial sample order as best permutation so far and calculate multi-variate score
@@ -426,18 +454,10 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
             ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]")))
   }
 
-  iteration <- 1
-  shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
-  attrib_msg_made <- FALSE
 
   while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
 
-    if (!quiet && !attrib_msg_made && !is.null(shuffle_params[["attrib"]])) {
-      message( "Adding attributes to samples!")
-      attrib_msg_made <- TRUE
-    }
-
-    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst , location_assignment = shuffle_params$loc )
+    update_batchcontainer(shuffle_params)
 
     new_score <- batch_container$score()
 
@@ -453,12 +473,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
         )
 
       }
-      # To be added: setting of sample attributes
-      #if (append_to_data) {
-      #  append_cols <- shuffle_proposal_func(onlyShuffleIndex = F, bufferedShuffle = T)[["DATA_APPEND"]]
-      #}
     } else {
-      if (is.null(shuffle_params[["loc"]])) { # have to swap back!
+      if (is.null(shuffle_params[["location_assignment"]])) { # we used the permutation method and thus have to swap samples back!
         batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst)
       }
     }
@@ -478,23 +494,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   }
 
-  # if (append_to_data) { # In case we append new sample columns, re-define samples_df in the batch container
-  #   best_perm <- dplyr::bind_cols(
-  #     dplyr::select(best_perm, -tidyselect::any_of(c(batch_container$dimension_names, colnames(append_cols), ".sample_id"))),
-  #     append_cols
-  #   ) %>% # strip off container names and potentially already existing append columns
-  #     as.data.frame()
-  #   if (!quiet) {
-  #     message(ncol(append_cols), " columns added to batch container data frame.")
-  #   }
-  #   batch_container$samples_df <- best_perm
-  # } else { # If nothing has been added to the sample list (the regular case), just update the container positions
-  #   batch_container$samples_dt <- best_perm # should be safe just to pass the reference, or?
-  #   batch_container$assignment_vec <- best_perm$.sample_id
-  # }
+  # In the end, always make sure that final state of bc is the one with the best score
+  batch_container$move_samples(location_assignment = best_perm)
 
   trace$shrink(iteration)
-  trace$seed <- save_random_seed
+  trace$seed <-  if (exists(".Random.seed")) .Random.seed else NA
   trace$elapsed <- Sys.time() - start_time
   trace
 }

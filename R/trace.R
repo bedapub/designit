@@ -53,7 +53,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @return `OptimizationTrace` invisibly.
     shrink = function(last_step) {
-      self$scores <- head(self$scores, last_step) # self$scores[seq_len(last_step), ] returns vector if we have a 1-dim matrix!
+      self$scores <- head(self$scores, last_step)
       invisible(self)
     },
 

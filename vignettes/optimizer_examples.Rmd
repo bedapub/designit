@@ -86,8 +86,6 @@ Optimization finishes after the list of permutations is exhausted.
 n_shuffle <- rep(c(32, 10, 5, 2, 1), c(100, 200, 200, 300, 300))
 
 
-set.seed(42)
-
 bc1 <- bc$copy()
 
 trace1 <- optimize_design(
