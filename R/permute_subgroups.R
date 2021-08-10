@@ -19,7 +19,8 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
                                        n_min = NA, n_max = NA, n_ideal = NA, subgroup_var_name = NULL,
                                        prefer_big_groups = TRUE, strict = TRUE) {
   assertthat::assert_that(batch_container$has_samples, msg = "Batch container must have samples assigned.")
-  samples <- batch_container$get_samples()
+  # Don't look at potential empty locations in the bc when determining group sizes
+  samples <- batch_container$get_samples(assignment = TRUE, remove_empty_locations = TRUE)
 
   # Check all vital arguments
   assertthat::assert_that(nrow(samples) > 1, msg = "Sample list must contain at least 2 samples.")
@@ -27,7 +28,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   assertthat::assert_that(allocate_var %in% colnames(samples), msg = "Allocation variable not found in sample table.")
   allocate_fac <- samples[[allocate_var]]
   assertthat::assert_that(!any(is.null(allocate_fac) | is.na(allocate_fac) | is.nan(allocate_fac)),
-    msg = "No undefined/empty levels of the allocation variable are allowed."
+                          msg = "No undefined/empty levels of the allocation variable are allowed."
   )
   # The allocation variable must have factor levels in a given order!
   # This is important later on for sample swapping as it has to be known which factor level corresponds to 'group 1' etc
@@ -62,7 +63,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
     n_ideal <- if (prefer_big_groups) ceiling((n_min + n_max) / 2) else floor((n_min + n_max) / 2)
   }
   assertthat::assert_that(n_ideal <= n_max, n_ideal >= n_min,
-    msg = stringr::str_c("n_ideal (", n_ideal, ") must be between n_min (", n_min, ") and n_max (", n_max, ").")
+                          msg = stringr::str_c("n_ideal (", n_ideal, ") must be between n_min (", n_min, ") and n_max (", n_max, ").")
   )
 
   best_group_sizes <- function(n, nmin, nmax, nideal, prefer_big) {
@@ -103,10 +104,12 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   # Group sample list by relevant variables
   grouped_samples <- dplyr::group_by(samples, dplyr::across(tidyselect::all_of(use_vars)))
 
+  # Determine sizes of the subgroups and store in list; name elements by levels of the involved grouping variables
   subgroup_sizes <- purrr::map(dplyr::group_size(grouped_samples), ~ best_group_sizes(.x, n_min, n_max, n_ideal, prefer_big_groups))
+  names(subgroup_sizes) = dplyr::group_keys(grouped_samples) %>% tidyr::unite(col="keys", sep="/") %>% dplyr::pull(1)
 
   assertthat::assert_that(!strict || (min(unlist(subgroup_sizes)) >= n_min && max(unlist(subgroup_sizes)) <= n_max),
-    msg = "Cannot form subgroups under strict setting with given constraints!"
+                          msg = "Cannot form subgroups under strict setting with given constraints!"
   )
 
   message(
@@ -135,8 +138,8 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
 #' @keywords internal
 validate_subgrouping_object <- function(subgroup_object) {
   assertthat::assert_that(all(c("Grouped_Samples", "Subgroup_Sizes", "Allocate_Var", "Subgroup_Var_Name", "Allocate_Levels")
-  %in% names(subgroup_object)),
-  msg = "Invalid subgroup object passed."
+                              %in% names(subgroup_object)),
+                          msg = "Invalid subgroup object passed."
   )
 }
 
@@ -163,7 +166,7 @@ find_possible_block_allocations <- function(block_sizes, group_nums, fullTree = 
   find_alloc <- function(done_groups, todo_blocks, groups_left) {
     ncalls <<- ncalls + 1
     if (length(todo_blocks) == 1 && sum(groups_left > 0) == 1 &&
-      groups_left[groups_left > 0] == todo_blocks) {
+        groups_left[groups_left > 0] == todo_blocks) {
       allocs[[length(allocs) + 1]] <<- unname(c(done_groups, which(groups_left > 0)))
     } else if (fullTree || ncalls < maxCalls) {
       to_try <- which(todo_blocks[1] <= groups_left)
@@ -211,11 +214,10 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
   validate_subgrouping_object(subgroup_object)
 
   find_possible_block_allocations(unlist(subgroup_object$Subgroup_Sizes, use.names = F),
-    table(factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
-      levels = subgroup_object$Allocate_Levels
-    )),
-    fullTree = fullTree,
-    maxCalls = maxCalls
+                                  table(factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
+                                               levels = subgroup_object$Allocate_Levels)),
+                                  fullTree = fullTree,
+                                  maxCalls = maxCalls
   )
 }
 
@@ -225,14 +227,17 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
 #' @param subgroup_object A subgrouping object as returned by `form_homogeneous_subgroups()`
 #' @param subgroup_allocations A list of possible assignments of the allocation variable as returned by `compile_possible_subgroup_allocation()`
 #' @param keep_separate_vars Vector of column names in sample table; items with identical values in those variables will not be put into the same subgroup if at all possible
+#' @param report_grouping_as_attribute Boolean, if TRUE, add an attribute table to the permutation functions' output, to be used in scoring during the design optimization
 #'
 #' @return Shuffling function that on each call returns an index vector for a valid sample permutation
 #' @export
 mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
-                                         keep_separate_vars = c()) {
+                                         keep_separate_vars = c(),
+                                         report_grouping_as_attribute = FALSE) {
   force(subgroup_object)
   force(subgroup_allocations)
   force(keep_separate_vars)
+  force(report_grouping_as_attribute)
 
   validate_subgrouping_object(subgroup_object)
 
@@ -259,9 +264,8 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
     sep_vars <- NULL
   }
 
-
   # Explicitly spell out the different possible subgroup allocations on a sample level
-  alloc_vectors <- purrr::map(subgroup_allocations, rep.int, times = unlist(subgroup_object$Subgroup_Sizes))
+  alloc_vectors <- purrr::map(subgroup_allocations, rep.int, times = unlist(subgroup_object$Subgroup_Sizes, use.names = FALSE))
 
   # Helper vector for the group level structure in the sample space
   # Note that this is ordered by the logical structure of the grouping, not the order of samples!
@@ -273,8 +277,8 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
   # Helper vector for the subgroup level structure;
   # Note that this is ordered by the logical structure of the (sub)grouping, not the order of samples!
   subgroup_vec <- rep.int(
-    unlist(purrr::map(subgroup_object$Subgroup_Sizes, seq_along)),
-    unlist(subgroup_object$Subgroup_Sizes)
+    unlist(purrr::map(subgroup_object$Subgroup_Sizes, seq_along), use.names = FALSE),
+    unlist(subgroup_object$Subgroup_Sizes, use.names = FALSE)
   )
 
   fullgroup_vec <- stringr::str_c(group_vec, subgroup_vec, sep = "_")
@@ -288,7 +292,7 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
   # Since this column won't be permuted along with the samples, we have to build an index for mapping
   # sorted logical group information back into the batch container
   alloc_var_orig <- factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
-    levels = subgroup_object$Allocate_Levels
+                           levels = subgroup_object$Allocate_Levels
   )
   alloc_var_order <- order(alloc_var_orig)
 
@@ -309,66 +313,66 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
   # Values refer to the levels of the allocation variable
   # All constraints are guaranteed to be satisfied
 
-  function(onlyShuffleIndex = TRUE, bufferedShuffle = FALSE, ...) {
-    if (!bufferedShuffle || idx == 0) { # skip and just return last result otherwise
+  function(...) {
 
-      idx <<- idx + 1
-      if (idx > length(alloc_vectors)) {
-        idx <<- 1
-      }
-      # Create a random permutation within (!) all the groups
-      # This means that only 'equivalent' items are swapped around and get assigned to new subgroups every time
-      rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
-
-      # Check if keep_separate_vars constraints are fulfilled within the randomized subgroups
-      # Otherwise, create new permutations and increment number of tolerated violations every 1000 unsuccessful attempts
-      if (!is.null(sep_vars)) {
-        fails <- 0
-        repeat {
-          dups <- purrr::map_int(sep_vars, ~ sum(duplicated(cbind(subgroup_object$Grouped_Samples[rand_index, .x], fullgroup_vec))))
-          if (max(dups) <= sep_fails_tolerance) {
-            break
-          }
-          fails <- fails + 1
-          if (fails > 1000) {
-            fails <- 0
-            sep_fails_tolerance <<- sep_fails_tolerance + 1
-            message(
-              "No permutations fulfilling the 'keep_separate' constraints in 1000 iters!\n",
-              "Increasing number of tolerated violations to ", sep_fails_tolerance
-            )
-          }
-          rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
-        }
-      }
-
-      # Fill the values for a concrete sample permutation that justifies the constraints.
-      # The following three vectors could be bound to the sample in their original order to denote the group assignment
-      alloc_var_assigned[rand_index] <<- alloc_vectors[[idx]] # the allocated variable
-      group_labels[rand_index] <<- group_vec # the group information
-      subgroup_labels[rand_index] <<- subgroup_vec # the subgroup information
-      fullgroup_labels[rand_index] <<- fullgroup_vec # both joined
-
-      grouped_order <- order(alloc_var_assigned, group_labels, subgroup_labels) # indices to bring orig. sample list into group based order
-
-      shuffle_index <<- grouped_order[alloc_var_order] # bring into order determined by the allocation variable in the batch container
+    idx <<- idx + 1
+    if (idx > length(alloc_vectors)) {
+      idx <<- 1
     }
 
-    if (onlyShuffleIndex) {
+    # Create a random permutation within (!) all the groups
+    # This means that only 'equivalent' items are swapped around and get assigned to new subgroups every time
+    rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
+
+    # Check if keep_separate_vars constraints are fulfilled within the randomized subgroups
+    # Otherwise, create new permutations and increment number of tolerated violations every 1000 unsuccessful attempts
+    if (!is.null(sep_vars)) {
+      fails <- 0
+      repeat {
+        dups <- purrr::map_int(sep_vars, ~ sum(duplicated(cbind(subgroup_object$Grouped_Samples[rand_index, .x], fullgroup_vec))))
+        if (max(dups) <= sep_fails_tolerance) {
+          break
+        }
+        fails <- fails + 1
+        if (fails > 1000) {
+          fails <- 0
+          sep_fails_tolerance <<- sep_fails_tolerance + 1
+          message(
+            "No permutations fulfilling the 'keep_separate' constraints in 1000 iters!\n",
+            "Increasing number of tolerated violations to ", sep_fails_tolerance
+          )
+        }
+        rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
+      }
+    }
+
+
+    # Fill the values for a concrete sample permutation that justifies the constraints.
+    # The following three vectors could be bound to the sample in their original order to denote the group assignment
+    alloc_var_assigned[rand_index] <<- alloc_vectors[[idx]] # the allocated variable
+    group_labels[rand_index] <<- group_vec # the group information
+    subgroup_labels[rand_index] <<- subgroup_vec # the subgroup information
+    fullgroup_labels[rand_index] <<- fullgroup_vec # both joined
+
+    grouped_order <- order(alloc_var_assigned, group_labels, subgroup_labels) # indices to bring orig. sample list into group based order
+
+    shuffle_index <<- grouped_order[alloc_var_order] # bring into order determined by the allocation variable in the batch container
+
+    if (!report_grouping_as_attribute) {
       return(shuffle_index)
     }
 
-    app <- tibble::tibble(
-      alloc_var_level = subgroup_object$Allocate_Levels[alloc_var_assigned[shuffle_index]],
-      group = group_labels[shuffle_index],
-      subgroup = subgroup_labels[shuffle_index]
+    attrib <- tibble::tibble(
+      alloc_var_level = subgroup_object$Allocate_Levels[alloc_var_assigned],
+      group = group_labels,
+      subgroup = subgroup_labels
     )
 
     if (!is.null(subgroup_object$Subgroup_Var_Name)) {
-      app[[subgroup_object$Subgroup_Var_Name]] <- fullgroup_labels[shuffle_index]
+      attrib[[subgroup_object$Subgroup_Var_Name]] <- fullgroup_labels # [shuffle_index]
     }
 
-    list(shuffle_index = shuffle_index, DATA_APPEND = app)
+    list(location_assignment = shuffle_index, samples_attr = attrib)
   }
 }
 
@@ -383,6 +387,7 @@ mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
 #' @param n_max Maximal number of samples in one sub(!)group; by default the size of the biggest group
 #' @param n_ideal Ideal number of samples in one sub(!)group; by default the floor or ceiling of `mean(n_min,n_max)`, depending on the setting of `prefer_big_groups`
 #' @param subgroup_var_name An optional column name for the subgroups which are formed (or NULL)
+#' @param report_grouping_as_attribute Boolean, if TRUE, add an attribute table to the permutation functions' output, to be used in scoring during the design optimization
 #' @param prefer_big_groups Boolean; indicating whether or not bigger subgroups should be preferred in case of several possibilities
 #' @param strict Boolean; if TRUE, subgroup size constraints have to be met strictly, implying the possibility of finding no solution at all
 #' @param fullTree Boolean: Enforce full search of the possibility tree, independent of the value of `maxCalls`
@@ -395,6 +400,7 @@ shuffle_grouped_data <- function(batch_container, allocate_var,
                                  keep_separate_vars = c(),
                                  n_min = NA, n_max = NA, n_ideal = NA,
                                  subgroup_var_name = NULL,
+                                 report_grouping_as_attribute = FALSE,
                                  prefer_big_groups = FALSE, strict = TRUE,
                                  fullTree = FALSE, maxCalls = 1e6) {
   sg <- form_homogeneous_subgroups(
@@ -407,5 +413,5 @@ shuffle_grouped_data <- function(batch_container, allocate_var,
 
   sa <- compile_possible_subgroup_allocation(sg, fullTree = fullTree, maxCalls = maxCalls)
 
-  mk_subgroup_shuffle_function(sg, sa, keep_separate_vars = keep_separate_vars)
+  mk_subgroup_shuffle_function(sg, sa, keep_separate_vars = keep_separate_vars, report_grouping_as_attribute = report_grouping_as_attribute)
 }

@@ -50,8 +50,6 @@ to group all the females together, marking them as interchangeable within this g
 
 ```{r}
 
-set.seed(43)
-
 treatment_names <- c("Control", "Compound")
 
 treatments <- factor(rep(treatment_names, each = 10))
@@ -61,13 +59,12 @@ data("invivo_samples")
 invivo_samples <- dplyr::mutate(invivo_samples, Litter_alloc = ifelse(Sex == "F", "female_all", Litter)) %>%
   dplyr::arrange(Genotype)
 
-invivo_samples %>%
-  head()
+invivo_samples %>% head() %>% gt::gt()
 ```
 
 ```{r}
 invivo_samples %>%
-  dplyr::count(Genotype, Sex)
+  dplyr::count(Genotype, Sex)  %>% gt::gt()
 ```
 
 # Preparatory steps
@@ -82,11 +79,15 @@ We assign samples, retaining initially the order given by the sample list.
 
 ```{r}
 
+# Question: Can one pass a location assignment directly, e.g. the vector 'treatments'?
+# Currently:
+# Error: Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers 
 bc <- BatchContainer$new(
   dimensions = c("Treatment" = nlevels(treatments), "position" = max(table(treatments)))
 )
 
 assign_in_order(bc, invivo_samples)
+
 
 bc
 ```
@@ -197,9 +198,9 @@ We can finally use the customized shuffling function in the optimization and may
 
 ```{r}
 
-bc2 <- bc$clone()
+bc2 <- bc$copy()
 
-trace <- optimize_design(
+trace = optimize_design(
   bc2,
   shuffle_proposal_func = shuffle_proposal,
   max_iter = 200
@@ -209,11 +210,39 @@ design <- bc2$get_samples()
 
 design %>% gt::gt()
 
-dplyr::count(design, Treatment, Genotype, Sex) %>% gt::gt()
-
+# Is it a good design, too?
 dplyr::count(design, Treatment, Genotype) %>% gt::gt()
 
 dplyr::count(design, Treatment, Sex) %>% gt::gt()
+
+dplyr::count(design, Treatment, Genotype, Sex) %>% gt::gt()
+
+# Not subject to a constraint
+dplyr::group_by(design, Treatment) %>% dplyr::summarize(mean(Bodyweight)) %>% gt::gt()
+
+```
+
+The permutation function actually also constructs a 'Cage' variable (see parameter \code{subgroup_var_name} in the call to
+\code{form_homogeneous_subgroups()}). To make this parameter available and join it to the samples in the batch container,
+use flag \code{report_grouping_as_attribute} in the construction of the permutation function.
+
+```{r}
+
+shuffle_proposal2 <- mk_subgroup_shuffle_function(subg, possible, report_grouping_as_attribute = TRUE)
+
+shuffle_proposal2()
+
+optimize_design(
+  bc2,
+  shuffle_proposal_func = shuffle_proposal2,
+  max_iter = 200
+)
+
+design <- bc2$get_samples()
+
+# Not subject to a constraint
+dplyr::group_by(design, Cage) %>% dplyr::summarize(mean(Bodyweight)) %>% gt::gt()
+
 ```
 
 # Example 1: One-step optimization
@@ -225,7 +254,7 @@ Let's take the chance and add one more scoring function for the equal distributi
 
 ```{r}
 
-bc3 <- bc$clone()
+bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
   function(samples) {
@@ -242,15 +271,20 @@ optimize_design(
     allocate_var = "Treatment",
     keep_together_vars = c("Genotype", "Sex"),
     subgroup_var_name = "Cage",
+    report_grouping_as_attribute = TRUE,
     n_min = 2, n_max = 4
   ),
   aggregate_scores_func = worst_score_only,
   max_iter = 200
 )
 
+# Note an issue in trace: have to remember aggregation function or store aggregated score as well
+# Note an issue in batch_container: bc3$get_samples(as_tibble = F, include_id = F) does not return anything (unless include_id=T)
+
 design <- bc3$get_samples()
 
 design %>% gt::gt()
+
 ```
 The updated sample sheet (enriched by the subgroup information which corresponds to the cages)
 corresponds to our first design step. We have formed cages and assigned treatments to the animals.
@@ -260,7 +294,7 @@ One may restore a column with the original treatment names (lost during containe
 
 ```{r}
 design %>%
-  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)]) %>%
+  dplyr::mutate(Condition = levels(treatments)[bc3$get_samples()$Treatment]) %>%
   gt::gt()
 ```
 
@@ -273,7 +307,7 @@ no way to get at least 2 males in one cage.
 
 ```{r}
 
-bc4 <- bc$clone()
+bc4 <- bc$copy()
 
 optimize_design(
   bc4,
@@ -299,6 +333,7 @@ optimize_design(
     allocate_var = "Treatment",
     keep_together_vars = c("Genotype", "Sex", "Litter_alloc"),
     subgroup_var_name = "Cage",
+    report_grouping_as_attribute = TRUE,
     n_min = 2, n_max = 4, prefer_big_groups = TRUE,
     strict = FALSE
   ),
@@ -306,7 +341,7 @@ optimize_design(
 )
 
 design <- bc4$get_samples() %>%
-  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)])
+  dplyr::mutate(Condition = levels(treatments)[bc4$get_samples()$Treatment])
 
 dplyr::count(design, Condition, Genotype, Sex, Cage) %>% gt::gt()
 ```
@@ -324,7 +359,7 @@ One cage will remain with an earmark duplication, which has to be accepted as th
 
 ```{r}
 
-bc5 <- bc$clone()
+bc5 <- bc$copy()
 
 optimize_design(
   bc5,
@@ -333,14 +368,67 @@ optimize_design(
     keep_together_vars = c("Genotype", "Sex"),
     keep_separate_vars = c("Earmark"),
     subgroup_var_name = "Cage",
+    report_grouping_as_attribute = TRUE,
     n_min = 2, n_max = 4, prefer_big_groups = TRUE,
     strict = FALSE
   ),
   max_iter = 200
 )
 
-design <- bc5$get_samples() %>%
-  dplyr::mutate(Condition = levels(treatments)[as.integer(alloc_var_level)])
+design <- bc5$get_samples()
 
 dplyr::count(design, Cage, Earmark) %>% gt::gt()
 ```
+
+
+# Example 4: One-step optimization
+
+For most straightforward use, we produce a shuffling function - all in one go - that
+can be used for the optimization. 
+
+Let's take the chance and add one more scoring function for the equal distribution of body weights across treatment groups.
+
+```{r}
+
+bc6 <- bc$copy()
+
+bc6$scoring_f <- list(
+  function(samples) {
+    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
+  },
+  function(samples) {
+    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
+  },
+  function(samples) {
+    osat_score(samples, batch_vars = "Cage", feature_vars = c("Bodyweight"))$score
+  }
+)
+
+optimize_design(
+  bc6,
+  shuffle_proposal_func = shuffle_grouped_data(bc3,
+    allocate_var = "Treatment",
+    keep_together_vars = c("Genotype", "Sex"),
+    subgroup_var_name = "Cage",
+    report_grouping_as_attribute = TRUE,
+    n_min = 2, n_max = 4
+  ),
+  aggregate_scores_func = worst_score_only,
+  max_iter = 200
+)
+
+# Note an issue in trace: have to remember aggregation function or store aggregated score as well
+
+design <- bc6$get_samples()
+
+design %>%
+  dplyr::mutate(Condition = levels(treatments)[bc6$get_samples()$Treatment]) %>%
+  gt::gt()
+
+dplyr::group_by(design, Cage) %>% dplyr::summarize(mean(Bodyweight))  %>% gt::gt()
+
+```
+The updated sample sheet (enriched by the subgroup information which corresponds to the cages)
+corresponds to our first design step. We have formed cages and assigned treatments to the animals.
+
+One may restore a column with the original treatment names (lost during container formation).
