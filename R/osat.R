@@ -109,6 +109,9 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
 #'
 osat_score_generator <- function(batch_vars, feature_vars) {
 
+  force(batch_vars)
+  force(feature_vars)
+
   expected_dt = NULL
 
   function(samples) {
