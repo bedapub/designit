@@ -267,6 +267,113 @@ mk_swapping_function <- function(n_samples, n_swaps = 1) {
 }
 
 
+#' Created a shuffling function that permutes samples within certain subgroups of the container locations
+#'
+#' If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
+#' If length(n_swaps)>1 the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted.
+#'
+#' @param batch_container Batch container with locations that can be used to define subgroups
+#' @param subgroup_vars Column names of the variables that together define the relevant subgroups
+#' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_locations/2))
+#'
+#' @return Function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+#' @export
+#'
+mk_subgroup_shuffling_function = function(batch_container, subgroup_vars, n_swaps=1) {
+
+  MAX_PERMUTATIONS = 1e6 # limit memory use of this function
+
+  bc_loc = batch_container$get_locations()
+  assertthat::assert_that(nrow(bc_loc)>9, msg="Subgroup shuffling is pointless for small containers (n<10)")
+  assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg="All subgroup defining variables have to be part of the container locations")
+
+  assertthat::assert_that(nrow(dplyr::filter(dplyr::select(bc_loc, all_of(subgroup_vars)), if_any(everything(), ~ !is.na(.))))==nrow(bc_loc),
+                          msg="Selected subgrouping variables should not contain any NA values")
+  subgroup_sizes = dplyr::count(bc_loc, across(all_of(subgroup_vars))) %>%
+    dplyr::pull("n")
+  assertthat::assert_that(length(subgroup_sizes)>1, msg="Subgroup shuffling is pointless if there's only one subgroup involved")
+  assertthat::assert_that(all(subgroup_sizes>1), msg="Subgroup shuffling requires all subgroups to have a minimum size of 2")
+  n_permut = sum(subgroup_sizes*(subgroup_sizes-1)/2)
+  assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
+                          msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS," possible permutations. Consider a different solution."))
+
+
+  bc_loc = dplyr::group_by(bc_loc, across(all_of(subgroup_vars)))
+  grp_ind = dplyr::group_indices(bc_loc)
+
+  valid_permutations = purrr::map(seq_along(group_size(bc_loc)), ~ which(grp_ind==.x)) %>%
+    purrr::map( ~crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
+    dplyr::bind_rows()
+  assertthat::assert_that(n_permut==nrow(valid_permutations), msg="Permutation calculations screwed up. Check the code.")
+
+  valid_indices = 1:n_permut
+
+  # Check user provided shuffling protocol
+  n_swaps <- round(n_swaps, 0)
+
+  if (any(n_swaps > n_permut)) { # limit swaps if user provides a meaningless number
+    n_swaps[n_swaps > n_permut] <- n_permut
+    message("Set upper number of swaps to ", n_permut, " in swapping protocol.")
+  }
+  if (any(n_swaps < 1)) {
+    n_swaps[n_swaps < 1] <- 1
+    message("Set lower number of swaps to 1 in swapping protocol.")
+  }
+
+  # Helper function to pick n INDEPENDENT permutations, i.e. permutations that don't lead to sample loss
+  pick_indep_perm = function(n) {
+    # Start with an index of all possible permutations
+    poss_perm = valid_permutations
+    source = desti = integer(n)
+    for (i in 1:n) {
+      p = floor(stats::runif(1,1,nrow(poss_perm)+1))
+      source[i]=poss_perm[["src"]][p]
+      desti[i]=poss_perm[["dst"]][p]
+      poss_perm = dplyr::filter(poss_perm, src!=source[i], src!=desti[i], dst!=source[i], dst!=desti[i] )
+      if (nrow(poss_perm)==0) {
+        # Stop if we don't have any independent exchanges left
+        break
+      }
+    }
+    list(src=c(source[1:i], desti[1:i]), dst=c(desti[1:i], source[1:i]))
+  }
+
+
+  iter <- 1
+
+  if (length(n_swaps)==1) {
+    return(
+      function(...) { # ignore possible other params passed to a generic shuffle function
+
+        if (n_swaps==1) {
+          swap = sample(valid_indices, 1)
+          return(list(src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
+                      dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])))
+        } else {
+          return(pick_indep_perm(n_swaps))
+        }
+      }
+    )
+  }
+
+  function(iteration = iter, ...) { # ignore possible other params passed to a generic shuffle function
+    if (iteration > length(n_swaps) || iteration < 1) {
+      return(NULL)
+    }
+    iter <<- iter+1
+
+    if (n_swaps[iteration]==1) {
+      swap = sample(valid_indices, 1)
+      return(list(src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
+                  dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])))
+    } else {
+      return(pick_indep_perm(n_swaps[iteration]))
+    }
+  }
+
+}
+
+
 #' Default acceptance function for optimizer (always accept the current score if it is smaller than the best one obtained before)
 #'
 #' @param current_score Score from the current optimizing iteration (scalar value, double)
