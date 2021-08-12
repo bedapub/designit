@@ -1,0 +1,211 @@
+---
+title: "Plate scoring examples"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plate scoring examples}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+  
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+  )
+```
+
+```{r setup}
+if (!requireNamespace("tidyverse", quietly = TRUE)) rlang::abort("Tidyverse required!")
+library(designit)
+```
+
+# ---------------------------------------------------------------------------------
+
+
+# Example 1: An expensive way to construct a 4x4 latin square (one plate)
+
+(latin square should give the best score)
+
+First using a combination of two OSAT scores (for row and column)
+
+This does not always converge to an ideal solution with the given number of iterations.
+
+```{r}
+# Setting up the batch container
+example1 <- BatchContainer$new(
+  dimensions = c(
+    plate = 1,
+    row = 4, col = 4
+  )
+)
+
+# Add samples to container
+# Need pos(ition) just to avoid non-unique rows in samples. Can we drop this constraint?
+assign_in_order(example1, samples = tibble::tibble(Group=rep(c("Grp 1","Grp 2","Grp 3","Grp 4"), each=4), Pos=1:16))
+
+# The following does not work (constant score of 12!) - why?
+# example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
+
+bc <- example1$copy()
+
+# # Set scoring function
+bc$scoring_f <- list(
+  osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
+  osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
+)
+
+start_time <- Sys.time()
+optimize_design( bc,
+                 min_score = 0, max_iter = 1e3,
+                 n_shuffle = 2,
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                 aggregate_scores_func = worst_score_only
+)
+Sys.time() - start_time
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+```
+
+Now using a dedicated scoring for the group distances on a plate. This should reliably lead to a nice latin square design.
+
+```{r}
+bc <- example1$copy()
+
+bc$scoring_f = mk_plate_scoring_functions(bc, row="row", column="col", group="Group")
+
+start_time <- Sys.time()
+optimize_design( bc,
+                 min_score = 1.16, max_iter = 5e3,
+                 n_shuffle = 2,
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5))
+)
+
+Sys.time() - start_time
+
+bc$score()
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+```
+# Example 2: Scoring two plates at once
+
+(latin square for each plate should give the best score)
+ 
+We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, plus one osat score
+to guarantee uniform distribution of groups across plates.
+ 
+```{r}
+# Setting up the batch container
+
+example2 <- BatchContainer$new(
+  dimensions = c(
+  plate = 2,
+  row = 4, col = 4
+  )
+)
+
+ 
+# Add samples to container
+assign_in_order(example2, samples = tibble::tibble(Group=rep(c("Grp 1","Grp 2","Grp 3","Grp 4"), each=8), Pos=1:32))
+ 
+bc <- example2$copy()
+
+bc$scoring_f = c( mk_plate_scoring_functions(bc, plate="plate", row="row", column="col", group="Group"),
+                  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+)
+ 
+bc$score()
+ 
+start_time <- Sys.time()
+optimize_design( bc,
+                 min_score = 0.0354, max_iter = 5e3,
+                 n_shuffle = c(rep(5,1000), rep(2,1000), rep(1,3000)),
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+                 aggregate_scores_func = worst_score_only
+)
+Sys.time() - start_time
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+```
+
+While this 'global' optimization is possible, it does probably not converge to an (almost) ideal solution in an acceptable time
+if there are more samples involved.
+This is due to a lot of unproductive sample swapping happening across the plates.
+
+One way to address this: we may split the optimization into two cycles, first assigning samples to plates (balancing groups),
+then improving the positions of the samples within each plate. This motivates the use of a dedicated sample permutation function
+which takes the plate structure into account and only shuffles samples around within one plate.
+
+
+```{r}
+# Setting up the batch container
+
+bc <- example2$copy()
+
+bc$scoring_f = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+ 
+start_time <- Sys.time()
+optimize_design( bc, quiet=T,
+                 min_score = 0, max_iter = 5e3,
+                 n_shuffle = 2,
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+)
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+bc$scoring_f = mk_plate_scoring_functions(bc, plate="plate", row="row", column="col", group="Group")
+
+optimize_design( bc,
+                 min_score = 1.17, max_iter = 5e3,
+                 shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars=c("plate")),
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                 aggregate_scores_func = worst_score_only
+)
+Sys.time() - start_time
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+```
+In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). However, any number of 
+constant swaps or a swapping protocol (formally a vector of integers) can be supplied as well.
+
+# Example 2: Two groups with 48 replications on a 96 well plate
+
+Very tough optimization problem --> should return a perfect checkerboard, ideally
+
+Optimal score is 12063.82!
+
+```{r}
+
+example4 <- BatchContainer$new(
+  dimensions = c(
+  plate = 1,
+  row = 12, col = 8
+  )
+)
+
+ 
+# Add samples to container
+assign_in_order(example4, samples = tibble::tibble(Group=rep(c("Grp 1","Grp 2"), each=48), Pos=1:96))
+
+bc <- example4$copy()
+ 
+start_time <- Sys.time()
+
+bc$scoring_f = mk_plate_scoring_functions(bc, plate="plate", row="row", column="col", group="Group")
+
+optimize_design( bc,
+                 min_score = 0, max_iter = 5e4,
+                 n_shuffle = c(rep(5,10000), rep(3,10000), rep(2,10000), rep(1,20000)),
+                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.1)),
+)
+
+
+start_time - Sys.time()
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
+```
