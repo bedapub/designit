@@ -301,8 +301,8 @@ mk_subgroup_shuffling_function = function(batch_container, subgroup_vars, n_swap
   bc_loc = dplyr::group_by(bc_loc, across(all_of(subgroup_vars)))
   grp_ind = dplyr::group_indices(bc_loc)
 
-  valid_permutations = purrr::map(seq_along(group_size(bc_loc)), ~ which(grp_ind==.x)) %>%
-    purrr::map( ~crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
+  valid_permutations = purrr::map(seq_along(dplyr::group_size(bc_loc)), ~ which(grp_ind==.x)) %>%
+    purrr::map( ~tidyr::crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
     dplyr::bind_rows()
   assertthat::assert_that(n_permut==nrow(valid_permutations), msg="Permutation calculations screwed up. Check the code.")
 
