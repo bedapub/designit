@@ -460,6 +460,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     update_batchcontainer(shuffle_params)
 
     new_score <- batch_container$score()
+    assertthat::assert_that(!any(is.na(new_score)), msg=stringr::str_c("NA apprearing during scoring in iteration ", iteration))
 
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
