@@ -41,8 +41,8 @@ example1 <- BatchContainer$new(
 # Add samples to container
 # Need pos(ition) just to avoid non-unique rows in samples. Can we drop this constraint?
 assign_in_order(example1, 
-                samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), 
-                                                     each = 4), Pos = 1:16))
+                samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4), 
+                                         Pos = 1:16))
 
 # The following does not work (constant score of 12!) - why?
 # example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
@@ -70,7 +70,8 @@ Sys.time() - start_time
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
 
-Now using a dedicated scoring for the group distances on a plate. This should reliably lead to a nice latin square design.
+Now using a dedicated scoring for the group distances on a plate. 
+This should reliably lead to a nice latin square design.
 
 ```{r}
 bc <- example1$copy()
@@ -94,17 +95,17 @@ plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Gr
 
 (latin square for each plate should give the best score)
  
-We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, plus one osat score
-to guarantee uniform distribution of groups across plates.
+We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, 
+plus one osat score to guarantee uniform distribution of groups across plates.
 
-The initial sample allocation (by assign_in_order) leads to a poor starting point since each plate has only 2 of the 4
-groups represented. This confounding also causes initial scores to start from Inf(inity). This is not a problem as long
-as we make sure that initial permutations are likely to remedy the situation. That's why we ensure 10 pairwise sample
-swaps for the first iterations.
+The initial sample allocation (by assign_in_order) leads to a poor starting point 
+since each plate has only 2 of the 4 groups represented. 
+This confounding also causes initial scores to start from Inf(inity). 
+This is not a problem as long as we make sure that initial permutations are likely to remedy the situation. 
+That's why we ensure 10 pairwise sample swaps for the first iterations.
  
 ```{r}
 # Setting up the batch container
-
 example2 <- BatchContainer$new(
   dimensions = c(
     plate = 2,
@@ -112,9 +113,9 @@ example2 <- BatchContainer$new(
   )
 )
 
-
 # Add samples to container
-assign_in_order(example2, samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8), Pos = 1:32))
+assign_in_order(example2, samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8), 
+                                                   Pos = 1:32))
 
 bc <- example2$copy()
 
@@ -137,12 +138,14 @@ Sys.time() - start_time
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
 
-While this 'global' optimization is possible, it does probably not converge to an (almost) ideal solution in an acceptable time
-if there are more samples involved.
+While this 'global' optimization is possible, it does probably not converge to an (almost) ideal solution 
+in an acceptable time if there are more samples involved.
 This is due to a lot of unproductive sample swapping happening across the plates.
 
-One way to address this: we may split the optimization into two cycles, first assigning samples to plates (balancing groups),
-then improving the positions of the samples within each plate. This motivates the use of a dedicated sample permutation function
+One way to address this: we may split the optimization into two cycles, 
+first assigning samples to plates (balancing groups),
+then improving the positions of the samples within each plate. 
+This motivates the use of a dedicated sample permutation function
 which takes the plate structure into account and only shuffles samples around within one plate.
 
 
@@ -175,23 +178,27 @@ Sys.time() - start_time
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
-In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). However, any number of 
-constant swaps or a swapping protocol (formally a vector of integers) can be supplied as well.
+In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). 
+However, any number of constant swaps or a swapping protocol (formally a vector of integers) 
+can be supplied as well.
 
 
 # Example 3: 3 plates with different dimension and different sample group sizes
 
-We simulate one ordinary 96 well plate and two smaller ones with sizes 6x8 and 4x6, respectively. There are 3 experimental
-groups as well with sample sizes of 69, 30 and 69, respectively. This example should demonstrate that an empirically determined
-normalization of the scores yield 3 comparable numerical values, independent of the different plate and group sizes.  
+We simulate one ordinary 96 well plate and two smaller ones with sizes 6x8 and 4x6, respectively. 
+There are 3 experimental groups as well with sample sizes of 69, 30 and 69, respectively. 
+This example should demonstrate that an empirically determined normalization of the scores 
+yield 3 comparable numerical values, independent of the different plate and group sizes.  
 
-Again, a first optimization aims to achieve same group allocation on each plate, while the second run takes care of the
-sample distribution on each plate.
+Again, a first optimization aims to achieve same group allocation on each plate, 
+while the second run takes care of the sample distribution on each plate.
 
 We use assign_random in this example to start from a more balanced initial position as compared to example 2.
 
-Aggregation of scores is done by the L2s method (square of L2 norm). Because of the comparable numerical range of scores, also
-the worst_score method could be used for aggregation. However, the L2s method always takes into account all individual scores,
+Aggregation of scores is done by the L2s method (square of L2 norm). 
+Because of the comparable numerical range of scores, 
+also the worst_score method could be used for aggregation. 
+However, the L2s method always takes into account all individual scores,
 providing more stability in case the 3 plate scores are not exactly normalized. 
 
 ```{r}
@@ -210,7 +217,10 @@ example3 <- BatchContainer$new(
 
 
 # Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
-assign_random(example3, samples = tibble::tibble(Group = rep.int(c("Grp 1", "Grp 2", "Grp3"), times = c(69, 30, 69)), Pos = 1:168))
+assign_random(example3, 
+              samples = tibble::tibble(Group = rep.int(c("Grp 1", "Grp 2", "Grp3"), 
+                                                       times = c(69, 30, 69)), 
+                                       Pos = 1:168))
 
 bc <- example3$copy()
 
@@ -226,7 +236,8 @@ optimize_design(bc,
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 
-bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
+bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", 
+                                           column = "col", group = "Group")
 
 bc$score()
 
