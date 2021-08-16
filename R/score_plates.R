@@ -8,10 +8,10 @@
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
-mk_dist_matrix = function(plate_x=12, plate_y=8, dist="euclidean") {
+mk_dist_matrix = function(plate_x=12, plate_y=8, dist="minkowski", p=2) { # p=1: Manhattan; p=2: Euclidean; the most flexible metric
   # Helper function: Sets up a euclidean or alternative distance matrix (supported by stats::dist) for a generic x*y plate
   matrix( c( rep(1:plate_y,plate_x), rep(1:plate_x, each=plate_y)), ncol = 2 ) %>%
-    stats::dist(method = dist) %>%
+    stats::dist(method = dist, p=p) %>%
     as.matrix()
 }
 
@@ -45,7 +45,7 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
 
   plate_scoring_func = function(samples, plate, plate_name, row, column, group) {
 
-    assertthat::assert_that(!any(is.na(samples[[group]])), msg=stringr::str_c("Group variable for plate ", plate_name," must not include NAs" ))
+    assertthat::assert_that(!all(is.na(samples[[group]])), msg=stringr::str_c("Group variable for plate ", plate_name," must not be all NAs" ))
     # Have to remember ALL factor levels of plate since sample exchanges may happen across plate, yielding other groups on plate
     group_fac = factor(samples[[group]])
     n_group = nlevels(group_fac)
@@ -70,7 +70,7 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
     assertthat::assert_that(!any(duplicated(plate_pos)), msg=stringr::str_c("Plate coordinates must be unique for plate ", plate_name))
 
 
-    distance_matrix = mk_dist_matrix(plate_x=plate_x, plate_y=plate_y, dist="euclidean")
+    distance_matrix = mk_dist_matrix(plate_x=plate_x, plate_y=plate_y)
     trial_template = double(plate_x*plate_y) # filled with 0 initially (=no sample at any position)
 
     # allocate memory for group scores
@@ -92,14 +92,16 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
         trial[ plate_y*(samples[[row]][sel]-1)+samples[[column]][sel] ] = group_lev_table[ samples[[group]][sel] ]
       }
 
-      # Omitting the explicit t() operation for the first argument in matrix multiplication saves 10% of CPU time.... :-|
+      trial[is.na(trial)] = 0 # Cope for empty plate locations
+
       for (i in loopover) {
         group_trial = as.double(trial==i)
         n = sum(group_trial)
-        # We normalize by the number of samples per group
         # Groups with less than 2 samples in the plate get a group score of 0, rendering the overall score to Inf!
+        # We normalize by the number of samples per group; why 2.6 and not 2 is empirically the best choice: not known yet
         # Omitting the explicit t() operation for the first argument in matrix multiplication saves 10% of CPU time.... :-|
-        group_scores[i] = if (n<2) 0 else (1/n^2) *(group_trial %*% (distance_matrix %*% group_trial))
+        group_scores[i] = if (n<2) 0 else (n^-2.6)*(group_trial %*% (distance_matrix %*% group_trial))
+
       }
 
       sum(1/group_scores^2) # Better solution --> larger pairwise distances of samples of same group --> smaller overall score

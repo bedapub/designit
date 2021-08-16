@@ -47,6 +47,8 @@ assign_in_order(example1, samples = tibble::tibble(Group=rep(c("Grp 1","Grp 2","
 # The following does not work (constant score of 12!) - why?
 # example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
 
+example1$scoring_f <- function(samples) osat_score(samples, batch_vars = c("row","col"), feature_vars = c("Group"))$score
+
 bc <- example1$copy()
 
 # # Set scoring function
@@ -77,7 +79,7 @@ bc$scoring_f = mk_plate_scoring_functions(bc, row="row", column="col", group="Gr
 
 start_time <- Sys.time()
 optimize_design( bc,
-                 min_score = 1.16, max_iter = 5e3,
+                 min_score = 6.07, max_iter = 5e3,
                  n_shuffle = 2,
                  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5))
 )
@@ -95,6 +97,11 @@ plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
  
 We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, plus one osat score
 to guarantee uniform distribution of groups across plates.
+
+The initial sample allocation (by assign_in_order) leads to a poor starting point since each plate has only 2 of the 4
+groups represented. This confounding also causes initial scores to start from Inf(inity). This is not a problem as long
+as we make sure that initial permutations are likely to remedy the situation. That's why we ensure 10 pairwise sample
+swaps for the first iterations.
  
 ```{r}
 # Setting up the batch container
@@ -116,12 +123,13 @@ bc$scoring_f = c( mk_plate_scoring_functions(bc, plate="plate", row="row", colum
                   osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 )
  
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
+
 bc$score()
  
 start_time <- Sys.time()
 optimize_design( bc,
-                 min_score = 0.0354, max_iter = 5e3,
-                 n_shuffle = c(rep(5,1000), rep(2,1000), rep(1,3000)),
+                 n_shuffle = c(rep(10,10), rep(3,990), rep(2,1000), rep(1,3000)),
                  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
                  aggregate_scores_func = worst_score_only
 )
@@ -159,7 +167,7 @@ plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
 bc$scoring_f = mk_plate_scoring_functions(bc, plate="plate", row="row", column="col", group="Group")
 
 optimize_design( bc,
-                 min_score = 1.17, max_iter = 5e3,
+                 max_iter = 5e3,
                  shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars=c("plate")),
                  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                  aggregate_scores_func = worst_score_only
@@ -172,40 +180,124 @@ plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
 In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). However, any number of 
 constant swaps or a swapping protocol (formally a vector of integers) can be supplied as well.
 
-# Example 2: Two groups with 48 replications on a 96 well plate
 
-Very tough optimization problem --> should return a perfect checkerboard, ideally
+# Example 3: 3 plates with different dimension and different sample group sizes
 
-Optimal score is 12063.82!
+We simulate one ordinary 96 well plate and two smaller ones with sizes 6x8 and 4x6, respectively. There are 3 experimental
+groups as well with sample sizes of 69, 30 and 69, respectively. This example should demonstrate that an empirically determined
+normalization of the scores yield 3 comparable numerical values, independent of the different plate and group sizes.  
+
+Again, a first optimization aims to achieve same group allocation on each plate, while the second run takes care of the
+sample distribution on each plate.
+
+We use assign_random in this example to start from a more balanced initial position as compared to example 2.
+
+Aggregation of scores is done by the L2s method (square of L2 norm). Because of the comparable numerical range of scores, also
+the worst_score method could be used for aggregation. However, the L2s method always takes into account all individual scores,
+providing more stability in case the 3 plate scores are not exactly normalized. 
 
 ```{r}
+# Setting up the batch container
 
-example4 <- BatchContainer$new(
+example3 <- BatchContainer$new(
   dimensions = c(
-  plate = 1,
-  row = 12, col = 8
+  plate = 3,
+  row = 8, col = 12
+  ),
+  exclude = dplyr::bind_rows(
+    tidyr::crossing(plate=2, row=1:8, col=1:12) %>% dplyr::filter(row>6|  col>8),
+    tidyr::crossing(plate=3, row=1:8, col=1:12) %>% dplyr::filter(row>4|  col>6)
   )
 )
 
  
-# Add samples to container
-assign_in_order(example4, samples = tibble::tibble(Group=rep(c("Grp 1","Grp 2"), each=48), Pos=1:96))
+# Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
+assign_random(example3, samples = tibble::tibble(Group=rep.int(c("Grp 1","Grp 2","Grp3"), times=c(69,30,69)), Pos=1:168))
 
-bc <- example4$copy()
- 
+bc <- example3$copy()
+
+bc$scoring_f = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+
 start_time <- Sys.time()
+optimize_design( bc, quiet=T,
+                  min_score = 1.49, max_iter = 5e3,
+                  n_shuffle = 2,
+                  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+ )
+
+plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
 
 bc$scoring_f = mk_plate_scoring_functions(bc, plate="plate", row="row", column="col", group="Group")
 
+bc$score()
+
 optimize_design( bc,
-                 min_score = 0, max_iter = 5e4,
-                 n_shuffle = c(rep(5,10000), rep(3,10000), rep(2,10000), rep(1,20000)),
-                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.1)),
+                  min_score = 0, max_iter = 1e5,
+                  shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars=c("plate"),
+                                                                         n_swaps = c(rep(5,500), rep(3,1500), rep(2,3000), rep(1,5000))),
+                  #acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+                  aggregate_scores_func = L2s_norm
 )
 
-
-start_time - Sys.time()
+Sys.time() - start_time
 
 plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group)
 
 ```
+
+# Example 4: More than one group factor to balance and empty plate positions
+
+In this example, we have 2 factors to distribute across one plate: Treatment and (animal) sex.
+
+To indicate that the balancing of treatment is considered more important than the animal sex we assign a custom aggregation
+function giving more weight to the treatment variable. 
+
+There can be less samples than possible positions on the plate(s). In this case, we simulate 20 animal derived samples distributed
+on a plate with 24 locations.
+
+
+```{r}
+# Setting up the batch container
+
+example4 <- BatchContainer$new(
+  dimensions = c(
+  plate = 1, row = 6, col = 4
+  )
+)
+
+ 
+# Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
+assign_in_order(example4, samples = tibble::tibble(Group=rep.int(c("Treatment 1","Treatment 2"), times=c(10,10)),
+                                                   Sex = rep(c("M","F","F","M"), times=5), Pos=1:20))
+
+bc <- example4$copy()
+
+cowplot::plot_grid(
+  plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group),
+  plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Sex),
+  ncol=2)
+
+
+bc$scoring_f = c( Group = mk_plate_scoring_functions(bc, row="row", column="col", group="Group"),
+                  Sex = mk_plate_scoring_functions(bc, row="row", column="col", group="Sex"))
+
+bc$score()
+
+optimize_design( bc,
+                  min_score = 16.75, max_iter = 5e3,
+                  n_shuffle = 1,
+                  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+                  aggregate_scores_func = function(scores, ...) { 3*scores["Group.Plate"] + scores["Sex.Plate"] }
+)
+
+Sys.time() - start_time
+
+cowplot::plot_grid(
+  plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Group),
+  plot_plate(bc$get_samples(), plate=plate, row=row, column=col, .color=Sex),
+  ncol=2)
+
+
+```
+
+
