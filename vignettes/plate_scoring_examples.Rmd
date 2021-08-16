@@ -39,10 +39,10 @@ example1 <- BatchContainer$new(
 )
 
 # Add samples to container
-# Need pos(ition) just to avoid non-unique rows in samples. Can we drop this constraint?
+# Need unique Sample ID. Can we drop this constraint?
 assign_in_order(example1, 
                 samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4), 
-                                         Pos = 1:16))
+                                         ID = 1:16))
 
 # The following does not work (constant score of 12!) - why?
 # example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
