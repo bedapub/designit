@@ -5,10 +5,11 @@
 #' @param plate_x Dimension of plate in x direction (i.e number of columns)
 #' @param plate_y Dimension of plate in y direction (i.e number of rows)
 #' @param dist Distance function as understood by \code{stats::dist()}
+#' @param p Distance metric p=1: Manhattan; p=2: Euclidean; the most flexible metric
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
-mk_dist_matrix = function(plate_x=12, plate_y=8, dist="minkowski", p=2) { # p=1: Manhattan; p=2: Euclidean; the most flexible metric
+mk_dist_matrix = function(plate_x=12, plate_y=8, dist="minkowski", p=2) {
   # Helper function: Sets up a euclidean or alternative distance matrix (supported by stats::dist) for a generic x*y plate
   matrix( c( rep(1:plate_y,plate_x), rep(1:plate_x, each=plate_y)), ncol = 2 ) %>%
     stats::dist(method = dist, p=p) %>%
