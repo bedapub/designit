@@ -6,6 +6,7 @@
 #' @param plate_y Dimension of plate in y direction (i.e number of rows)
 #' @param dist Distance function as understood by \code{stats::dist()}
 #' @param p Distance metric p=1: Manhattan; p=2: Euclidean; the most flexible metric
+#' @param p type of distance p=1: Manhattan; p=2: Euclidean; the most flexible metric
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
