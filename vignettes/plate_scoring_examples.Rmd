@@ -91,6 +91,7 @@ bc$score()
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
+
 # Example 2: Scoring two plates at once
 
 (latin square for each plate should give the best score)
