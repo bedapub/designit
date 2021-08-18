@@ -11,7 +11,7 @@
 #' @keywords internal
 mk_dist_matrix = function(plate_x=12, plate_y=8, dist="minkowski", p=2) {
   # Helper function: Sets up a euclidean or alternative distance matrix (supported by stats::dist) for a generic x*y plate
-  matrix( c( rep(1:plate_y,plate_x), rep(1:plate_x, each=plate_y)), ncol = 2 ) %>%
+  matrix( c( rep(1:plate_y,plate_x), rep(1:plate_x, each=plate_y)), ncol = 2) %>%
     stats::dist(method = dist, p=p) %>%
     as.matrix()
 }
@@ -42,11 +42,13 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
                           column %in% colnames(samp), group %in% colnames(samp),
                           msg="Batch container must contain all variables denoting row, column (of the plate) and a group")
 
-  assertthat::assert_that(is.null(plate) || plate %in% colnames(samp), msg="Plate variable must be in batch container if more than one plate is used")
+  assertthat::assert_that(is.null(plate) || plate %in% colnames(samp),
+                          msg="Plate variable must be in batch container if more than one plate is used")
 
   plate_scoring_func = function(samples, plate, plate_name, row, column, group) {
 
-    assertthat::assert_that(!all(is.na(samples[[group]])), msg=stringr::str_c("Group variable for plate ", plate_name," must not be all NAs" ))
+    assertthat::assert_that(!all(is.na(samples[[group]])),
+                            msg=stringr::str_c("Group variable for plate ", plate_name," must not be all NAs" ))
     # Have to remember ALL factor levels of plate since sample exchanges may happen across plate, yielding other groups on plate
     group_fac = factor(samples[[group]])
     n_group = nlevels(group_fac)
@@ -68,7 +70,8 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
     plate_x = max(samples[[row]])
     plate_y = max(samples[[column]])
     plate_pos = plate_y*(samples[[row]]-1) + samples[[column]]
-    assertthat::assert_that(!any(duplicated(plate_pos)), msg=stringr::str_c("Plate coordinates must be unique for plate ", plate_name))
+    assertthat::assert_that(!any(duplicated(plate_pos)),
+                            msg=stringr::str_c("Plate coordinates must be unique for plate ", plate_name))
 
 
     distance_matrix = mk_dist_matrix(plate_x=plate_x, plate_y=plate_y)
