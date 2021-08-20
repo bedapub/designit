@@ -5,7 +5,7 @@
 #' @param plate_x Dimension of plate in x direction (i.e number of columns)
 #' @param plate_y Dimension of plate in y direction (i.e number of rows)
 #' @param dist Distance function as understood by \code{stats::dist()}
-#' @param p Distance metric p=1: Manhattan; p=2: Euclidean; the most flexible metric
+#' @param p p parameter, used only if distance metric is 'minkowski'. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
@@ -36,7 +36,7 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
   assertthat::assert_that(!is.null(batch_container), batch_container$has_samples,
                           msg="Batch container must have samples")
 
-  samp = batch_container$get_samples(assignment = T, remove_empty_locations = F, as_tibble = T)
+  samp = batch_container$get_samples(assignment = T, include_id = T, remove_empty_locations = F, as_tibble = T)
 
   assertthat::assert_that(row %in% colnames(samp),
                           column %in% colnames(samp), group %in% colnames(samp),
@@ -47,14 +47,21 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
 
   plate_scoring_func = function(samples, plate, plate_name, row, column, group) {
 
-    assertthat::assert_that(!all(is.na(samples[[group]])),
+    # Have to distinguish between empty positions on plate and NA-levels of experimental factors which may happen for real samples, too
+    nonempty_pos = !is.na(samples[[".sample_id"]])
+
+    assertthat::assert_that(!all(is.na(samples[[group]][nonempty_pos])),
                             msg=stringr::str_c("Group variable for plate ", plate_name," must not be all NAs" ))
-    # Have to remember ALL factor levels of plate since sample exchanges may happen across plate, yielding other groups on plate
-    group_fac = factor(samples[[group]])
+
+    # Have to remember ALL levels of the Group factor since sample exchanges may happen across plates,
+    # yielding different groups on the plate each time.
+    # This includes NA as a dedicated level as well (note that <NA> will be always the last level in the level list!)
+    group_fac = factor(as.character(samples[[group]][nonempty_pos]), exclude=NULL)
+
     n_group = nlevels(group_fac)
     group_lev_table = setNames(1:n_group, nm=levels(group_fac))
 
-    if (!is.null(plate)) { # But now focus on the relevant plate only
+    if (!is.null(plate)) { # But now focus on the relevant plate only for remaining checks
       samples = dplyr::filter(samples, !!as.symbol(plate) == plate_name)
     }
 
@@ -77,10 +84,6 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
     distance_matrix = mk_dist_matrix(plate_x=plate_x, plate_y=plate_y)
     trial_template = double(plate_x*plate_y) # filled with 0 initially (=no sample at any position)
 
-    # allocate memory for group scores
-    group_scores = double(n_group)
-    loopover = seq_along(group_scores)
-
     # Create and return the actual scoring function for a specific sample permutation
 
     function(samples) {
@@ -88,27 +91,29 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
       # Set up trial matrix from sample list
       trial = trial_template
 
-      # Probably have to filter out correct plate
+      # Filter out correct plate (if necessary) and non-empty plate locations
       if (is.null(plate)) {
-        trial[ plate_y*(samples[[row]]-1)+samples[[column]] ] = group_lev_table[ samples[[group]] ]
+        sel = !is.na(samples[[".sample_id"]])
       } else {
-        sel = samples[[plate]] == plate_name
-        trial[ plate_y*(samples[[row]][sel]-1)+samples[[column]][sel] ] = group_lev_table[ samples[[group]][sel] ]
+        sel = samples[[plate]] == plate_name & !is.na(samples[[".sample_id"]])
       }
 
-      trial[is.na(trial)] = 0 # Cope for empty plate locations
+      trial[ plate_y*(samples[[row]][sel]-1)+samples[[column]][sel] ] = group_lev_table[ as.character(samples[[group]][sel]) ]
+
+      trial[is.na(trial)] = n_group # Cope for true NA levels in variables as indexing with NA yielded NAs at this step
+
+      group_freq = rle(sort(trial))
+      loopover = which(group_freq[["lengths"]]>1) # elegantly skip groups which deliver an Inf score
+      score = 0
 
       for (i in loopover) {
-        group_trial = as.double(trial==i)
-        n = sum(group_trial)
-        # Groups with less than 2 samples in the plate get a group score of 0, rendering the overall score to Inf!
-        # We normalize by the number of samples per group; why 2.6 and not 2 is empirically the best choice: not known yet
+        group_trial = as.double(trial==group_freq[["values"]][i])
         # Omitting the explicit t() operation for the first argument in matrix multiplication saves 10% of CPU time.... :-|
-        group_scores[i] = if (n<2) 0 else (n^-2.6)*(group_trial %*% (distance_matrix %*% group_trial))
-
+        score = score + ( (group_freq[["lengths"]][i] ^-2.6) * (group_trial %*% (distance_matrix %*% group_trial)) )^-2
+        # Better solution --> larger pairwise distances of samples of same group --> smaller overall score
       }
 
-      sum(1/group_scores^2) # Better solution --> larger pairwise distances of samples of same group --> smaller overall score
+      score
     }
 
   }
