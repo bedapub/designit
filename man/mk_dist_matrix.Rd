@@ -13,7 +13,7 @@ mk_dist_matrix(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2)
 
 \item{dist}{Distance function as understood by \code{stats::dist()}}
 
-\item{p}{Distance metric p=1: Manhattan; p=2: Euclidean; the most flexible metric}
+\item{p}{p parameter, used only if distance metric is 'minkowski'. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance}
 }
 \value{
 The  matrix with pairwise distances between any wells on the plate
