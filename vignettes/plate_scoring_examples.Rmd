@@ -299,7 +299,7 @@ optimize_design(bc,
 )
 ```
 
-```{r, fig.width=8, fig.height=4}
+```{r, fig.width=7, fig.height=3.5}
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
 
@@ -326,7 +326,7 @@ bc$score()
 
 ```
 
-```{r, fig.width=8, fig.height=4}
+```{r, fig.width=7, fig.height=3.5}
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
 
@@ -341,7 +341,7 @@ There can be less samples than possible positions on the plate(s). In this case,
 on a plate with 24 locations.
 
 
-```{r, fig.width=8, fig.height=4}
+```{r, fig.width=7, fig.height=3.5}
 # Setting up the batch container
 
 example4 <- BatchContainer$new(
