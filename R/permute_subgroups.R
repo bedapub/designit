@@ -32,8 +32,8 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   )
   # The allocation variable must have factor levels in a given order!
   # This is important later on for sample swapping as it has to be known which factor level corresponds to 'group 1' etc
-  if (class(allocate_fac) != "factor") {
-    allocate_fac <- factor(allocate_fac)
+  if (!inherits(allocate_fac, "factor")) {
+    allocate_fac <- forcats::as_factor(allocate_fac)
   }
 
   assertthat::assert_that(length(keep_together_vars) > 0, msg = "Function can only help if vector of 'keep_together_vars' is specified.")

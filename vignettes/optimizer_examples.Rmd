@@ -120,9 +120,13 @@ We may safely apply the batch container methods get_samples() and score() also a
 bc1$score()
 
 bc1$get_samples(assignment = TRUE) %>%
-  dplyr::mutate(batch = factor(batch)) %>%
-  ggplot2::ggplot(ggplot2::aes(x = batch, fill = Treatment, alpha = factor(Time))) +
-  ggplot2::geom_bar()
+  dplyr::filter(!is.na(Treatment)) %>%
+  dplyr::mutate(anno = stringr::str_c(Time," hr")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
+  ggplot2::geom_tile(color="white") +
+  geom_hline(yintercept = 5.5, size=1) + 
+  geom_text(aes(label=anno)) +
+  labs(x="Batch", y="Position . Run")
 ```
 
 ## Perform new iterations on optimized batch container
@@ -219,7 +223,7 @@ distance vectors or normalized n-tuples.
 
 We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
 
-```{r}
+```{r, eval = FALSE}
 
 bc5 <- bc$copy()
 
