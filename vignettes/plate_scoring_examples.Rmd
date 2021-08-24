@@ -58,14 +58,12 @@ bc$scoring_f <- list(
   osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
 )
 
-start_time <- Sys.time()
 optimize_design(bc,
-  min_score = 0, max_iter = 1e4,
+  min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
   aggregate_scores_func = L2s_norm
 )
-Sys.time() - start_time
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
@@ -81,14 +79,13 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", grou
 
 start_time <- Sys.time()
 optimize_design(bc,
-  min_score = 6.1, max_iter = 1e4,
+  min_score = 6.1, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5))
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  quiet = TRUE
 )
 
 Sys.time() - start_time
-
-bc$score()
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
@@ -134,9 +131,12 @@ start_time <- Sys.time()
 optimize_design(bc,
   n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
-  aggregate_scores_func = worst_score_only
+  aggregate_scores_func = worst_score_only,
+  quiet = TRUE
 )
 Sys.time() - start_time
+
+bc$score()
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
@@ -162,7 +162,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("
 start_time <- Sys.time()
 optimize_design(bc,
   quiet = T,
-  min_score = 2, max_iter = 5e3,
+  min_score = 2, max_iter = 5e3,  # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
@@ -171,16 +171,22 @@ plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Gr
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
+bc$score()
+
 optimize_design(bc,
-  max_iter = 5e3,
+  max_iter = 5e2,
   shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate")),
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  aggregate_scores_func = L2s_norm
+  aggregate_scores_func = L2s_norm,
+  quiet = TRUE
 )
 Sys.time() - start_time
 
+bc$score()
+
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
+
 In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). 
 However, any number of constant swaps or a swapping protocol (formally a vector of integers) 
 can be supplied as well.
@@ -205,7 +211,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("
 start_time <- Sys.time()
 optimize_design(bc,
   quiet = T,
-  min_score = 2, max_iter = 5e3,
+  min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
@@ -234,9 +240,9 @@ optimize_design(bc,
   aggregate_scores_func = L2s_norm
 )
 
-bc$score()
-
 Sys.time() - start_time
+
+bc$score()
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
@@ -285,21 +291,25 @@ bc <- example3$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
-start_time <- Sys.time()
 optimize_design(bc,
   quiet = T,
   min_score = 1.49, max_iter = 5e3,
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
 )
+```
 
+```{r, fig.width=8, fig.height=4}
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
+```
 
+```{r}
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", 
                                            column = "col", group = "Group")
 
 bc$score()
 
+start_time <- Sys.time()
 optimize_design(bc,
   min_score = 0, max_iter = 1e4,
   shuffle_proposal_func = mk_subgroup_shuffling_function(bc,
@@ -307,11 +317,16 @@ optimize_design(bc,
     n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
   ),
   # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
-  aggregate_scores_func = L2s_norm
+  aggregate_scores_func = L2s_norm,
+  quiet = TRUE
 )
-
 Sys.time() - start_time
 
+bc$score()
+
+```
+
+```{r, fig.width=8, fig.height=4}
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group)
 ```
 
@@ -326,7 +341,7 @@ There can be less samples than possible positions on the plate(s). In this case,
 on a plate with 24 locations.
 
 
-```{r}
+```{r, fig.width=8, fig.height=4}
 # Setting up the batch container
 
 example4 <- BatchContainer$new(
@@ -358,16 +373,21 @@ bc$scoring_f <- c(
 
 bc$score()
 
+start_time <- Sys.time()
+
 optimize_design(bc,
   min_score = 17.66, max_iter = 5e3,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
   aggregate_scores_func = function(scores, ...) {
     2 * scores["Group.Plate"] + scores["Sex.Plate"]
-  }
+  },
+  quiet = TRUE
 )
 
 Sys.time() - start_time
+
+bc$score()
 
 cowplot::plot_grid(
   plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group),
