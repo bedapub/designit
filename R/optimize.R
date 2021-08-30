@@ -143,7 +143,8 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 mk_pairwise_swapping_function <- function(n_samples) {
   # Function factory for creator of a 'neighboring' sample arrangement with just one pairwise swap
 
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE))
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
   assertthat::assert_that(n_samples > 1, msg = "at least 2 samples needed for defining a pairwise swap")
   pos_vec <- 1:n_samples
   Z <- 2:1
@@ -167,7 +168,8 @@ mk_pairwise_swapping_function <- function(n_samples) {
 mk_constant_swapping_function <- function(n_samples, n_swaps) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE))
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
                           msg = "n_swaps should be an iteger vector")
   n <- n_samples
@@ -238,7 +240,8 @@ mk_swapping_function <- function(n_samples, n_swaps = 1) {
   }
 
   # User has provided a shuffling protocol!
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE))
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
                           msg = "n_swaps should be an iteger vector")
   n <- n_samples
