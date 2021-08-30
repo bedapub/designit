@@ -168,7 +168,8 @@ mk_constant_swapping_function <- function(n_samples, n_swaps) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
   assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE))
-  assertthat::assert_that(rlang::is_integerish(n_swaps, n = 1, finite = TRUE))
+  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
+                          msg = "n_swaps should be an iteger vector")
   n <- n_samples
   draws <- 2 * n_swaps
 
@@ -238,7 +239,8 @@ mk_swapping_function <- function(n_samples, n_swaps = 1) {
 
   # User has provided a shuffling protocol!
   assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE))
-  assertthat::assert_that(rlang::is_integerish(n_swaps, n = 1, finite = TRUE))
+  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
+                          msg = "n_swaps should be an iteger vector")
   n <- n_samples
 
   if (any(n_swaps > floor(n / 2))) { # limit swaps if user provides a meaningless number
