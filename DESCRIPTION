@@ -47,7 +47,8 @@ Imports:
     data.table,
     glue,
     forcats,
-    checkmate
+    checkmate,
+    stats
 Suggests: 
     testthat,
     roxygen2,
