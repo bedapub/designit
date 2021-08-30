@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 ```
   
 ```{r setup}
-library(tidyverse)
 library(designit)
 ```
   
@@ -124,9 +123,9 @@ bc1$get_samples(assignment = TRUE) %>%
   dplyr::mutate(anno = stringr::str_c(Time," hr")) %>%
   ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
   ggplot2::geom_tile(color="white") +
-  geom_hline(yintercept = 5.5, size=1) + 
-  geom_text(aes(label=anno)) +
-  labs(x="Batch", y="Position . Run")
+  ggplot2::geom_hline(yintercept = 5.5, size=1) + 
+  ggplot2::geom_text(aes(label=anno)) +
+  ggplot2::labs(x="Batch", y="Position . Run")
 ```
 
 ## Perform new iterations on optimized batch container
