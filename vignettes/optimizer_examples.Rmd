@@ -64,7 +64,7 @@ bc <- BatchContainer$new(
 # Add samples to container
 assign_in_order(bc, samples = multi_trt_day_samples)
 # Set scoring function
-bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
+bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
 
 bc
 ```
@@ -174,8 +174,8 @@ The second scoring function used here is rather redundant and just serves as ill
 bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 
@@ -194,8 +194,8 @@ decide on the best iteration. (It has the same effect in this example though.)
 bc4 <- bc$copy()
 
 bc4$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 
@@ -218,8 +218,8 @@ We omit the `n_shuffle` parameter here, which will lead by default to pairwise s
 bc5 <- bc$copy()
 
 bc5$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 optimize_design(
@@ -298,9 +298,9 @@ The following example puts together all possible options to illustrate the flexi
 
 ```{r}
 bc$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Time"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment")),
+  osat_score_generator(c("batch"), c("Time"))
 )
 
 n_shuffle <- rep(c(3, 2, 1), c(20, 20, 100))

@@ -94,17 +94,14 @@ An OSAT scoring function should ensure even distribution of treatments across Ge
 and `sex` interactions are considered in the scoring function.
 
 ```{r}
-bc$scoring_f <- function(samples) {
-  osat_score(
-    samples,
+bc$scoring_f <- osat_score_generator(
     batch_vars = "Treatment",
     feature_vars = c("Genotype", "Sex"),
-  )$score
-}
+  )
 
 # Avoid this - it does not take care of the interaction between the variables
-# bc$scoring_f <- list( function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype"))$score },
-#                      function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Sex"))$score }
+# bc$scoring_f <- list(osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype")),
+#                      osat_score_generator(batch_vars = "Treatment", feature_vars = c("Sex"))
 #                      )
 ```
 
@@ -246,12 +243,8 @@ Let's take the chance and add one more scoring function for the equal distributi
 bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
-  }
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype", "Sex")),
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Bodyweight"))
 )
 
 optimize_design(
@@ -377,15 +370,9 @@ Let's take the chance and add one more scoring function for the equal distributi
 bc6 <- bc$copy()
 
 bc6$scoring_f <- list(
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Cage", feature_vars = c("Bodyweight"))$score
-  }
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype", "Sex")),
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Bodyweight")),
+  osat_score_generator(batch_vars = "Cage", feature_vars = c("Bodyweight"))
 )
 
 optimize_design(

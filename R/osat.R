@@ -5,7 +5,7 @@
 #' @param batch_vars [character] vector with batch variable names to take into account for the
 #' score computation.
 #' @param feature_vars [character] vector with sample variable names to take into account for
-#' score comptation.
+#' score computation.
 #' @param expected_dt A [`data.table`][data.table::data.table] with expected number of samples sample
 #' variables and batch variables combination. This is not required, however it does not change
 #' during the optimization process. So it is a good idea to cache this value.
@@ -75,4 +75,50 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
   merged_df[is.na(N), N := 0]
   score <- with(merged_df, sum((N - .n_expected)^2))
   list(score = score, expected_dt = expected_dt)
+}
+
+
+#' Convenience wrapper for the OSAT score
+#'
+#' This function wraps [osat_score()] in order to take full advantage of the speed gain without
+#' managing the buffered objects in the user code.
+#'
+#' @param batch_vars [character] vector with batch variable names to take into account for the
+#' score computation.
+#' @param feature_vars [character] vector with sample variable names to take into account for
+#' score computation.
+#' @return A function that returns the OSAT score for a specific sample arrangement
+#' @export
+#'
+#' @examples
+#' sample_assignment <- tibble::tribble(
+#'   ~ID, ~SampleType, ~Sex, ~plate,
+#'   1, "Case", "Female", 1,
+#'   2, "Case", "Female", 1,
+#'   3, "Case", "Male", 2,
+#'   4, "Control", "Female", 2,
+#'   5, "Control", "Female", 1,
+#'   6, "Control", "Male", 2,
+#'   NA, NA, NA, 1,
+#'   NA, NA, NA, 2,
+#' )
+#'
+#' osat_scoring_function <- osat_score_generator(batch_vars = "plate", feature_vars = c("SampleType", "Sex"))
+#'
+#' osat_scoring_function(sample_assignment)
+osat_score_generator <- function(batch_vars, feature_vars) {
+  force(batch_vars)
+  force(feature_vars)
+
+  expected_dt <- NULL
+
+  function(samples) {
+    os <- osat_score(samples,
+      batch_vars = batch_vars,
+      feature_vars = feature_vars,
+      expected_dt = expected_dt
+    )
+    if (is.null(expected_dt)) expected_dt <<- os$expected_dt
+    os$score
+  }
 }

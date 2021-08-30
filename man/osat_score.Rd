@@ -14,7 +14,7 @@ in a container and a sample in this location.}
 score computation.}
 
 \item{feature_vars}{\link{character} vector with sample variable names to take into account for
-score comptation.}
+score computation.}
 
 \item{expected_dt}{A \code{\link[data.table:data.table]{data.table}} with expected number of samples sample
 variables and batch variables combination. This is not required, however it does not change

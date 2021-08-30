@@ -136,7 +136,7 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 
 ## Using designit OSAT score implementation
 ```{r}
-bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"))$score
+bc$scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
 
 bc$score()
 g_setup@metadata$optValue %>% head(1)
@@ -144,33 +144,16 @@ g_setup@metadata$optValue %>% head(1)
 
 bench::system_time({
   set.seed(123)
-  trace <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+  trace_reference <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
 })
 ```
 
 ```{r}
 # final score
 bc$score()
-plot(trace, main = str_glue("Final score={bc$score()}"))
+plot(trace_reference, main = str_glue("Final score={bc$score()}"))
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
-```
-
-## Cache `expected_dt`
-Caching `expected_dt` should improve the performance.
-
-```{r}
-bc$move_samples(location_assignment = starting_assignment)
-
-# precompute expected_dt
-edf <- osat_score(bc$get_samples(), "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
-
-bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
-
-bench::system_time({
-  set.seed(123)
-  trace_reference <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
-})
 ```
 
 ## Manually work with `data.table`
@@ -229,10 +212,7 @@ bench::system_time({
 ```{r}
 bc$move_samples(location_assignment = starting_assignment)
 
-# precompute expected_dt
-edf <- osat_score(bc$get_samples(), "plates", c("SampleType", "Race", "AgeGrp"))$expected_dt
-
-bc$scoring_f <- function(samples) osat_score(samples, "plates", c("SampleType", "Race", "AgeGrp"), expected_dt = edf)$score
+bc$scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
 
 burn_in_it <- floor(params$iterations * 0.1)
 burn_in_it
