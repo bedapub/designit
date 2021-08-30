@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 ```
   
 ```{r setup}
-if (!requireNamespace("tidyverse", quietly = TRUE)) rlang::abort("Tidyverse required!")
+library(tidyverse)
 library(designit)
 ```
   
