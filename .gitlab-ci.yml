@@ -5,6 +5,10 @@ variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
   BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+  # github returns 401; personal access token of davydovi (idavydov) is supposed to help
+  # see here: https://github.com/r-lib/remotes/issues/330#issuecomment-578474009
+  # this token is valid till August 2022
+  GITHUB_PAT: "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"
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}

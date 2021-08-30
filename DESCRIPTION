@@ -38,6 +38,7 @@ Imports:
     ggplot2,
     tibble,
     tidyselect,
+    tidyr,
     assertthat,
     stringr,
     AlgDesign,
@@ -47,7 +48,7 @@ Imports:
     glue,
     forcats,
     checkmate,
-    gt
+    stats
 Suggests: 
     testthat,
     roxygen2,
@@ -55,10 +56,10 @@ Suggests:
     knitr,
     markdown,
     rmarkdown,
+    gt,
     bench,
     OSAT,
     tidyverse,
-    DT,
     printr,
     devtools (>= 2.0.0),
     gridpattern,

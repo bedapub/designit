@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 has_printr <- requireNamespace("printr", quietly = TRUE) # for printing help pages nicely
 
 library(designit)
-library(tidyverse)
+library(ggplot2)
 ```
 
 # Description of data
@@ -41,7 +41,7 @@ if (has_printr) {
 plot_cages <- function(data, var, colors, .row = CageRow, .col = CageCol) {
   varname <- as_label(enquo(var))
   data %>%
-    distinct({{ .row }}, {{ .col }}, {{ var }}) %>%
+    dplyr::distinct({{ .row }}, {{ .col }}, {{ var }}) %>%
     ggplot() +
     aes(x = 1, y = 1, fill = {{ var }}) +
     facet_grid(rows = vars({{ .row }}), cols = vars({{ .col }})) +

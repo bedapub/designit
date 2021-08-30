@@ -67,7 +67,7 @@ conditions <- data.frame(group = c(1, 2, 3, 4, 5),
                                     "TRT1", "TRT2"),
                       dose = c(0, 25, 25, 50, 50))
 
-knitr::kable(conditions)
+gt::gt(conditions)
 ```
 
 We will have 3 animals per groups with 4 replicates each
@@ -81,7 +81,7 @@ samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 
   dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
                 AnimalID = paste0(treatment,'_',animal))
 
-DT::datatable(samples)
+gt::gt(samples)
 ```
 ## Plate layout requirements
 
@@ -132,7 +132,6 @@ Plot of the result using the `plot_plate` function
 ```{r, fig.width=6, fig.height=3.5}
 plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
-
 ```
 
 To move individual samples or manually assigning all locations we can use the 

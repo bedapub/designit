@@ -1,6 +1,3 @@
-library(designit)
-
-
 bcd1 <- BatchContainerDimension$new("d1", size = 10)
 bcd2 <- BatchContainerDimension$new("d2", values = 1:10)
 bcd3 <- BatchContainerDimension$new("d3", values = 2 + 1:10)
