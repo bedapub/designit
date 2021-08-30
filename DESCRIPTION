@@ -38,6 +38,7 @@ Imports:
     ggplot2,
     tibble,
     tidyselect,
+    tidyr,
     assertthat,
     stringr,
     AlgDesign,
