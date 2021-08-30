@@ -124,7 +124,7 @@ bc1$get_samples(assignment = TRUE) %>%
   ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
   ggplot2::geom_tile(color="white") +
   ggplot2::geom_hline(yintercept = 5.5, size=1) + 
-  ggplot2::geom_text(aes(label=anno)) +
+  ggplot2::geom_text(ggplot2::aes(label=anno)) +
   ggplot2::labs(x="Batch", y="Position . Run")
 ```
 
