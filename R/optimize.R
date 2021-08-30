@@ -27,6 +27,7 @@
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL, aggregate_scores_func = first_score_only) {
   start_time <- Sys.time()
+  if (!exists(".Random.seed")) runif(1)
   save_random_seed <- .Random.seed
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
