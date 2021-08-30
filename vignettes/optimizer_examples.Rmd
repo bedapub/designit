@@ -81,7 +81,6 @@ two different positions anyway. The upper limit is reduced to the max number of 
 Optimization finishes after the list of permutations is exhausted.
 
 ```{r}
-
 n_shuffle <- rep(c(32, 10, 5, 2, 1), c(100, 200, 200, 300, 300))
 
 
@@ -107,7 +106,6 @@ ggplot2::qplot(x = seq_along(trace1$scores), y = trace1$scores, color = factor(n
 Using the internal method...
 
 ```{r, fig.width=5, fig.height= 4}
-
 trace1$plot()
 ```
 
@@ -115,7 +113,6 @@ We may safely apply the batch container methods get_samples() and score() also a
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
-
 bc1$score()
 
 bc1$get_samples(assignment = TRUE) %>%
@@ -134,7 +131,6 @@ Further optimization (using a different shuffling protocol maybe) can be done im
 on the same batch container.
 
 ```{r}
-
 n_shuffle <- rep(c(5, 2, 1), c(100, 100, 200))
 
 optimize_design(
@@ -153,7 +149,6 @@ and can be called an arbitrary number of times. Thus, iteration has to be stoppe
 criterion or by reaching a specific target score.
 
 ```{r}
-
 bc2 <- bc$copy()
 
 optimize_design(
@@ -162,7 +157,6 @@ optimize_design(
   max_iter = 1000,
   min_score = 3.0
 )
-
 ```
 
 
@@ -177,7 +171,6 @@ However, the user may specify other methods for the aggregating of the scores.
 The second scoring function used here is rather redundant and just serves as illustration.
 
 ```{r}
-
 bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
@@ -198,7 +191,6 @@ Next, we repeat the optimization by using an aggregation function that takes the
 decide on the best iteration. (It has the same effect in this example though.)
 
 ```{r}
-
 bc4 <- bc$copy()
 
 bc4$scoring_f <- list(
@@ -223,7 +215,6 @@ distance vectors or normalized n-tuples.
 We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
 
 ```{r, eval = FALSE}
-
 bc5 <- bc$copy()
 
 bc5$scoring_f <- list(
@@ -249,7 +240,6 @@ The following example uses a template for creating complete random shuffles acro
 Note that this is usually not a good strategy for converging to a solution.
 
 ```{r}
-
 bc6 <- bc$copy()
 
 optimize_design(
@@ -271,7 +261,6 @@ can be changed by supplying a simulated annealing protocol, most simply by gener
 It is generally recommended for SA to make small changes at each step, like allowing just 1 sample swap per iteration.
 
 ```{r}
-
 bc7 <- bc$copy()
 
 trace7 <- optimize_design(
@@ -284,7 +273,6 @@ trace7 <- optimize_design(
 The trace may show a non strictly monotonic behavior now, reflecting the SA protocol at work.
 
 ```{r, fig.width=5, fig.height= 4}
-
 trace7$plot()
 ```
 
@@ -292,7 +280,6 @@ Better results and quicker convergence may be achieved by playing with the start
 cooling speed (alpha) in a specific case.
 
 ```{r}
-
 bc8 <- bc$copy()
 
 trace8 <- optimize_design(
@@ -310,7 +297,6 @@ trace8$plot()
 The following example puts together all possible options to illustrate the flexibility of the optimization.
 
 ```{r}
-
 bc$scoring_f <- list(
   function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
   function(samples) osat_score(samples, c("batch"), c("Treatment"))$score,
