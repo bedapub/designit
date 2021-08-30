@@ -51,7 +51,7 @@ docs:
     - Rscript -e 'pkgdown::build_site()'
     - (cd docs && zip -r ../ci/docs.zip .)
     - "echo Version: $VERSION"
-    - curl -X POST --header "Docat-Api-Key: $DOCAT_API_KEY" -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/$VERSION"
-    - curl -X PUT --header "Docat-Api-Key: $DOCAT_API_KEY" "http://docs.roche.com/api/designit/$VERSION/tags/latest"
+    - 'curl -X POST --header "Docat-Api-Key: $DOCAT_API_KEY" -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/$VERSION"'
+    - 'curl -X PUT --header "Docat-Api-Key: $DOCAT_API_KEY" "http://docs.roche.com/api/designit/$VERSION/tags/latest"'
   only:
     - tags
