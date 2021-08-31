@@ -96,13 +96,10 @@ and `sex` interactions are considered in the scoring function. We only use 10 it
 shuffling is limited to locations with males and enforces change of cage on every iteration.
 
 ```{r}
-bc$scoring_f <- function(samples) {
-  osat_score(
-    samples,
+bc$scoring_f <- osat_score_generator(
     "cage",
     "sex"
-  )$score
-}
+  )
 
 set.seed(10)
 

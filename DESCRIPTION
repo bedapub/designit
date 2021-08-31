@@ -1,6 +1,6 @@
 Package: designit
 Title: Blocking and randomization for experimental design
-Version: 0.1.1
+Version: 0.2.0
 Authors@R: c(
     person(given = "Balazs",
            family = "Banfai",
@@ -38,6 +38,7 @@ Imports:
     ggplot2,
     tibble,
     tidyselect,
+    tidyr,
     assertthat,
     stringr,
     AlgDesign,
@@ -46,7 +47,8 @@ Imports:
     data.table,
     glue,
     forcats,
-    checkmate
+    checkmate,
+    stats
 Suggests: 
     testthat,
     roxygen2,

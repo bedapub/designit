@@ -27,6 +27,7 @@
 #' @export
 assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shuffle = NULL, shuffle_proposal = NULL, iterations = NULL, aggregate_scores_func = first_score_only) {
   start_time <- Sys.time()
+  if (!exists(".Random.seed")) stats::runif(1)
   save_random_seed <- .Random.seed
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
@@ -142,9 +143,10 @@ assign_score_optimize_shuffle <- function(batch_container, samples = NULL, n_shu
 mk_pairwise_swapping_function <- function(n_samples) {
   # Function factory for creator of a 'neighboring' sample arrangement with just one pairwise swap
 
-  n <- round(n_samples, 0)
-  assertthat::assert_that(n > 1, msg = "at least 2 samples needed for defining a pairwise swap")
-  pos_vec <- 1:n
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
+  assertthat::assert_that(n_samples > 1, msg = "at least 2 samples needed for defining a pairwise swap")
+  pos_vec <- 1:n_samples
   Z <- 2:1
 
   function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
@@ -166,8 +168,11 @@ mk_pairwise_swapping_function <- function(n_samples) {
 mk_constant_swapping_function <- function(n_samples, n_swaps) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
-  n <- round(n_samples, 0)
-  n_swaps <- round(n_swaps, 0)
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
+  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
+                          msg = "n_swaps should be an iteger vector")
+  n <- n_samples
   draws <- 2 * n_swaps
 
   if (n < draws) { # limit swaps if user provides a meaningless number
@@ -182,6 +187,9 @@ mk_constant_swapping_function <- function(n_samples, n_swaps) {
 
   function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
     swap <- sample(pos_vec, draws)
+    # ensures that there are
+    # a) no samples are left in place
+    # b) no complex shuffles, like 1->2, 2->3, 3->1
     list(src = swap, dst = swap[Z])
   }
 }
@@ -218,7 +226,7 @@ mk_complete_random_shuffling_function <- function(batch_container) {
 #' @param n_samples Total number of samples (i.e. max of permutation index)
 #' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_samples/2))
 #'
-#' @return Function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #'
 #' @export
 mk_swapping_function <- function(n_samples, n_swaps = 1) {
@@ -232,8 +240,11 @@ mk_swapping_function <- function(n_samples, n_swaps = 1) {
   }
 
   # User has provided a shuffling protocol!
-  n <- round(n_samples, 0)
-  n_swaps <- round(n_swaps, 0)
+  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
+                          msg = "n_samples should be a single iteger")
+  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
+                          msg = "n_swaps should be an iteger vector")
+  n <- n_samples
 
   if (any(n_swaps > floor(n / 2))) { # limit swaps if user provides a meaningless number
     n_swaps[n_swaps > floor(n / 2)] <- floor(n / 2)
@@ -439,10 +450,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             acceptance_func = accept_best_solution,
                             aggregate_scores_func = first_score_only,
                             max_iter = 1e4, min_score = NA, quiet = FALSE) {
-
-  # This is an alternative implementation to assign_score_optimize_shuffle()
-
   start_time <- Sys.time()
+
+  # based on https://stat.ethz.ch/pipermail/r-help/2007-September/141717.html
+  if (!exists(".Random.seed")) stats::runif(1)
+  save_random_seed <- .Random.seed
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
@@ -625,7 +637,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   batch_container$move_samples(location_assignment = best_perm)
 
   trace$shrink(iteration)
-  trace$seed <-  if (exists(".Random.seed")) .Random.seed else NA
+  trace$seed <-  save_random_seed
   trace$elapsed <- Sys.time() - start_time
   trace
 }

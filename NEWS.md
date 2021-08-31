@@ -1,3 +1,8 @@
+# designit 0.2.0
+
+* new optimizer `optimize_design()`
+* various API improvements
+
 # designit 0.1.0
 
 * `BatchContainer` major API update

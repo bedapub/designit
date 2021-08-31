@@ -5,6 +5,10 @@ variables:
   R_LIBS_USER: "$CI_PROJECT_DIR/ci/lib"
   CHECK_DIR: "$CI_PROJECT_DIR/ci/logs"
   BUILD_LOGS_DIR: "$CI_PROJECT_DIR/ci/logs/$CI_PROJECT_NAME.Rcheck"
+  # github returns 401; personal access token of davydovi (idavydov) is supposed to help
+  # see here: https://github.com/r-lib/remotes/issues/330#issuecomment-578474009
+  # this token is valid till August 2022
+  GITHUB_PAT: "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"
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -27,7 +31,7 @@ pages:
     - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_local())'
     - Rscript -e 'pkgdown::build_site()'
     - (cd docs && zip -r ../ci/docs.zip .)
-    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/devel"
+    - 'curl -X POST --header "Docat-Api-Key: $DOCAT_API_KEY" -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/devel"'
     - mv docs public
   artifacts:
     paths:
@@ -47,7 +51,7 @@ docs:
     - Rscript -e 'pkgdown::build_site()'
     - (cd docs && zip -r ../ci/docs.zip .)
     - "echo Version: $VERSION"
-    - curl -X POST -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/$VERSION"
-    - curl -X PUT "http://docs.roche.com/api/designit/$VERSION/tags/latest"
+    - 'curl -X POST --header "Docat-Api-Key: $DOCAT_API_KEY" -F "file=@ci/docs.zip" "http://docs.roche.com/api/designit/$VERSION"'
+    - 'curl -X PUT --header "Docat-Api-Key: $DOCAT_API_KEY" "http://docs.roche.com/api/designit/$VERSION/tags/latest"'
   only:
     - tags

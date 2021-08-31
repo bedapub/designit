@@ -16,7 +16,6 @@ knitr::opts_chunk$set(
 ```
   
 ```{r setup}
-if (!requireNamespace("tidyverse", quietly = TRUE)) rlang::abort("Tidyverse required!")
 library(designit)
 ```
   
@@ -65,7 +64,7 @@ bc <- BatchContainer$new(
 # Add samples to container
 assign_in_order(bc, samples = multi_trt_day_samples)
 # Set scoring function
-bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
+bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
 
 bc
 ```
@@ -82,8 +81,7 @@ two different positions anyway. The upper limit is reduced to the max number of 
 Optimization finishes after the list of permutations is exhausted.
 
 ```{r}
-
-n_shuffle <- rep(c(32, 10, 5, 2, 1), c(100, 200, 200, 300, 300))
+n_shuffle <- rep(c(32, 10, 5, 2, 1), c(20, 40, 40, 50, 50))
 
 
 bc1 <- bc$copy()
@@ -108,7 +106,6 @@ ggplot2::qplot(x = seq_along(trace1$scores), y = trace1$scores, color = factor(n
 Using the internal method...
 
 ```{r, fig.width=5, fig.height= 4}
-
 trace1$plot()
 ```
 
@@ -116,13 +113,16 @@ We may safely apply the batch container methods get_samples() and score() also a
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
-
 bc1$score()
 
 bc1$get_samples(assignment = TRUE) %>%
-  dplyr::mutate(batch = factor(batch)) %>%
-  ggplot2::ggplot(ggplot2::aes(x = batch, fill = Treatment, alpha = factor(Time))) +
-  ggplot2::geom_bar()
+  dplyr::filter(!is.na(Treatment)) %>%
+  dplyr::mutate(anno = stringr::str_c(Time," hr")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
+  ggplot2::geom_tile(color="white") +
+  ggplot2::geom_hline(yintercept = 5.5, size=1) + 
+  ggplot2::geom_text(ggplot2::aes(label=anno)) +
+  ggplot2::labs(x="Batch", y="Position . Run")
 ```
 
 ## Perform new iterations on optimized batch container
@@ -131,8 +131,7 @@ Further optimization (using a different shuffling protocol maybe) can be done im
 on the same batch container.
 
 ```{r}
-
-n_shuffle <- rep(c(5, 2, 1), c(100, 100, 200))
+n_shuffle <- rep(c(5, 2, 1), c(30, 30, 30))
 
 optimize_design(
   bc1,
@@ -150,16 +149,14 @@ and can be called an arbitrary number of times. Thus, iteration has to be stoppe
 criterion or by reaching a specific target score.
 
 ```{r}
-
 bc2 <- bc$copy()
 
 optimize_design(
   bc2,
   n_shuffle = 3, # will implicitly generate a shuffling function that will do 3 swaps at each iteration
-  max_iter = 1000,
+  max_iter = 200,
   min_score = 3.0
 )
-
 ```
 
 
@@ -174,19 +171,18 @@ However, the user may specify other methods for the aggregating of the scores.
 The second scoring function used here is rather redundant and just serves as illustration.
 
 ```{r}
-
 bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 
 optimize_design(
   bc3,
   n_shuffle = 3,
-  max_iter = 500,
+  max_iter = 200,
   min_score = 2.6
 )
 ```
@@ -195,12 +191,11 @@ Next, we repeat the optimization by using an aggregation function that takes the
 decide on the best iteration. (It has the same effect in this example though.)
 
 ```{r}
-
 bc4 <- bc$copy()
 
 bc4$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 
@@ -208,7 +203,7 @@ optimize_design(
   bc4,
   n_shuffle = 3,
   aggregate_scores_func = worst_score_only,
-  max_iter = 500,
+  max_iter = 200,
   min_score = 2.6
 )
 ```
@@ -219,19 +214,18 @@ distance vectors or normalized n-tuples.
 
 We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
 
-```{r}
-
+```{r, eval = FALSE}
 bc5 <- bc$copy()
 
 bc5$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
 )
 
 optimize_design(
   bc5,
   aggregate_scores_func = L2s_norm,
-  max_iter = 500,
+  max_iter = 200,
   min_score = 2.6
 )
 ```
@@ -246,13 +240,12 @@ The following example uses a template for creating complete random shuffles acro
 Note that this is usually not a good strategy for converging to a solution.
 
 ```{r}
-
 bc6 <- bc$copy()
 
 optimize_design(
   bc6,
   shuffle_proposal_func = mk_complete_random_shuffling_function(batch_container = bc6),
-  max_iter = 500,
+  max_iter = 200,
   min_score = 2.6
 )
 ```
@@ -268,20 +261,18 @@ can be changed by supplying a simulated annealing protocol, most simply by gener
 It is generally recommended for SA to make small changes at each step, like allowing just 1 sample swap per iteration.
 
 ```{r}
-
 bc7 <- bc$copy()
 
 trace7 <- optimize_design(
   bc7,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(),
-  max_iter = 500
+  max_iter = 200
 )
 ```
 The trace may show a non strictly monotonic behavior now, reflecting the SA protocol at work.
 
 ```{r, fig.width=5, fig.height= 4}
-
 trace7$plot()
 ```
 
@@ -289,14 +280,13 @@ Better results and quicker convergence may be achieved by playing with the start
 cooling speed (alpha) in a specific case.
 
 ```{r}
-
 bc8 <- bc$copy()
 
 trace8 <- optimize_design(
   bc8,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 100, alpha = 2)),
-  max_iter = 200
+  max_iter = 150
 )
 
 trace8$plot()
@@ -307,14 +297,13 @@ trace8$plot()
 The following example puts together all possible options to illustrate the flexibility of the optimization.
 
 ```{r}
-
 bc$scoring_f <- list(
-  function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Treatment"))$score,
-  function(samples) osat_score(samples, c("batch"), c("Time"))$score
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment")),
+  osat_score_generator(c("batch"), c("Time"))
 )
 
-n_shuffle <- rep(c(3, 2, 1), c(100, 100, 400))
+n_shuffle <- rep(c(3, 2, 1), c(20, 20, 100))
 
 trace <- optimize_design(
   bc,

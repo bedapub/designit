@@ -21,7 +21,6 @@ knitr::opts_chunk$set(
 ```
   
 ```{r setup}
-if (!requireNamespace("tidyverse", quietly = TRUE)) rlang::abort("Tidyverse required!")
 library(designit)
 ```
 
@@ -49,7 +48,6 @@ In order to indicate the irrelevance of the litter for the females, a pseudo-lit
 to group all the females together, marking them as interchangeable within this group.
 
 ```{r}
-
 treatment_names <- c("Control", "Compound")
 
 treatments <- factor(rep(treatment_names, each = 10))
@@ -78,7 +76,6 @@ Note that positions do not actually matter; this is just to fix the number of an
 We assign samples, retaining initially the order given by the sample list.
 
 ```{r}
-
 # Question: Can one pass a location assignment directly, e.g. the vector 'treatments'?
 # Currently:
 # Error: Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers 
@@ -97,17 +94,14 @@ An OSAT scoring function should ensure even distribution of treatments across Ge
 and `sex` interactions are considered in the scoring function.
 
 ```{r}
-bc$scoring_f <- function(samples) {
-  osat_score(
-    samples,
+bc$scoring_f <- osat_score_generator(
     batch_vars = "Treatment",
     feature_vars = c("Genotype", "Sex"),
-  )$score
-}
+  )
 
 # Avoid this - it does not take care of the interaction between the variables
-# bc$scoring_f <- list( function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype"))$score },
-#                      function(samples) { osat_score(samples, batch_vars = "Treatment", feature_vars = c("Sex"))$score }
+# bc$scoring_f <- list(osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype")),
+#                      osat_score_generator(batch_vars = "Treatment", feature_vars = c("Sex"))
 #                      )
 ```
 
@@ -134,7 +128,6 @@ about the samples, the allocation variable and the sizes of the subgroups that h
 decided, however, which animal will end up in which subgroup. This will be a matter of optimization later on.
 
 ```{r}
-
 subg <- form_homogeneous_subgroups(
   batch_container = bc, allocate_var = "Treatment",
   keep_together_vars = c("Genotype", "Sex"),
@@ -166,7 +159,6 @@ treated animals.
 
 
 ```{r}
-
 possible <- compile_possible_subgroup_allocation(subg)
 ```
 
@@ -197,7 +189,6 @@ shuffle_proposal()
 We can finally use the customized shuffling function in the optimization and may quickly inspect the solution afterwards.
 
 ```{r}
-
 bc2 <- bc$copy()
 
 trace = optimize_design(
@@ -219,7 +210,6 @@ dplyr::count(design, Treatment, Genotype, Sex) %>% gt::gt()
 
 # Not subject to a constraint
 dplyr::group_by(design, Treatment) %>% dplyr::summarize(mean(Bodyweight)) %>% gt::gt()
-
 ```
 
 The permutation function actually also constructs a 'Cage' variable (see parameter \code{subgroup_var_name} in the call to
@@ -227,7 +217,6 @@ The permutation function actually also constructs a 'Cage' variable (see paramet
 use flag \code{report_grouping_as_attribute} in the construction of the permutation function.
 
 ```{r}
-
 shuffle_proposal2 <- shuffle_with_subgroup_formation(subg, possible, report_grouping_as_attribute = TRUE)
 
 shuffle_proposal2()
@@ -242,7 +231,6 @@ design <- bc2$get_samples()
 
 # Not subject to a constraint
 dplyr::group_by(design, Cage) %>% dplyr::summarize(mean(Bodyweight)) %>% gt::gt()
-
 ```
 
 # Example 1: One-step optimization
@@ -253,16 +241,11 @@ can be used for the optimization.
 Let's take the chance and add one more scoring function for the equal distribution of body weights across treatment groups.
 
 ```{r}
-
 bc3 <- bc$copy()
 
 bc3$scoring_f <- list(
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
-  }
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype", "Sex")),
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Bodyweight"))
 )
 
 optimize_design(
@@ -284,7 +267,6 @@ optimize_design(
 design <- bc3$get_samples()
 
 design %>% gt::gt()
-
 ```
 The updated sample sheet (enriched by the subgroup information which corresponds to the cages)
 corresponds to our first design step. We have formed cages and assigned treatments to the animals.
@@ -306,7 +288,6 @@ subgroup (i.e. cage). It turns out that no solution can be found under these cir
 no way to get at least 2 males in one cage.
 
 ```{r}
-
 bc4 <- bc$copy()
 
 optimize_design(
@@ -326,7 +307,6 @@ from the size constraints if needed. (Another option is to modify the size const
 Inspection of the solution indeed shows that we have quite a few isolated male animals now.
 
 ```{r}
-
 optimize_design(
   bc4,
   shuffle_proposal_func = shuffle_grouped_data(bc4,
@@ -358,7 +338,6 @@ As you can see, the 'keep separate' constraint is then automatically loosened st
 One cage will remain with an earmark duplication, which has to be accepted as the best possible option in this case.
 
 ```{r}
-
 bc5 <- bc$copy()
 
 optimize_design(
@@ -389,19 +368,12 @@ can be used for the optimization.
 Let's take the chance and add one more scoring function for the equal distribution of body weights across treatment groups.
 
 ```{r}
-
 bc6 <- bc$copy()
 
 bc6$scoring_f <- list(
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Genotype", "Sex"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Treatment", feature_vars = c("Bodyweight"))$score
-  },
-  function(samples) {
-    osat_score(samples, batch_vars = "Cage", feature_vars = c("Bodyweight"))$score
-  }
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Genotype", "Sex")),
+  osat_score_generator(batch_vars = "Treatment", feature_vars = c("Bodyweight")),
+  osat_score_generator(batch_vars = "Cage", feature_vars = c("Bodyweight"))
 )
 
 optimize_design(
@@ -426,7 +398,6 @@ design %>%
   gt::gt()
 
 dplyr::group_by(design, Cage) %>% dplyr::summarize(mean(Bodyweight))  %>% gt::gt()
-
 ```
 The updated sample sheet (enriched by the subgroup information which corresponds to the cages)
 corresponds to our first design step. We have formed cages and assigned treatments to the animals.

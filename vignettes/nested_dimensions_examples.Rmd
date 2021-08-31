@@ -56,7 +56,7 @@ bc$samples <- multi_trt_day_samples
 # Initial random assignment
 assign_in_order(bc)
 # Set scoring function
-bc$scoring_f <- function(samples) osat_score(samples, c("batch"), c("Treatment", "Time"))$score
+bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
 
 bc
 ```
@@ -140,7 +140,7 @@ For this we keep the optimized `batch` and now only optimize `run` with constrai
 n_iterations <- 100
 
 # assign new optimization function
-bc$scoring_f <- function(samples) osat_score(samples, c("run"), c("Treatment", "Time"))$score
+bc$scoring_f <- osat_score_generator(c("run"), c("Treatment", "Time"))
 # like this the optimization score is wrong because it tries to optimize across Batches.
 # Possible ways to go:
 # - we'd need something like c("batch", batch/run") for optimize by batch and run within batch.
@@ -207,7 +207,7 @@ bc$get_samples() %>%
 <!-- set.seed(42) # should we have conventions for this? -->
 
 <!-- # Set scoring function -->
-<!-- bc$scoring_f <- function(samples) osat_score(samples, c("batch", "run"), c("Treatment", "Time"))$score -->
+<!-- bc$scoring_f <- osat_score_generator(c("batch", "run"), c("Treatment", "Time")) -->
 
 <!-- # initial score -->
 <!-- #bc$score() -->
