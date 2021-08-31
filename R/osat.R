@@ -51,12 +51,23 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
     batch_df[, .freq_batch := .n_batch / sum(.n_batch), data.table::.SD]
     batch_df[, .n_batch := NULL]
 
-    features_df <- na.omit(df)[, .(.n_samples = .N), by = feature_vars]
+    features_df <- df[, .(.n_samples = .N), by = feature_vars]
 
     # https://stackoverflow.com/a/14165493
     expected_dt <- data.table::setkey(batch_df[, c(k = 1, .SD)], k)[features_df[, c(k = 1, .SD)], allow.cartesian = TRUE][, k := NULL]
     expected_dt[, .n_expected := .n_samples * .freq_batch]
     expected_dt[, c(".n_samples", ".freq_batch") := NULL]
+
+    n_rows <- nrow(expected_dt)
+    expected_dt <- na.omit(expected_dt)
+    rows_removed <- n_rows - nrow(expected_dt)
+
+    assertthat::assert_that(nrow(expected_dt) > 0,
+      msg = "All elements of one of the features / batches are NAs"
+    )
+    if (rows_removed > 0) {
+      warning("NAs in features / batch columns; they will be excluded from scoring")
+    }
 
     data.table::setkeyv(expected_dt, c(batch_vars, feature_vars))
   } else {
@@ -69,7 +80,7 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
       msg = glue::glue("expecting column names in expected_dt: {expected_colnames_str}")
     )
   }
-  sample_count_df <- na.omit(df)[, .N, by = c(feature_vars, batch_vars)]
+  sample_count_df <- na.omit(df[, .N, by = c(feature_vars, batch_vars)])
   data.table::setkeyv(sample_count_df, c(feature_vars, batch_vars))
   merged_df <- merge(sample_count_df, expected_dt, all = TRUE)
   merged_df[is.na(N), N := 0]
