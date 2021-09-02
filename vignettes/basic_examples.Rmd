@@ -19,37 +19,6 @@ library(designit)
 library(tidyverse)
 ```
 
-<!-- ## Example 1 -->
-
-<!-- This is a basic example: -->
-
-<!-- ```{r example1} -->
-<!-- anno <- tribble( -->
-<!--   ~Cell,         ~Trt, ~Type, ~Rep, -->
-<!--    "WT",    "treated",   "A",    1, -->
-<!--    "WT",    "treated",   "A",    2,   -->
-<!--    "WT", "nontreated",   "A",    1, -->
-<!--    "WT", "nontreated",   "A",    2, -->
-<!--    "WT",    "control",   "A",    1, -->
-<!--    "WT",    "control",   "A",    2, -->
-<!--    "WT",    "treated",   "B",    1, -->
-<!--    "WT",    "treated",   "B",    2,   -->
-<!--    "WT", "nontreated",   "B",    1, -->
-<!--    "WT", "nontreated",   "B",    2, -->
-<!--    "WT",    "control",   "A",    1, -->
-<!--    "WT",    "control",   "A",    2, -->
-<!--    "KO",    "treated",   "A",    1, -->
-<!--    "KO",    "treated",   "A",    2,   -->
-<!--    "KO", "nontreated",   "A",    1, -->
-<!--    "KO", "nontreated",   "A",    2, -->
-<!--    "KO",    "treated",   "B",    1, -->
-<!--    "KO",    "treated",   "B",    2,   -->
-<!--    "KO", "nontreated",   "B",    1, -->
-<!--    "KO", "nontreated",   "B",    2,   -->
-<!-- ) -->
-<!-- ``` -->
-
-
 # Plate layout with two factors
 
 ## The samples
@@ -76,12 +45,14 @@ We will have 3 animals per groups with 4 replicates each
 # sample table (2 animals per group with 3 replicates)
 n_reps <- 4
 n_animals <- 3
-samples <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), .id = 'animal') 
-samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 'replicate') %>%
+animals <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), 
+                            .id = 'animal') 
+samples <- dplyr::bind_rows(replicate(n_reps, animals, simplify = FALSE), 
+                            .id = 'replicate') %>%
   dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
                 AnimalID = paste0(treatment,'_',animal))
 
-gt::gt(samples)
+samples %>% head(10) %>% gt::gt()
 ```
 ## Plate layout requirements
 
@@ -129,9 +100,11 @@ bc$get_samples(remove_empty_locations = TRUE)
 
 Plot of the result using the `plot_plate` function
 
-```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
-           .color = treatment, .alpha = dose)
+```{r, fig.width=6, fig.height=4}
+plot_plate(
+  bc$get_samples(remove_empty_locations = FALSE),
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) 
 ```
 
 To move individual samples or manually assigning all locations we can use the 
@@ -221,3 +194,4 @@ plot_plate(
            .color = treatment, .alpha = dose) +
   scale_fill_manual(values = c(color_vector, empty = 'white'), na.value="darkgray")
 ```
+
