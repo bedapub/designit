@@ -152,8 +152,8 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)
     g <- g +
-      ggplot2::aes(alpha = {{ .alpha }}) +
-      ggplot2::scale_alpha(range = alpha_range)
+      ggplot2::aes(alpha = {{ .alpha }}) #+
+      #ggplot2::scale_alpha(range = alpha_range) # why would we need this?
   }
 
   # set labels as original variables
