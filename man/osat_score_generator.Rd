@@ -33,8 +33,10 @@ sample_assignment <- tibble::tribble(
   NA, NA, NA, 2,
 )
 
-osat_scoring_function <- osat_score_generator(batch_vars = "plate",
-                                              feature_vars = c("SampleType", "Sex"))
+osat_scoring_function <- osat_score_generator(
+  batch_vars = "plate",
+  feature_vars = c("SampleType", "Sex")
+)
 
 osat_scoring_function(sample_assignment)
 }
