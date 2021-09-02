@@ -36,13 +36,15 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 
 #' Plot plate layouts
 #'
-#' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations. Alternatively a [BatchContainter][designit::BatchContainer()] with samples can be supplied here.
-#' @param plate the dimension variable used for the plate ids
+#' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations.
+#' Alternatively a [BatchContainter][designit::BatchContainer()] with samples can be supplied here.
+#' @param plate optional dimension variable used for the plate ids
 #' @param row the dimension variable used for the row ids
 #' @param column the dimension variable used for the column ids
 #' @param .color the continuous or discrete variable to color by
 #' @param .alpha a continuous variable encoding transparency
 #' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
+#' @param title string for the plot title
 #'
 #' @return the ggplot object
 #' @export
@@ -85,8 +87,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'   .color = Treatment, .pattern = Timepoint
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
-                       .color, .alpha = NULL, .pattern = NULL) {
-  # preven undefined variable error
+                       .color, .alpha = NULL, .pattern = NULL,
+                       title = paste("Layout by", rlang::as_name(rlang::enquo(plate)))) {
+  # prevent undefined variable error
   Pattern <- NULL
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
@@ -96,8 +99,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
 
   add_pattern <- FALSE
-  # check dimensions
-  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
+  # check parameters
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(row))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(column))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.color))))
@@ -113,6 +115,18 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       .tbl <- .tbl %>%
         dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
     }
+  }
+  if (!rlang::quo_is_null(rlang::enquo(plate))) {
+    assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
+  } else {
+    assertthat::assert_that(
+      (.tbl %>% count({{ column }}, {{ row }}) %>% nrow()) ==
+        nrow(.tbl),
+      msg = "Non-unique row + column combination found. Please provide a plate variable.")
+    # make a fake plate variable
+    .tbl <- .tbl %>%
+      dplyr::mutate(plate = 1)
+    plate <- rlang::sym("plate")
   }
 
   .tbl <- .tbl %>%
@@ -145,7 +159,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   # set labels as original variables
   g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(column))) +
     ggplot2::ylab(rlang::as_name(rlang::enquo(row))) +
-    ggplot2::ggtitle(paste("Layout by", rlang::as_name(rlang::enquo(plate))))
+    ggplot2::ggtitle(title)
 
   # make tiles
   if (add_pattern) {
