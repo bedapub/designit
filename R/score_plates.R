@@ -59,7 +59,7 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
     group_fac = factor(as.character(samples[[group]][nonempty_pos]), exclude=NULL)
 
     n_group = nlevels(group_fac)
-    group_lev_table = setNames(1:n_group, nm=levels(group_fac))
+    group_lev_table = stats::setNames(1:n_group, nm=levels(group_fac))
 
     if (!is.null(plate)) { # But now focus on the relevant plate only for remaining checks
       samples = dplyr::filter(samples, !!as.symbol(plate) == plate_name)
@@ -121,11 +121,11 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
   if (is.null(plate) || dplyr::n_distinct(dplyr::pull(samp, plate))==1) { # can skip differentiation of plates since there's only one
     score_funcs = list("Plate" = plate_scoring_func(samp, plate=NULL, plate_name = "", row=row, column=column, group=group))
   } else {
-    samp = dplyr::group_by(samp, across(all_of(plate)))
+    samp = dplyr::group_by(samp, dplyr::across(dplyr::all_of(plate)))
     plate_names = dplyr::pull(dplyr::group_keys(samp),1)
 
     score_funcs = purrr::map(plate_names, ~ plate_scoring_func(samp, plate=plate, plate_name=.x, row=row, column=column, group=group)) %>%
-      setNames(nm=paste("Plate", plate_names))
+      stats::setNames(nm=paste("Plate", plate_names))
   }
 
   score_funcs
