@@ -191,7 +191,8 @@ trace$plot()
 The layout after plate batching looks the following
 
 ```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 ```
 
@@ -201,4 +202,22 @@ Looking at treatment, we see it's evenly distributed across the plates
 ggplot(bc$get_samples(remove_empty_locations = TRUE),
        aes(x = treatment, fill = treatment)) + geom_bar() +  
    facet_wrap(~plate)
+```
+
+## Customizing the plate layout
+
+To properly distinguish between empty and excluded locations one can do the
+following.
+
+```{r}
+color_vector <- RColorBrewer::brewer.pal(length(unique(samples$treatment)),
+                                         name = "Set1")
+names(color_vector) <- unique(samples$treatment)
+plot_plate(
+  bind_rows(bc$get_samples(remove_empty_locations = FALSE) %>% 
+              mutate(treatment = ifelse(is.na(treatment), "empty", treatment)),
+            bc$exclude),
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) +
+  scale_fill_manual(values = c(color_vector, empty = 'white'), na.value="darkgray")
 ```
