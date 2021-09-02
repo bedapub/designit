@@ -11,13 +11,15 @@ plot_plate(
   column = column,
   .color,
   .alpha = NULL,
-  .pattern = NULL
+  .pattern = NULL,
+  title = paste("Layout by", rlang::as_name(rlang::enquo(plate)))
 )
 }
 \arguments{
-\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations. Alternatively a \link[=BatchContainer]{BatchContainter} with samples can be supplied here.}
+\item{.tbl}{a \code{\link[tibble:tibble]{tibble}} (or \code{data.frame}) with the samples assigned to locations.
+Alternatively a \link[=BatchContainer]{BatchContainter} with samples can be supplied here.}
 
-\item{plate}{the dimension variable used for the plate ids}
+\item{plate}{optional dimension variable used for the plate ids}
 
 \item{row}{the dimension variable used for the row ids}
 
@@ -28,6 +30,8 @@ plot_plate(
 \item{.alpha}{a continuous variable encoding transparency}
 
 \item{.pattern}{a discrete variable encoding tile pattern (needs ggpattern)}
+
+\item{title}{string for the plot title}
 }
 \value{
 the ggplot object
