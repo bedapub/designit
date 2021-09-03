@@ -48,12 +48,13 @@ We will have 3 animals per groups with 4 replicates each
 # sample table (2 animals per group with 3 replicates)
 n_reps <- 4
 n_animals <- 3
-animals <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), 
+animals <- bind_rows(replicate(n_animals, conditions, simplify = FALSE), 
                             .id = 'animal') 
-samples <- dplyr::bind_rows(replicate(n_reps, animals, simplify = FALSE), 
+samples <- bind_rows(replicate(n_reps, animals, simplify = FALSE), 
                             .id = 'replicate') %>%
-  dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
-                AnimalID = paste0(treatment,'_',animal)) 
+  mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
+                AnimalID = paste0(treatment,'_',animal)) %>% 
+  mutate(dose = factor(dose))
 
 samples %>% head(10) %>% gt::gt()
 ```
