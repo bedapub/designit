@@ -12,7 +12,9 @@ plot_plate(
   .color,
   .alpha = NULL,
   .pattern = NULL,
-  title = paste("Layout by", rlang::as_name(rlang::enquo(plate)))
+  title = paste("Layout by", rlang::as_name(rlang::enquo(plate))),
+  add_excluded = FALSE,
+  rename_empty = FALSE
 )
 }
 \arguments{
@@ -32,6 +34,11 @@ Alternatively a \link[=BatchContainer]{BatchContainter} with samples can be supp
 \item{.pattern}{a discrete variable encoding tile pattern (needs ggpattern)}
 
 \item{title}{string for the plot title}
+
+\item{add_excluded}{flag to add excluded wells (in bc$exclude) to the plot.
+A BatchContainer must be provided for this.}
+
+\item{rename_empty}{whether NA entries in sample table should be renamed to 'empty`.}
 }
 \value{
 the ggplot object
