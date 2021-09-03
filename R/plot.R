@@ -45,6 +45,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @param .alpha a continuous variable encoding transparency
 #' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
 #' @param title string for the plot title
+#' @param add_excluded flag to add excluded wells (in bc$exclude) to the plot.
+#' A BatchContainer must be provided for this.
+#' @param rename_empty whether NA entries in sample table should be renamed to 'empty`.
 #'
 #' @return the ggplot object
 #' @export
@@ -88,9 +91,16 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL,
-                       title = paste("Layout by", rlang::as_name(rlang::enquo(plate)))) {
+                       title = paste("Layout by", rlang::as_name(rlang::enquo(plate))),
+                       add_excluded = FALSE,
+                       rename_empty = FALSE) {
   # prevent undefined variable error
   Pattern <- NULL
+
+  if (add_excluded) {
+    assertthat::assert_that(checkmate::test_r6(.tbl, "BatchContainer"))
+    excluded <- .tbl$exclude
+  }
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
     .tbl = .tbl$get_samples()
@@ -116,6 +126,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
         dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
     }
   }
+  # If there is no plate, check if row and column are unique and make dummy variable
   if (!rlang::quo_is_null(rlang::enquo(plate))) {
     assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
   } else {
@@ -127,6 +138,16 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     .tbl <- .tbl %>%
       dplyr::mutate(plate = 1)
     plate <- rlang::sym("plate")
+  }
+  # change NA values for empty wells
+  if (rename_empty) {
+    .tbl <- .tbl %>%
+      dplyr::mutate(!!rlang::enquo(.color) :=
+                      ifelse(is.na({{ .color }}), "empty", {{ .color }}))
+  }
+  # add excluded wells
+  if (add_excluded) {
+    .tbl <- dplyr::bind_rows(.tbl, excluded)
   }
 
   .tbl <- .tbl %>%
@@ -173,9 +194,9 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       # this is required, see https://github.com/coolbutuseless/ggpattern/issues/50
       ggpattern::scale_pattern_discrete()
   } else {
-    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{ .color }}),
-      colour = "grey50"
-    )
+    g <- g + ggplot2::geom_tile(
+      ggplot2::aes(fill = {{ .color }}),
+      colour = "grey50")
   }
 
   return(g)
