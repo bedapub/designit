@@ -132,8 +132,8 @@ To assign all samples in one go, use the option `location_assignment`.
 The example below orders samples by ID and adds the empty locations afterwards
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(
-  location_assignment = as.integer(c(1:nrow(samples), 
-                                     rep(NA, (bc$n_available - nrow(samples))))))
+  location_assignment = c(1:nrow(samples), 
+                          rep(NA, (bc$n_available - nrow(samples)))))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE), 
            plate = plate, column = column, row = row,
