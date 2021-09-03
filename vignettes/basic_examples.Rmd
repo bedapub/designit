@@ -101,31 +101,39 @@ bc$get_samples(remove_empty_locations = TRUE)
 
 ```
 
-
 Plot of the result using the `plot_plate` function
 
-```{r, fig.width=6, fig.height=4}
-plot_plate(
-  bc$get_samples(remove_empty_locations = FALSE),
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc, plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose)
+```
+To not show empty wells, we can directly plot the sample table as well
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
            plate = plate, column = column, row = row,
-           .color = treatment, .alpha = dose) 
+           .color = treatment, .alpha = dose)
 ```
 
 To move individual samples or manually assigning all locations we can use the 
 `batchContainer$move_samples()` method
 
 To swap two or more samples use
+
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
 
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 ```
 
 To assign all samples in one go, use the option `location_assignment`.
 The example below orders samples by ID and adds the empty locations afterwards
 ```{r, fig.width=6, fig.height=3.5}
-bc$move_samples(location_assignment = as.integer(c(1:nrow(samples), rep(NA, (bc$n_available - nrow(samples))))))
+bc$move_samples(
+  location_assignment = as.integer(c(1:nrow(samples), 
+                                     rep(NA, (bc$n_available - nrow(samples))))))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE), 
            plate = plate, column = column, row = row,
@@ -164,7 +172,6 @@ Development of the score can be viewed with
 trace$plot()
 ```
 
-
 The layout after plate batching looks the following
 
 ```{r, fig.width=6, fig.height=3.5}
@@ -186,14 +193,39 @@ ggplot(bc$get_samples(remove_empty_locations = TRUE),
 To properly distinguish between empty and excluded locations one can do the
 following.
 
-```{r}
-color_vector <- c(TRT1 = "blue", TRT2 = "orange", vehicle = "purple")
-plot_plate(
-  bind_rows(bc$get_samples(remove_empty_locations = FALSE) %>% 
-              mutate(treatment = ifelse(is.na(treatment), "empty", treatment)),
-            bc$exclude),
-           plate = plate, column = column, row = row,
-           .color = treatment, .alpha = dose) +
-  scale_fill_manual(values = c(color_vector, empty = 'white'), na.value="darkgray")
+* Supply the BatchContainer directly
+* set `add_excluded = TRUE`, set `rename_empty = TRUE`
+* supply a custom color palette
+* excluded wells have NA values and can be colored with `na.value`
+
+```{r, fig.width=6, fig.height=3.5}
+color_palette <- c(TRT1 = "blue", TRT2 = "purple", 
+                   vehicle = "orange", empty = "white")
+
+plot_plate(bc, plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose,
+           add_excluded = TRUE, rename_empty = TRUE) +
+  scale_fill_manual(values = color_palette, na.value = "darkgray")
 ```
 
+To remove all empty wells from the plot, hand the pruned sample list.
+to plot_plate rather than the whole BatchContainer.
+You can still assign your own colors.
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) +
+  scale_fill_viridis_d()
+```
+
+Note: removing all empty and excluded wells will lead to omitting 
+completely empty rows or columns!
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE) %>% 
+             filter(column != 2), 
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) +
+  scale_fill_viridis_d()
+```
