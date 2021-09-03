@@ -126,13 +126,12 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
         dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
     }
   }
-  # If there is no plate, check if row and column are unique and make dummy variable
-  if (!rlang::quo_is_null(rlang::enquo(plate))) {
-    assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
-  } else {
+  # If there is no plate,
+  if (rlang::quo_is_null(rlang::enquo(plate)) ||
+      !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
+    # check if row + column is unique
     assertthat::assert_that(
-      (.tbl %>% count({{ column }}, {{ row }}) %>% nrow()) ==
-        nrow(.tbl),
+      (.tbl %>% count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
       msg = "Non-unique row + column combination found. Please provide a plate variable.")
     # make a fake plate variable
     .tbl <- .tbl %>%
