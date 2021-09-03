@@ -224,7 +224,7 @@ completely empty rows or columns!
 
 ```{r, fig.width=6, fig.height=3.5}
 plot_plate(bc$get_samples(remove_empty_locations = TRUE) %>% 
-             filter(column != 2), 
+             filter(column != 2),
            plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose) +
   scale_fill_viridis_d()
