@@ -131,7 +131,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
     # check if row + column is unique
     assertthat::assert_that(
-      (.tbl %>% count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
+      (.tbl %>% dplyr::count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
       msg = "Non-unique row + column combination found. Please provide a plate variable.")
     # make a fake plate variable
     .tbl <- .tbl %>%
