@@ -91,7 +91,7 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
 
 #' Convenience wrapper for the OSAT score
 #'
-#' This function wraps \code{osat_score()} in order to take full advantage of the speed gain without
+#' This function wraps [osat_score()] in order to take full advantage of the speed gain without
 #' managing the buffered objects in the user code.
 #'
 #' @param batch_vars [character] vector with batch variable names to take into account for the
