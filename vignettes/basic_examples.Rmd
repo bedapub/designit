@@ -164,8 +164,8 @@ This function will assess how well treatment
 and dose are balanced across the two plates.
 
 ```{r}
-bc$scoring_f <- function(samples) osat_score(samples, batch_vars = "plate", 
-                                             feature_vars = c("treatment", "dose"))$score
+bc$scoring_f <- osat_score_generator(batch_vars = "plate",
+                                     feature_vars = c("treatment", "dose"))
 ```
 
 ## Run an optimization
