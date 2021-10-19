@@ -376,7 +376,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field n_locations
-    #' Returns number of available locations in a `BatchContainer`.
+    #' Returns number of locations in a `BatchContainer`. This number can be larger than
+    #' `n_available` since it does not take excluded locations into account.
     #' This field cannot be assigned.
     n_locations = function(value) {
       if (missing(value)) {
