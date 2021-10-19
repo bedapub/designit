@@ -64,7 +64,7 @@ assign_in_order <- function(batch_container, samples = NULL) {
 #' Additionally a special variable `.src` is available in this environment which
 #' describes the selected source row from the table.
 #'
-#' @return Returns a function which accepts a data.table (`dt`) and an iteration
+#' @return Returns a function which accepts a `BatchContainer` and an iteration
 #' number (`i`). This function returns a list with two names: `src` vector of length
 #' 2 and `dst` vector of length two. See [`BatchContainer$move_samples()`][BatchContainer].
 #'
@@ -72,7 +72,8 @@ assign_in_order <- function(batch_container, samples = NULL) {
 shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
   src <- enquo(src)
   dst <- enquo(dst)
-  function(dt, i) {
+  function(bc, i) {
+    dt <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
     src_ind <- which(rep_len(TRUE, nrow(dt)) & rlang::eval_tidy(src, dt))
     assertthat::assert_that(length(src_ind) > 0,
       msg = "source conditions not satisfied"
