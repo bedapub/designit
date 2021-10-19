@@ -40,7 +40,8 @@ In the later case each function is called.}
 
 \item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
 
-\item{\code{n_locations}}{Returns number of available locations in a \code{BatchContainer}.
+\item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}. This number can be larger than
+\code{n_available} since it does not take excluded locations into account.
 This field cannot be assigned.}
 
 \item{\code{n_excluded}}{Returns number of excluded locations in a \code{BatchContainer}.

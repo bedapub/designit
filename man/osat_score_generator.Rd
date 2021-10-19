@@ -4,7 +4,7 @@
 \alias{osat_score_generator}
 \title{Convenience wrapper for the OSAT score}
 \usage{
-osat_score_generator(batch_vars, feature_vars)
+osat_score_generator(batch_vars, feature_vars, quiet = FALSE)
 }
 \arguments{
 \item{batch_vars}{\link{character} vector with batch variable names to take into account for the
@@ -12,6 +12,8 @@ score computation.}
 
 \item{feature_vars}{\link{character} vector with sample variable names to take into account for
 score computation.}
+
+\item{quiet}{Do not warn about \code{NA}s in feature columns.}
 }
 \value{
 A function that returns the OSAT score for a specific sample arrangement
