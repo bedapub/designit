@@ -1,5 +1,5 @@
 #' OptimizationTrace represents optimization trace.
-#' Usually it is created by [assign_score_optimize_shuffle()].
+#' Usually it is created by [optimize_design()].
 OptimizationTrace <- R6::R6Class("OptimizationTrace",
   public = list(
     #' @field scores
