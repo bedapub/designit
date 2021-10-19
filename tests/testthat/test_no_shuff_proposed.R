@@ -11,7 +11,8 @@ bc$scoring_f <- function(...) rnorm(1)
 
 test_that("No shuffling proposed error is generated", {
   set.seed(6)
-  expect_silent(
-    assign_score_optimize_shuffle(bc, samples = samples, iterations = 30, n_shuffle = 2)
+  expect_error(
+    optimize_design(bc, samples = samples, max_iter = 30, n_shuffle = 2),
+    NA
   )
 })

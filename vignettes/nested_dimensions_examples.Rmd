@@ -72,10 +72,10 @@ set.seed(42) # should we have conventions for this?
 
 # initial score
 #bc$score()
-trace <- assign_score_optimize_shuffle(
+trace <- optimize_design(
    bc,
    n_shuffle = n_shuffle, 
-   iterations = n_iterations) # default is 1000?
+   max_iter = n_iterations) # default is 10000
 ```
 
 NOTE: Here the shuffling procedure is short, as it was optimized for this vignette. 
@@ -109,15 +109,14 @@ n_iterations <- 200
 
 set.seed(42) # should we have conventions for this?
 
-trace2 <- assign_score_optimize_shuffle(
+trace2 <- optimize_design(
    bc2,
-   n_shuffle = NULL,
    shuffle_proposal = shuffle_with_constraints(
     src = TRUE,
     # batch needs to change for shuffle to be accepted
     dst=.src$batch != batch
    ),
-   iterations = n_iterations)
+   max_iter = n_iterations)
 
 qplot(x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle), 
       main = str_glue("Final score={bc2$score()}"), geom = "point")
@@ -147,15 +146,14 @@ bc$scoring_f <- osat_score_generator(c("run"), c("Treatment", "Time"))
 # - or we add "batch/run" to the constraints somehow.
 bc$score()
 
-trace_run <- assign_score_optimize_shuffle(
+trace_run <- optimize_design(
   bc,
-  n_shuffle = NULL,
   shuffle_proposal = shuffle_with_constraints(
     src = TRUE,
     # batch remains the same and run needs to change
     dst = batch == .src$batch & run != .src$run
   ),
-  iterations = n_iterations
+  max_iter = n_iterations
 )
 ```
 
