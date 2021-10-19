@@ -210,6 +210,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                           msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
 
+  assertthat::assert_that(is.null(n_shuffle) ||
+                            (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
+                          msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL")
+
+
   # Create shuffle_proposal_func
   # If passed by the user, this one getting priority over n_shuffle.
   # If nothing is passed, default shuffling function is to swap 2 random elements per iteration, which
