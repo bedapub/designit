@@ -1,86 +1,87 @@
-#' Create function to propose 1 pairwise swap of samples on each call
+#' Proposes pairwise swap of samples on each call.
 #'
-#' This internal function is wrapped by mk_swapping_function()
+#' This function will ensure that one of the locations is always non-empty. It should not
+#' return trivial permutations (e.g., `src=c(1,2)` and `dst=c(1,2)`).
 #'
-#' @param n_samples Total number of samples (i.e. max of permutation index)
+#' @param batch_container The batch-container.
+#' @param iteration The current iteration number.
 #'
-#' @return Parameter-less function to return a list with length 1 vectors 'src' and 'dst', denoting source and destination index for the swap operation
+#' @return Function accepting batch container & iteration number. It returns a list with length 1 vectors 'src' and 'dst', denoting source and destination index for the swap operation
 #'
 #' @keywords internal
-mk_pairwise_swapping_function <- function(n_samples) {
-  # Function factory for creator of a 'neighboring' sample arrangement with just one pairwise swap
-
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
-                          msg = "n_samples should be a single iteger")
-  assertthat::assert_that(n_samples > 1, msg = "at least 2 samples needed for defining a pairwise swap")
-  pos_vec <- 1:n_samples
-  Z <- 2:1
-
-  function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
-    swap <- sample(pos_vec, 2)
-    list(src = swap, dst = swap[Z])
-  }
+pairwise_swapping <- function(batch_container, iteration) {
+  # We assume that optimization time is usually dominated by the scoring function,
+  # so we do not try to cache values in this function.
+  non_empty_locations <- which(!is.na(batch_container$assignment))
+  first_element <- sample(non_empty_locations, 1)
+  non_first_location <- seq_len(batch_container$n_available)[-first_element]
+  second_element <- sample(non_first_location, 1)
+  return(list(src = c(first_element, second_element), dst = c(second_element, first_element)))
 }
 
 #' Create function to propose n pairwise swaps of samples on each call (n is a constant across iterations)
 #'
 #' This internal function is wrapped by mk_swapping_function()
 #'
-#' @param n_samples Total number of samples (i.e. max of permutation index)
 #' @param n_swaps Number of swaps to be proposed (valid range is 1..floor(n_samples/2))
+#' @param quiet Do not warn if number of swaps is too big.
 #'
-#' @return Parameter-less function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation on each call
+#' @return Function accepting batch container & iteration number.
+#' Return a list with length n vectors 'src' and 'dst', denoting source and destination index for
+#' the swap operation on each call
 #'
 #' @keywords internal
-mk_constant_swapping_function <- function(n_samples, n_swaps) {
+mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
+  force(n_swaps)
+  force(quiet)
+  draws <- NULL
 
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
-                          msg = "n_samples should be a single iteger")
-  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
-                          msg = "n_swaps should be an iteger vector")
-  n <- n_samples
-  draws <- 2 * n_swaps
+  function(batch_container, iteration) {
+    if (is.null(draws)) {
+      # first time we make sure that n_swaps makes sense
+      redefined <- FALSE
+      if (n_swaps > nrow(batch_container$samples)) {
+        n_swaps <<- nrow(batch_container$samples)
+        redefined <- TRUE
+      }
+      draws <<- 2 * n_swaps
+      if (draws > batch_container$n_available) {
+        n_swaps <<- floor(batch_container$n_available / 2)
+        draws <<- 2 * n_swaps
+        redefined <- TRUE
+      }
+      assertthat::assert_that(draws > 1, msg = "at least 1 swap needed for defining a meaningful swap function")
+      if (redefined && !quiet) {
+        message("Re-defined number of swaps to ", n_swaps, " in swapping function.")
+      }
+    }
+    non_empty_locations <- which(!is.na(batch_container$assignment))
+    first_elements <- sample(non_empty_locations, n_swaps)
+    non_first_location <- seq_len(batch_container$n_available)[-first_elements]
+    second_elements <- sample(non_first_location, n_swaps)
 
-  if (n < draws) { # limit swaps if user provides a meaningless number
-    n_swaps <- floor(n / 2)
-    draws <- 2 * n_swaps
-    message("Re-defined number of swaps to ", n_swaps, " in swapping function.")
-  }
-  assertthat::assert_that(draws > 1, msg = "at least 1 swap needed for defining a meaningful swap function")
-
-  pos_vec <- 1:n
-  Z <- c((n_swaps + 1):draws, 1:n_swaps) # scrambled return order for destination
-
-  function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
-    swap <- sample(pos_vec, draws)
     # ensures that there are
     # a) no samples are left in place
     # b) no complex shuffles, like 1->2, 2->3, 3->1
-    list(src = swap, dst = swap[Z])
+    list(src = c(first_elements, second_elements), dst = c(second_elements, first_elements))
   }
 }
 
 
-#' Create function to reshuffle sample indices completely randomly
+#' Reshuffle sample indices completely randomly
 #'
-#' This function was just added to test early on the functionality of optimize_design() to accept a permutation vector rather than a list with src and dst indices.
+#' This function was just added to test early on the functionality of optimize_design() to accept a
+#' permutation vector rather than a list with src and dst indices.
 #'
-#' @param batch_container A batch container with samples assigned that should be permuted randomly
+#' @param batch_container The batch-container.
+#' @param iteration The current iteration number.
 #'
 #' @return Parameter-less function to return a random permutation of the sample locations in the container
 #'
 #' @export
-mk_complete_random_shuffling_function <- function(batch_container) {
-  # Function factory for creator of a complete random reshuffling of samples
-
-  assertthat::assert_that(batch_container$has_samples, msg = "Batch container has to have samples assigned")
-
-  pos_vec <- batch_container$assignment
-
-  function(...) { # be able to ignore additional params passed to a generic shuffle proposal function
-    sample(pos_vec)
-  }
+complete_random_shuffling <- function(batch_container, iteration) {
+  return(list(location_assignment=sample(batch_container$assignment)))
 }
 
 
@@ -90,57 +91,43 @@ mk_complete_random_shuffling_function <- function(batch_container) {
 #' If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
 #' If length(n_swaps)>1 and called without argument, the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted. Alternatively, the function may be called with an iteration number as the only argument, giving the user some freedom how to iterate over the sample swapping protocol.
 #'
-#' @param n_samples Total number of samples (i.e. max of permutation index)
 #' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_samples/2))
 #'
 #' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #'
 #' @export
-mk_swapping_function <- function(n_samples, n_swaps = 1) {
+mk_swapping_function <- function(n_swaps = 1) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
   if (length(n_swaps) == 1 && n_swaps == 1) { # default to pairwise swapping function in the default case
-    return(mk_pairwise_swapping_function(n_samples = n_samples))
+    return(pairwise_swapping)
   }
   if (length(n_swaps) == 1) { # default to function with constant number of swaps in this default case
-    return(mk_constant_swapping_function(n_samples = n_samples, n_swaps = n_swaps))
+    return(mk_constant_swapping_function(n_swaps = n_swaps))
   }
 
   # User has provided a shuffling protocol!
-  assertthat::assert_that(rlang::is_integerish(n_samples, n = 1, finite = TRUE),
-                          msg = "n_samples should be a single iteger")
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
                           msg = "n_swaps should be an iteger vector")
-  n <- n_samples
 
-  if (any(n_swaps > floor(n / 2))) { # limit swaps if user provides a meaningless number
-    n_swaps[n_swaps > floor(n / 2)] <- floor(n / 2)
-    message("Set upper number of swaps to ", floor(n / 2), " in swapping protocol.")
+  swapping_functions <- NULL
+  if (length(unique(n_swaps)) < 1000) {
+    # When number of unique values is small, pre-generate a swapping function for each n_swaps.
+    swapping_functions <- n_swaps %>%
+      unique() %>%
+      purrr::set_names() %>%
+      purrr::map(mk_constant_swapping_function)
   }
-  if (any(n_swaps < 1)) {
-    n_swaps[n_swaps < 1] <- 1
-    message("Set lower number of swaps to 1 in swapping protocol.")
-  }
 
-  pos_vec <- 1:n
-  iter <- 1
-  Z <- NA
-  draws <- NA
-  S <- 0 # remember last number of swaps (for optimizing speed)
 
-  function(iteration = iter, ...) { # ignore possible other params passed to a generic shuffle function
-    if (iteration > length(n_swaps) || iteration < 1) {
-      return(NULL)
+  function(batch_container, iteration) {
+    if (!is.null(swapping_functions)) {
+      f <- swapping_functions[[as.character(n_swaps[iteration])]]
+    } else {
+      # call the function in quiet mode to avoid too much output
+      f <- mk_constant_swapping_function(n_swaps[iteration], quiet = TRUE)
     }
-    ns <- n_swaps[iteration]
-    if (ns != S) { # number of swaps changed --> have to set up new params
-      draws <<- 2 * ns
-      Z <<- c((ns + 1):draws, 1:ns) # scrambled return order for destination
-      S <<- ns
-    }
-    iter <<- iteration + 1
-    swap <- sample(pos_vec, draws)
-    list(src = swap, dst = swap[Z])
+    return(f(batch_container, iteration))
   }
 }
 
@@ -228,9 +215,9 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # If nothing is passed, default shuffling function is to swap 2 random elements per iteration, which
   # is implemented by an especially efficient function.
   if (is.null(n_shuffle) && is.null(shuffle_proposal_func)) {
-    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp), n_swaps = 1)
+    shuffle_proposal_func <- mk_swapping_function(n_swaps = 1)
   } else if (is.null(shuffle_proposal_func)) {
-    shuffle_proposal_func <- mk_swapping_function(n_samples = nrow(samp), n_swaps = n_shuffle)
+    shuffle_proposal_func <- mk_swapping_function(n_swaps = n_shuffle)
     if (length(n_shuffle) > 1) {
       # Restrict number if iters, so that also trace object will be appropriately sized
       max_iter <- min(max_iter, length(n_shuffle), na.rm = T)
@@ -302,7 +289,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
 
   iteration <- 1
-  shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
+  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>% extract_shuffle_params()
 
 
   # If sample attributes are provided, frontload first bc update since additional variables may be actually used in the scoring function(s)!
@@ -369,7 +356,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       break
     }
 
-    shuffle_params <- shuffle_proposal_func(iteration) %>% extract_shuffle_params()
+    if (iteration <= max_iter) {
+      # only call shuffle_proposal_func in case we have more iterations
+      shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+        extract_shuffle_params()
+    }
 
   }
 
