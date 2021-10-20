@@ -9,6 +9,7 @@
 #' @param expected_dt A [`data.table`][data.table::data.table] with expected number of samples sample
 #' variables and batch variables combination. This is not required, however it does not change
 #' during the optimization process. So it is a good idea to cache this value.
+#' @param quiet Do not warn about `NA`s in feature columns.
 #'
 #' @return a list with two attributes: `$score` (numeric score value), `$expected_dt`
 #' (expected counts `data.table` for reuse)
@@ -32,7 +33,7 @@
 #'   feature_vars = c("SampleType", "Sex")
 #' )
 #' @importFrom stats na.omit
-osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
+osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE) {
   . <- .N <- `:=` <- .SD <- NULL # silence R check warnings
   .freq_batch <- .n_batch <- k <- .n_expected <- .n_samples <- N <- NULL # silence R check warnings
   stopifnot(
@@ -65,7 +66,7 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
     assertthat::assert_that(nrow(expected_dt) > 0,
       msg = "All elements of one of the features / batches are NAs"
     )
-    if (rows_removed > 0) {
+    if (rows_removed > 0 && ! quiet) {
       warning("NAs in features / batch columns; they will be excluded from scoring")
     }
 
@@ -98,6 +99,7 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
 #' score computation.
 #' @param feature_vars [character] vector with sample variable names to take into account for
 #' score computation.
+#' @param quiet Do not warn about `NA`s in feature columns.
 #' @return A function that returns the OSAT score for a specific sample arrangement
 #' @export
 #'
@@ -120,18 +122,22 @@ osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL) {
 #' )
 #'
 #' osat_scoring_function(sample_assignment)
-osat_score_generator <- function(batch_vars, feature_vars) {
+osat_score_generator <- function(batch_vars, feature_vars, quiet = FALSE) {
   force(batch_vars)
   force(feature_vars)
 
   expected_dt <- NULL
 
+  first_call <- TRUE
+
   function(samples) {
     os <- osat_score(samples,
       batch_vars = batch_vars,
       feature_vars = feature_vars,
-      expected_dt = expected_dt
+      expected_dt = expected_dt,
+      quiet = quiet || !first_call
     )
+    first_call <<- FALSE
     if (is.null(expected_dt)) expected_dt <<- os$expected_dt
     os$score
   }

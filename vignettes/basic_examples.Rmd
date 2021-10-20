@@ -164,8 +164,8 @@ This function will assess how well treatment
 and dose are balanced across the two plates.
 
 ```{r}
-bc$scoring_f <- function(samples) osat_score(samples, batch_vars = "plate", 
-                                             feature_vars = c("treatment", "dose"))$score
+bc$scoring_f <- osat_score_generator(batch_vars = "plate",
+                                     feature_vars = c("treatment", "dose"))
 ```
 
 ## Run an optimization
@@ -175,9 +175,9 @@ Here we use a simple shuffling schedule:
 swap 10 samples for 100 times, then swap 2 samples for 400 times.
 
 ```{r}
-trace <- assign_score_optimize_shuffle(bc,
-                              # shuffling schedule
-                              n_shuffle=c(rep(10, 200), rep(2, 400))
+trace <- optimize_design(bc,
+                         # shuffling schedule
+                         n_shuffle=c(rep(10, 200), rep(2, 400))
 )
 ```
 
