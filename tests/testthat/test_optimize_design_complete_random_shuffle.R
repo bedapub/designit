@@ -15,7 +15,7 @@ set.seed(42)
 
 start_state <- ifelse(is.na(bc$assignment), -1, bc$assignment)
 
-test_that("correct number of shuffles = 1", {
+test_that("complete_random_shuffling shuffles most of the elements", {
   optimize_design(
     bc,
     max_iter = 1,
