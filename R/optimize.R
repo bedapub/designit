@@ -121,12 +121,14 @@ mk_swapping_function <- function(n_swaps = 1) {
 
 
   function(batch_container, iteration) {
+    assertthat::assert_that(iteration <= length(n_swaps))
     if (!is.null(swapping_functions)) {
       f <- swapping_functions[[as.character(n_swaps[iteration])]]
     } else {
       # call the function in quiet mode to avoid too much output
       f <- mk_constant_swapping_function(n_swaps[iteration], quiet = TRUE)
     }
+    assertthat::assert_that(!is.null(f))
     return(f(batch_container, iteration))
   }
 }
