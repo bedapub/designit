@@ -39,8 +39,9 @@ test_that("Score names are correct", {
 test_that("Can optimize a single score", {
   set.seed(6)
   bc$scoring_f <- function(...) rnorm(1)
-  expect_silent(
-    assign_score_optimize_shuffle(bc, iterations = 30, n_shuffle = 2)
+  expect_equal(
+    optimize_design(bc, max_iter = 30, n_shuffle = 2)$n_steps,
+    31
   )
 })
 
@@ -50,7 +51,8 @@ test_that("Can optimize multiple scores", {
     a = function(...) rnorm(1),
     b = function(...) rnorm(1)
   )
-  expect_silent(
-    assign_score_optimize_shuffle(bc, iterations = 30, n_shuffle = 2)
+  expect_equal(
+    optimize_design(bc, max_iter = 30, n_shuffle = 2)$n_steps,
+    31
   )
 })

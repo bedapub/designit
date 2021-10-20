@@ -144,7 +144,7 @@ g_setup@metadata$optValue %>% head(1)
 
 bench::system_time({
   set.seed(123)
-  trace_reference <- assign_score_optimize_shuffle(bc, iterations = params$iterations)
+  trace_reference <- optimize_design(bc, max_iter = params$iterations)
 })
 ```
 
@@ -219,7 +219,7 @@ burn_in_it
 
 bench::system_time({
   set.seed(123)
-  trace_burn_in <- assign_score_optimize_shuffle(bc,
+  trace_burn_in <- optimize_design(bc,
     n_shuffle = c(
       rep(20, burn_in_it),
       rep(
@@ -227,7 +227,7 @@ bench::system_time({
         params$iterations - burn_in_it
       )
     ),
-    iterations = params$iterations
+    max_iter = params$iterations
   )
 })
 ```

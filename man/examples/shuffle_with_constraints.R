@@ -21,7 +21,7 @@ bc$scoring_f <- function(samples) {
 # in this example we treat all the positions in the plate as equal.
 # when shuffling we enforce that source location is non-empty,
 # and destination location has a different plate number
-assign_score_optimize_shuffle(
+optimize_design(
   bc,
   samples,
   shuffle_proposal = shuffle_with_constraints(
@@ -30,5 +30,5 @@ assign_score_optimize_shuffle(
     # destination has a different plate
     plate != .src$plate
   ),
-  iterations = 10
+  max_iter = 10
 )
