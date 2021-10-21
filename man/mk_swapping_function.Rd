@@ -5,11 +5,9 @@
 \title{Create function to propose swaps of samples on each call, either with a constant number of swaps or following
 a user defined protocol}
 \usage{
-mk_swapping_function(n_samples, n_swaps = 1)
+mk_swapping_function(n_swaps = 1)
 }
 \arguments{
-\item{n_samples}{Total number of samples (i.e. max of permutation index)}
-
 \item{n_swaps}{Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_samples/2))}
 }
 \value{

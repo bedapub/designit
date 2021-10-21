@@ -4,15 +4,17 @@
 \alias{mk_constant_swapping_function}
 \title{Create function to propose n pairwise swaps of samples on each call (n is a constant across iterations)}
 \usage{
-mk_constant_swapping_function(n_samples, n_swaps)
+mk_constant_swapping_function(n_swaps, quiet = FALSE)
 }
 \arguments{
-\item{n_samples}{Total number of samples (i.e. max of permutation index)}
-
 \item{n_swaps}{Number of swaps to be proposed (valid range is 1..floor(n_samples/2))}
+
+\item{quiet}{Do not warn if number of swaps is too big.}
 }
 \value{
-Parameter-less function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation on each call
+Function accepting batch container & iteration number.
+Return a list with length n vectors 'src' and 'dst', denoting source and destination index for
+the swap operation on each call
 }
 \description{
 This internal function is wrapped by mk_swapping_function()

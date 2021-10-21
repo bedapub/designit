@@ -3,13 +3,13 @@
 \name{OptimizationTrace}
 \alias{OptimizationTrace}
 \title{OptimizationTrace represents optimization trace.
-Usually it is created by \code{\link[=assign_score_optimize_shuffle]{assign_score_optimize_shuffle()}}.}
+Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.}
 \description{
 OptimizationTrace represents optimization trace.
-Usually it is created by \code{\link[=assign_score_optimize_shuffle]{assign_score_optimize_shuffle()}}.
+Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 
 OptimizationTrace represents optimization trace.
-Usually it is created by \code{\link[=assign_score_optimize_shuffle]{assign_score_optimize_shuffle()}}.
+Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

@@ -103,13 +103,13 @@ bc$scoring_f <- osat_score_generator(
 
 set.seed(10)
 
-res <- assign_score_optimize_shuffle(
+res <- optimize_design(
   bc,
-  shuffle_proposal = shuffle_with_constraints(
+  shuffle_proposal_func = shuffle_with_constraints(
     sex == "M",
     cage != .src$cage
   ),
-  iterations = 10
+  max_iter = 10
 )
 
 plot(res)
@@ -140,13 +140,13 @@ bc$scoring_f <- function(samples) {
 }
 
 set.seed(12)
-res <- assign_score_optimize_shuffle(bc,
+res <- optimize_design(bc,
   shuffle_proposal = shuffle_with_constraints(
     sex == "F",
     cage != .src$cage & (is.na(sex) | sex != "M")
   ),
   n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
-  iterations = 200
+  max_iter = 200
 )
 plot(res)
 bc$score()

@@ -32,22 +32,6 @@ worst_score_only <- function(scores, na.rm = FALSE, ...) {
 }
 
 
-#' Aggregation of scores: take the average (mean value) of n scores
-#'
-#' This function enables comparison of the results of two scoring functions by just basing
-#' the decision on the largest element. This corresponds to the infinity-norm in ML terms.
-#'
-#' @param scores A score or multiple component score vector
-#' @param na.rm Boolean. Should NA values be ignored when obtaining the maximum? FALSE by default as ignoring NA values may hide some issues with the provided scoring functions and also the aggregated value cannot be seen as the proper infinity norm anymore.
-#' @param ... Parameters to be ignored by this aggregation function
-#'
-#' @return The aggregated score, i.e. the mean value of a multiple-component score vector.
-#'
-#' @export
-mean_score <- function(scores, na.rm = FALSE, ...) {
-  mean(scores, na.rm = na.rm)
-}
-
 
 #' Aggregation of scores: L2 norm squared
 #'

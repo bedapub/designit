@@ -20,7 +20,7 @@ Additionally a special variable \code{.src} is available in this environment whi
 describes the selected source row from the table.}
 }
 \value{
-Returns a function which accepts a data.table (\code{dt}) and an iteration
+Returns a function which accepts a \code{BatchContainer} and an iteration
 number (\code{i}). This function returns a list with two names: \code{src} vector of length
 2 and \code{dst} vector of length two. See \code{\link[=BatchContainer]{BatchContainer$move_samples()}}.
 }
@@ -51,7 +51,7 @@ bc$scoring_f <- function(samples) {
 # in this example we treat all the positions in the plate as equal.
 # when shuffling we enforce that source location is non-empty,
 # and destination location has a different plate number
-assign_score_optimize_shuffle(
+optimize_design(
   bc,
   samples,
   shuffle_proposal = shuffle_with_constraints(
@@ -60,6 +60,6 @@ assign_score_optimize_shuffle(
     # destination has a different plate
     plate != .src$plate
   ),
-  iterations = 10
+  max_iter = 10
 )
 }

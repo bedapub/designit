@@ -244,7 +244,7 @@ bc6 <- bc$copy()
 
 optimize_design(
   bc6,
-  shuffle_proposal_func = mk_complete_random_shuffling_function(batch_container = bc6),
+  shuffle_proposal_func = complete_random_shuffling,
   max_iter = 200,
   min_score = 2.6
 )

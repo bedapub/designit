@@ -4,7 +4,7 @@
 \alias{osat_score}
 \title{Compute OSAT score for sample assignment.}
 \usage{
-osat_score(df, batch_vars, feature_vars, expected_dt = NULL)
+osat_score(df, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE)
 }
 \arguments{
 \item{df}{\code{\link[data.table:data.table]{data.table}} or \link{data.frame} where every row is a location
@@ -19,6 +19,8 @@ score computation.}
 \item{expected_dt}{A \code{\link[data.table:data.table]{data.table}} with expected number of samples sample
 variables and batch variables combination. This is not required, however it does not change
 during the optimization process. So it is a good idea to cache this value.}
+
+\item{quiet}{Do not warn about \code{NA}s in feature columns.}
 }
 \value{
 a list with two attributes: \verb{$score} (numeric score value), \verb{$expected_dt}
