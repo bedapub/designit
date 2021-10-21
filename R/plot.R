@@ -141,8 +141,8 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   # change NA values for empty wells
   if (rename_empty) {
     .tbl <- .tbl %>%
-      dplyr::mutate(!!rlang::enquo(.color) :=
-                      ifelse(is.na({{ .color }}), "empty", {{ .color }}))
+      dplyr::mutate(rlang::`:=`(!!rlang::enquo(.color),
+                                ifelse(is.na({{ .color }}), "empty", {{ .color }})))
   }
   # add excluded wells
   if (add_excluded) {
