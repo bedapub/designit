@@ -246,7 +246,7 @@ mk_subgroup_shuffling_function = function(batch_container, subgroup_vars,
     )
   }
 
-  function(iteration = iter, ...) { # ignore possible other params passed to a generic shuffle function
+  function(batch_container = NULL, iteration = iter, ...) { # ignore possible other params passed to a generic shuffle function
     if (iteration > length(n_swaps) || iteration < 1) {
       return(NULL)
     }
