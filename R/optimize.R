@@ -153,6 +153,9 @@ mk_subgroup_shuffling_function = function(batch_container, subgroup_vars,
 
   MAX_PERMUTATIONS = 1e6 # limit memory use of this function
 
+  # suppress no visible binding messages
+  src <- dst <- NULL
+
   bc_loc = batch_container$get_locations()
   assertthat::assert_that(nrow(bc_loc)>9, msg="Subgroup shuffling is pointless for small containers (n<10)")
   assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg="All subgroup defining variables have to be part of the container locations")
