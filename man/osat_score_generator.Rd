@@ -19,7 +19,7 @@ score computation.}
 A function that returns the OSAT score for a specific sample arrangement
 }
 \description{
-This function wraps \code{osat_score()} in order to take full advantage of the speed gain without
+This function wraps \code{\link[=osat_score]{osat_score()}} in order to take full advantage of the speed gain without
 managing the buffered objects in the user code.
 }
 \examples{
