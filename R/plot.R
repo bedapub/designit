@@ -140,8 +140,8 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
   # change NA values for empty wells
   if (rename_empty) {
-    .color_name <- rlang::as_name(.color)
-    .tbl[.color_name, is.na(.tbl[[.color_name]])] <- "empty"
+    .color_name <- rlang::as_name(rlang::enquo(.color))
+    .tbl[is.na(.tbl[[.color_name]]), .color_name] <- "empty"
   }
   # add excluded wells
   if (add_excluded) {
