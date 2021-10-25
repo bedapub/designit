@@ -6,8 +6,7 @@
 \alias{designit-package}
 \title{designit: Blocking and randomization for experimental design}
 \description{
-Blocking and randomization for experimental design.
-    TODO: expand this.
+Blocking and randomization for experimental design. TODO: expand this.
 }
 \seealso{
 Useful links:
