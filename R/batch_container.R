@@ -251,8 +251,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "No samples in the batch container, cannot compute score"
       )
 
-      samples <- self$get_samples(include_id = TRUE, as_tibble = FALSE)
-      res <- purrr::map_dbl(private$scoring_funcs, ~ .x(samples))
+      res <- purrr::map_dbl(private$scoring_funcs, ~ .x(self))
       assertthat::assert_that(length(res) == length(private$scoring_funcs))
 
       assertthat::assert_that(is.numeric(res), msg="Scoring function should return a number")
@@ -340,9 +339,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
   active = list(
     #' @field scoring_f
     #' Scoring functions used for optimization.
-    #' Each scoring function should receive a [`data.table`][data.table::data.table] with columns from
-    #' the samples [data.frame], locations [data.frame], and
-    #' `.sample_id` column. This function should return a floating
+    #' Each scoring function should receive a [BatchContainer].
+    #' This function should return a floating
     #' point score value for the assignment. This a list of functions.
     #' Upon assignment a single function will be automatically converted to a list
     #' In the later case each function is called.

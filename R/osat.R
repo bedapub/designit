@@ -1,6 +1,7 @@
 #' Compute OSAT score for sample assignment.
 #'
-#' @param df [`data.table`][data.table::data.table] or [data.frame] where every row is a location
+#' @param bc [BatchContainer] with samples
+#' or [`data.table`][data.table::data.table]/[data.frame] where every row is a location
 #' in a container and a sample in this location.
 #' @param batch_vars [character] vector with batch variable names to take into account for the
 #' score computation.
@@ -33,13 +34,20 @@
 #'   feature_vars = c("SampleType", "Sex")
 #' )
 #' @importFrom stats na.omit
-osat_score <- function(df, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE) {
+osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE) {
   . <- .N <- `:=` <- .SD <- NULL # silence R check warnings
   .freq_batch <- .n_batch <- k <- .n_expected <- .n_samples <- N <- NULL # silence R check warnings
   stopifnot(
     is.character(batch_vars),
     is.character(feature_vars)
   )
+  if (inherits(bc, "BatchContainer")) {
+    df <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
+  } else {
+    assertthat::assert_that(is.data.frame(bc),
+                            msg = "bc should be a BatchContainer or a table")
+    df <- bc
+  }
   assertthat::assert_that(is.data.frame(df) && nrow(df) > 0)
   df <- data.table::as.data.table(df)
   special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
@@ -130,8 +138,8 @@ osat_score_generator <- function(batch_vars, feature_vars, quiet = FALSE) {
 
   first_call <- TRUE
 
-  function(samples) {
-    os <- osat_score(samples,
+  function(bc) {
+    os <- osat_score(bc,
       batch_vars = batch_vars,
       feature_vars = feature_vars,
       expected_dt = expected_dt,

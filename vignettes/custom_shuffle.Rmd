@@ -129,7 +129,8 @@ locations. We also ensure that on every iteration the cage number is changed; we
 `position` dimension does affect actual animal allocation.
 
 ```{r}
-bc$scoring_f <- function(samples) {
+bc$scoring_f <- function(bc) {
+  samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
   avg_w <- samples[, mean(weight, na.rm = TRUE)]
   avg_w_per_cage <- samples[!is.na(weight), mean(weight), by = cage]$V1
   trt_per_cage <- samples[!is.na(group), sum(group == "treatment") / .N, by = cage]$V1

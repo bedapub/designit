@@ -289,7 +289,8 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 #' stops if the swapping protocol is exhausted.
 #' @param shuffle_proposal_func A user defined function to propose the next shuffling of samples.
 #' Takes priority over n_shuffle if both are provided. The function is called with
-#' one integer parameter for the current iteration number, allowing very flexible shuffling strategies.
+#' a [BatchContainer] `bc` and an integer parameter `iteration` for the current iteration number,
+#' allowing very flexible shuffling strategies.
 #' The returned function must either return a list with fields `src`and `dst` (for pairwise sample swapping)
 #' or a numeric vector with a complete re-assigned sample order.
 #' @param acceptance_func Alternative function to select a new score as the best one.
