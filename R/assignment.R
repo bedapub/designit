@@ -50,7 +50,7 @@ assign_in_order <- function(batch_container, samples = NULL) {
 
 #' Shuffling proposal function with constraints.
 #'
-#' Can be used with `assign_score_optimize_shuffle` to improve convergence speed.
+#' Can be used with `optimize_design` to improve convergence speed.
 #'
 #' @export
 #' @param src Expression to define possible source locations in the samples/locations

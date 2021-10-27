@@ -155,7 +155,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = "plate",
 
 ## Run an optimization
 
-The optimization procedure is invoked with e.g. `assign_score_optimize_shuffle`.
+The optimization procedure is invoked with e.g. `optimize_design`.
 Here we use a simple shuffling schedule: 
 swap 10 samples for 100 times, then swap 2 samples for 400 times.
 
