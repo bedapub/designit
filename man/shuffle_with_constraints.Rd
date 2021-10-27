@@ -25,7 +25,7 @@ number (\code{i}). This function returns a list with two names: \code{src} vecto
 2 and \code{dst} vector of length two. See \code{\link[=BatchContainer]{BatchContainer$move_samples()}}.
 }
 \description{
-Can be used with \code{assign_score_optimize_shuffle} to improve convergence speed.
+Can be used with \code{optimize_design} to improve convergence speed.
 }
 \examples{
 set.seed(43)
