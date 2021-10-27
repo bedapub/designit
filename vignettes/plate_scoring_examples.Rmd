@@ -11,10 +11,7 @@ editor_options:
   
   
 ```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 ```
 
 ```{r setup}
@@ -65,10 +62,10 @@ bc$scoring_f <- list(
 )
 
 optimize_design(bc,
-  min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
-  n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  aggregate_scores_func = L2s_norm
+                min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
+                n_shuffle = 2,
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                aggregate_scores_func = L2s_norm
 )
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
@@ -84,15 +81,14 @@ bc <- example1$copy()
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
 
-start_time <- Sys.time()
-optimize_design(bc,
-  min_score = 6.1, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
-  n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  quiet = TRUE
+trace = optimize_design(bc,
+                        min_score = 6.1, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
+                        n_shuffle = 2,
+                        acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                        quiet = TRUE
 )
 
-Sys.time() - start_time
+trace$elapsed
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
            title = "Exa 1: Using a dedicated plate scoring function:\nThis should show a latin square!")
@@ -101,7 +97,7 @@ plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Gr
 # Example 2: Scoring two plates at once
 
 (latin square for each plate should give the best score)
- 
+
 We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, 
 plus one osat score to guarantee uniform distribution of groups across plates.
 
@@ -110,7 +106,7 @@ since each plate has only 2 of the 4 groups represented.
 
 This is not a problem as long as we make sure that initial permutations are likely to remedy the situation. 
 That's why we ensure 10 pairwise sample swaps for the first iterations.
- 
+
 ```{r}
 # Setting up the batch container
 example2 <- BatchContainer$new(
@@ -122,13 +118,12 @@ example2 <- BatchContainer$new(
 
 # Add samples to container
 assign_in_order(example2, samples = tibble::tibble(Group = c(rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8)),
-                                                   Group_num = c(rep(1:4, each = 7), NA,NA,NA,NA), # possibility for debugging
                                                    ID = 1:32))
 
 bc <- example2$copy()
 
 bc$scoring_f <- c(mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group"),
-  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+                  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 )
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
@@ -136,19 +131,19 @@ plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Gr
 
 bc$score()
 
-start_time <- Sys.time()
-optimize_design(bc,
-  n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
-  aggregate_scores_func = worst_score_only,
-  quiet = TRUE
+trace = optimize_design(bc,
+                        n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
+                        acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+                        aggregate_scores_func = worst_score_only,
+                        quiet = TRUE
 )
-Sys.time() - start_time
+
+trace$elapsed
 
 bc$score()
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
-            title = "Exa 2: Design created by swapping samples 'globally' across the plates")
+           title = "Exa 2: Design created by swapping samples 'globally' across the plates")
 ```
 
 While this 'global' optimization is possible, it does probably not converge to an (almost) ideal solution 
@@ -169,12 +164,11 @@ bc <- example2$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
-start_time <- Sys.time()
 optimize_design(bc,
-  quiet = T,
-  min_score = 2, max_iter = 5e3,  # this is set to shorten vignette run-time, normally we don't know.
-  n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+                quiet = T,
+                min_score = 2, max_iter = 5e3,  # this is set to shorten vignette run-time, normally we don't know.
+                n_shuffle = 2,
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
@@ -185,13 +179,12 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", col
 bc$score()
 
 optimize_design(bc,
-  max_iter = 5e2,
-  shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate")),
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  aggregate_scores_func = L2s_norm,
-  quiet = TRUE
+                max_iter = 5e2,
+                shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate")),
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                aggregate_scores_func = L2s_norm,
+                quiet = TRUE
 )
-Sys.time() - start_time
 
 bc$score()
 
@@ -220,12 +213,11 @@ bc <- example2$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
-start_time <- Sys.time()
 optimize_design(bc,
-  quiet = T,
-  min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
-  n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+                quiet = T,
+                min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
+                n_shuffle = 2,
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 
 plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
@@ -236,24 +228,23 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", col
 bc$score()
 
 optimize_design(bc,
-  max_iter = 5e3,
-  quiet=T,
-  shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(1)),
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  aggregate_scores_func = L2s_norm
+                max_iter = 5e3,
+                quiet=T,
+                shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(1)),
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                aggregate_scores_func = L2s_norm
 )
 
 bc$score()
 
 optimize_design(bc,
-  max_iter = 5e3,
-  quiet=T,
-  shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(2)),
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-  aggregate_scores_func = L2s_norm
+                max_iter = 5e3,
+                quiet=T,
+                shuffle_proposal_func = mk_subgroup_shuffling_function(bc, subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(2)),
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                aggregate_scores_func = L2s_norm
 )
 
-Sys.time() - start_time
 
 bc$score()
 
@@ -306,10 +297,10 @@ bc <- example3$copy()
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
 optimize_design(bc,
-  quiet = T,
-  min_score = 1.49, max_iter = 5e3,
-  n_shuffle = 2,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+                quiet = T,
+                min_score = 1.49, max_iter = 5e3,
+                n_shuffle = 2,
+                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
 )
 ```
 
@@ -324,18 +315,18 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row",
 
 bc$score()
 
-start_time <- Sys.time()
-optimize_design(bc,
-  min_score = 0, max_iter = 1e4,
-  shuffle_proposal_func = mk_subgroup_shuffling_function(bc,
-    subgroup_vars = c("plate"),
-    n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
-  ),
-  # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
-  aggregate_scores_func = L2s_norm,
-  quiet = TRUE
+trace = optimize_design(bc,
+                        min_score = 0, max_iter = 1e4,
+                        shuffle_proposal_func = mk_subgroup_shuffling_function(bc,
+                                                                               subgroup_vars = c("plate"),
+                                                                               n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
+                        ),
+                        # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+                        aggregate_scores_func = L2s_norm,
+                        quiet = TRUE
 )
-Sys.time() - start_time
+
+trace$elapsed
 
 bc$score()
 
@@ -389,19 +380,17 @@ bc$scoring_f <- c(
 
 bc$score()
 
-start_time <- Sys.time()
-
-optimize_design(bc,
-  min_score = 17.66, max_iter = 5e3,
-  n_shuffle = 1,
-  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
-  aggregate_scores_func = function(scores, ...) {
-    2 * scores["Group.Plate"] + scores["Sex.Plate"]
-  },
-  quiet = TRUE
+trace = optimize_design(bc,
+                        min_score = 17.66, max_iter = 5e3,
+                        n_shuffle = 1,
+                        acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+                        aggregate_scores_func = function(scores, ...) {
+                          2 * scores["Group.Plate"] + scores["Sex.Plate"]
+                        },
+                        quiet = TRUE
 )
 
-Sys.time() - start_time
+trace$elapsed
 
 bc$score()
 
