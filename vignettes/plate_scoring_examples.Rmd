@@ -68,7 +68,7 @@ optimize_design(bc,
                 aggregate_scores_func = L2s_norm
 )
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 1: Using OSAT scores for plate design\n(not the recommended way!)")
 ```
 
@@ -82,7 +82,7 @@ bc <- example1$copy()
 bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
 
 trace = optimize_design(bc,
-                        min_score = 6.1, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
+                        min_score = 6.1, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
                         n_shuffle = 2,
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                         quiet = TRUE
@@ -90,7 +90,7 @@ trace = optimize_design(bc,
 
 trace$elapsed
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 1: Using a dedicated plate scoring function:\nThis should show a latin square!")
 ```
 
@@ -126,7 +126,7 @@ bc$scoring_f <- c(mk_plate_scoring_functions(bc, plate = "plate", row = "row", c
                   osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 )
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: Initial sample arrangement")
 
 bc$score()
@@ -142,7 +142,7 @@ trace$elapsed
 
 bc$score()
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: Design created by swapping samples 'globally' across the plates")
 ```
 
@@ -171,7 +171,7 @@ optimize_design(bc,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: 'Plate wise' design\nStep 1: after allocating samples to plates")
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
@@ -188,7 +188,7 @@ optimize_design(bc,
 
 bc$score()
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: 'Plate wise' design\nStep 2: after arranging samples within plates")
 ```
 
@@ -220,7 +220,7 @@ optimize_design(bc,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: 'Serial plate' design\nStep 1: after allocating samples to plates")
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
@@ -248,7 +248,7 @@ optimize_design(bc,
 
 bc$score()
 
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: 'Serial plate' design\nStep 2: after optimizing each plate in turn")
 ```
 
@@ -305,7 +305,7 @@ optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 3: Dealing with plates of different size\nStep 1: after distributing groups across plates")
 ```
 
@@ -316,7 +316,7 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row",
 bc$score()
 
 trace = optimize_design(bc,
-                        min_score = 0, max_iter = 1e4,
+                        min_score = 131.0, max_iter = 5e3,
                         shuffle_proposal_func = mk_subgroup_shuffling_function(bc,
                                                                                subgroup_vars = c("plate"),
                                                                                n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
@@ -333,7 +333,7 @@ bc$score()
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group,
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 3: Dealing with plates of different size\nStep 2: after swapping samples within plates")
 ```
 
@@ -367,8 +367,8 @@ assign_in_order(example4, samples = tibble::tibble(
 bc <- example4$copy()
 
 cowplot::plot_grid(
-  plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group, title="Initial layout by Group"),
-  plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Sex, title="Initial layout by Sex"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title="Initial layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title="Initial layout by Sex"),
   ncol = 2
 )
 
@@ -381,13 +381,13 @@ bc$scoring_f <- c(
 bc$score()
 
 trace = optimize_design(bc,
-                        min_score = 17.66, max_iter = 5e3,
+                        min_score = 17.75, max_iter = 5e3,
                         n_shuffle = 1,
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
                         aggregate_scores_func = function(scores, ...) {
                           2 * scores["Group.Plate"] + scores["Sex.Plate"]
                         },
-                        quiet = TRUE
+                        quiet = T
 )
 
 trace$elapsed
@@ -395,8 +395,8 @@ trace$elapsed
 bc$score()
 
 cowplot::plot_grid(
-  plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Group, title="Final layout by Group"),
-  plot_plate(bc$get_samples(), plate = plate, row = row, column = col, .color = Sex, title="Final layout by Sex"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title="Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title="Final layout by Sex"),
   ncol = 2
 )
 ```
