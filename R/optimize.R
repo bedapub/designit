@@ -139,7 +139,6 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
 #' If length(n_swaps)>1 the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted.
 #'
-#' @param batch_container Batch container with locations that can be used to define subgroups
 #' @param subgroup_vars Column names of the variables that together define the relevant subgroups
 #' @param restrain_on_subgroup_levels Permutations can be forced to take place only within a level of the factor of the subgrouping variable. In this case, the user must pass only one subgrouping variable and a number of levels that together define the permuted subgroup.
 #' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_locations/2))
@@ -147,67 +146,81 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' @return Function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #' @export
 #'
-mk_subgroup_shuffling_function = function(batch_container, subgroup_vars,
+mk_subgroup_shuffling_function = function(subgroup_vars,
                                           restrain_on_subgroup_levels = c(),
                                           n_swaps=1) {
 
+  force(subgroup_vars)
+  force(restrain_on_subgroup_levels)
+  force(n_swaps)
+
   MAX_PERMUTATIONS = 1e6 # limit memory use of this function
+
+  # Objects that remain in function's name space and will be evaluated on first invocation
+  valid_indices = NULL
+  valid_permutations = NULL
+  iter <- 0
 
   # suppress no visible binding messages
   src <- dst <- NULL
 
-  bc_loc = batch_container$get_locations()
-  assertthat::assert_that(nrow(bc_loc)>9, msg="Subgroup shuffling is pointless for small containers (n<10)")
-  assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg="All subgroup defining variables have to be part of the container locations")
+  # Helper function to analyze batch container and set up valid permutation table on first invocation of shuffling
+  setup_perms = function(batch_container) {
 
-  assertthat::assert_that(nrow(dplyr::filter(dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
-                                             dplyr::if_any(dplyr::everything(), ~ !is.na(.))))==nrow(bc_loc),
-                          msg="Selected subgrouping variables should not contain any NA values")
+    bc_loc = batch_container$get_locations()
+    assertthat::assert_that(nrow(bc_loc)>9, msg="Subgroup shuffling is pointless for small containers (n<10)")
+    assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg="All subgroup defining variables have to be part of the container locations")
 
-  assertthat::assert_that( !(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0 && length(subgroup_vars)!=1),
-                           msg="Exactly one subgrouping variable must be specified if specific subgrouping levels are passed")
-  assertthat::assert_that( is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels)==0 ||
-                           all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]) ,
-                           msg="All selected subgroup levels have to be present in the subgrouping variable")
+    assertthat::assert_that(nrow(dplyr::filter(dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
+                                               dplyr::if_any(dplyr::everything(), ~ !is.na(.))))==nrow(bc_loc),
+                            msg="Selected subgrouping variables should not contain any NA values")
 
-  if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0) { # we focus on selected subgroups only
-    valid_indices = which( bc_loc[[subgroup_vars]] %in% restrain_on_subgroup_levels)
-    subgroup_sizes = length(valid_indices)
-    n_permut = subgroup_sizes*(subgroup_sizes-1)/2
-    assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
-                            msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                               " possible permutations. Consider a different solution."))
-    valid_permutations = tidyr::crossing( src=valid_indices, dst=valid_indices) %>% dplyr::filter(src<dst)
-  } else { # we swap samples across subgroups
-    bc_loc = dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
-    grp_ind = dplyr::group_indices(bc_loc)
-    subgroup_sizes = dplyr::group_size(bc_loc)
-    n_permut = sum(subgroup_sizes*(subgroup_sizes-1)/2)
-    assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
-                            msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                               " possible permutations. Consider a different solution."))
-    assertthat::assert_that(length(subgroup_sizes)>1, msg="Subgroup shuffling is pointless if there's only one subgroup involved")
-    valid_permutations = purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind==.x)) %>%
-      purrr::map( ~tidyr::crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
-      dplyr::bind_rows()
-  }
+    assertthat::assert_that( !(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0 && length(subgroup_vars)!=1),
+                             msg="Exactly one subgrouping variable must be specified if specific subgrouping levels are passed")
+    assertthat::assert_that( is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels)==0 ||
+                               all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]) ,
+                             msg="All selected subgroup levels have to be present in the subgrouping variable")
 
-  assertthat::assert_that(all(subgroup_sizes>1), msg="Subgroup shuffling requires all subgroups to have a minimum size of 2")
+    if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0) { # we focus on selected subgroups only
+      valid_indices <<- which( bc_loc[[subgroup_vars]] %in% restrain_on_subgroup_levels)
+      subgroup_sizes = length(valid_indices)
+      n_permut = subgroup_sizes*(subgroup_sizes-1)/2
+      assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
+                              msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+                                                 " possible permutations. Consider a different solution."))
+      valid_permutations <<- tidyr::crossing( src=valid_indices, dst=valid_indices) %>% dplyr::filter(src<dst)
+    } else { # we swap samples across subgroups
+      bc_loc = dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
+      grp_ind = dplyr::group_indices(bc_loc)
+      subgroup_sizes = dplyr::group_size(bc_loc)
+      n_permut = sum(subgroup_sizes*(subgroup_sizes-1)/2)
+      assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
+                              msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+                                                 " possible permutations. Consider a different solution."))
+      assertthat::assert_that(length(subgroup_sizes)>1, msg="Subgroup shuffling is pointless if there's only one subgroup involved")
+      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind==.x)) %>%
+        purrr::map( ~tidyr::crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
+        dplyr::bind_rows()
+    }
 
-  assertthat::assert_that(n_permut==nrow(valid_permutations), msg="Permutation calculations screwed up. Check the code.")
+    assertthat::assert_that(all(subgroup_sizes>1), msg="Subgroup shuffling requires all subgroups to have a minimum size of 2")
 
-  valid_indices = 1:n_permut
+    assertthat::assert_that(n_permut==nrow(valid_permutations), msg="Permutation calculations screwed up. Check the code.")
 
-  # Check user provided shuffling protocol
-  n_swaps <- round(n_swaps, 0)
+    valid_indices <<- 1:n_permut
 
-  if (any(n_swaps > n_permut)) { # limit swaps if user provides a meaningless number
-    n_swaps[n_swaps > n_permut] <- n_permut
-    message("Set upper number of swaps to ", n_permut, " in swapping protocol.")
-  }
-  if (any(n_swaps < 1)) {
-    n_swaps[n_swaps < 1] <- 1
-    message("Set lower number of swaps to 1 in swapping protocol.")
+    # Check user provided shuffling protocol
+    n_swaps <- round(n_swaps, 0)
+
+    if (any(n_swaps > n_permut)) { # limit swaps if user provides a meaningless number
+      n_swaps[n_swaps > n_permut] <- n_permut
+      message("Set upper number of swaps to ", n_permut, " in swapping protocol.")
+    }
+    if (any(n_swaps < 1)) {
+      n_swaps[n_swaps < 1] <- 1
+      message("Set lower number of swaps to 1 in swapping protocol.")
+    }
+
   }
 
   # Helper function to pick n INDEPENDENT permutations, i.e. permutations that don't lead to sample loss
@@ -229,12 +242,13 @@ mk_subgroup_shuffling_function = function(batch_container, subgroup_vars,
   }
 
 
-  iter <- 1
-
   if (length(n_swaps)==1) {
     return(
-      function(...) { # ignore possible other params passed to a generic shuffle function
+      function(bc, ...) { # iteration param not used
 
+        if (is.null(valid_permutations)) { # first call
+          setup_perms(bc)
+        }
         if (n_swaps==1) {
           swap = sample(valid_indices, 1)
           return(list(src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
@@ -246,11 +260,22 @@ mk_subgroup_shuffling_function = function(batch_container, subgroup_vars,
     )
   }
 
-  function(batch_container = NULL, iteration = iter, ...) { # ignore possible other params passed to a generic shuffle function
-    if (iteration > length(n_swaps) || iteration < 1) {
+  function(bc, iteration=NULL) {
+
+    if (is.null(iteration)) {
+      iter <<- iter+1
+      iteration = iter
+    } else {
+      iter <<- iteration
+    }
+
+    if (iteration > length(n_swaps)) {
       return(NULL)
     }
-    iter <<- iter+1
+
+    if (is.null(valid_permutations)) { # first call
+      setup_perms(bc)
+    }
 
     if (n_swaps[iteration]==1) {
       swap = sample(valid_indices, 1)
