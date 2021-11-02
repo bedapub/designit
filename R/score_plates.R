@@ -86,7 +86,9 @@ mk_plate_scoring_functions = function (batch_container, plate=NULL, row, column,
 
     # Create and return the actual scoring function for a specific sample permutation
 
-    function(samples) {
+    function(bc) {
+
+      samples = bc$get_samples(assignment = T, include_id = T, remove_empty_locations = F, as_tibble = T)
 
       # Set up trial matrix from sample list
       trial = trial_template
