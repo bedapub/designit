@@ -5,15 +5,12 @@
 \title{Created a shuffling function that permutes samples within certain subgroups of the container locations}
 \usage{
 mk_subgroup_shuffling_function(
-  batch_container,
   subgroup_vars,
   restrain_on_subgroup_levels = c(),
   n_swaps = 1
 )
 }
 \arguments{
-\item{batch_container}{Batch container with locations that can be used to define subgroups}
-
 \item{subgroup_vars}{Column names of the variables that together define the relevant subgroups}
 
 \item{restrain_on_subgroup_levels}{Permutations can be forced to take place only within a level of the factor of the subgrouping variable. In this case, the user must pass only one subgrouping variable and a number of levels that together define the permuted subgroup.}
