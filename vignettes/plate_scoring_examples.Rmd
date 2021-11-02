@@ -7,6 +7,9 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
+params:
+  regenerate_cache: FALSE
+  verbose_cache: TRUE
 ---
   
   
@@ -60,13 +63,27 @@ bc$scoring_f <- list(
   osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
   osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
 )
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace1")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 
 plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 1: Using OSAT scores for plate design\n(not the recommended way!)")
@@ -80,14 +97,26 @@ This should reliably lead to a nice symmetry-bearing latin square design with on
 bc <- example1$copy()
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace2")
+```
+
+```{r eval=.eval_cached_chunk}
 trace = optimize_design(bc,
                         min_score = 6.1, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
                         n_shuffle = 2,
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                         quiet = TRUE
 )
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
 trace$elapsed
 
 plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
@@ -130,14 +159,26 @@ plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: Initial sample arrangement")
 
 bc$score()
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace3")
+```
+
+```{r eval=.eval_cached_chunk}
 trace = optimize_design(bc,
                         n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
                         aggregate_scores_func = worst_score_only,
                         quiet = TRUE
 )
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
 trace$elapsed
 
 bc$score()
@@ -177,14 +218,28 @@ plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
 bc$score()
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace4")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 max_iter = 5e2,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm,
                 quiet = TRUE
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 
 bc$score()
 
@@ -212,13 +267,27 @@ the two scores can be optimized in succeeding runs.
 bc <- example2$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace5")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 quiet = T,
                 min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 
 plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
            title = "Exa 2: 'Serial plate' design\nStep 1: after allocating samples to plates")
@@ -226,25 +295,52 @@ plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
 bc$score()
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace6")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 max_iter = 5e3,
                 quiet=T,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(1)),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 
 bc$score()
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace7")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 max_iter = 5e3,
                 quiet=T,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(2)),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
 )
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 
 bc$score()
 
@@ -295,13 +391,27 @@ assign_random(example3,
 bc <- example3$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+```
 
-optimize_design(bc,
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace8")
+```
+
+```{r eval=.eval_cached_chunk}
+trace <- optimize_design(bc,
                 quiet = T,
                 min_score = 1.49, max_iter = 5e3,
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
+trace
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
@@ -314,7 +424,13 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row",
                                            column = "col", group = "Group")
 
 bc$score()
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace9")
+```
+
+```{r eval=.eval_cached_chunk}
 trace = optimize_design(bc,
                         min_score = 131.0, max_iter = 5e3,
                         shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"),
@@ -324,7 +440,13 @@ trace = optimize_design(bc,
                         aggregate_scores_func = L2s_norm,
                         quiet = TRUE
 )
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r}
 trace$elapsed
 
 bc$score()
@@ -378,7 +500,13 @@ bc$scoring_f <- c(
 )
 
 bc$score()
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.load_cache("trace10")
+```
+
+```{r eval=.eval_cached_chunk}
 trace = optimize_design(bc,
                         min_score = 17.75, max_iter = 5e3,
                         n_shuffle = 1,
@@ -388,7 +516,13 @@ trace = optimize_design(bc,
                         },
                         quiet = T
 )
+```
 
+```{r include=FALSE, message = FALSE}
+designit:::.save_cache(trace)
+```
+
+```{r, fig.width=7, fig.height=3.5}
 trace$elapsed
 
 bc$score()
