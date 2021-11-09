@@ -34,7 +34,7 @@ You can install the development version from Roche GitHub with:
 devtools::install_gitlab(
   "BEDA/designit",
   host = "code.roche.com",
-  auth_token = "LUNaFrSzdHsdxmP-pQGh"
+  auth_token = "TQHaLNrm-VsaALWReKYz"
 )
 ```
 
