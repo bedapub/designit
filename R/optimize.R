@@ -159,7 +159,6 @@ mk_subgroup_shuffling_function = function(subgroup_vars,
   # Objects that remain in function's name space and will be evaluated on first invocation
   valid_indices = NULL
   valid_permutations = NULL
-  iter <- 0
 
   # suppress no visible binding messages
   src <- dst <- NULL
@@ -260,14 +259,7 @@ mk_subgroup_shuffling_function = function(subgroup_vars,
     )
   }
 
-  function(bc, iteration=NULL) {
-
-    if (is.null(iteration)) {
-      iter <<- iter+1
-      iteration = iter
-    } else {
-      iter <<- iteration
-    }
+  function(bc, iteration) {
 
     if (iteration > length(n_swaps)) {
       return(NULL)
