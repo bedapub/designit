@@ -143,7 +143,7 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' @param restrain_on_subgroup_levels Permutations can be forced to take place only within a level of the factor of the subgrouping variable. In this case, the user must pass only one subgrouping variable and a number of levels that together define the permuted subgroup.
 #' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_locations/2))
 #'
-#' @return Function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or `NULL` if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #' @export
 #'
 mk_subgroup_shuffling_function = function(subgroup_vars,
