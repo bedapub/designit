@@ -66,7 +66,7 @@ bc$scoring_f <- list(
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace1")
+designit::.load_cache("trace1")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -79,7 +79,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -100,7 +100,7 @@ bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", grou
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace2")
+designit::.load_cache("trace2")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -113,7 +113,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -162,7 +162,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace3")
+designit::.load_cache("trace3")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -175,7 +175,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -221,7 +221,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace4")
+designit::.load_cache("trace4")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -235,7 +235,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -270,7 +270,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace5")
+designit::.load_cache("trace5")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -283,7 +283,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -298,7 +298,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace6")
+designit::.load_cache("trace6")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -312,7 +312,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -322,7 +322,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace7")
+designit::.load_cache("trace7")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -336,7 +336,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -394,7 +394,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace8")
+designit::.load_cache("trace8")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -407,7 +407,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -427,7 +427,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace9")
+designit::.load_cache("trace9")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -443,7 +443,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r}
@@ -503,7 +503,7 @@ bc$score()
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.load_cache("trace10")
+designit::.load_cache("trace10")
 ```
 
 ```{r eval=.eval_cached_chunk}
@@ -519,7 +519,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit:::.save_cache(trace)
+designit::.save_cache(trace)
 ```
 
 ```{r, fig.width=7, fig.height=3.5}

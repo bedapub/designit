@@ -9,6 +9,7 @@
 #' @param id A unique cache id.
 #'
 #' @keywords internal
+#' @export
 .load_cache <- function(id) {
   report_basename <- stringr::str_replace(knitr::current_input(), "[.]Rmd$", "")
   cache_filename <- stringr::str_c(report_basename, "_", id, ".rda")
@@ -37,6 +38,7 @@
 #' `.cache_filename_write` is not `NULL` and `.eval_cached_chunk`
 #' is `TRUE`
 #' @keywords internal
+#' @export
 .save_cache <- function(...) {
   if (.eval_cached_chunk && !is.null(.cache_filename_write)) {
     if (params$verbose_cache) {

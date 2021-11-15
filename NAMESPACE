@@ -2,6 +2,8 @@
 
 export("%>%")
 export(.data)
+export(.load_cache)
+export(.save_cache)
 export(BatchContainer)
 export(BatchContainerDimension)
 export(L1_norm)
