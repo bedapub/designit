@@ -44,23 +44,12 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Step number.
     #' @param scores
     #' Scores, a vector or a value if no auxiliary functions are used.
-    #'
-    #' @return `OptimizationTrace` invisibly.
-    set_scores = function(i, scores) {
-      self$scores[i, ] <- scores
-      invisible(self)
-    },
-
-    #' @description
-    #' Set aggregated score for i-th step.
-    #'
-    #' @param i
-    #' Step number.
     #' @param aggregated_score
     #' Scores, a vector or a value if no auxiliary functions are used.
     #'
     #' @return `OptimizationTrace` invisibly.
-    set_aggregated_score = function(i, aggregated_score) {
+    set_scores = function(i, scores, aggregated_score) {
+      self$scores[i, ] <- scores
       self$aggregated_score[i] <- aggregated_score
       invisible(self)
     },
