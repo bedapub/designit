@@ -31,6 +31,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Names of scoring functions.
     initialize = function(n_steps, n_scores, score_names) {
       self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
+      self$aggregated_score <- rep(NA_real_, n_steps)
       if (!is.null(score_names)) {
         dimnames(self$scores) <- list(NULL, score_names)
       }
@@ -59,7 +60,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Scores, a vector or a value if no auxiliary functions are used.
     #'
     #' @return `OptimizationTrace` invisibly.
-    set_aggregated_scores = function(i, aggregated_score) {
+    set_aggregated_score = function(i, aggregated_score) {
       self$aggregated_score[i] <- aggregated_score
       invisible(self)
     },
@@ -73,6 +74,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @return `OptimizationTrace` invisibly.
     shrink = function(last_step) {
       self$scores <- head(self$scores, last_step)
+      self$aggregated_score <- head(self$aggregated_score, last_step)
       invisible(self)
     },
 
@@ -84,8 +86,10 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @return `OptimizationTrace` invisibly.
     print = function(...) {
-      start_score <- self$scores[1, 1]
-      final_score <- self$scores[nrow(self$scores), 1]
+      start_score <- self$aggregated_score[1]
+      #start_score <- self$scores[1, 1]
+      #final_score <- self$scores[nrow(self$scores), 1]
+      final_score <- self$aggregated_score[length(self$aggregated_score)]
       cat(stringr::str_glue("Optimization trace ({self$n_steps} score values, elapsed {format(self$elapsed)}).\n\n"))
       cat("  Starting score: ", start_score, "\n", sep = "")
       cat("  Final score   : ", final_score, "\n", sep = "")
