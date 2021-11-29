@@ -176,7 +176,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     } else {
       alpha_levels <- factor(alpha_levels)
       alpha_range <- scales::rescale(
-        alpha_levels,
+        as.numeric(alpha_levels),
         c(1 / min(5, length(alpha_levels)), 1)
       )
       names(alpha_range) <- levels(alpha_levels)
