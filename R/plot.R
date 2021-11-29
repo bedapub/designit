@@ -164,19 +164,27 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
-  if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-    alpha_levels <- .tbl %>%
-      dplyr::pull({{ .alpha }})
-      factor() %>%
-      levels()
-    alpha_range <- scales::rescale(
-      alpha_levels,
-      c(1 / min(5, length(alpha_levels)), 1)
-    )
-    names(alpha_range) <- levels(alpha_levels)
-    g <- g +
-      ggplot2::aes(alpha = {{ .alpha }}) +
-      ggplot2::scale_alpha_manual(values = alpha_range)
+  .alpha <- rlang::enquo(.alpha))
+  if (!rlang::quo_is_null(alpha) {
+    alpha_var <- .tbl %>%
+      dplyr::pull(!!.alpha)
+    alpha_levels <- unique(alpha_var)
+    if (is.numeric(alpha_var) && length(alpha_levels > 7)) {
+      g <- g +
+        ggplot2::aes(alpha = !!.alpha) +
+        ggplot2::scale_alpha(range = alpha_range)
+    } else {
+      alpha_levels <- factor(alpha_levels)
+      alpha_range <- scales::rescale(
+        alpha_levels,
+        c(1 / min(5, length(alpha_levels)), 1)
+      )
+      names(alpha_range) <- levels(alpha_levels)
+      g <- g +
+        ggplot2::aes(alpha = factor(!!.alpha)) +
+        ggplot2::scale_alpha_manual(name = rlang::as_label(.alpha),
+                                    values = alpha_range)
+    }
   }
 
   # set labels as original variables
