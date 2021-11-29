@@ -143,7 +143,7 @@ Plot \code{OptimizationTrace}. Only the main score at the moment.
 \describe{
 \item{\code{aggregated_only}}{only plot the aggregated score}
 
-\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:qplot]{ggplot2::qplot()}}.}
+\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.}
 }
 \if{html}{\out{</div>}}
 }
