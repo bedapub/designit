@@ -51,6 +51,20 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     },
 
     #' @description
+    #' Set aggregated score for i-th step.
+    #'
+    #' @param i
+    #' Step number.
+    #' @param aggregated_score
+    #' Scores, a vector or a value if no auxiliary functions are used.
+    #'
+    #' @return `OptimizationTrace` invisibly.
+    set_aggregated_scores = function(i, aggregated_score) {
+      self$aggregated_score[i] <- aggregated_score
+      invisible(self)
+    },
+
+    #' @description
     #' Shrink scores by keeping only first `last_step` scores.
     #'
     #' @param last_step
