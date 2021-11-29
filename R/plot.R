@@ -170,6 +170,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       dplyr::pull(!!.alpha)
     alpha_levels <- unique(alpha_var)
     if (is.numeric(alpha_var) && length(alpha_levels > 7)) {
+      alpha_range <- c(1 / min(5, length(alpha_levels)), 1)
       g <- g +
         ggplot2::aes(alpha = !!.alpha) +
         ggplot2::scale_alpha(range = alpha_range)
