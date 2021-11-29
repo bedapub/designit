@@ -86,15 +86,24 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @description
     #' Plot `OptimizationTrace`. Only the main score at the moment.
     #'
+    #' @param aggregated_only = TRUE
     #' @param ...
     #' Extra arguments passed to [ggplot2::qplot()].
-    plot = function(...) {
-      ggplot2::qplot(
-        x = seq_len(length(self$aggregated_score)), y = self$aggregated_score,
-        geom = c("point", "line"),
-        xlab = "step", ylab = "score",
-        ...
-      )
+    plot = function(plot_aggregated_only, ...) {
+
+      if (plot_aggregated_only) {
+        ggplot2::qplot(
+          x = seq_len(length(self$aggregated_score)), y = self$aggregated_score,
+          geom = c("point", "line"),
+          xlab = "step", ylab = "score",
+          ...
+        )
+      } else {
+        all_scores <- tidyr::pivot_longer(self$score)
+        ggplot2::ggplot()
+      }
+
+
     }
   ),
   active = list(
