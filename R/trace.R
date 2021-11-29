@@ -87,8 +87,6 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @return `OptimizationTrace` invisibly.
     print = function(...) {
       start_score <- self$aggregated_score[1]
-      #start_score <- self$scores[1, 1]
-      #final_score <- self$scores[nrow(self$scores), 1]
       final_score <- self$aggregated_score[length(self$aggregated_score)]
       cat(stringr::str_glue("Optimization trace ({self$n_steps} score values, elapsed {format(self$elapsed)}).\n\n"))
       cat("  Starting score: ", start_score, "\n", sep = "")
@@ -103,7 +101,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Extra arguments passed to [ggplot2::qplot()].
     plot = function(...) {
       ggplot2::qplot(
-        x = seq_len(nrow(self$scores)), y = self$scores[, 1],
+        x = seq_len(length(self$aggregated_score)), y = self$aggregated_score,
         geom = c("point", "line"),
         xlab = "step", ylab = "score",
         ...
