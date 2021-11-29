@@ -7,6 +7,11 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' `c(iterations + 1, length(bc$scoring_f))`
     scores = NULL,
 
+    #' @field aggregated_score
+    #' Contains a vector of aggregated scores. The vector length is usually
+    #' `c(iterations + 1)`
+    aggregated_score = NULL,
+
     #' @field seed
     #' Saved value of [.Random.seed].
     seed = NULL,
