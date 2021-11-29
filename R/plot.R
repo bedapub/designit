@@ -166,13 +166,17 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   # scale alpha
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
     alpha_levels <- .tbl %>%
-      dplyr::pull({{ .alpha }}) %>%
-      unique() %>%
-      length()
-    alpha_range <- c(1 / min(5, alpha_levels), 1)
+      dplyr::pull({{ .alpha }})
+      factor() %>%
+      levels()
+    alpha_range <- scales::rescale(
+      alpha_levels,
+      c(1 / min(5, length(alpha_levels)), 1)
+    )
+    names(alpha_range) <- levels(alpha_levels)
     g <- g +
-      ggplot2::aes(alpha = {{ .alpha }}) #+
-      #ggplot2::scale_alpha(range = alpha_range) # why would we need this?
+      ggplot2::aes(alpha = {{ .alpha }}) +
+      ggplot2::scale_alpha_manual(values = alpha_range)
   }
 
   # set labels as original variables
