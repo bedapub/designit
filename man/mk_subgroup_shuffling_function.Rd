@@ -18,7 +18,7 @@ mk_subgroup_shuffling_function(
 \item{n_swaps}{Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_locations/2))}
 }
 \value{
-Function to return a list with length n vectors 'src' and 'dst', denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+Function to return a list with length n vectors \code{src} and \code{dst}, denoting source and destination index for the swap operation, or \code{NULL} if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 }
 \description{
 If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
