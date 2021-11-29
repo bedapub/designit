@@ -38,7 +38,6 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \itemize{
 \item \href{#method-new}{\code{OptimizationTrace$new()}}
 \item \href{#method-set_scores}{\code{OptimizationTrace$set_scores()}}
-\item \href{#method-set_aggregated_score}{\code{OptimizationTrace$set_aggregated_score()}}
 \item \href{#method-shrink}{\code{OptimizationTrace$shrink()}}
 \item \href{#method-print}{\code{OptimizationTrace$print()}}
 \item \href{#method-plot}{\code{OptimizationTrace$plot()}}
@@ -72,7 +71,7 @@ Create a new \code{OptimizationTrace} object.
 \subsection{Method \code{set_scores()}}{
 Set scores for i-th step.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores, aggregated_score)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -81,26 +80,6 @@ Set scores for i-th step.
 \item{\code{i}}{Step number.}
 
 \item{\code{scores}}{Scores, a vector or a value if no auxiliary functions are used.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{OptimizationTrace} invisibly.
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_aggregated_score"></a>}}
-\if{latex}{\out{\hypertarget{method-set_aggregated_score}{}}}
-\subsection{Method \code{set_aggregated_score()}}{
-Set aggregated score for i-th step.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_aggregated_score(i, aggregated_score)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{i}}{Step number.}
 
 \item{\code{aggregated_score}}{Scores, a vector or a value if no auxiliary functions are used.}
 }
@@ -156,12 +135,14 @@ Print \code{OptimizationTrace}.
 \subsection{Method \code{plot()}}{
 Plot \code{OptimizationTrace}. Only the main score at the moment.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(aggregated_only = TRUE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{aggregated_only}}{only plot the aggregated score}
+
 \item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:qplot]{ggplot2::qplot()}}.}
 }
 \if{html}{\out{</div>}}
