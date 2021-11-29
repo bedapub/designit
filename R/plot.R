@@ -165,7 +165,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
 
   # scale alpha
   .alpha <- rlang::enquo(.alpha)
-  if (!rlang::quo_is_null(alpha)) {
+  if (!rlang::quo_is_null(.alpha)) {
     alpha_var <- .tbl %>%
       dplyr::pull(!!.alpha)
     alpha_levels <- unique(alpha_var)
