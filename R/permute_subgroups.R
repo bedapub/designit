@@ -231,7 +231,7 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
 #'
 #' @return Shuffling function that on each call returns an index vector for a valid sample permutation
 #' @export
-mk_subgroup_shuffle_function <- function(subgroup_object, subgroup_allocations,
+shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocations,
                                          keep_separate_vars = c(),
                                          report_grouping_as_attribute = FALSE) {
   force(subgroup_object)
@@ -413,5 +413,5 @@ shuffle_grouped_data <- function(batch_container, allocate_var,
 
   sa <- compile_possible_subgroup_allocation(sg, fullTree = fullTree, maxCalls = maxCalls)
 
-  mk_subgroup_shuffle_function(sg, sa, keep_separate_vars = keep_separate_vars, report_grouping_as_attribute = report_grouping_as_attribute)
+  shuffle_with_subgroup_formation(sg, sa, keep_separate_vars = keep_separate_vars, report_grouping_as_attribute = report_grouping_as_attribute)
 }

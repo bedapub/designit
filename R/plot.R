@@ -36,13 +36,18 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 
 #' Plot plate layouts
 #'
-#' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations. Alternatively a [BatchContainter][designit::BatchContainer()] with samples can be supplied here.
-#' @param plate the dimension variable used for the plate ids
+#' @param .tbl a [`tibble`][tibble::tibble()] (or `data.frame`) with the samples assigned to locations.
+#' Alternatively a [BatchContainter][designit::BatchContainer()] with samples can be supplied here.
+#' @param plate optional dimension variable used for the plate ids
 #' @param row the dimension variable used for the row ids
 #' @param column the dimension variable used for the column ids
 #' @param .color the continuous or discrete variable to color by
 #' @param .alpha a continuous variable encoding transparency
 #' @param .pattern a discrete variable encoding tile pattern (needs ggpattern)
+#' @param title string for the plot title
+#' @param add_excluded flag to add excluded wells (in bc$exclude) to the plot.
+#' A BatchContainer must be provided for this.
+#' @param rename_empty whether NA entries in sample table should be renamed to 'empty`.
 #'
 #' @return the ggplot object
 #' @export
@@ -85,9 +90,17 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'   .color = Treatment, .pattern = Timepoint
 #' )
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
-                       .color, .alpha = NULL, .pattern = NULL) {
-  # preven undefined variable error
+                       .color, .alpha = NULL, .pattern = NULL,
+                       title = paste("Layout by", rlang::as_name(rlang::enquo(plate))),
+                       add_excluded = FALSE,
+                       rename_empty = FALSE) {
+  # prevent undefined variable error
   Pattern <- NULL
+
+  if (add_excluded) {
+    assertthat::assert_that(checkmate::test_r6(.tbl, "BatchContainer"))
+    excluded <- .tbl$exclude
+  }
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
     .tbl = .tbl$get_samples()
@@ -96,8 +109,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
 
   add_pattern <- FALSE
-  # check dimensions
-  assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate))))
+  # check parameters
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(row))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(column))))
   assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.color))))
@@ -113,6 +125,27 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       .tbl <- .tbl %>%
         dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
     }
+  }
+  # If there is no plate,
+  if (rlang::quo_is_null(rlang::enquo(plate)) ||
+      !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
+    # check if row + column is unique
+    assertthat::assert_that(
+      (.tbl %>% dplyr::count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
+      msg = "Non-unique row + column combination found. Please provide a plate variable.")
+    # make a fake plate variable
+    .tbl <- .tbl %>%
+      dplyr::mutate(plate = 1)
+    plate <- rlang::sym("plate")
+  }
+  # change NA values for empty wells
+  if (rename_empty) {
+    .color_name <- rlang::as_name(rlang::enquo(.color))
+    .tbl[is.na(.tbl[[.color_name]]), .color_name] <- "empty"
+  }
+  # add excluded wells
+  if (add_excluded) {
+    .tbl <- dplyr::bind_rows(.tbl, excluded)
   }
 
   .tbl <- .tbl %>%
@@ -131,21 +164,34 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     ggplot2::scale_x_discrete(position = "top")
 
   # scale alpha
-  if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-    alpha_levels <- .tbl %>%
-      dplyr::pull({{ .alpha }}) %>%
-      unique() %>%
-      length()
-    alpha_range <- c(1 / min(5, alpha_levels), 1)
-    g <- g +
-      ggplot2::aes(alpha = {{ .alpha }}) +
-      ggplot2::scale_alpha(range = alpha_range)
+  .alpha <- rlang::enquo(.alpha)
+  if (!rlang::quo_is_null(.alpha)) {
+    alpha_var <- .tbl %>%
+      dplyr::pull(!!.alpha)
+    alpha_levels <- unique(alpha_var)
+    if (is.numeric(alpha_var) && length(alpha_levels > 7)) {
+      alpha_range <- c(1 / min(5, length(alpha_levels)), 1)
+      g <- g +
+        ggplot2::aes(alpha = !!.alpha) +
+        ggplot2::scale_alpha(range = alpha_range)
+    } else {
+      alpha_levels <- factor(alpha_levels)
+      alpha_range <- scales::rescale(
+        as.numeric(alpha_levels),
+        c(1 / min(5, length(alpha_levels)), 1)
+      )
+      names(alpha_range) <- levels(alpha_levels)
+      g <- g +
+        ggplot2::aes(alpha = factor(!!.alpha)) +
+        ggplot2::scale_alpha_manual(name = rlang::as_label(.alpha),
+                                    values = alpha_range)
+    }
   }
 
   # set labels as original variables
   g <- g + ggplot2::xlab(rlang::as_name(rlang::enquo(column))) +
     ggplot2::ylab(rlang::as_name(rlang::enquo(row))) +
-    ggplot2::ggtitle(paste("Layout by", rlang::as_name(rlang::enquo(plate))))
+    ggplot2::ggtitle(title)
 
   # make tiles
   if (add_pattern) {
@@ -159,9 +205,9 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       # this is required, see https://github.com/coolbutuseless/ggpattern/issues/50
       ggpattern::scale_pattern_discrete()
   } else {
-    g <- g + ggplot2::geom_tile(ggplot2::aes(fill = {{ .color }}),
-      colour = "grey50"
-    )
+    g <- g + ggplot2::geom_tile(
+      ggplot2::aes(fill = {{ .color }}),
+      colour = "grey50")
   }
 
   return(g)

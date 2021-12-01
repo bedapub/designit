@@ -6,7 +6,8 @@ samples <- data.frame(
   sampleId = seq_len(10)
 )
 
-n_elements_changed <- function(df) {
+n_elements_changed <- function(bc) {
+  df <- bc$get_samples(include_id=TRUE, as_tibble=FALSE)
   cur_state <- df$.sample_id
   cur_state <- tidyr::replace_na(cur_state, -1)
   n_changed <<- c(n_changed, sum(start_state != cur_state))

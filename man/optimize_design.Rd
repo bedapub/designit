@@ -29,7 +29,8 @@ stops if the swapping protocol is exhausted.}
 
 \item{shuffle_proposal_func}{A user defined function to propose the next shuffling of samples.
 Takes priority over n_shuffle if both are provided. The function is called with
-one integer parameter for the current iteration number, allowing very flexible shuffling strategies.
+a \link{BatchContainer} \code{bc} and an integer parameter \code{iteration} for the current iteration number,
+allowing very flexible shuffling strategies.
 The returned function must either return a list with fields \code{src}and \code{dst} (for pairwise sample swapping)
 or a numeric vector with a complete re-assigned sample order.}
 

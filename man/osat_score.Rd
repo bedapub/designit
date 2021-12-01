@@ -4,10 +4,11 @@
 \alias{osat_score}
 \title{Compute OSAT score for sample assignment.}
 \usage{
-osat_score(df, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE)
+osat_score(bc, batch_vars, feature_vars, expected_dt = NULL, quiet = FALSE)
 }
 \arguments{
-\item{df}{\code{\link[data.table:data.table]{data.table}} or \link{data.frame} where every row is a location
+\item{bc}{\link{BatchContainer} with samples
+or \code{\link[data.table:data.table]{data.table}}/\link{data.frame} where every row is a location
 in a container and a sample in this location.}
 
 \item{batch_vars}{\link{character} vector with batch variable names to take into account for the

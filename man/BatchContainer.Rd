@@ -31,9 +31,8 @@ bc
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
 \item{\code{scoring_f}}{Scoring functions used for optimization.
-Each scoring function should receive a \code{\link[data.table:data.table]{data.table}} with columns from
-the samples \link{data.frame}, locations \link{data.frame}, and
-\code{.sample_id} column. This function should return a floating
+Each scoring function should receive a \link{BatchContainer}.
+This function should return a floating
 point score value for the assignment. This a list of functions.
 Upon assignment a single function will be automatically converted to a list
 In the later case each function is called.}

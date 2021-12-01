@@ -20,6 +20,9 @@ simanneal_acceptance_prob <- function(current_score, best_score, temp, eps = 0.1
   if (current_score < best_score) {
     return(1)
   }
+  if (current_score == Inf) {
+    return(0)
+  }
   exp((best_score - current_score - eps) / temp)
 }
 

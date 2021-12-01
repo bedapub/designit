@@ -16,39 +16,11 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(designit)
-library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
 ```
-
-<!-- ## Example 1 -->
-
-<!-- This is a basic example: -->
-
-<!-- ```{r example1} -->
-<!-- anno <- tribble( -->
-<!--   ~Cell,         ~Trt, ~Type, ~Rep, -->
-<!--    "WT",    "treated",   "A",    1, -->
-<!--    "WT",    "treated",   "A",    2,   -->
-<!--    "WT", "nontreated",   "A",    1, -->
-<!--    "WT", "nontreated",   "A",    2, -->
-<!--    "WT",    "control",   "A",    1, -->
-<!--    "WT",    "control",   "A",    2, -->
-<!--    "WT",    "treated",   "B",    1, -->
-<!--    "WT",    "treated",   "B",    2,   -->
-<!--    "WT", "nontreated",   "B",    1, -->
-<!--    "WT", "nontreated",   "B",    2, -->
-<!--    "WT",    "control",   "A",    1, -->
-<!--    "WT",    "control",   "A",    2, -->
-<!--    "KO",    "treated",   "A",    1, -->
-<!--    "KO",    "treated",   "A",    2,   -->
-<!--    "KO", "nontreated",   "A",    1, -->
-<!--    "KO", "nontreated",   "A",    2, -->
-<!--    "KO",    "treated",   "B",    1, -->
-<!--    "KO",    "treated",   "B",    2,   -->
-<!--    "KO", "nontreated",   "B",    1, -->
-<!--    "KO", "nontreated",   "B",    2,   -->
-<!-- ) -->
-<!-- ``` -->
-
 
 # Plate layout with two factors
 
@@ -76,12 +48,15 @@ We will have 3 animals per groups with 4 replicates each
 # sample table (2 animals per group with 3 replicates)
 n_reps <- 4
 n_animals <- 3
-samples <- dplyr::bind_rows(replicate(n_animals, conditions, simplify = FALSE), .id = 'animal') 
-samples <- dplyr::bind_rows(replicate(n_reps, samples, simplify = FALSE), .id = 'replicate') %>%
-  dplyr::mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
-                AnimalID = paste0(treatment,'_',animal))
+animals <- bind_rows(replicate(n_animals, conditions, simplify = FALSE), 
+                            .id = 'animal') 
+samples <- bind_rows(replicate(n_reps, animals, simplify = FALSE), 
+                            .id = 'replicate') %>%
+  mutate(SampleID = paste0(treatment,'_',animal,'_',replicate),
+                AnimalID = paste0(treatment,'_',animal)) %>% 
+  mutate(dose = factor(dose))
 
-gt::gt(samples)
+samples %>% head(10) %>% gt::gt()
 ```
 ## Plate layout requirements
 
@@ -126,11 +101,17 @@ bc$get_samples(remove_empty_locations = TRUE)
 
 ```
 
-
 Plot of the result using the `plot_plate` function
 
 ```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+plot_plate(bc, plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose)
+```
+To not show empty wells, we can directly plot the sample table as well
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 ```
 
@@ -138,17 +119,21 @@ To move individual samples or manually assigning all locations we can use the
 `batchContainer$move_samples()` method
 
 To swap two or more samples use
+
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
 
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 ```
 
 To assign all samples in one go, use the option `location_assignment`.
 The example below orders samples by ID and adds the empty locations afterwards
 ```{r, fig.width=6, fig.height=3.5}
-bc$move_samples(location_assignment = as.integer(c(1:nrow(samples), rep(NA, (bc$n_available - nrow(samples))))))
+bc$move_samples(
+  location_assignment = c(1:nrow(samples), 
+                          rep(NA, (bc$n_available - nrow(samples)))))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE), 
            plate = plate, column = column, row = row,
@@ -170,7 +155,7 @@ bc$scoring_f <- osat_score_generator(batch_vars = "plate",
 
 ## Run an optimization
 
-The optimization procedure is invoked with e.g. `assign_score_optimize_shuffle`.
+The optimization procedure is invoked with e.g. `optimize_design`.
 Here we use a simple shuffling schedule: 
 swap 10 samples for 100 times, then swap 2 samples for 400 times.
 
@@ -187,11 +172,11 @@ Development of the score can be viewed with
 trace$plot()
 ```
 
-
 The layout after plate batching looks the following
 
 ```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE), plate = plate, column = column, row = row,
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
            .color = treatment, .alpha = dose)
 ```
 
@@ -201,4 +186,46 @@ Looking at treatment, we see it's evenly distributed across the plates
 ggplot(bc$get_samples(remove_empty_locations = TRUE),
        aes(x = treatment, fill = treatment)) + geom_bar() +  
    facet_wrap(~plate)
+```
+
+## Customizing the plate layout
+
+To properly distinguish between empty and excluded locations one can do the
+following.
+
+* Supply the BatchContainer directly
+* set `add_excluded = TRUE`, set `rename_empty = TRUE`
+* supply a custom color palette
+* excluded wells have NA values and can be colored with `na.value`
+
+```{r, fig.width=6, fig.height=3.5}
+color_palette <- c(TRT1 = "blue", TRT2 = "purple", 
+                   vehicle = "orange", empty = "white")
+
+plot_plate(bc, plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose,
+           add_excluded = TRUE, rename_empty = TRUE) +
+  scale_fill_manual(values = color_palette, na.value = "darkgray")
+```
+
+To remove all empty wells from the plot, hand the pruned sample list.
+to plot_plate rather than the whole BatchContainer.
+You can still assign your own colors.
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE), 
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) +
+  scale_fill_viridis_d()
+```
+
+Note: removing all empty and excluded wells will lead to omitting 
+completely empty rows or columns!
+
+```{r, fig.width=6, fig.height=3.5}
+plot_plate(bc$get_samples(remove_empty_locations = TRUE) %>% 
+             filter(column != 2),
+           plate = plate, column = column, row = row,
+           .color = treatment, .alpha = dose) +
+  scale_fill_viridis_d()
 ```

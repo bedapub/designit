@@ -36,6 +36,7 @@ Imports:
     dplyr (>= 1.0.0),
     purrr,
     ggplot2,
+    scales,
     tibble,
     tidyselect,
     tidyr,
@@ -63,7 +64,8 @@ Suggests:
     printr,
     devtools (>= 2.0.0),
     gridpattern,
-    ggpattern
+    ggpattern,
+    cowplot
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

@@ -31,6 +31,8 @@ worst_score_only <- function(scores, na.rm = FALSE, ...) {
   max(scores, na.rm = na.rm)
 }
 
+
+
 #' Aggregation of scores: L2 norm squared
 #'
 #' This function enables comparison of the results of two scoring functions by calculating
