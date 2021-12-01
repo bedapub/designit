@@ -24,7 +24,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Create a new `OptimizationTrace` object.
     #'
     #' @param n_steps
-    #' Number of values to save. Usually `n_steps == iterations + `.
+    #' Number of values to save. Usually `n_steps == iterations + 1`.
     #' @param n_scores
     #' Number of scoring functions.
     #' @param score_names
@@ -45,7 +45,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @param scores
     #' Scores, a vector or a value if no auxiliary functions are used.
     #' @param aggregated_score
-    #' Scores, a vector or a value if no auxiliary functions are used.
+    #' Aggregated score, a double value.
     #'
     #' @return `OptimizationTrace` invisibly.
     set_scores = function(i, scores, aggregated_score) {
