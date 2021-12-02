@@ -17,6 +17,9 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \item{\code{scores}}{Contains a matrix of scores. The matrix size is usually
 \code{c(iterations + 1, length(bc$scoring_f))}}
 
+\item{\code{aggregated_score}}{Contains a vector of aggregated scores. The vector length is usually
+\code{c(iterations + 1)}}
+
 \item{\code{seed}}{Saved value of \link{.Random.seed}.}
 
 \item{\code{elapsed}}{Running time of the optimization.}
@@ -68,7 +71,7 @@ Create a new \code{OptimizationTrace} object.
 \subsection{Method \code{set_scores()}}{
 Set scores for i-th step.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores, aggregated_score)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -77,6 +80,8 @@ Set scores for i-th step.
 \item{\code{i}}{Step number.}
 
 \item{\code{scores}}{Scores, a vector or a value if no auxiliary functions are used.}
+
+\item{\code{aggregated_score}}{Scores, a vector or a value if no auxiliary functions are used.}
 }
 \if{html}{\out{</div>}}
 }
@@ -130,13 +135,15 @@ Print \code{OptimizationTrace}.
 \subsection{Method \code{plot()}}{
 Plot \code{OptimizationTrace}. Only the main score at the moment.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(aggregated_only = TRUE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:qplot]{ggplot2::qplot()}}.}
+\item{\code{aggregated_only}}{only plot the aggregated score}
+
+\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.}
 }
 \if{html}{\out{</div>}}
 }

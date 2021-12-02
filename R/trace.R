@@ -7,6 +7,11 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' `c(iterations + 1, length(bc$scoring_f))`
     scores = NULL,
 
+    #' @field aggregated_score
+    #' Contains a vector of aggregated scores. The vector length is usually
+    #' `c(iterations + 1)`
+    aggregated_score = NULL,
+
     #' @field seed
     #' Saved value of [.Random.seed].
     seed = NULL,
@@ -19,13 +24,14 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Create a new `OptimizationTrace` object.
     #'
     #' @param n_steps
-    #' Number of values to save. Usually `n_steps == iterations + `.
+    #' Number of values to save. Usually `n_steps == iterations + 1`.
     #' @param n_scores
     #' Number of scoring functions.
     #' @param score_names
     #' Names of scoring functions.
     initialize = function(n_steps, n_scores, score_names) {
       self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
+      self$aggregated_score <- rep(NA_real_, n_steps)
       if (!is.null(score_names)) {
         dimnames(self$scores) <- list(NULL, score_names)
       }
@@ -38,10 +44,13 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Step number.
     #' @param scores
     #' Scores, a vector or a value if no auxiliary functions are used.
+    #' @param aggregated_score
+    #' Aggregated score, a double value.
     #'
     #' @return `OptimizationTrace` invisibly.
-    set_scores = function(i, scores) {
+    set_scores = function(i, scores, aggregated_score) {
       self$scores[i, ] <- scores
+      self$aggregated_score[i] <- aggregated_score
       invisible(self)
     },
 
@@ -54,6 +63,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @return `OptimizationTrace` invisibly.
     shrink = function(last_step) {
       self$scores <- head(self$scores, last_step)
+      self$aggregated_score <- head(self$aggregated_score, last_step)
       invisible(self)
     },
 
@@ -65,8 +75,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @return `OptimizationTrace` invisibly.
     print = function(...) {
-      start_score <- self$scores[1, 1]
-      final_score <- self$scores[nrow(self$scores), 1]
+      start_score <- self$aggregated_score[1]
+      final_score <- self$aggregated_score[length(self$aggregated_score)]
       cat(stringr::str_glue("Optimization trace ({self$n_steps} score values, elapsed {format(self$elapsed)}).\n\n"))
       cat("  Starting score: ", start_score, "\n", sep = "")
       cat("  Final score   : ", final_score, "\n", sep = "")
@@ -76,15 +86,22 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @description
     #' Plot `OptimizationTrace`. Only the main score at the moment.
     #'
+    #' @param aggregated_only only plot the aggregated score
     #' @param ...
-    #' Extra arguments passed to [ggplot2::qplot()].
-    plot = function(...) {
-      ggplot2::qplot(
-        x = seq_len(nrow(self$scores)), y = self$scores[, 1],
-        geom = c("point", "line"),
-        xlab = "step", ylab = "score",
-        ...
-      )
+    #' Extra arguments passed to [ggplot2::ggplot()].
+    plot = function(aggregated_only = FALSE, ...) {
+
+      plot_data <- data.frame(Iteration = 1:length(self$aggregated_score),
+                              AggregatedScore = self$aggregated_score)
+      if(!aggregated_only && (ncol(self$scores) > 1)) {
+        plot_data <- cbind(plot_data, self$scores)
+      }
+
+      tidyr::pivot_longer(plot_data, names_to = "ScoreName", values_to = "Score",
+                          cols = -Iteration) %>%
+        ggplot2::ggplot(aes(x = Iteration, y = Score)) +
+        geom_point() + geom_line() +
+          facet_wrap(~ScoreName, scales = "free_y")
     }
   ),
   active = list(

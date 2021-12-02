@@ -468,7 +468,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     names(batch_container$scoring_f)
   )
 
-  trace$set_scores(1, best_score)
+  trace$set_scores(1, best_score, best_agg)
 
   if (!quiet) {
     message("Initial aggregated score: ", best_agg, " (", score_dim, "-dim)",
@@ -502,7 +502,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     iteration <- iteration + 1
-    trace$set_scores(iteration, best_score)
+    trace$set_scores(iteration, best_score, best_agg)
 
     # Test stopping criteria
     if (!is.na(min_score) && best_agg <= min_score) {
