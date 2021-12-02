@@ -18,6 +18,9 @@ cache:
 test:
   script:
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  - R -e 'message(paste(capture.output(sessionInfo(package = "remotes")$otherPkgs), "\n"))'
+  - R -e 'message(getOption("repos"))'
+  - R -e 'message(paste(capture.output(remotes::dev_package_deps(dependencies = T)), "\n"))'  
   - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_dev_deps(dep = TRUE))'
   - R -e 'devtools::check(cran = FALSE, error_on = "error", check_dir = Sys.getenv("CHECK_DIR"))'
   - R -e 'if (length(devtools::check_failures(path = Sys.getenv("BUILD_LOGS_DIR"), note = FALSE, warning = FALSE)) > 0) stop()'
