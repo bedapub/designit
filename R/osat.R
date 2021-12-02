@@ -45,7 +45,8 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
     df <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
   } else {
     assertthat::assert_that(is.data.frame(bc),
-                            msg = "bc should be a BatchContainer or a table")
+      msg = "bc should be a BatchContainer or a table"
+    )
     df <- bc
   }
   assertthat::assert_that(is.data.frame(df) && nrow(df) > 0)
@@ -74,7 +75,7 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
     assertthat::assert_that(nrow(expected_dt) > 0,
       msg = "All elements of one of the features / batches are NAs"
     )
-    if (rows_removed > 0 && ! quiet) {
+    if (rows_removed > 0 && !quiet) {
       warning("NAs in features / batch columns; they will be excluded from scoring")
     }
 
@@ -134,7 +135,7 @@ osat_score_generator <- function(batch_vars, feature_vars, quiet = FALSE) {
   force(batch_vars)
   force(feature_vars)
 
-  expected_dt = NULL
+  expected_dt <- NULL
 
   first_call <- TRUE
 

@@ -81,7 +81,7 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
 #'
 #' @export
 complete_random_shuffling <- function(batch_container, iteration) {
-  return(list(location_assignment=sample(batch_container$assignment)))
+  return(list(location_assignment = sample(batch_container$assignment)))
 }
 
 
@@ -108,7 +108,8 @@ mk_swapping_function <- function(n_swaps = 1) {
 
   # User has provided a shuffling protocol!
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
-                          msg = "n_swaps should be an iteger vector")
+    msg = "n_swaps should be an iteger vector"
+  )
 
   swapping_functions <- NULL
   if (length(unique(n_swaps)) < 1000) {
@@ -146,65 +147,74 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or `NULL` if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #' @export
 #'
-mk_subgroup_shuffling_function = function(subgroup_vars,
-                                          restrain_on_subgroup_levels = c(),
-                                          n_swaps=1) {
-
+mk_subgroup_shuffling_function <- function(subgroup_vars,
+                                           restrain_on_subgroup_levels = c(),
+                                           n_swaps = 1) {
   force(subgroup_vars)
   force(restrain_on_subgroup_levels)
   force(n_swaps)
 
-  MAX_PERMUTATIONS = 1e6 # limit memory use of this function
+  MAX_PERMUTATIONS <- 1e6 # limit memory use of this function
 
   # Objects that remain in function's name space and will be evaluated on first invocation
-  valid_indices = NULL
-  valid_permutations = NULL
+  valid_indices <- NULL
+  valid_permutations <- NULL
 
   # suppress no visible binding messages
   src <- dst <- NULL
 
   # Helper function to analyze batch container and set up valid permutation table on first invocation of shuffling
-  setup_perms = function(batch_container) {
+  setup_perms <- function(batch_container) {
+    bc_loc <- batch_container$get_locations()
+    assertthat::assert_that(nrow(bc_loc) > 9, msg = "Subgroup shuffling is pointless for small containers (n<10)")
+    assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg = "All subgroup defining variables have to be part of the container locations")
 
-    bc_loc = batch_container$get_locations()
-    assertthat::assert_that(nrow(bc_loc)>9, msg="Subgroup shuffling is pointless for small containers (n<10)")
-    assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg="All subgroup defining variables have to be part of the container locations")
+    assertthat::assert_that(nrow(dplyr::filter(
+      dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
+      dplyr::if_any(dplyr::everything(), ~ !is.na(.))
+    )) == nrow(bc_loc),
+    msg = "Selected subgrouping variables should not contain any NA values"
+    )
 
-    assertthat::assert_that(nrow(dplyr::filter(dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
-                                               dplyr::if_any(dplyr::everything(), ~ !is.na(.))))==nrow(bc_loc),
-                            msg="Selected subgrouping variables should not contain any NA values")
+    assertthat::assert_that(!(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0 && length(subgroup_vars) != 1),
+      msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
+    )
+    assertthat::assert_that(is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
+      all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
+    msg = "All selected subgroup levels have to be present in the subgrouping variable"
+    )
 
-    assertthat::assert_that( !(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0 && length(subgroup_vars)!=1),
-                             msg="Exactly one subgrouping variable must be specified if specific subgrouping levels are passed")
-    assertthat::assert_that( is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels)==0 ||
-                               all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]) ,
-                             msg="All selected subgroup levels have to be present in the subgrouping variable")
-
-    if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels)>0) { # we focus on selected subgroups only
-      valid_indices <<- which( bc_loc[[subgroup_vars]] %in% restrain_on_subgroup_levels)
-      subgroup_sizes = length(valid_indices)
-      n_permut = subgroup_sizes*(subgroup_sizes-1)/2
-      assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
-                              msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                                 " possible permutations. Consider a different solution."))
-      valid_permutations <<- tidyr::crossing( src=valid_indices, dst=valid_indices) %>% dplyr::filter(src<dst)
+    if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0) { # we focus on selected subgroups only
+      valid_indices <<- which(bc_loc[[subgroup_vars]] %in% restrain_on_subgroup_levels)
+      subgroup_sizes <- length(valid_indices)
+      n_permut <- subgroup_sizes * (subgroup_sizes - 1) / 2
+      assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
+        msg = stringr::str_c(
+          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+          " possible permutations. Consider a different solution."
+        )
+      )
+      valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) %>% dplyr::filter(src < dst)
     } else { # we swap samples across subgroups
-      bc_loc = dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
-      grp_ind = dplyr::group_indices(bc_loc)
-      subgroup_sizes = dplyr::group_size(bc_loc)
-      n_permut = sum(subgroup_sizes*(subgroup_sizes-1)/2)
-      assertthat::assert_that(n_permut<=MAX_PERMUTATIONS,
-                              msg=stringr::str_c("Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                                 " possible permutations. Consider a different solution."))
-      assertthat::assert_that(length(subgroup_sizes)>1, msg="Subgroup shuffling is pointless if there's only one subgroup involved")
-      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind==.x)) %>%
-        purrr::map( ~tidyr::crossing( src=.x, dst=.x) %>% dplyr::filter(src<dst)) %>%
+      bc_loc <- dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
+      grp_ind <- dplyr::group_indices(bc_loc)
+      subgroup_sizes <- dplyr::group_size(bc_loc)
+      n_permut <- sum(subgroup_sizes * (subgroup_sizes - 1) / 2)
+      assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
+        msg = stringr::str_c(
+          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+          " possible permutations. Consider a different solution."
+        )
+      )
+      assertthat::assert_that(length(subgroup_sizes) > 1, msg = "Subgroup shuffling is pointless if there's only one subgroup involved")
+      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) %>%
+        purrr::map(~ tidyr::crossing(src = .x, dst = .x) %>% dplyr::filter(src < dst)) %>%
         dplyr::bind_rows()
     }
 
-    assertthat::assert_that(all(subgroup_sizes>1), msg="Subgroup shuffling requires all subgroups to have a minimum size of 2")
+    assertthat::assert_that(all(subgroup_sizes > 1), msg = "Subgroup shuffling requires all subgroups to have a minimum size of 2")
 
-    assertthat::assert_that(n_permut==nrow(valid_permutations), msg="Permutation calculations screwed up. Check the code.")
+    assertthat::assert_that(n_permut == nrow(valid_permutations), msg = "Permutation calculations screwed up. Check the code.")
 
     valid_indices <<- 1:n_permut
 
@@ -219,39 +229,40 @@ mk_subgroup_shuffling_function = function(subgroup_vars,
       n_swaps[n_swaps < 1] <- 1
       message("Set lower number of swaps to 1 in swapping protocol.")
     }
-
   }
 
   # Helper function to pick n INDEPENDENT permutations, i.e. permutations that don't lead to sample loss
-  pick_indep_perm = function(n) {
+  pick_indep_perm <- function(n) {
     # Start with an index of all possible permutations
-    poss_perm = valid_permutations
-    source = desti = integer(n)
+    poss_perm <- valid_permutations
+    source <- desti <- integer(n)
     for (i in 1:n) {
-      p = floor(stats::runif(1,1,nrow(poss_perm)+1))
-      source[i]=poss_perm[["src"]][p]
-      desti[i]=poss_perm[["dst"]][p]
-      poss_perm = dplyr::filter(poss_perm, src!=source[i], src!=desti[i], dst!=source[i], dst!=desti[i] )
-      if (nrow(poss_perm)==0) {
+      p <- floor(stats::runif(1, 1, nrow(poss_perm) + 1))
+      source[i] <- poss_perm[["src"]][p]
+      desti[i] <- poss_perm[["dst"]][p]
+      poss_perm <- dplyr::filter(poss_perm, src != source[i], src != desti[i], dst != source[i], dst != desti[i])
+      if (nrow(poss_perm) == 0) {
         # Stop if we don't have any independent exchanges left
         break
       }
     }
-    list(src=c(source[1:i], desti[1:i]), dst=c(desti[1:i], source[1:i]))
+    list(src = c(source[1:i], desti[1:i]), dst = c(desti[1:i], source[1:i]))
   }
 
 
-  if (length(n_swaps)==1) {
+  if (length(n_swaps) == 1) {
     return(
       function(bc, ...) { # iteration param not used
 
         if (is.null(valid_permutations)) { # first call
           setup_perms(bc)
         }
-        if (n_swaps==1) {
-          swap = sample(valid_indices, 1)
-          return(list(src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
-                      dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])))
+        if (n_swaps == 1) {
+          swap <- sample(valid_indices, 1)
+          return(list(
+            src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
+            dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])
+          ))
         } else {
           return(pick_indep_perm(n_swaps))
         }
@@ -260,7 +271,6 @@ mk_subgroup_shuffling_function = function(subgroup_vars,
   }
 
   function(bc, iteration) {
-
     if (iteration > length(n_swaps)) {
       return(NULL)
     }
@@ -269,15 +279,16 @@ mk_subgroup_shuffling_function = function(subgroup_vars,
       setup_perms(bc)
     }
 
-    if (n_swaps[iteration]==1) {
-      swap = sample(valid_indices, 1)
-      return(list(src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
-                  dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])))
+    if (n_swaps[iteration] == 1) {
+      swap <- sample(valid_indices, 1)
+      return(list(
+        src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
+        dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])
+      ))
     } else {
       return(pick_indep_perm(n_swaps[iteration]))
     }
   }
-
 }
 
 
@@ -336,7 +347,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
-                            msg = "batch-container is empty and no samples provided"
+      msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
@@ -356,13 +367,14 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   n_locations <- nrow(samp)
 
   assertthat::assert_that(".sample_id" %in% colnames(samp),
-                          all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
-                          msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
+    all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
+    msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
 
   assertthat::assert_that(is.null(n_shuffle) ||
-                            (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
-                          msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL")
+    (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
+  msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
+  )
 
 
   # Create shuffle_proposal_func
@@ -384,7 +396,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
 
-  extract_shuffle_params = function(shuffle) {
+  extract_shuffle_params <- function(shuffle) {
     # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
     # Tried to avoid redundant checks that are performed on batch container level
 
@@ -398,45 +410,46 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     if (rlang::is_atomic(shuffle)) {
-      loc = shuffle
-      src = dst = attrib = NULL
+      loc <- shuffle
+      src <- dst <- attrib <- NULL
       assertthat::assert_that(!using_attributes,
-                              msg = "sample attributes must be consistently supplied by shuffle function once started")
+        msg = "sample attributes must be consistently supplied by shuffle function once started"
+      )
     } else {
       assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
       if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
-        loc = NULL
-        src = shuffle[["src"]]
-        dst = shuffle[["dst"]]
+        loc <- NULL
+        src <- shuffle[["src"]]
+        dst <- shuffle[["dst"]]
       } else {
-        assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg="shuffle function must return either a src/dst pair or a location vector")
-        loc = shuffle[["location_assignment"]]
-        src = dst = NULL
+        assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg = "shuffle function must return either a src/dst pair or a location vector")
+        loc <- shuffle[["location_assignment"]]
+        src <- dst <- NULL
       }
       if (is.null(shuffle[["samples_attr"]])) {
         assertthat::assert_that(!using_attributes,
-                                msg = "sample attributes must be consistently supplied by shuffle function once started")
-        attrib = NULL
+          msg = "sample attributes must be consistently supplied by shuffle function once started"
+        )
+        attrib <- NULL
       } else {
-        attrib = shuffle[["samples_attr"]]
+        attrib <- shuffle[["samples_attr"]]
         using_attributes <<- TRUE
       }
     }
 
-    list( src=src, dst=dst, location_assignment=loc, samples_attr=attrib)
+    list(src = src, dst = dst, location_assignment = loc, samples_attr = attrib)
   }
 
   attrib_msg_made <- FALSE
 
-  update_batchcontainer = function(shuffle_params) {
-
-    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst , location_assignment = shuffle_params$location_assignment )
+  update_batchcontainer <- function(shuffle_params) {
+    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst, location_assignment = shuffle_params$location_assignment)
 
     # Add sample attributes to container if necessary
     if (!is.null(shuffle_params[["samples_attr"]])) {
-      batch_container$samples_attr = shuffle_params[["samples_attr"]]
+      batch_container$samples_attr <- shuffle_params[["samples_attr"]]
       if (!quiet && !attrib_msg_made) {
-        message( "Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
+        message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
         attrib_msg_made <<- TRUE
       }
     }
@@ -471,8 +484,10 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   trace$set_scores(1, best_score, best_agg)
 
   if (!quiet) {
-    message("Initial aggregated score: ", best_agg, " (", score_dim, "-dim)",
-            ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]")))
+    message(
+      "Initial aggregated score: ", best_agg, " (", score_dim, "-dim)",
+      ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]"))
+    )
   }
 
 
@@ -481,7 +496,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     update_batchcontainer(shuffle_params)
 
     new_score <- batch_container$score()
-    assertthat::assert_that(!any(is.na(new_score)), msg=stringr::str_c("NA apprearing during scoring in iteration ", iteration))
+    assertthat::assert_that(!any(is.na(new_score)), msg = stringr::str_c("NA apprearing during scoring in iteration ", iteration))
 
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
@@ -493,7 +508,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
           ifelse(score_dim < 2, "", stringr::str_c(" [c(", stringr::str_c(round(best_score, 3), collapse = ", "), ")]")),
           " in iter ", iteration
         )
-
       }
     } else {
       if (is.null(shuffle_params[["location_assignment"]])) { # we used the permutation method and thus have to swap samples back!
@@ -507,7 +521,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     # Test stopping criteria
     if (!is.na(min_score) && best_agg <= min_score) {
       if (!quiet) {
-        message("Reached min_score in ", iteration-1, " iterations.")
+        message("Reached min_score in ", iteration - 1, " iterations.")
       }
       break
     }
@@ -517,14 +531,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
         extract_shuffle_params()
     }
-
   }
 
   # In the end, always make sure that final state of bc is the one with the best score
   batch_container$move_samples(location_assignment = best_perm)
 
   trace$shrink(iteration)
-  trace$seed <-  save_random_seed
+  trace$seed <- save_random_seed
   trace$elapsed <- Sys.time() - start_time
   trace
 }

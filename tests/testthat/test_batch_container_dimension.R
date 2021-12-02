@@ -52,4 +52,3 @@ test_that("Test errors with invalid parameters", {
   # NAs as values
   expect_error(BatchContainerDimension$new(name = "test", values = c(1:10, NA)))
 })
-

@@ -7,7 +7,7 @@ samples <- data.frame(
 )
 
 n_elements_changed <- function(bc) {
-  df <- bc$get_samples(include_id=TRUE, as_tibble=FALSE)
+  df <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
   cur_state <- df$.sample_id
   cur_state <- tidyr::replace_na(cur_state, -1)
   n_changed <<- c(n_changed, sum(start_state != cur_state))
@@ -71,4 +71,3 @@ test_that("complex shuffling schedule", {
   )
   expect_equal(n_changed, c(0, c(4, 4, 10, 4, 4, 20, 20, 20, 20)))
 })
-

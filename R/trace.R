@@ -90,17 +90,21 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @param ...
     #' Extra arguments passed to [ggplot2::ggplot()].
     plot = function(aggregated_only = FALSE, ...) {
-
-      plot_data <- data.frame(Iteration = 1:length(self$aggregated_score),
-                              AggregatedScore = self$aggregated_score)
-      if(!aggregated_only && (ncol(self$scores) > 1)) {
+      plot_data <- data.frame(
+        Iteration = 1:length(self$aggregated_score),
+        AggregatedScore = self$aggregated_score
+      )
+      if (!aggregated_only && (ncol(self$scores) > 1)) {
         plot_data <- cbind(plot_data, self$scores)
       }
 
-      tidyr::pivot_longer(plot_data, names_to = "ScoreName", values_to = "Score",
-                          cols = -Iteration) %>%
+      tidyr::pivot_longer(plot_data,
+        names_to = "ScoreName", values_to = "Score",
+        cols = -Iteration
+      ) %>%
         ggplot2::ggplot(ggplot2::aes(x = Iteration, y = Score)) +
-        ggplot2::geom_point() + ggplot2::geom_line() +
+        ggplot2::geom_point() +
+        ggplot2::geom_line() +
         ggplot2::facet_wrap(~ScoreName, scales = "free_y")
     }
   ),

@@ -17,7 +17,7 @@ without getting an error.
 }
 \examples{
 \dontrun{
-dt <- data.table::data.table(a=1, b=2)
+dt <- data.table::data.table(a = 1, b = 2)
 dt[, a := NULL]
 }
 }

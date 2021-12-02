@@ -15,7 +15,8 @@ validate_samples <- function(samples) {
   )
 
   assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(tidyselect::everything(), is.na))) == 0,
-                          msg = "Samples contain all-NA rows")
+    msg = "Samples contain all-NA rows"
+  )
 }
 
 
@@ -50,8 +51,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' )
     #'
     #' bc
-    initialize = function(
-                          dimensions,
+    initialize = function(dimensions,
                           exclude = NULL) {
       assertthat::assert_that(length(dimensions) >= 1)
 
@@ -133,7 +133,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           private$validate_assignment(private$assignment_vector)
           private$samples_dt_cache <- cbind(
             self$get_locations(),
-            private$samples_table[private$assignment_vector,]
+            private$samples_table[private$assignment_vector, ]
           ) %>%
             data.table::as.data.table()
         }
@@ -150,7 +150,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
 
       if (!include_id) {
-        res[,.sample_id := NULL]
+        res[, .sample_id := NULL]
       }
 
       if (as_tibble) {
@@ -190,8 +190,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
     move_samples = function(src, dst, location_assignment) {
       if (!missing(src) && !is.null(src)) {
         assertthat::assert_that(missing(location_assignment) ||
-                                  is.null(location_assignment),
-                                msg = "move_samples supports either src & dst, or location_assignment, not both")
+          is.null(location_assignment),
+        msg = "move_samples supports either src & dst, or location_assignment, not both"
+        )
         assertthat::assert_that(
           # is.integer is much faster, but we want to allow
           # src = c(1, 2)
@@ -244,7 +245,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         msg = "Scoring function needs to be assigned"
       )
       assertthat::assert_that(is.list(private$scoring_funcs),
-                              length(private$scoring_funcs) >= 1,
+        length(private$scoring_funcs) >= 1,
         msg = "Scroring function should be a non-empty list"
       )
       assertthat::assert_that(!is.null(private$samples_table),
@@ -254,7 +255,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       res <- purrr::map_dbl(private$scoring_funcs, ~ .x(self))
       assertthat::assert_that(length(res) == length(private$scoring_funcs))
 
-      assertthat::assert_that(is.numeric(res), msg="Scoring function should return a number")
+      assertthat::assert_that(is.numeric(res), msg = "Scoring function should return a number")
 
       return(res)
     },
@@ -272,7 +273,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           dplyr::select(-.sample_id)
       }
       if (!is.null(self$assignment)) {
-        bc$move_samples(location_assignment=self$assignment)
+        bc$move_samples(location_assignment = self$assignment)
       }
       bc$scoring_f <- self$scoring_f
       bc
@@ -295,7 +296,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       invisible(self)
     }
   ),
-
   private = list(
     #' List of scoring functions.
     scoring_funcs = NULL,
@@ -335,7 +335,6 @@ BatchContainer <- R6::R6Class("BatchContainer",
       )
     }
   ),
-
   active = list(
     #' @field scoring_f
     #' Scoring functions used for optimization.
@@ -356,7 +355,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           assertthat::assert_that(is.list(value), length(value) >= 1)
           assertthat::assert_that(
             all(purrr::map_lgl(self$scoring_f, is.function)),
-            msg="All elements of scoring_f should be functions"
+            msg = "All elements of scoring_f should be functions"
           )
           private$scoring_funcs <- value
         }
@@ -448,8 +447,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         # In rare cases when this is really needed, one could create a new
         # BatchContainer.
         assertthat::assert_that(
-           is.null(private$samples_table),
-           msg = "Cannot change excluded locations after samples have been added"
+          is.null(private$samples_table),
+          msg = "Cannot change excluded locations after samples have been added"
         )
         if (is.null(value) || nrow(value) == 0) {
           private$exclude_df <- NULL
@@ -511,7 +510,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         )
 
         assertthat::assert_that(nrow(samples) > 0 && ncol(samples) > 0,
-                                msg = "samples should be a non-empty data.frame")
+          msg = "samples should be a non-empty data.frame"
+        )
 
         assertthat::assert_that(length(intersect(self$dimension_names, colnames(samples))) == 0,
           msg = "some of the samples columns match batch container dimension names"
@@ -524,7 +524,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
         samples$.sample_id <- seq_len(nrow(samples))
 
         private$samples_table <- dplyr::select(
-          samples, .sample_id, dplyr::everything())
+          samples, .sample_id, dplyr::everything()
+        )
 
         private$samples_dt_cache <- NULL
       }

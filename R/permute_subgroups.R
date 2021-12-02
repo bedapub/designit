@@ -28,7 +28,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   assertthat::assert_that(allocate_var %in% colnames(samples), msg = "Allocation variable not found in sample table.")
   allocate_fac <- samples[[allocate_var]]
   assertthat::assert_that(!any(is.null(allocate_fac) | is.na(allocate_fac) | is.nan(allocate_fac)),
-                          msg = "No undefined/empty levels of the allocation variable are allowed."
+    msg = "No undefined/empty levels of the allocation variable are allowed."
   )
   # The allocation variable must have factor levels in a given order!
   # This is important later on for sample swapping as it has to be known which factor level corresponds to 'group 1' etc
@@ -63,7 +63,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
     n_ideal <- if (prefer_big_groups) ceiling((n_min + n_max) / 2) else floor((n_min + n_max) / 2)
   }
   assertthat::assert_that(n_ideal <= n_max, n_ideal >= n_min,
-                          msg = stringr::str_c("n_ideal (", n_ideal, ") must be between n_min (", n_min, ") and n_max (", n_max, ").")
+    msg = stringr::str_c("n_ideal (", n_ideal, ") must be between n_min (", n_min, ") and n_max (", n_max, ").")
   )
 
   best_group_sizes <- function(n, nmin, nmax, nideal, prefer_big) {
@@ -106,10 +106,12 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
 
   # Determine sizes of the subgroups and store in list; name elements by levels of the involved grouping variables
   subgroup_sizes <- purrr::map(dplyr::group_size(grouped_samples), ~ best_group_sizes(.x, n_min, n_max, n_ideal, prefer_big_groups))
-  names(subgroup_sizes) = dplyr::group_keys(grouped_samples) %>% tidyr::unite(col="keys", sep="/") %>% dplyr::pull(1)
+  names(subgroup_sizes) <- dplyr::group_keys(grouped_samples) %>%
+    tidyr::unite(col = "keys", sep = "/") %>%
+    dplyr::pull(1)
 
   assertthat::assert_that(!strict || (min(unlist(subgroup_sizes)) >= n_min && max(unlist(subgroup_sizes)) <= n_max),
-                          msg = "Cannot form subgroups under strict setting with given constraints!"
+    msg = "Cannot form subgroups under strict setting with given constraints!"
   )
 
   message(
@@ -138,8 +140,8 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
 #' @keywords internal
 validate_subgrouping_object <- function(subgroup_object) {
   assertthat::assert_that(all(c("Grouped_Samples", "Subgroup_Sizes", "Allocate_Var", "Subgroup_Var_Name", "Allocate_Levels")
-                              %in% names(subgroup_object)),
-                          msg = "Invalid subgroup object passed."
+  %in% names(subgroup_object)),
+  msg = "Invalid subgroup object passed."
   )
 }
 
@@ -166,7 +168,7 @@ find_possible_block_allocations <- function(block_sizes, group_nums, fullTree = 
   find_alloc <- function(done_groups, todo_blocks, groups_left) {
     ncalls <<- ncalls + 1
     if (length(todo_blocks) == 1 && sum(groups_left > 0) == 1 &&
-        groups_left[groups_left > 0] == todo_blocks) {
+      groups_left[groups_left > 0] == todo_blocks) {
       allocs[[length(allocs) + 1]] <<- unname(c(done_groups, which(groups_left > 0)))
     } else if (fullTree || ncalls < maxCalls) {
       to_try <- which(todo_blocks[1] <= groups_left)
@@ -214,10 +216,11 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
   validate_subgrouping_object(subgroup_object)
 
   find_possible_block_allocations(unlist(subgroup_object$Subgroup_Sizes, use.names = F),
-                                  table(factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
-                                               levels = subgroup_object$Allocate_Levels)),
-                                  fullTree = fullTree,
-                                  maxCalls = maxCalls
+    table(factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
+      levels = subgroup_object$Allocate_Levels
+    )),
+    fullTree = fullTree,
+    maxCalls = maxCalls
   )
 }
 
@@ -232,8 +235,8 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
 #' @return Shuffling function that on each call returns an index vector for a valid sample permutation
 #' @export
 shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocations,
-                                         keep_separate_vars = c(),
-                                         report_grouping_as_attribute = FALSE) {
+                                            keep_separate_vars = c(),
+                                            report_grouping_as_attribute = FALSE) {
   force(subgroup_object)
   force(subgroup_allocations)
   force(keep_separate_vars)
@@ -292,7 +295,7 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
   # Since this column won't be permuted along with the samples, we have to build an index for mapping
   # sorted logical group information back into the batch container
   alloc_var_orig <- factor(subgroup_object$Grouped_Samples[[subgroup_object$Allocate_Var]],
-                           levels = subgroup_object$Allocate_Levels
+    levels = subgroup_object$Allocate_Levels
   )
   alloc_var_order <- order(alloc_var_orig)
 
@@ -314,7 +317,6 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
   # All constraints are guaranteed to be satisfied
 
   function(...) {
-
     idx <<- idx + 1
     if (idx > length(alloc_vectors)) {
       idx <<- 1
