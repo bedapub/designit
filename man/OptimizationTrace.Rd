@@ -56,7 +56,7 @@ Create a new \code{OptimizationTrace} object.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{n_steps}}{Number of values to save. Usually \verb{n_steps == iterations + }.}
+\item{\code{n_steps}}{Number of values to save. Usually \code{n_steps == iterations + 1}.}
 
 \item{\code{n_scores}}{Number of scoring functions.}
 
@@ -81,7 +81,7 @@ Set scores for i-th step.
 
 \item{\code{scores}}{Scores, a vector or a value if no auxiliary functions are used.}
 
-\item{\code{aggregated_score}}{Scores, a vector or a value if no auxiliary functions are used.}
+\item{\code{aggregated_score}}{Aggregated score, a double value.}
 }
 \if{html}{\out{</div>}}
 }
@@ -135,7 +135,7 @@ Print \code{OptimizationTrace}.
 \subsection{Method \code{plot()}}{
 Plot \code{OptimizationTrace}. Only the main score at the moment.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(aggregated_only = TRUE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(aggregated_only = FALSE, ...)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
