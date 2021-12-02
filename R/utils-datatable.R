@@ -3,7 +3,7 @@
 #' @keywords internal
 #' @examples
 #' \dontrun{
-#' dt <- data.table::data.table(a=1, b=2)
+#' dt <- data.table::data.table(a = 1, b = 2)
 #' dt[, a := NULL]
 #' }
-.datatable.aware = TRUE
+.datatable.aware <- TRUE

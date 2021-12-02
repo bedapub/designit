@@ -50,71 +50,86 @@ This function generates a randomized experimental layout based on given
 experimental dimensions and factors to be balanced
 }
 \examples{
-
 \dontrun{
 # samples to use
-samples <- data.frame(Group = c(1, 2, 3, 4, 5),
-                     Treatment = c("vehicle", "RTR24", "RTR25",
-                                   "RTR26", "RTR27"),
-                     Dose = c(0, 25, 25, 25, 25),
-                     animals = c(2, 2, 2, 2, 2))
+samples <- data.frame(
+  Group = c(1, 2, 3, 4, 5),
+  Treatment = c(
+    "vehicle", "RTR24", "RTR25",
+    "RTR26", "RTR27"
+  ),
+  Dose = c(0, 25, 25, 25, 25),
+  animals = c(2, 2, 2, 2, 2)
+)
 
 # generate initial sample table (2 animals per group with 3 replicates)
 samples <- dplyr::bind_rows(samples \%>\% dplyr::mutate(animals = 1), samples) \%>\%
-            dplyr::rename(animal = animals)
-samples <- dplyr::bind_rows(list(samples,samples,samples)) \%>\%
-            dplyr::mutate(replicate = rep(1:3, each = 10),
-                   SampleID = paste0(Treatment,'_',animal,'_',replicate),
-                   AnimalID = paste0(Treatment,'_',animal))
+  dplyr::rename(animal = animals)
+samples <- dplyr::bind_rows(list(samples, samples, samples)) \%>\%
+  dplyr::mutate(
+    replicate = rep(1:3, each = 10),
+    SampleID = paste0(Treatment, "_", animal, "_", replicate),
+    AnimalID = paste0(Treatment, "_", animal)
+  )
 
 # to be put on a 96 well plate
 # (empty wells: first and last column plus two more wells)
-empty <- 8*4 - nrow(samples) # n locations - n samples
-emptydf <- data.frame(Treatment = 'empty',
-                      FixColumn = 4, FixRow = 8 + 1 - (1:empty))
+empty <- 8 * 4 - nrow(samples) # n locations - n samples
+emptydf <- data.frame(
+  Treatment = "empty",
+  FixColumn = 4, FixRow = 8 + 1 - (1:empty)
+)
 
 # final sample table
 design <- dplyr::full_join(samples, emptydf)
 
 # set parameters
 layout_dim <- c(Row = 8, Column = 4)
-scoring_groups <- list(c('Row'),c('Column'))
-scoring_tests <- list('countGini','countGini')
+scoring_groups <- list(c("Row"), c("Column"))
+scoring_tests <- list("countGini", "countGini")
 scoring_weights <- c(Row = 1, Column = 2)
-balance <- c('AnimalID')
-balance_weights <- c(1,1)
+balance <- c("AnimalID")
+balance_weights <- c(1, 1)
 names(balance_weights) <- balance
 report <- "SampleID" # column with a unique ID
-#annealprotocol <- rep(c(10,5,2,1), c(500,1000,2000,5000))
-annealprotocol <- rep(c(10,5,2,1), c(50,100,200,300))
+# annealprotocol <- rep(c(10,5,2,1), c(500,1000,2000,5000))
+annealprotocol <- rep(c(10, 5, 2, 1), c(50, 100, 200, 300))
 
 # run randomization
 result <- randomize(design, report, layout_dim, balance,
-                    scoring_groups = scoring_groups,
-                    scoring_tests = scoring_tests,
-                    burnin = 200, annealprotocol = annealprotocol,
-                    scoring_weights = scoring_weights,
-                    balance_weights = balance_weights,
-                    distribute = sample(1:(prod(layout_dim))))
+  scoring_groups = scoring_groups,
+  scoring_tests = scoring_tests,
+  burnin = 200, annealprotocol = annealprotocol,
+  scoring_weights = scoring_weights,
+  balance_weights = balance_weights,
+  distribute = sample(1:(prod(layout_dim)))
+)
 
 final_design <- result$design \%>\%
   dplyr::mutate(Column = Column + 1) # first column empty
 
-#plot
+# plot
 library(ggplot)
-ggplot(final_design,
-       aes(x = Column, y = Row, fill = Treatment, alpha = factor(animal))) +
-  theme_minimal() + geom_tile() +
+ggplot(
+  final_design,
+  aes(x = Column, y = Row, fill = Treatment, alpha = factor(animal))
+) +
+  theme_minimal() +
+  geom_tile() +
   scale_x_continuous(breaks = unique(final_design$Column)) +
   scale_y_reverse(breaks = rev(unique(final_design$Row))) +
-  scale_alpha_manual(values = c(1,0.5))
+  scale_alpha_manual(values = c(1, 0.5))
 
-kable(table(final_design$Treatment,final_design$Column), digits = 0,
-      caption = 'Treatment distribution across Columns.')
+kable(table(final_design$Treatment, final_design$Column),
+  digits = 0,
+  caption = "Treatment distribution across Columns."
+)
 
 # optimization curve
-plot(score ~ iteration, data = result$opti,
-     log = "x", ylab = "penalty", type = "b")
+plot(score ~ iteration,
+  data = result$opti,
+  log = "x", ylab = "penalty", type = "b"
+)
 }
 
 }

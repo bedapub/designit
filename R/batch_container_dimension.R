@@ -44,8 +44,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' )
     #'
     #' bc
-    initialize = function(
-                          name,
+    initialize = function(name,
                           size = NULL,
                           values = NULL,
                           weight = NA_real_,
@@ -115,7 +114,6 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
       self$parent_dimension <- parent_dimension
     }
   ),
-
   active = list(
     #' @field size
     #' Returns size of a dimension.

@@ -103,7 +103,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
 
   if (checkmate::test_r6(.tbl, "BatchContainer")) {
-    .tbl = .tbl$get_samples()
+    .tbl <- .tbl$get_samples()
   } else {
     assertthat::assert_that(is.data.frame(.tbl))
   }
@@ -118,8 +118,8 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
   if (!rlang::quo_is_null(rlang::enquo(.pattern))) {
     add_pattern <- requireNamespace("ggpattern", quietly = TRUE)
-    if (!add_pattern){
-       warning("Please install ggpattern to use patterns in the plot")
+    if (!add_pattern) {
+      warning("Please install ggpattern to use patterns in the plot")
     } else {
       assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
       .tbl <- .tbl %>%
@@ -128,11 +128,12 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   }
   # If there is no plate,
   if (rlang::quo_is_null(rlang::enquo(plate)) ||
-      !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
+    !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
     # check if row + column is unique
     assertthat::assert_that(
       (.tbl %>% dplyr::count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
-      msg = "Non-unique row + column combination found. Please provide a plate variable.")
+      msg = "Non-unique row + column combination found. Please provide a plate variable."
+    )
     # make a fake plate variable
     .tbl <- .tbl %>%
       dplyr::mutate(plate = 1)
@@ -183,8 +184,10 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       names(alpha_range) <- levels(alpha_levels)
       g <- g +
         ggplot2::aes(alpha = factor(!!.alpha)) +
-        ggplot2::scale_alpha_manual(name = rlang::as_label(.alpha),
-                                    values = alpha_range)
+        ggplot2::scale_alpha_manual(
+          name = rlang::as_label(.alpha),
+          values = alpha_range
+        )
     }
   }
 
@@ -207,7 +210,8 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   } else {
     g <- g + ggplot2::geom_tile(
       ggplot2::aes(fill = {{ .color }}),
-      colour = "grey50")
+      colour = "grey50"
+    )
   }
 
   return(g)
