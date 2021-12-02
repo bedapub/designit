@@ -99,9 +99,9 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
 
       tidyr::pivot_longer(plot_data, names_to = "ScoreName", values_to = "Score",
                           cols = -Iteration) %>%
-        ggplot2::ggplot(aes(x = Iteration, y = Score)) +
-        geom_point() + geom_line() +
-          facet_wrap(~ScoreName, scales = "free_y")
+        ggplot2::ggplot(ggplot2::aes(x = Iteration, y = Score)) +
+        ggplot2::geom_point() + ggplot2::geom_line() +
+        ggplot2::facet_wrap(~ScoreName, scales = "free_y")
     }
   ),
   active = list(
