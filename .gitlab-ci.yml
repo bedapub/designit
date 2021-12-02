@@ -18,6 +18,7 @@ cache:
 test:
   script:
   - mkdir -p $R_LIBS_USER $BUILD_LOGS_DIR
+  - R -e 'if (packageVersion("remotes") < "2.3.0") install.packages("remotes")
   - R -e 'message(paste(capture.output(sessionInfo(package = "remotes")$otherPkgs), "\n"))'
   - R -e 'message(getOption("repos"))'
   - R -e 'message(paste(capture.output(remotes::dev_package_deps(dependencies = T)), "\n"))'  
