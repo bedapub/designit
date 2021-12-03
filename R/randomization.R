@@ -10,8 +10,6 @@
 #'
 #' @author Juliane Siebourg-Polster
 #'
-#' @export
-#'
 countGini <- function(m) {
   lev <- nlevels(m)
   m <- table(m, useNA = "no")
@@ -25,8 +23,6 @@ countGini <- function(m) {
 #' @return the mean difference
 #'
 #' @author Juliane Siebourg-Polster
-#'
-#' @export
 #'
 meanDiff <- function(m) {
   (max(m) - min(m)) / mean(m)
@@ -62,8 +58,6 @@ kruskal <- function(m) {
 #'
 #' @author Juliane Siebourg-Polster
 #'
-#' @export
-#'
 neighbors <- function(m) {
   x <- sum(m[1:(length(m) - 1)] == m[2:length(m)])
   return(x)
@@ -83,9 +77,6 @@ neighbors <- function(m) {
 #' @return the summarized penalty score
 #'
 #' @author Juliane Siebourg-Polster
-#'
-#' @export
-#'
 #'
 getScore <- function(layout, balance, sc_groups, sc_tests,
                      bal_weights = rep(1, length(balance)),
@@ -147,8 +138,6 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #' @return the value of the Gini index
 #'
 #' @author Juliane Siebourg-Polster
-#'
-#' @export
 #'
 #' @examples
 #' \dontrun{
