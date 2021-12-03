@@ -4,15 +4,15 @@
 \alias{complete_random_shuffling}
 \title{Reshuffle sample indices completely randomly}
 \usage{
-complete_random_shuffling(batch_container, iteration)
+complete_random_shuffling(batch_container, ...)
 }
 \arguments{
 \item{batch_container}{The batch-container.}
 
-\item{iteration}{The current iteration number.}
+\item{...}{Other params that are passed to a generic shuffling function (like the iteration number).}
 }
 \value{
-Parameter-less function to return a random permutation of the sample locations in the container
+A random permutation of the sample assignment in the container
 }
 \description{
 This function was just added to test early on the functionality of optimize_design() to accept a

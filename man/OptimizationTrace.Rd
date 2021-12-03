@@ -23,6 +23,8 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \item{\code{seed}}{Saved value of \link{.Random.seed}.}
 
 \item{\code{elapsed}}{Running time of the optimization.}
+
+\item{\code{last_step}}{Last iteration step for which the score was set.}
 }
 \if{html}{\out{</div>}}
 }
@@ -39,6 +41,7 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \item \href{#method-new}{\code{OptimizationTrace$new()}}
 \item \href{#method-set_scores}{\code{OptimizationTrace$set_scores()}}
 \item \href{#method-shrink}{\code{OptimizationTrace$shrink()}}
+\item \href{#method-get_scores}{\code{OptimizationTrace$get_scores()}}
 \item \href{#method-print}{\code{OptimizationTrace$print()}}
 \item \href{#method-plot}{\code{OptimizationTrace$plot()}}
 \item \href{#method-clone}{\code{OptimizationTrace$clone()}}
@@ -95,7 +98,27 @@ Set scores for i-th step.
 \subsection{Method \code{shrink()}}{
 Shrink scores by keeping only first \code{last_step} scores.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$shrink(last_step)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$shrink(last_step = self$last_step)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{last_step}}{Last step to keep.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+\code{OptimizationTrace} invisibly.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_scores"></a>}}
+\if{latex}{\out{\hypertarget{method-get_scores}{}}}
+\subsection{Method \code{get_scores()}}{
+Return individual (not aggregated!) scores by keeping only first \code{last_step} scores.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$get_scores(last_step = self$last_step)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
