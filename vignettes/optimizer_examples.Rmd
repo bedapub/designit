@@ -3,8 +3,10 @@ title: "Optimizer examples"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Optimizer examples}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
   
   
@@ -179,11 +181,13 @@ bc3$scoring_f <- list(
 )
 
 
-optimize_design(
+trace = optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
-  min_score = 2.6
+  # min_score = 2.6,
+  autoscale_scores = T,
+  autoscaling_permutations = 500
 )
 ```
 
