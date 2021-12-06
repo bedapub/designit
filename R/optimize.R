@@ -506,7 +506,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
   # Set up autoscaling function if needed
-  score_dim <- length(batch_container$score())
+  initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
+  score_dim <- length(initial_score)
   if (autoscale_scores && score_dim>1) {
     autoscaling_permutations = max(20, floor(autoscaling_permutations))
     if (!quiet) message("Creating autoscaling function for ", score_dim, "-dim. score vector. (",
@@ -518,7 +519,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   # Remember initial sample order as best permutation so far and calculate multi-variate score
   best_perm <- batch_container$assignment
-  best_score <- autoscale_func(batch_container$score())
+  best_score <- autoscale_func(initial_score)
   best_agg <- aggregate_scores_func(best_score)
 
 
