@@ -1,3 +1,7 @@
+# designit 0.2.2
+
+* fix plate scoring example vignette caching
+
 # designit 0.2.1
 
 * plate scoring
