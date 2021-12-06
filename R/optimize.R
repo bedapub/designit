@@ -392,7 +392,7 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE)
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_best_solution,
-                            aggregate_scores_func = worst_score_only,
+                            aggregate_scores_func = first_score_only,
                             autoscale_scores = FALSE, autoscaling_permutations = 100, autoscale_useboxcox = TRUE,
                             max_iter = 1e4, min_score = NA, quiet = FALSE) {
   start_time <- Sys.time()
