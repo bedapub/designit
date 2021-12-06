@@ -44,7 +44,7 @@
     if (params$verbose_cache) {
       message(stringr::str_glue("Saving cache to {.cache_filename_write}"))
     }
-    save(..., file = .cache_filename_write)
+    save(..., file = .cache_filename_write, envir = .GlobalEnv)
   }
   invisible(NULL)
 }
