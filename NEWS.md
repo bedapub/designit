@@ -1,3 +1,7 @@
+# designit 0.2.1
+
+* plate scoring
+
 # designit 0.2.0
 
 * new optimizer `optimize_design()`
