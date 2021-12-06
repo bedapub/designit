@@ -22,7 +22,6 @@ library(designit)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-
 ```
 
 
@@ -79,7 +78,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -113,7 +112,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -175,7 +174,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -235,7 +234,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -283,7 +282,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -312,7 +311,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -336,7 +335,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -407,7 +406,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -443,7 +442,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r}
@@ -519,7 +518,7 @@ trace = optimize_design(bc,
 ```
 
 ```{r include=FALSE, message = FALSE}
-designit::.save_cache(trace)
+designit::.save_cache(trace, bc)
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
