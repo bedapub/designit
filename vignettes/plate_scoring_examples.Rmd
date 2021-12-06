@@ -24,6 +24,10 @@ library(dplyr)
 library(tidyr)
 ```
 
+```{r seed}
+set.seed(42)
+```
+
 
 # Example 1: An expensive way to construct a 4x4 latin square (one plate)
 
