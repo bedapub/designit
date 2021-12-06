@@ -168,7 +168,7 @@ Instead of passing a single scoring function, a list of multiple scoring functio
 each of which to return a scalar value on evaluation.
 
 By default, the first function is determining the overall (aggregated) score for the comparison of solutions.
-However, the user may specify other methods for the aggregating of the scores.
+(However, the user could specify other methods for the aggregating of the scores.)
 
 The second scoring function used here is rather redundant and just serves as illustration.
 
@@ -185,14 +185,45 @@ trace = optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
-  # min_score = 2.6,
-  autoscale_scores = T,
-  autoscaling_permutations = 500
+  min_score = 2.6
 )
 ```
 
-Next, we repeat the optimization by using an aggregation function that takes the maximum value of the score vectors to
-decide on the best iteration. (It has the same effect in this example though.)
+Note that the first score tends to yield higher values than the second one. This could be a problem when trying to select
+a solution based on an aggregated, overall score. We repeat the same optimization now by using the autoscaling functionality
+of the optimizer.
+
+# Auto-scaling scores
+
+We're just adding the `autoscale_scores` option here to estimate the distribution of individual scores on a number
+of completely random sample assignments (200 in this case) and then apply a transformation to rescale each score
+to a standard normal. 
+
+Note that by changing the distribution of the scores we need to adjust the min_score parameter, too, if we are using it.
+
+```{r}
+bc3_as <- bc$copy()
+
+bc3_as$scoring_f <- list(
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
+)
+
+
+trace = optimize_design(
+  bc3_as,
+  n_shuffle = 3,
+  max_iter = 200,
+  min_score = -4.0,
+  autoscale_scores = T,
+  autoscaling_permutations = 200
+)
+```
+
+
+Having directly comparable scores, it makes sense now to use an aggregation function that takes the maximum value of the score vectors to
+decide on the best iteration (instead of looking at one score only).
+
 
 ```{r}
 bc4 <- bc$copy()
@@ -208,12 +239,14 @@ optimize_design(
   n_shuffle = 3,
   aggregate_scores_func = worst_score_only,
   max_iter = 200,
-  min_score = 2.6
+  min_score = -4.0,
+  autoscale_scores = T,
+  autoscaling_permutations = 200
 )
 ```
 
-As a final example, we calculate the (squared) L2 norm to actually aggregate the two scores. Not that this
-makes sense in this case, but it could be used in future cases where optimization is carried on meaningful
+As a final example, we calculate the (squared) L2 norm to actually aggregate the two scores. Not that this choice
+is not really motivated in this case, but it could be used if optimization was carried on meaningful
 distance vectors or normalized n-tuples.
 
 We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
@@ -230,7 +263,9 @@ optimize_design(
   bc5,
   aggregate_scores_func = L2s_norm,
   max_iter = 200,
-  min_score = 2.6
+  min_score = -4.0,
+  autoscale_scores = T,
+  autoscaling_permutations = 200
 )
 ```
 
@@ -315,7 +350,8 @@ trace <- optimize_design(
   aggregate_scores_func = worst_score_only,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 1)),
   max_iter = 200,
-  min_score = 2.3
+  min_score = -3.0,
+  autoscale_scores = T
 )
 
 trace$plot()
