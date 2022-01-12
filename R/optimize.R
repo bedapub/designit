@@ -108,7 +108,7 @@ mk_swapping_function <- function(n_swaps = 1) {
 
   # User has provided a shuffling protocol!
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
-    msg = "n_swaps should be an iteger vector"
+                          msg = "n_swaps should be an iteger vector"
   )
 
   swapping_functions <- NULL
@@ -177,11 +177,11 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
     )
 
     assertthat::assert_that(!(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0 && length(subgroup_vars) != 1),
-      msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
+                            msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
     )
     assertthat::assert_that(is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
-      all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
-    msg = "All selected subgroup levels have to be present in the subgrouping variable"
+                              all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
+                            msg = "All selected subgroup levels have to be present in the subgrouping variable"
     )
 
     if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0) { # we focus on selected subgroups only
@@ -189,10 +189,10 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
       subgroup_sizes <- length(valid_indices)
       n_permut <- subgroup_sizes * (subgroup_sizes - 1) / 2
       assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-        msg = stringr::str_c(
-          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-          " possible permutations. Consider a different solution."
-        )
+                              msg = stringr::str_c(
+                                "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+                                " possible permutations. Consider a different solution."
+                              )
       )
       valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) %>% dplyr::filter(src < dst)
     } else { # we swap samples across subgroups
@@ -201,10 +201,10 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
       subgroup_sizes <- dplyr::group_size(bc_loc)
       n_permut <- sum(subgroup_sizes * (subgroup_sizes - 1) / 2)
       assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-        msg = stringr::str_c(
-          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-          " possible permutations. Consider a different solution."
-        )
+                              msg = stringr::str_c(
+                                "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+                                " possible permutations. Consider a different solution."
+                              )
       )
       assertthat::assert_that(length(subgroup_sizes) > 1, msg = "Subgroup shuffling is pointless if there's only one subgroup involved")
       valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) %>%
@@ -306,6 +306,27 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 }
 
 
+
+#' Sample scores from a number of completely random sample permutations
+#'
+#' @param batch_container An instance of `BatchContainer`.
+#' @param random_perm Number of random sample permutations to be done.
+#'
+#' @return A score matrix with n (# of permutations) rows and m (dimensionality of score) columns.
+#'
+#' @keywords internal
+sample_random_scores = function(batch_container, random_perm) {
+
+  random_scores = matrix(NA_real_, nrow = random_perm, ncol = length(batch_container$score()))
+  for (i in 1:random_perm) {
+    batch_container$move_samples(location_assignment = complete_random_shuffling(batch_container))
+    random_scores[i, ] = batch_container$score()
+  }
+
+  random_scores
+}
+
+
 #' Create a function that transforms a current (multi-dimensional) score into a boxcox normalized one
 #'
 #' @param batch_container An instance of `BatchContainer`.
@@ -317,13 +338,8 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 #' @keywords internal
 mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE) {
 
+  random_scores = sample_random_scores(batch_container, random_perm)
   score_dim = length(batch_container$score())
-
-  random_scores = matrix(NA_real_, nrow = random_perm, ncol = score_dim)
-  for (i in 1:random_perm) {
-    batch_container$move_samples(location_assignment = complete_random_shuffling(batch_container))
-    random_scores[i, ] = batch_container$score()
-  }
 
   # Return function using boxcox transform if bestNormalize package is available
   if (use_boxcox && requireNamespace("bestNormalize", quietly = T)) {
@@ -355,6 +371,22 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE)
 }
 
 
+#' Estimate the variance of individual scores by a series of completely random sample permutations
+#'
+#' @param batch_container An instance of `BatchContainer`.
+#' @param random_perm Number of random sample permutations to be done.
+#'
+#' @return Vector of length m (=dimensionality of score) with estimated variances of each subscore
+#'
+#' @keywords internal
+random_score_variances = function(batch_container, random_perm) {
+
+  random_scores = sample_random_scores(batch_container, random_perm)
+  purrr::map_dbl(asplit(random_scores,2), var, na.rm=T)
+
+}
+
+
 #' Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
 #'
 #' @param batch_container An instance of `BatchContainer`.
@@ -375,6 +407,8 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE)
 #' acceptance function generated by mk_simanneal_acceptance_func() or a user provided function.
 #' @param aggregate_scores_func A function to aggregate the scores.
 #' By default the worst (i.e. highest) score will determine the aggregated value.
+#' @param check_score_variance Logical: if TRUE, scores will be checked for variability under sample permutation
+#' and the optimization is not performed if at least one subscore appears to have a zero variance.
 #' @param autoscale_scores Logical: if TRUE, perform a transformation on the fly to equally scale scores
 #' to a standard normal. This makes scores more directly comparable and easier to aggregate.
 #' @param autoscaling_permutations How many random sample permutations should be done to estimate autoscaling parameters.
@@ -393,6 +427,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_best_solution,
                             aggregate_scores_func = first_score_only,
+                            check_score_variance = TRUE,
                             autoscale_scores = FALSE, autoscaling_permutations = 100, autoscale_useboxcox = TRUE,
                             max_iter = 1e4, min_score = NA, quiet = FALSE) {
   start_time <- Sys.time()
@@ -403,7 +438,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
-      msg = "batch-container is empty and no samples provided"
+                            msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
@@ -423,13 +458,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   n_locations <- nrow(samp)
 
   assertthat::assert_that(".sample_id" %in% colnames(samp),
-    all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
-    msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
+                          all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
+                          msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
 
   assertthat::assert_that(is.null(n_shuffle) ||
-    (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
-  msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
+                            (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
+                          msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
   )
 
 
@@ -469,7 +504,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       loc <- shuffle
       src <- dst <- attrib <- NULL
       assertthat::assert_that(!using_attributes,
-        msg = "sample attributes must be consistently supplied by shuffle function once started"
+                              msg = "sample attributes must be consistently supplied by shuffle function once started"
       )
     } else {
       assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
@@ -484,7 +519,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       }
       if (is.null(shuffle[["samples_attr"]])) {
         assertthat::assert_that(!using_attributes,
-          msg = "sample attributes must be consistently supplied by shuffle function once started"
+                                msg = "sample attributes must be consistently supplied by shuffle function once started"
         )
         attrib <- NULL
       } else {
@@ -525,9 +560,26 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     update_batchcontainer(shuffle_params)
   }
 
-  # Set up autoscaling function if needed
+
   initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
   score_dim <- length(initial_score)
+
+  # Check score variances (should be all >0)
+  if (check_score_variance) {
+    score_vars = random_score_variances(batch_container$copy(), random_perm = 100)
+    low_var_scores = score_vars<1e-10
+    if (!quiet) {
+      message("Checking variances of ", length(low_var_scores), "-dim. score vector.",
+              "\n... (",stringr::str_c(round(score_vars,3), collapse=", "), ")",
+              ifelse(any(low_var_scores), " !!", " - OK"))
+    }
+    assertthat::assert_that(!any(low_var_scores),
+                            msg=stringr::str_c("Low variance scores detected! Check scores # ",
+                                               stringr::str_c(which(low_var_scores), collapse=", ")))
+  }
+
+
+  # Set up autoscaling function if needed
   if (autoscale_scores && score_dim>1) {
     autoscaling_permutations = max(20, floor(autoscaling_permutations))
     if (!quiet) message("Creating autoscaling function for ", score_dim, "-dim. score vector. (",
