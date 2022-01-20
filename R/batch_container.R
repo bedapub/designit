@@ -275,6 +275,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (!is.null(self$assignment)) {
         bc$move_samples(location_assignment = self$assignment)
       }
+      if (!is.null(self$samples_attr)) {
+        bc$samples_attr = self$samples_attr
+      }
+
       bc$scoring_f <- self$scoring_f
       bc
     },
