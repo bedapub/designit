@@ -275,8 +275,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (!is.null(self$assignment)) {
         bc$move_samples(location_assignment = self$assignment)
       }
-      if (!is.null(self$samples_attr)) {
-        bc$samples_attr = self$samples_attr
+      if (self$has_sample_attributes) {
+        bc$samples_attr = private$samples_attributes
       }
 
       bc$scoring_f <- self$scoring_f
@@ -373,6 +373,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
         !is.null(private$samples_table)
       } else {
         stop("Cannot set has_samples (read-only).")
+      }
+    },
+
+    #' @field has_sample_attributes
+    #' Returns TRUE if `BatchContainer` has sample atrributes assigned.
+    has_sample_attributes = function(value) {
+      if (missing(value)) {
+        !is.null(private$samples_attributes)
+      } else {
+        stop("Cannot set has_sample_attributes (read-only).")
       }
     },
 
