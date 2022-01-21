@@ -1,5 +1,86 @@
 
 
+#' Extract relevant parameters from a generic shuffle function output
+#'
+#' Any shuffling function should return one of the following:
+#' 1. atomic index vector for a direct location assignment
+#' 2. a list with src and dst vector
+#' 3. a list with locations vector (for location assignment) and optional sample_attr data frame/tibble
+#'
+#' This function parses the output, performs a few checks and returns results in a simple-to-use list.
+#'
+#' @param shuffle Return value of a shuffle function
+#' @param attributes_expected Logical; if TRUE, sample attributes are expected from the shuffling result and the
+#' function dies if they are not provided.
+#'
+#' @return A list with components src, dst, location_assignment and samples_attr, depending on the output
+#' of the specific shuffling function
+#' @keywords internal
+extract_shuffle_params <- function(shuffle, attributes_expected) {
+
+  # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
+  # Tried to avoid redundant checks that are performed on batch container level
+
+  if (is.null(shuffle)) { # marks end of iteration schedule
+    return(NULL)
+  }
+
+  if (rlang::is_atomic(shuffle)) {
+    loc <- shuffle
+    src <- dst <- attrib <- NULL
+    assertthat::assert_that(!attributes_expected,
+                            msg = "sample attributes must be consistently supplied by shuffle function once started"
+    )
+  } else {
+    assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
+    if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
+      loc <- NULL
+      src <- shuffle[["src"]]
+      dst <- shuffle[["dst"]]
+    } else {
+      assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg = "shuffle function must return either a src/dst pair or a location vector")
+      loc <- shuffle[["location_assignment"]]
+      src <- dst <- NULL
+    }
+    if (is.null(shuffle[["samples_attr"]])) {
+      assertthat::assert_that(!attributes_expected,
+                              msg = "sample attributes must be consistently supplied by shuffle function once started"
+      )
+      attrib <- NULL
+    } else {
+      attrib <- shuffle[["samples_attr"]]
+    }
+  }
+
+  list(src = src, dst = dst, location_assignment = loc, samples_attr = attrib)
+}
+
+
+#' Updates a batch container by permuting samples according to a shuffling
+#'
+#' As post-condition, the batch container is in a different state
+#'
+#' @param bc The batch container to operate on.
+#' @param shuffle_params Shuffling parameters as returned by [extract_shuffle_params()].
+#'
+#' @return TRUE if sample attributes have been assigned, FALSE otherwise
+#'
+#' @keywords internal
+update_batchcontainer <- function(bc, shuffle_params) {
+
+    bc$move_samples(src = shuffle_params$src, dst = shuffle_params$dst,
+                  location_assignment = shuffle_params$location_assignment)
+
+  # Add sample attributes to container if necessary
+  if (!is.null(shuffle_params[["samples_attr"]])) {
+    bc$samples_attr <- shuffle_params[["samples_attr"]]
+    TRUE
+  } else {
+    FALSE
+  }
+}
+
+
 
 #' Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
 #'
@@ -102,81 +183,22 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   assertthat::assert_that(is.function(shuffle_proposal_func), msg = "shuffle_proposal_func should be a function")
 
 
+  # Do first iteration outside of loop; helps to perform initial checks just once
+  iteration <- 1
   using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
 
-  extract_shuffle_params <- function(shuffle) {
-    # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
-    # Tried to avoid redundant checks that are performed on batch container level
+  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+    extract_shuffle_params(attributes_expected = FALSE)
 
-    # Any shuffling function should return one of the following
-    # 1. atomic index vector for a direct location assignment
-    # 2. a list with src and dst vectors
-    # 3. a list with locations vector (for location assignment) and optional sample_attr data frame/tibble
-
-    if (is.null(shuffle)) { # marks end of iteration schedule
-      return(NULL)
-    }
-
-    if (rlang::is_atomic(shuffle)) {
-      loc <- shuffle
-      src <- dst <- attrib <- NULL
-      assertthat::assert_that(!using_attributes,
-                              msg = "sample attributes must be consistently supplied by shuffle function once started"
-      )
-    } else {
-      assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
-      if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
-        loc <- NULL
-        src <- shuffle[["src"]]
-        dst <- shuffle[["dst"]]
-      } else {
-        assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg = "shuffle function must return either a src/dst pair or a location vector")
-        loc <- shuffle[["location_assignment"]]
-        src <- dst <- NULL
-      }
-      if (is.null(shuffle[["samples_attr"]])) {
-        assertthat::assert_that(!using_attributes,
-                                msg = "sample attributes must be consistently supplied by shuffle function once started"
-        )
-        attrib <- NULL
-      } else {
-        attrib <- shuffle[["samples_attr"]]
-        using_attributes <<- TRUE
-      }
-    }
-
-    list(src = src, dst = dst, location_assignment = loc, samples_attr = attrib)
+  # Always perform first shuffling before scoring the bc; works also if attributes are added at this stage
+  # Otherwise remember initial state as currently best shuffling
+  if (!is.null(shuffle_params[["samples_attr"]])) {
+    if (!quiet) message("Usage of sample attributes --> executing first shuffling call.")
+    update_batchcontainer(batch_container, shuffle_params)
+    best_shuffle <- shuffle_params
+  } else {
+    best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment, samples_attr = NULL)
   }
-
-  attrib_msg_made <- FALSE
-
-  update_batchcontainer <- function(shuffle_params) {
-    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst, location_assignment = shuffle_params$location_assignment)
-
-    # Add sample attributes to container if necessary
-    if (!is.null(shuffle_params[["samples_attr"]])) {
-      batch_container$samples_attr <- shuffle_params[["samples_attr"]]
-      if (!quiet && !attrib_msg_made) {
-        message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
-        attrib_msg_made <<- TRUE
-      }
-    }
-  }
-
-
-  iteration <- 1
-  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>% extract_shuffle_params()
-
-
-  # If sample attributes are provided, frontload first bc update since additional variables may be actually used in the scoring function(s)!
-  # Would be nice in principle to check whether any of these variable is ACTUALLY used in a scoring function
-  if (using_attributes) {
-    if (!quiet) {
-      message("Permutation function uses sample attributes. Frontloading sample permutation before scoring.")
-    }
-    update_batchcontainer(shuffle_params)
-  }
-
 
   initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
   score_dim <- length(initial_score)
@@ -217,12 +239,10 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     autoscale_func = identity
   }
 
-  # Remember initial sample order as best permutation so far and calculate multi-variate score
+  # Calculate and remember initial multi-variate & aggregated score
   best_perm <- batch_container$assignment
   best_score <- autoscale_func(initial_score)
   best_agg <- aggregate_scores_func(best_score)
-
-
 
 
   trace <- OptimizationTrace$new(
@@ -243,7 +263,11 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
 
-    update_batchcontainer(shuffle_params)
+    attribs_assigned = update_batchcontainer(batch_container, shuffle_params)
+    if (!using_attributes && attribs_assigned) {
+      message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
+      using_attributes <- TRUE
+    }
 
     new_score <- autoscale_func(batch_container$score())
     assertthat::assert_that(!any(is.na(new_score)), msg = stringr::str_c("NA apprearing during scoring in iteration ", iteration))
@@ -252,6 +276,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       best_score <- new_score
       best_agg <- aggregate_scores_func(best_score)
       best_perm <- batch_container$assignment
+      best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment,
+                           samples_attr = shuffle_params[["samples_attr"]])
       if (!quiet) {
         message(
           "Achieved score: ", best_agg,
@@ -261,7 +287,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       }
     } else {
       if (is.null(shuffle_params[["location_assignment"]])) { # we used the permutation method and thus have to swap samples back!
-        batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst)
+        update_batchcontainer(batch_container, shuffle_params) # two swaps are in effect no swaps
       }
     }
 
@@ -279,12 +305,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     if (iteration <= max_iter) {
       # only call shuffle_proposal_func in case we have more iterations
       shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
-        extract_shuffle_params()
+        extract_shuffle_params(attributes_expected = using_attributes)
     }
   }
 
   # In the end, always make sure that final state of bc is the one with the best score
-  batch_container$move_samples(location_assignment = best_perm)
+  #batch_container$move_samples(location_assignment = best_perm)
+  update_batchcontainer(batch_container, best_shuffle)
 
   trace$shrink(iteration)
   trace$seed <- save_random_seed

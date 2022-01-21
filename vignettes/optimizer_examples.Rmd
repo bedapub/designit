@@ -157,7 +157,7 @@ optimize_design(
   bc2,
   n_shuffle = 3, # will implicitly generate a shuffling function that will do 3 swaps at each iteration
   max_iter = 200,
-  min_score = 3.0
+  min_score = 8.0
 )
 ```
 
@@ -245,9 +245,8 @@ optimize_design(
 )
 ```
 
-As a final example, we calculate the (squared) L2 norm to actually aggregate the two scores. Not that this choice
-is not really motivated in this case, but it could be used if optimization was carried on meaningful
-distance vectors or normalized n-tuples.
+Another option would be to aggregate the two scores by taking their sum. This way both scores influence
+the optimization at every step.
 
 We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
 
@@ -261,6 +260,30 @@ bc5$scoring_f <- list(
 
 optimize_design(
   bc5,
+  aggregate_scores_func = sum_scores,
+  max_iter = 200,
+  min_score = -4.0,
+  autoscale_scores = T,
+  autoscaling_permutations = 200
+)
+```
+
+As a final example, we calculate the (squared) L2 norm to actually aggregate the two scores. Not that this choice
+is not really motivated in this case, but it could be used if optimization was carried on meaningful
+distance vectors or normalized n-tuples.
+
+Note that this optimization forces both normalized scores towards zero, not the minimal value!
+
+```{r, eval = FALSE}
+bc5_2 <- bc$copy()
+
+bc5_2$scoring_f <- list(
+  osat_score_generator(c("batch"), c("Treatment", "Time")),
+  osat_score_generator(c("batch"), c("Treatment"))
+)
+
+optimize_design(
+  bc5_2,
   aggregate_scores_func = L2s_norm,
   max_iter = 200,
   min_score = -4.0,
@@ -347,10 +370,10 @@ n_shuffle <- rep(c(3, 2, 1), c(20, 20, 100))
 trace <- optimize_design(
   bc,
   n_shuffle = n_shuffle,
-  aggregate_scores_func = worst_score_only,
+  aggregate_scores_func = sum_scores,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 1)),
   max_iter = 200,
-  min_score = -3.0,
+  min_score = -6.0,
   autoscale_scores = T
 )
 
