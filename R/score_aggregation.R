@@ -32,6 +32,20 @@ worst_score_only <- function(scores, na.rm = FALSE, ...) {
 }
 
 
+#' Aggregation of scores: sum up all individual scores
+#'
+#'
+#' @param scores A score or multiple component score vector
+#' @param na.rm Boolean. Should NA values be ignored when obtaining the maximum? FALSE by default as ignoring NA values may render the sum meaningless.
+#' @param ... Parameters to be ignored by this aggregation function
+#'
+#' @return The aggregated score, i.e. the sum of all indicidual scores.
+#'
+#' @export
+sum_scores <- function(scores, na.rm = FALSE, ...) {
+  sum(scores, na.rm = na.rm)
+}
+
 
 #' Aggregation of scores: L2 norm squared
 #'
