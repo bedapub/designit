@@ -4,7 +4,12 @@
 \alias{mk_autoscale_function}
 \title{Create a function that transforms a current (multi-dimensional) score into a boxcox normalized one}
 \usage{
-mk_autoscale_function(batch_container, random_perm, use_boxcox = TRUE)
+mk_autoscale_function(
+  batch_container,
+  random_perm,
+  use_boxcox = TRUE,
+  sample_attributes_fixed = FALSE
+)
 }
 \arguments{
 \item{batch_container}{An instance of \code{BatchContainer}.}
@@ -13,6 +18,8 @@ mk_autoscale_function(batch_container, random_perm, use_boxcox = TRUE)
 
 \item{use_boxcox}{Logical; if TRUE and the \code{bestNormalize} package is available, boxcox transformations will be used to
 normalize individual scores. If not possible, scores will just be transformed to a zero mean and unit standard deviation.}
+
+\item{sample_attributes_fixed}{Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.}
 }
 \value{
 The transformation function for a new score vector
