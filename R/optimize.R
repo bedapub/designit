@@ -311,15 +311,19 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 #'
 #' @param batch_container An instance of `BatchContainer`.
 #' @param random_perm Number of random sample permutations to be done.
+#' @param sample_attributes_fixed Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.
 #'
 #' @return A score matrix with n (# of permutations) rows and m (dimensionality of score) columns.
 #'
 #' @keywords internal
-sample_random_scores = function(batch_container, random_perm) {
+sample_random_scores = function(batch_container, random_perm, sample_attributes_fixed) {
 
   random_scores = matrix(NA_real_, nrow = random_perm, ncol = length(batch_container$score()))
   for (i in 1:random_perm) {
     batch_container$move_samples(location_assignment = complete_random_shuffling(batch_container))
+    if (!sample_attributes_fixed && batch_container$has_sample_attributes) {
+      batch_container$samples_attr = batch_container$samples_attr[ sample(nrow(batch_container$samples_attr)), ]
+    }
     random_scores[i, ] = batch_container$score()
   }
 
@@ -333,12 +337,13 @@ sample_random_scores = function(batch_container, random_perm) {
 #' @param random_perm Number of random sample permutations for the estimation of the scaling params.
 #' @param use_boxcox Logical; if TRUE and the `bestNormalize` package is available, boxcox transformations will be used to
 #' normalize individual scores. If not possible, scores will just be transformed to a zero mean and unit standard deviation.
+#' @param sample_attributes_fixed Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.
 #'
 #' @return The transformation function for a new score vector
 #' @keywords internal
-mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE) {
+mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE, sample_attributes_fixed = FALSE) {
 
-  random_scores = sample_random_scores(batch_container, random_perm)
+  random_scores = sample_random_scores(batch_container, random_perm, sample_attributes_fixed)
   score_dim = length(batch_container$score())
 
   # Return function using boxcox transform if bestNormalize package is available
@@ -375,13 +380,14 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE)
 #'
 #' @param batch_container An instance of `BatchContainer`.
 #' @param random_perm Number of random sample permutations to be done.
+#' @param sample_attributes_fixed Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.
 #'
 #' @return Vector of length m (=dimensionality of score) with estimated variances of each subscore
 #'
 #' @keywords internal
-random_score_variances = function(batch_container, random_perm) {
+random_score_variances = function(batch_container, random_perm, sample_attributes_fixed) {
 
-  random_scores = sample_random_scores(batch_container, random_perm)
+  random_scores = sample_random_scores(batch_container, random_perm, sample_attributes_fixed)
   purrr::map_dbl(asplit(random_scores,2), var, na.rm=T)
 
 }
@@ -415,6 +421,8 @@ random_score_variances = function(batch_container, random_perm) {
 #' (Note: minimum will be 20, regardless of the specified value)
 #' @param autoscale_useboxcox Logical; if TRUE, use a boxcox transformation for the autoscaling if possible at all.
 #' Requires installation of the `bestNormalize` package.
+#' @param sample_attributes_fixed Logical; if TRUE, sample shuffle function may generate altered sample attributes at each iteration.
+#' This affects estimation of score distributions. (Parameter only relevant if shuffle function does introduce attributes!)
 #' @param max_iter Stop optimization after a maximum number of iterations,
 #' independent from other stopping criteria (user defined shuffle proposal or min_score)
 #' @param min_score If not NA, optimization is stopped as soon as min_score or lower values are reached
@@ -429,6 +437,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             aggregate_scores_func = first_score_only,
                             check_score_variance = TRUE,
                             autoscale_scores = FALSE, autoscaling_permutations = 100, autoscale_useboxcox = TRUE,
+                            sample_attributes_fixed = FALSE,
                             max_iter = 1e4, min_score = NA, quiet = FALSE) {
   start_time <- Sys.time()
 
@@ -566,13 +575,21 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   # Check score variances (should be all >0)
   if (check_score_variance) {
-    score_vars = random_score_variances(batch_container$copy(), random_perm = 100)
+    bc_copy = batch_container$copy()
+    # Remove defensive checks later if possible
+    assertthat::assert_that(identical(batch_container$get_samples(), bc_copy$get_samples()))
+    assertthat::assert_that(identical(batch_container$assignment, bc_copy$assignment))
+    score_vars = random_score_variances(batch_container$copy(), random_perm = 100, sample_attributes_fixed)
     low_var_scores = score_vars<1e-10
     if (!quiet) {
       message("Checking variances of ", length(low_var_scores), "-dim. score vector.",
               "\n... (",stringr::str_c(round(score_vars,3), collapse=", "), ")",
               ifelse(any(low_var_scores), " !!", " - OK"))
     }
+    ne_scores = assertthat::validate_that(!any(is.na(low_var_scores)),
+                            msg=stringr::str_c("Caution! Non-evaluable scores detected! Check scores # ",
+                                               stringr::str_c(which(is.na(low_var_scores)), collapse=", ")))
+    if (is.character(ne_scores)) message(ne_scores)
     assertthat::assert_that(!any(low_var_scores),
                             msg=stringr::str_c("Low variance scores detected! Check scores # ",
                                                stringr::str_c(which(low_var_scores), collapse=", ")))
@@ -586,7 +603,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                         autoscaling_permutations, " random permutations)")
     autoscale_func = mk_autoscale_function(batch_container$copy(),
                                            random_perm = autoscaling_permutations,
-                                           use_boxcox = autoscale_useboxcox)
+                                           use_boxcox = autoscale_useboxcox,
+                                           sample_attributes_fixed)
   } else {
     autoscale_func = identity
   }
