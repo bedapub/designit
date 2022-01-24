@@ -240,7 +240,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
   # Calculate and remember initial multi-variate & aggregated score
-  best_perm <- batch_container$assignment
   best_score <- autoscale_func(initial_score)
   best_agg <- aggregate_scores_func(best_score)
 
@@ -275,7 +274,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
       best_agg <- aggregate_scores_func(best_score)
-      best_perm <- batch_container$assignment
       best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment,
                            samples_attr = shuffle_params[["samples_attr"]])
       if (!quiet) {
@@ -310,7 +308,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
   # In the end, always make sure that final state of bc is the one with the best score
-  #batch_container$move_samples(location_assignment = best_perm)
   update_batchcontainer(batch_container, best_shuffle)
 
   trace$shrink(iteration)
