@@ -168,7 +168,9 @@ Instead of passing a single scoring function, a list of multiple scoring functio
 each of which to return a scalar value on evaluation.
 
 By default, the first function is determining the overall (aggregated) score for the comparison of solutions.
-(However, the user could specify other methods for the aggregating of the scores.)
+However, the user could specify other methods for the aggregating of the scores.
+
+Note: the scoring function is to be provided as a mandatory argument if a multi-dimensional score is used! 
 
 The second scoring function used here is rather redundant and just serves as illustration.
 
@@ -185,7 +187,8 @@ trace = optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
-  min_score = 2.6
+  min_score = 2.6,
+  aggregate_scores_func = first_score_only
 )
 ```
 
@@ -216,7 +219,8 @@ trace = optimize_design(
   max_iter = 200,
   min_score = -4.0,
   autoscale_scores = T,
-  autoscaling_permutations = 200
+  autoscaling_permutations = 200,
+  aggregate_scores_func = first_score_only
 )
 ```
 
