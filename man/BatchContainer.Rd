@@ -39,7 +39,7 @@ In the later case each function is called.}
 
 \item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
 
-\item{\code{has_sample_attributes}}{Returns TRUE if \code{BatchContainer} has sample atrributes assigned.}
+\item{\code{has_samples_attr}}{Returns TRUE if \code{BatchContainer} has sample atrributes assigned.}
 
 \item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}. This number can be larger than
 \code{n_available} since it does not take excluded locations into account.
