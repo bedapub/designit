@@ -15,7 +15,7 @@ first_score_only <- function(scores, ...) {
 }
 
 
-#' Aggregation of scores: take the maximum (i.e. worst) score only
+#' Aggregation of scores: take the maximum (i.e. worst score only)
 #'
 #' This function enables comparison of the results of two scoring functions by just basing
 #' the decision on the largest element. This corresponds to the infinity-norm in ML terms.
@@ -27,7 +27,7 @@ first_score_only <- function(scores, ...) {
 #' @return The aggregated score, i.e. the value of the largest element in a multiple-component score vector.
 #'
 #' @export
-worst_score_only <- function(scores, na.rm = FALSE, ...) {
+worst_score <- function(scores, na.rm = FALSE, ...) {
   max(scores, na.rm = na.rm)
 }
 
