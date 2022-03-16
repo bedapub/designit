@@ -241,7 +241,7 @@ bc4$scoring_f <- list(
 optimize_design(
   bc4,
   n_shuffle = 3,
-  aggregate_scores_func = worst_score_only,
+  aggregate_scores_func = worst_score,
   max_iter = 200,
   min_score = -4.0,
   autoscale_scores = T,
