@@ -46,7 +46,7 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE,
     return(
       function(score) {
         assertthat::assert_that(length(score)==score_dim)
-        purrr::map2_dbl(bc_transforms, score, predict)
+        purrr::map2_dbl(bc_transforms, score, bestNormalize::predict.boxcox)
       }
     )
   }
@@ -57,7 +57,7 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE,
   if (!use_boxcox) message("'bestNormalize' package not available.")
   message("... Performing simple mean/stddev adjustment.")
   mu = purrr::map_dbl(asplit(random_scores,2), mean, na.rm=T)
-  sds = purrr::map_dbl(asplit(random_scores,2), sd, na.rm=T)
+  sds = purrr::map_dbl(asplit(random_scores,2), stats::sd, na.rm=T)
 
   function(score) {
     assertthat::assert_that(length(score)==score_dim)
@@ -79,6 +79,6 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE,
 random_score_variances = function(batch_container, random_perm, sample_attributes_fixed) {
 
   random_scores = sample_random_scores(batch_container, random_perm, sample_attributes_fixed)
-  purrr::map_dbl(asplit(random_scores,2), var, na.rm=T)
+  purrr::map_dbl(asplit(random_scores,2), stats::var, na.rm=T)
 
 }
