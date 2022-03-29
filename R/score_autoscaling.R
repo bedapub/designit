@@ -46,7 +46,7 @@ mk_autoscale_function = function(batch_container, random_perm, use_boxcox= TRUE,
     return(
       function(score) {
         assertthat::assert_that(length(score)==score_dim)
-        purrr::map2_dbl(bc_transforms, score, bestNormalize::predict.boxcox)
+        purrr::map2_dbl(bc_transforms, score, stats::predict)
       }
     )
   }
