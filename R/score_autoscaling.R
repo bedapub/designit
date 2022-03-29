@@ -24,7 +24,7 @@ sample_random_scores = function(batch_container, random_perm, sample_attributes_
 
 #' Create a function that transforms a current (multi-dimensional) score into a boxcox normalized one
 #'
-#' @param batch_container An instance of `BatchContainer`.
+#' @param batch_container An instance of [BatchContainer].
 #' @param random_perm Number of random sample permutations for the estimation of the scaling params.
 #' @param use_boxcox Logical; if TRUE and the `bestNormalize` package is available, boxcox transformations will be used to
 #' normalize individual scores. If not possible, scores will just be transformed to a zero mean and unit standard deviation.
