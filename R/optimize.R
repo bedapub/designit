@@ -123,7 +123,7 @@ update_batchcontainer <- function(bc, shuffle_params) {
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_best_solution,
-                            aggregate_scores_func = first_score_only,
+                            aggregate_scores_func = NULL,
                             check_score_variance = TRUE,
                             autoscale_scores = FALSE, autoscaling_permutations = 100, autoscale_useboxcox = TRUE,
                             sample_attributes_fixed = FALSE,
