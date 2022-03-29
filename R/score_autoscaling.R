@@ -10,7 +10,7 @@
 sample_random_scores = function(batch_container, random_perm, sample_attributes_fixed) {
 
   random_scores = matrix(NA_real_, nrow = random_perm, ncol = length(batch_container$score()))
-  for (i in 1:random_perm) {
+  for (i in seq_len(random_perm)) {
     batch_container$move_samples(location_assignment = complete_random_shuffling(batch_container))
     if (!sample_attributes_fixed && batch_container$has_samples_attr) {
       batch_container$samples_attr = batch_container$samples_attr[ sample(nrow(batch_container$samples_attr)), ]
