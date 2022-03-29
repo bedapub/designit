@@ -1,5 +1,3 @@
-
-
 #' Sample scores from a number of completely random sample permutations
 #'
 #' @param batch_container An instance of `BatchContainer`.
