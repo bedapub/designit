@@ -204,9 +204,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
   score_dim <- length(initial_score)
 
+  if (score_dim==1 && is.null(aggregate_scores_func)) { # implicit default aggregation for one-dimensional scores
+    aggregate_scores_func = first_score_only
+  }
   assertthat::assert_that(score_dim==1 || (!missing(aggregate_scores_func) && !is.null(aggregate_scores_func)),
                           msg=stringr::str_c("Aggregation function has to be specific explicitly if a ", score_dim,
                                              "-dim. score is used.\nSee param 'aggregate_scores_func'."))
+
 
   # Check score variances (should be all >0)
   if (check_score_variance) {
