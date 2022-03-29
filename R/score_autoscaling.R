@@ -2,7 +2,7 @@
 #'
 #' @param batch_container An instance of [BatchContainer].
 #' @param random_perm Number of random sample permutations to be done.
-#' @param sample_attributes_fixed Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.
+#' @param sample_attributes_fixed Logical; if `FALSE`, simulate a shuffle function that alters sample attributes at each iteration.
 #'
 #' @return A score matrix with n (# of permutations) rows and m (dimensionality of score) columns.
 #'
