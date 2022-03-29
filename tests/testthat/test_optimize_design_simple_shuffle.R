@@ -64,8 +64,8 @@ test_that("specify too many shuffles", {
     bc,
     max_iter = 10,
     n_shuffle = 40,
-    check_score_variance = F,
-    autoscale_scores = F
+    check_score_variance = FALSE,
+    autoscale_scores = FALSE
   )
   expect_equal(n_changed, c(0, rep(20, 10)))
 })
