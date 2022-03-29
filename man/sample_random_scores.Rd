@@ -7,11 +7,11 @@
 sample_random_scores(batch_container, random_perm, sample_attributes_fixed)
 }
 \arguments{
-\item{batch_container}{An instance of \code{BatchContainer}.}
+\item{batch_container}{An instance of \link{BatchContainer}.}
 
 \item{random_perm}{Number of random sample permutations to be done.}
 
-\item{sample_attributes_fixed}{Logical; if FALSE, simulate a shuffle function that alters sample attributes at each iteration.}
+\item{sample_attributes_fixed}{Logical; if \code{FALSE}, simulate a shuffle function that alters sample attributes at each iteration.}
 }
 \value{
 A score matrix with n (# of permutations) rows and m (dimensionality of score) columns.

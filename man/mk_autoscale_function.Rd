@@ -12,7 +12,7 @@ mk_autoscale_function(
 )
 }
 \arguments{
-\item{batch_container}{An instance of \code{BatchContainer}.}
+\item{batch_container}{An instance of \link{BatchContainer}.}
 
 \item{random_perm}{Number of random sample permutations for the estimation of the scaling params.}
 
