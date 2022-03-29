@@ -204,7 +204,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
   score_dim <- length(initial_score)
 
-  assertthat::assert_that(score_dim==1 || !missing(aggregate_scores_func),
+  assertthat::assert_that(score_dim==1 || (!missing(aggregate_scores_func) && !is.null(aggregate_scores_func)),
                           msg=stringr::str_c("Aggregation function has to be specific explicitly if a ", score_dim,
                                              "-dim. score is used.\nSee param 'aggregate_scores_func'."))
 
