@@ -291,7 +291,7 @@ optimize_design(
   aggregate_scores_func = L2s_norm,
   max_iter = 200,
   min_score = -4.0,
-  autoscale_scores = T,
+  autoscale_scores = TRUE,
   autoscaling_permutations = 200
 )
 ```
