@@ -276,7 +276,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         bc$move_samples(location_assignment = self$assignment)
       }
       if (self$has_samples_attr) {
-        bc$samples_attr = private$samples_attributes
+        bc$samples_attr <- private$samples_attributes
       }
 
       bc$scoring_f <- self$scoring_f

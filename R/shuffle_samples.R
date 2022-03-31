@@ -108,7 +108,7 @@ mk_swapping_function <- function(n_swaps = 1) {
 
   # User has provided a shuffling protocol!
   assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
-                          msg = "n_swaps should be an iteger vector"
+    msg = "n_swaps should be an iteger vector"
   )
 
   swapping_functions <- NULL
@@ -177,11 +177,11 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
     )
 
     assertthat::assert_that(!(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0 && length(subgroup_vars) != 1),
-                            msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
+      msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
     )
     assertthat::assert_that(is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
-                              all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
-                            msg = "All selected subgroup levels have to be present in the subgrouping variable"
+      all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
+    msg = "All selected subgroup levels have to be present in the subgrouping variable"
     )
 
     if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0) { # we focus on selected subgroups only
@@ -189,10 +189,10 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
       subgroup_sizes <- length(valid_indices)
       n_permut <- subgroup_sizes * (subgroup_sizes - 1) / 2
       assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-                              msg = stringr::str_c(
-                                "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                " possible permutations. Consider a different solution."
-                              )
+        msg = stringr::str_c(
+          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+          " possible permutations. Consider a different solution."
+        )
       )
       valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) %>% dplyr::filter(src < dst)
     } else { # we swap samples across subgroups
@@ -201,10 +201,10 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
       subgroup_sizes <- dplyr::group_size(bc_loc)
       n_permut <- sum(subgroup_sizes * (subgroup_sizes - 1) / 2)
       assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-                              msg = stringr::str_c(
-                                "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-                                " possible permutations. Consider a different solution."
-                              )
+        msg = stringr::str_c(
+          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
+          " possible permutations. Consider a different solution."
+        )
       )
       assertthat::assert_that(length(subgroup_sizes) > 1, msg = "Subgroup shuffling is pointless if there's only one subgroup involved")
       valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) %>%

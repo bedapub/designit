@@ -92,4 +92,3 @@ L1_norm <- function(scores, ...) {
 accept_best_solution <- function(current_score, best_score, ...) { # ignore iteration parameter in case it's passed
   current_score < best_score
 }
-

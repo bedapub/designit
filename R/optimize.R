@@ -29,7 +29,7 @@ extract_shuffle_params <- function(shuffle, attributes_expected) {
     loc <- shuffle
     src <- dst <- attrib <- NULL
     assertthat::assert_that(!attributes_expected,
-                            msg = "sample attributes must be consistently supplied by shuffle function once started"
+      msg = "sample attributes must be consistently supplied by shuffle function once started"
     )
   } else {
     assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
@@ -44,7 +44,7 @@ extract_shuffle_params <- function(shuffle, attributes_expected) {
     }
     if (is.null(shuffle[["samples_attr"]])) {
       assertthat::assert_that(!attributes_expected,
-                              msg = "sample attributes must be consistently supplied by shuffle function once started"
+        msg = "sample attributes must be consistently supplied by shuffle function once started"
       )
       attrib <- NULL
     } else {
@@ -67,9 +67,10 @@ extract_shuffle_params <- function(shuffle, attributes_expected) {
 #'
 #' @keywords internal
 update_batchcontainer <- function(bc, shuffle_params) {
-
-    bc$move_samples(src = shuffle_params$src, dst = shuffle_params$dst,
-                  location_assignment = shuffle_params$location_assignment)
+  bc$move_samples(
+    src = shuffle_params$src, dst = shuffle_params$dst,
+    location_assignment = shuffle_params$location_assignment
+  )
 
   # Add sample attributes to container if necessary
   if (!is.null(shuffle_params[["samples_attr"]])) {
@@ -137,7 +138,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
-                            msg = "batch-container is empty and no samples provided"
+      msg = "batch-container is empty and no samples provided"
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
@@ -157,13 +158,13 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   n_locations <- nrow(samp)
 
   assertthat::assert_that(".sample_id" %in% colnames(samp),
-                          all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
-                          msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
+    all(sort(samp$.sample_id, na.last = NA) == 1:n_samples),
+    msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
 
   assertthat::assert_that(is.null(n_shuffle) ||
-                            (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
-                          msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
+    (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
+  msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
   )
 
 
@@ -204,48 +205,64 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
   score_dim <- length(initial_score)
 
-  if (score_dim==1 && is.null(aggregate_scores_func)) { # implicit default aggregation for one-dimensional scores
-    aggregate_scores_func = first_score_only
+  if (score_dim == 1 && is.null(aggregate_scores_func)) { # implicit default aggregation for one-dimensional scores
+    aggregate_scores_func <- first_score_only
   }
-  assertthat::assert_that(score_dim==1 || (!missing(aggregate_scores_func) && !is.null(aggregate_scores_func)),
-                          msg=stringr::str_c("Aggregation function has to be specific explicitly if a ", score_dim,
-                                             "-dim. score is used.\nSee param 'aggregate_scores_func'."))
+  assertthat::assert_that(score_dim == 1 || (!missing(aggregate_scores_func) && !is.null(aggregate_scores_func)),
+    msg = stringr::str_c(
+      "Aggregation function has to be specific explicitly if a ", score_dim,
+      "-dim. score is used.\nSee param 'aggregate_scores_func'."
+    )
+  )
 
 
   # Check score variances (should be all >0)
   if (check_score_variance) {
-    bc_copy = batch_container$copy()
+    bc_copy <- batch_container$copy()
     # Remove defensive checks later if possible
     assertthat::assert_that(identical(batch_container$get_samples(), bc_copy$get_samples()))
     assertthat::assert_that(identical(batch_container$assignment, bc_copy$assignment))
-    score_vars = random_score_variances(batch_container$copy(), random_perm = 100, sample_attributes_fixed)
-    low_var_scores = score_vars<1e-10
+    score_vars <- random_score_variances(batch_container$copy(), random_perm = 100, sample_attributes_fixed)
+    low_var_scores <- score_vars < 1e-10
     if (!quiet) {
-      message("Checking variances of ", length(low_var_scores), "-dim. score vector.",
-              "\n... (",stringr::str_c(round(score_vars,3), collapse=", "), ")",
-              ifelse(any(low_var_scores), " !!", " - OK"))
+      message(
+        "Checking variances of ", length(low_var_scores), "-dim. score vector.",
+        "\n... (", stringr::str_c(round(score_vars, 3), collapse = ", "), ")",
+        ifelse(any(low_var_scores), " !!", " - OK")
+      )
     }
-    ne_scores = assertthat::validate_that(!any(is.na(low_var_scores)),
-                            msg=stringr::str_c("Caution! Non-evaluable scores detected! Check scores # ",
-                                               stringr::str_c(which(is.na(low_var_scores)), collapse=", ")))
+    ne_scores <- assertthat::validate_that(!any(is.na(low_var_scores)),
+      msg = stringr::str_c(
+        "Caution! Non-evaluable scores detected! Check scores # ",
+        stringr::str_c(which(is.na(low_var_scores)), collapse = ", ")
+      )
+    )
     if (is.character(ne_scores)) message(ne_scores)
     assertthat::assert_that(!any(low_var_scores),
-                            msg=stringr::str_c("Low variance scores detected! Check scores # ",
-                                               stringr::str_c(which(low_var_scores), collapse=", ")))
+      msg = stringr::str_c(
+        "Low variance scores detected! Check scores # ",
+        stringr::str_c(which(low_var_scores), collapse = ", ")
+      )
+    )
   }
 
 
   # Set up autoscaling function if needed
-  if (autoscale_scores && score_dim>1) {
-    autoscaling_permutations = max(20, floor(autoscaling_permutations))
-    if (!quiet) message("Creating autoscaling function for ", score_dim, "-dim. score vector. (",
-                        autoscaling_permutations, " random permutations)")
-    autoscale_func = mk_autoscale_function(batch_container$copy(),
-                                           random_perm = autoscaling_permutations,
-                                           use_boxcox = autoscale_useboxcox,
-                                           sample_attributes_fixed)
+  if (autoscale_scores && score_dim > 1) {
+    autoscaling_permutations <- max(20, floor(autoscaling_permutations))
+    if (!quiet) {
+      message(
+        "Creating autoscaling function for ", score_dim, "-dim. score vector. (",
+        autoscaling_permutations, " random permutations)"
+      )
+    }
+    autoscale_func <- mk_autoscale_function(batch_container$copy(),
+      random_perm = autoscaling_permutations,
+      use_boxcox = autoscale_useboxcox,
+      sample_attributes_fixed
+    )
   } else {
-    autoscale_func = identity
+    autoscale_func <- identity
   }
 
   # Calculate and remember initial multi-variate & aggregated score
@@ -271,7 +288,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
 
-    attribs_assigned = update_batchcontainer(batch_container, shuffle_params)
+    attribs_assigned <- update_batchcontainer(batch_container, shuffle_params)
     if (!using_attributes && attribs_assigned) {
       message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
       using_attributes <- TRUE
@@ -283,8 +300,10 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
       best_agg <- aggregate_scores_func(best_score)
-      best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment,
-                           samples_attr = shuffle_params[["samples_attr"]])
+      best_shuffle <- list(
+        src = NULL, dst = NULL, location_assignment = batch_container$assignment,
+        samples_attr = shuffle_params[["samples_attr"]]
+      )
       if (!quiet) {
         message(
           "Achieved score: ", best_agg,
