@@ -52,7 +52,7 @@ test_that("Can optimize multiple scores", {
     b = function(...) rnorm(1)
   )
   expect_equal(
-    optimize_design(bc, max_iter = 30, n_shuffle = 2)$n_steps,
+    optimize_design(bc, max_iter = 30, n_shuffle = 2, aggregate_scores_func = first_score_only)$n_steps,
     31
   )
 })

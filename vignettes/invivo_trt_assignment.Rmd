@@ -257,7 +257,7 @@ optimize_design(
     report_grouping_as_attribute = TRUE,
     n_min = 2, n_max = 4
   ),
-  aggregate_scores_func = worst_score_only,
+  aggregate_scores_func = worst_score,
   max_iter = 200
 )
 
@@ -385,7 +385,7 @@ optimize_design(
     report_grouping_as_attribute = TRUE,
     n_min = 2, n_max = 4
   ),
-  aggregate_scores_func = worst_score_only,
+  aggregate_scores_func = worst_score,
   max_iter = 200
 )
 

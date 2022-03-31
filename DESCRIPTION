@@ -65,7 +65,8 @@ Suggests:
     devtools (>= 2.0.0),
     gridpattern,
     ggpattern,
-    cowplot
+    cowplot,
+    bestNormalize
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

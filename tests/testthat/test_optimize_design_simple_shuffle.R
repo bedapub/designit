@@ -27,7 +27,9 @@ n_changed <- numeric(0)
 test_that("correct number of shuffles = 1", {
   optimize_design(
     bc,
-    max_iter = 10
+    max_iter = 10,
+    check_score_variance = F,
+    autoscale_scores = F
   )
   expect_equal(n_changed, c(0, rep(2, 10)))
 })
@@ -37,7 +39,9 @@ test_that("correct number of shuffles = 2", {
   optimize_design(
     bc,
     max_iter = 10,
-    n_shuffle = 2
+    n_shuffle = 2,
+    check_score_variance = F,
+    autoscale_scores = F
   )
   expect_equal(n_changed, c(0, rep(4, 10)))
 })
@@ -47,7 +51,9 @@ test_that("correct number of shuffles = 5", {
   optimize_design(
     bc,
     max_iter = 10,
-    n_shuffle = 5
+    n_shuffle = 5,
+    check_score_variance = FALSE,
+    autoscale_scores = FALSE
   )
   expect_equal(n_changed, c(0, rep(10, 10)))
 })
@@ -57,7 +63,9 @@ test_that("specify too many shuffles", {
   optimize_design(
     bc,
     max_iter = 10,
-    n_shuffle = 40
+    n_shuffle = 40,
+    check_score_variance = FALSE,
+    autoscale_scores = FALSE
   )
   expect_equal(n_changed, c(0, rep(20, 10)))
 })
@@ -67,7 +75,9 @@ test_that("complex shuffling schedule", {
   optimize_design(
     bc,
     max_iter = 10,
-    n_shuffle = c(2, 2, 5, 2, 2, 10, 20, 40, 40)
+    n_shuffle = c(2, 2, 5, 2, 2, 10, 20, 40, 40),
+    check_score_variance = F,
+    autoscale_scores = F
   )
   expect_equal(n_changed, c(0, c(4, 4, 10, 4, 4, 20, 20, 20, 20)))
 })

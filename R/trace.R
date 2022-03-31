@@ -20,6 +20,10 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Running time of the optimization.
     elapsed = NULL,
 
+    #' @field last_step
+    #' Last iteration step for which the score was set.
+    last_step = 0,
+
     #' @description
     #' Create a new `OptimizationTrace` object.
     #'
@@ -51,6 +55,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     set_scores = function(i, scores, aggregated_score) {
       self$scores[i, ] <- scores
       self$aggregated_score[i] <- aggregated_score
+      self$last_step <- i
       invisible(self)
     },
 
@@ -61,10 +66,21 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Last step to keep.
     #'
     #' @return `OptimizationTrace` invisibly.
-    shrink = function(last_step) {
+    shrink = function(last_step = self$last_step) {
       self$scores <- head(self$scores, last_step)
       self$aggregated_score <- head(self$aggregated_score, last_step)
       invisible(self)
+    },
+
+    #' @description
+    #' Return individual (not aggregated!) scores by keeping only first `last_step` scores.
+    #'
+    #' @param last_step
+    #' Last step to keep.
+    #'
+    #' @return `OptimizationTrace` invisibly.
+    get_scores = function(last_step = self$last_step) {
+      head(self$scores, last_step)
     },
 
     #' @description

@@ -1,309 +1,86 @@
-#' Proposes pairwise swap of samples on each call.
-#'
-#' This function will ensure that one of the locations is always non-empty. It should not
-#' return trivial permutations (e.g., `src=c(1,2)` and `dst=c(1,2)`).
-#'
-#' @param batch_container The batch-container.
-#' @param iteration The current iteration number.
-#'
-#' @return Function accepting batch container & iteration number. It returns a list with length 1 vectors 'src' and 'dst', denoting source and destination index for the swap operation
-#'
-#' @keywords internal
-pairwise_swapping <- function(batch_container, iteration) {
-  # We assume that optimization time is usually dominated by the scoring function,
-  # so we do not try to cache values in this function.
-  non_empty_locations <- which(!is.na(batch_container$assignment))
-  first_element <- sample(non_empty_locations, 1)
-  non_first_location <- seq_len(batch_container$n_available)[-first_element]
-  second_element <- sample(non_first_location, 1)
-  return(list(src = c(first_element, second_element), dst = c(second_element, first_element)))
-}
 
-#' Create function to propose n pairwise swaps of samples on each call (n is a constant across iterations)
-#'
-#' This internal function is wrapped by mk_swapping_function()
-#'
-#' @param n_swaps Number of swaps to be proposed (valid range is 1..floor(n_samples/2))
-#' @param quiet Do not warn if number of swaps is too big.
-#'
-#' @return Function accepting batch container & iteration number.
-#' Return a list with length n vectors 'src' and 'dst', denoting source and destination index for
-#' the swap operation on each call
-#'
-#' @keywords internal
-mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
-  # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
-  force(n_swaps)
-  force(quiet)
-  draws <- NULL
 
-  function(batch_container, iteration) {
-    if (is.null(draws)) {
-      # first time we make sure that n_swaps makes sense
-      redefined <- FALSE
-      if (n_swaps > nrow(batch_container$samples)) {
-        n_swaps <<- nrow(batch_container$samples)
-        redefined <- TRUE
-      }
-      draws <<- 2 * n_swaps
-      if (draws > batch_container$n_available) {
-        n_swaps <<- floor(batch_container$n_available / 2)
-        draws <<- 2 * n_swaps
-        redefined <- TRUE
-      }
-      assertthat::assert_that(draws > 1, msg = "at least 1 swap needed for defining a meaningful swap function")
-      if (redefined && !quiet) {
-        message("Re-defined number of swaps to ", n_swaps, " in swapping function.")
-      }
+#' Extract relevant parameters from a generic shuffle function output
+#'
+#' Any shuffling function should return one of the following:
+#' 1. atomic index vector for a direct location assignment
+#' 2. a list with src and dst vector
+#' 3. a list with locations vector (for location assignment) and optional sample_attr data frame/tibble
+#'
+#' This function parses the output, performs a few checks and returns results in a simple-to-use list.
+#'
+#' @param shuffle Return value of a shuffle function
+#' @param attributes_expected Logical; if TRUE, sample attributes are expected from the shuffling result and the
+#' function dies if they are not provided.
+#'
+#' @return A list with components src, dst, location_assignment and samples_attr, depending on the output
+#' of the specific shuffling function
+#' @keywords internal
+extract_shuffle_params <- function(shuffle, attributes_expected) {
+
+  # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
+  # Tried to avoid redundant checks that are performed on batch container level
+
+  if (is.null(shuffle)) { # marks end of iteration schedule
+    return(NULL)
+  }
+
+  if (rlang::is_atomic(shuffle)) {
+    loc <- shuffle
+    src <- dst <- attrib <- NULL
+    assertthat::assert_that(!attributes_expected,
+      msg = "sample attributes must be consistently supplied by shuffle function once started"
+    )
+  } else {
+    assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
+    if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
+      loc <- NULL
+      src <- shuffle[["src"]]
+      dst <- shuffle[["dst"]]
+    } else {
+      assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg = "shuffle function must return either a src/dst pair or a location vector")
+      loc <- shuffle[["location_assignment"]]
+      src <- dst <- NULL
     }
-    non_empty_locations <- which(!is.na(batch_container$assignment))
-    first_elements <- sample(non_empty_locations, n_swaps)
-    non_first_location <- seq_len(batch_container$n_available)[-first_elements]
-    second_elements <- sample(non_first_location, n_swaps)
-
-    # ensures that there are
-    # a) no samples are left in place
-    # b) no complex shuffles, like 1->2, 2->3, 3->1
-    list(src = c(first_elements, second_elements), dst = c(second_elements, first_elements))
+    if (is.null(shuffle[["samples_attr"]])) {
+      assertthat::assert_that(!attributes_expected,
+        msg = "sample attributes must be consistently supplied by shuffle function once started"
+      )
+      attrib <- NULL
+    } else {
+      attrib <- shuffle[["samples_attr"]]
+    }
   }
+
+  list(src = src, dst = dst, location_assignment = loc, samples_attr = attrib)
 }
 
 
-#' Reshuffle sample indices completely randomly
+#' Updates a batch container by permuting samples according to a shuffling
 #'
-#' This function was just added to test early on the functionality of optimize_design() to accept a
-#' permutation vector rather than a list with src and dst indices.
+#' As post-condition, the batch container is in a different state
 #'
-#' @param batch_container The batch-container.
-#' @param iteration The current iteration number.
+#' @param bc The batch container to operate on.
+#' @param shuffle_params Shuffling parameters as returned by [extract_shuffle_params()].
 #'
-#' @return Parameter-less function to return a random permutation of the sample locations in the container
+#' @return TRUE if sample attributes have been assigned, FALSE otherwise
 #'
-#' @export
-complete_random_shuffling <- function(batch_container, iteration) {
-  return(list(location_assignment = sample(batch_container$assignment)))
-}
-
-
-#' Create function to propose swaps of samples on each call, either with a constant number of swaps or following
-#' a user defined protocol
-#'
-#' If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
-#' If length(n_swaps)>1 and called without argument, the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted. Alternatively, the function may be called with an iteration number as the only argument, giving the user some freedom how to iterate over the sample swapping protocol.
-#'
-#' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_samples/2))
-#'
-#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
-#'
-#' @export
-mk_swapping_function <- function(n_swaps = 1) {
-  # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
-
-  if (length(n_swaps) == 1 && n_swaps == 1) { # default to pairwise swapping function in the default case
-    return(pairwise_swapping)
-  }
-  if (length(n_swaps) == 1) { # default to function with constant number of swaps in this default case
-    return(mk_constant_swapping_function(n_swaps = n_swaps))
-  }
-
-  # User has provided a shuffling protocol!
-  assertthat::assert_that(rlang::is_integerish(n_swaps, finite = TRUE),
-    msg = "n_swaps should be an iteger vector"
+#' @keywords internal
+update_batchcontainer <- function(bc, shuffle_params) {
+  bc$move_samples(
+    src = shuffle_params$src, dst = shuffle_params$dst,
+    location_assignment = shuffle_params$location_assignment
   )
 
-  swapping_functions <- NULL
-  if (length(unique(n_swaps)) < 1000) {
-    # When number of unique values is small, pre-generate a swapping function for each n_swaps.
-    swapping_functions <- n_swaps %>%
-      unique() %>%
-      purrr::set_names() %>%
-      purrr::map(mk_constant_swapping_function)
-  }
-
-
-  function(batch_container, iteration) {
-    assertthat::assert_that(iteration <= length(n_swaps))
-    if (!is.null(swapping_functions)) {
-      f <- swapping_functions[[as.character(n_swaps[iteration])]]
-    } else {
-      # call the function in quiet mode to avoid too much output
-      f <- mk_constant_swapping_function(n_swaps[iteration], quiet = TRUE)
-    }
-    assertthat::assert_that(!is.null(f))
-    return(f(batch_container, iteration))
+  # Add sample attributes to container if necessary
+  if (!is.null(shuffle_params[["samples_attr"]])) {
+    bc$samples_attr <- shuffle_params[["samples_attr"]]
+    TRUE
+  } else {
+    FALSE
   }
 }
 
-
-#' Created a shuffling function that permutes samples within certain subgroups of the container locations
-#'
-#' If length(n_swaps)==1, the returned function may be called an arbitrary number of times.
-#' If length(n_swaps)>1 the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted.
-#'
-#' @param subgroup_vars Column names of the variables that together define the relevant subgroups
-#' @param restrain_on_subgroup_levels Permutations can be forced to take place only within a level of the factor of the subgrouping variable. In this case, the user must pass only one subgrouping variable and a number of levels that together define the permuted subgroup.
-#' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..floor(n_locations/2))
-#'
-#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or `NULL` if the user provided a defined protocol for the number of swaps and the last iteration has been reached
-#' @export
-#'
-mk_subgroup_shuffling_function <- function(subgroup_vars,
-                                           restrain_on_subgroup_levels = c(),
-                                           n_swaps = 1) {
-  force(subgroup_vars)
-  force(restrain_on_subgroup_levels)
-  force(n_swaps)
-
-  MAX_PERMUTATIONS <- 1e6 # limit memory use of this function
-
-  # Objects that remain in function's name space and will be evaluated on first invocation
-  valid_indices <- NULL
-  valid_permutations <- NULL
-
-  # suppress no visible binding messages
-  src <- dst <- NULL
-
-  # Helper function to analyze batch container and set up valid permutation table on first invocation of shuffling
-  setup_perms <- function(batch_container) {
-    bc_loc <- batch_container$get_locations()
-    assertthat::assert_that(nrow(bc_loc) > 9, msg = "Subgroup shuffling is pointless for small containers (n<10)")
-    assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg = "All subgroup defining variables have to be part of the container locations")
-
-    assertthat::assert_that(nrow(dplyr::filter(
-      dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
-      dplyr::if_any(dplyr::everything(), ~ !is.na(.))
-    )) == nrow(bc_loc),
-    msg = "Selected subgrouping variables should not contain any NA values"
-    )
-
-    assertthat::assert_that(!(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0 && length(subgroup_vars) != 1),
-      msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
-    )
-    assertthat::assert_that(is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
-      all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
-    msg = "All selected subgroup levels have to be present in the subgrouping variable"
-    )
-
-    if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0) { # we focus on selected subgroups only
-      valid_indices <<- which(bc_loc[[subgroup_vars]] %in% restrain_on_subgroup_levels)
-      subgroup_sizes <- length(valid_indices)
-      n_permut <- subgroup_sizes * (subgroup_sizes - 1) / 2
-      assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-        msg = stringr::str_c(
-          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-          " possible permutations. Consider a different solution."
-        )
-      )
-      valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) %>% dplyr::filter(src < dst)
-    } else { # we swap samples across subgroups
-      bc_loc <- dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
-      grp_ind <- dplyr::group_indices(bc_loc)
-      subgroup_sizes <- dplyr::group_size(bc_loc)
-      n_permut <- sum(subgroup_sizes * (subgroup_sizes - 1) / 2)
-      assertthat::assert_that(n_permut <= MAX_PERMUTATIONS,
-        msg = stringr::str_c(
-          "Subgroup shuffling would lead to more than ", MAX_PERMUTATIONS,
-          " possible permutations. Consider a different solution."
-        )
-      )
-      assertthat::assert_that(length(subgroup_sizes) > 1, msg = "Subgroup shuffling is pointless if there's only one subgroup involved")
-      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) %>%
-        purrr::map(~ tidyr::crossing(src = .x, dst = .x) %>% dplyr::filter(src < dst)) %>%
-        dplyr::bind_rows()
-    }
-
-    assertthat::assert_that(all(subgroup_sizes > 1), msg = "Subgroup shuffling requires all subgroups to have a minimum size of 2")
-
-    assertthat::assert_that(n_permut == nrow(valid_permutations), msg = "Permutation calculations screwed up. Check the code.")
-
-    valid_indices <<- 1:n_permut
-
-    # Check user provided shuffling protocol
-    n_swaps <- round(n_swaps, 0)
-
-    if (any(n_swaps > n_permut)) { # limit swaps if user provides a meaningless number
-      n_swaps[n_swaps > n_permut] <- n_permut
-      message("Set upper number of swaps to ", n_permut, " in swapping protocol.")
-    }
-    if (any(n_swaps < 1)) {
-      n_swaps[n_swaps < 1] <- 1
-      message("Set lower number of swaps to 1 in swapping protocol.")
-    }
-  }
-
-  # Helper function to pick n INDEPENDENT permutations, i.e. permutations that don't lead to sample loss
-  pick_indep_perm <- function(n) {
-    # Start with an index of all possible permutations
-    poss_perm <- valid_permutations
-    source <- desti <- integer(n)
-    for (i in 1:n) {
-      p <- floor(stats::runif(1, 1, nrow(poss_perm) + 1))
-      source[i] <- poss_perm[["src"]][p]
-      desti[i] <- poss_perm[["dst"]][p]
-      poss_perm <- dplyr::filter(poss_perm, src != source[i], src != desti[i], dst != source[i], dst != desti[i])
-      if (nrow(poss_perm) == 0) {
-        # Stop if we don't have any independent exchanges left
-        break
-      }
-    }
-    list(src = c(source[1:i], desti[1:i]), dst = c(desti[1:i], source[1:i]))
-  }
-
-
-  if (length(n_swaps) == 1) {
-    return(
-      function(bc, ...) { # iteration param not used
-
-        if (is.null(valid_permutations)) { # first call
-          setup_perms(bc)
-        }
-        if (n_swaps == 1) {
-          swap <- sample(valid_indices, 1)
-          return(list(
-            src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
-            dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])
-          ))
-        } else {
-          return(pick_indep_perm(n_swaps))
-        }
-      }
-    )
-  }
-
-  function(bc, iteration) {
-    if (iteration > length(n_swaps)) {
-      return(NULL)
-    }
-
-    if (is.null(valid_permutations)) { # first call
-      setup_perms(bc)
-    }
-
-    if (n_swaps[iteration] == 1) {
-      swap <- sample(valid_indices, 1)
-      return(list(
-        src = c(valid_permutations[["src"]][swap], valid_permutations[["dst"]][swap]),
-        dst = c(valid_permutations[["dst"]][swap], valid_permutations[["src"]][swap])
-      ))
-    } else {
-      return(pick_indep_perm(n_swaps[iteration]))
-    }
-  }
-}
-
-
-#' Default acceptance function for optimizer (always accept the current score if it is smaller than the best one obtained before)
-#'
-#' @param current_score Score from the current optimizing iteration (scalar value, double)
-#' @param best_score Score from the current optimizing iteration (scalar value, double)
-#' @param ... Ignored arguments that may be used by alternative acceptance functions
-#'
-#' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
-#'
-#' @keywords internal
-accept_best_solution <- function(current_score, best_score, ...) { # ignore iteration parameter in case it's passed
-  current_score < best_score
-}
 
 
 #' Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
@@ -324,8 +101,19 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 #' @param acceptance_func Alternative function to select a new score as the best one.
 #' Defaults to simply taking the overall best score. Max be replaced with an
 #' acceptance function generated by mk_simanneal_acceptance_func() or a user provided function.
-#' @param aggregate_scores_func A function to aggregate the scores.
-#' By default one is used that just uses the first score.
+#' @param aggregate_scores_func A function to aggregate multiple scores.
+#' In case multiple scores are available it is required to provide such function.
+#' E.g., see [first_score_only()] or [worst_score()].
+#' @param check_score_variance Logical: if TRUE, scores will be checked for variability under sample permutation
+#' and the optimization is not performed if at least one subscore appears to have a zero variance.
+#' @param autoscale_scores Logical: if TRUE, perform a transformation on the fly to equally scale scores
+#' to a standard normal. This makes scores more directly comparable and easier to aggregate.
+#' @param autoscaling_permutations How many random sample permutations should be done to estimate autoscaling parameters.
+#' (Note: minimum will be 20, regardless of the specified value)
+#' @param autoscale_useboxcox Logical; if TRUE, use a boxcox transformation for the autoscaling if possible at all.
+#' Requires installation of the `bestNormalize` package.
+#' @param sample_attributes_fixed Logical; if TRUE, sample shuffle function may generate altered sample attributes at each iteration.
+#' This affects estimation of score distributions. (Parameter only relevant if shuffle function does introduce attributes!)
 #' @param max_iter Stop optimization after a maximum number of iterations,
 #' independent from other stopping criteria (user defined shuffle proposal or min_score)
 #' @param min_score If not NA, optimization is stopped as soon as min_score or lower values are reached
@@ -337,7 +125,10 @@ accept_best_solution <- function(current_score, best_score, ...) { # ignore iter
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_best_solution,
-                            aggregate_scores_func = first_score_only,
+                            aggregate_scores_func = NULL,
+                            check_score_variance = TRUE,
+                            autoscale_scores = FALSE, autoscaling_permutations = 100, autoscale_useboxcox = TRUE,
+                            sample_attributes_fixed = FALSE,
                             max_iter = 1e4, min_score = NA, quiet = FALSE) {
   start_time <- Sys.time()
 
@@ -394,86 +185,90 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   assertthat::assert_that(is.function(shuffle_proposal_func), msg = "shuffle_proposal_func should be a function")
 
 
+  # Do first iteration outside of loop; helps to perform initial checks just once
+  iteration <- 1
   using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
 
-  extract_shuffle_params <- function(shuffle) {
-    # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
-    # Tried to avoid redundant checks that are performed on batch container level
+  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+    extract_shuffle_params(attributes_expected = FALSE)
 
-    # Any shuffling function should return one of the following
-    # 1. atomic index vector for a direct location assignment
-    # 2. a list with src and dst vectors
-    # 3. a list with locations vector (for location assignment) and optional sample_attr data frame/tibble
-
-    if (is.null(shuffle)) { # marks end of iteration schedule
-      return(NULL)
-    }
-
-    if (rlang::is_atomic(shuffle)) {
-      loc <- shuffle
-      src <- dst <- attrib <- NULL
-      assertthat::assert_that(!using_attributes,
-        msg = "sample attributes must be consistently supplied by shuffle function once started"
-      )
-    } else {
-      assertthat::assert_that(is.list(shuffle), msg = "shuffle proposal function must return either a numeric vector or a list")
-      if (!is.null(shuffle[["src"]]) && !is.null(shuffle[["dst"]])) {
-        loc <- NULL
-        src <- shuffle[["src"]]
-        dst <- shuffle[["dst"]]
-      } else {
-        assertthat::assert_that(!is.null(shuffle[["location_assignment"]]), msg = "shuffle function must return either a src/dst pair or a location vector")
-        loc <- shuffle[["location_assignment"]]
-        src <- dst <- NULL
-      }
-      if (is.null(shuffle[["samples_attr"]])) {
-        assertthat::assert_that(!using_attributes,
-          msg = "sample attributes must be consistently supplied by shuffle function once started"
-        )
-        attrib <- NULL
-      } else {
-        attrib <- shuffle[["samples_attr"]]
-        using_attributes <<- TRUE
-      }
-    }
-
-    list(src = src, dst = dst, location_assignment = loc, samples_attr = attrib)
+  # Always perform first shuffling before scoring the bc; works also if attributes are added at this stage
+  # Otherwise remember initial state as currently best shuffling
+  if (!is.null(shuffle_params[["samples_attr"]])) {
+    if (!quiet) message("Usage of sample attributes --> executing first shuffling call.")
+    update_batchcontainer(batch_container, shuffle_params)
+    best_shuffle <- shuffle_params
+  } else {
+    best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment, samples_attr = NULL)
   }
 
-  attrib_msg_made <- FALSE
+  initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
+  score_dim <- length(initial_score)
 
-  update_batchcontainer <- function(shuffle_params) {
-    batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst, location_assignment = shuffle_params$location_assignment)
-
-    # Add sample attributes to container if necessary
-    if (!is.null(shuffle_params[["samples_attr"]])) {
-      batch_container$samples_attr <- shuffle_params[["samples_attr"]]
-      if (!quiet && !attrib_msg_made) {
-        message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
-        attrib_msg_made <<- TRUE
-      }
-    }
+  if (score_dim == 1 && is.null(aggregate_scores_func)) { # implicit default aggregation for one-dimensional scores
+    aggregate_scores_func <- first_score_only
   }
+  assertthat::assert_that(score_dim == 1 || (!missing(aggregate_scores_func) && !is.null(aggregate_scores_func)),
+    msg = stringr::str_c(
+      "Aggregation function has to be specific explicitly if a ", score_dim,
+      "-dim. score is used.\nSee param 'aggregate_scores_func'."
+    )
+  )
 
 
-  iteration <- 1
-  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>% extract_shuffle_params()
-
-
-  # If sample attributes are provided, frontload first bc update since additional variables may be actually used in the scoring function(s)!
-  # Would be nice in principle to check whether any of these variable is ACTUALLY used in a scoring function
-  if (using_attributes) {
+  # Check score variances (should be all >0)
+  if (check_score_variance) {
+    bc_copy <- batch_container$copy()
+    # Remove defensive checks later if possible
+    assertthat::assert_that(identical(batch_container$get_samples(), bc_copy$get_samples()))
+    assertthat::assert_that(identical(batch_container$assignment, bc_copy$assignment))
+    score_vars <- random_score_variances(batch_container$copy(), random_perm = 100, sample_attributes_fixed)
+    low_var_scores <- score_vars < 1e-10
     if (!quiet) {
-      message("Permutation function uses sample attributes. Frontloading sample permutation before scoring.")
+      message(
+        "Checking variances of ", length(low_var_scores), "-dim. score vector.",
+        "\n... (", stringr::str_c(round(score_vars, 3), collapse = ", "), ")",
+        ifelse(any(low_var_scores), " !!", " - OK")
+      )
     }
-    update_batchcontainer(shuffle_params)
+    ne_scores <- assertthat::validate_that(!any(is.na(low_var_scores)),
+      msg = stringr::str_c(
+        "Caution! Non-evaluable scores detected! Check scores # ",
+        stringr::str_c(which(is.na(low_var_scores)), collapse = ", ")
+      )
+    )
+    if (is.character(ne_scores)) message(ne_scores)
+    assertthat::assert_that(!any(low_var_scores),
+      msg = stringr::str_c(
+        "Low variance scores detected! Check scores # ",
+        stringr::str_c(which(low_var_scores), collapse = ", ")
+      )
+    )
   }
 
-  # Remember initial sample order as best permutation so far and calculate multi-variate score
-  best_perm <- batch_container$assignment
-  best_score <- batch_container$score()
+
+  # Set up autoscaling function if needed
+  if (autoscale_scores && score_dim > 1) {
+    autoscaling_permutations <- max(20, floor(autoscaling_permutations))
+    if (!quiet) {
+      message(
+        "Creating autoscaling function for ", score_dim, "-dim. score vector. (",
+        autoscaling_permutations, " random permutations)"
+      )
+    }
+    autoscale_func <- mk_autoscale_function(batch_container$copy(),
+      random_perm = autoscaling_permutations,
+      use_boxcox = autoscale_useboxcox,
+      sample_attributes_fixed
+    )
+  } else {
+    autoscale_func <- identity
+  }
+
+  # Calculate and remember initial multi-variate & aggregated score
+  best_score <- autoscale_func(initial_score)
   best_agg <- aggregate_scores_func(best_score)
-  score_dim <- length(best_score)
+
 
   trace <- OptimizationTrace$new(
     max_iter + 1, # + 1 to accommodate initial score
@@ -493,15 +288,22 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
   while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
 
-    update_batchcontainer(shuffle_params)
+    attribs_assigned <- update_batchcontainer(batch_container, shuffle_params)
+    if (!using_attributes && attribs_assigned) {
+      message("Adding ", ncol(shuffle_params[["samples_attr"]]), " attributes to samples.")
+      using_attributes <- TRUE
+    }
 
-    new_score <- batch_container$score()
+    new_score <- autoscale_func(batch_container$score())
     assertthat::assert_that(!any(is.na(new_score)), msg = stringr::str_c("NA apprearing during scoring in iteration ", iteration))
 
     if (acceptance_func(aggregate_scores_func(new_score), best_agg, iteration)) {
       best_score <- new_score
       best_agg <- aggregate_scores_func(best_score)
-      best_perm <- batch_container$assignment
+      best_shuffle <- list(
+        src = NULL, dst = NULL, location_assignment = batch_container$assignment,
+        samples_attr = shuffle_params[["samples_attr"]]
+      )
       if (!quiet) {
         message(
           "Achieved score: ", best_agg,
@@ -511,7 +313,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       }
     } else {
       if (is.null(shuffle_params[["location_assignment"]])) { # we used the permutation method and thus have to swap samples back!
-        batch_container$move_samples(src = shuffle_params$src, dst = shuffle_params$dst)
+        update_batchcontainer(batch_container, shuffle_params) # two swaps are in effect no swaps
       }
     }
 
@@ -529,12 +331,12 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     if (iteration <= max_iter) {
       # only call shuffle_proposal_func in case we have more iterations
       shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
-        extract_shuffle_params()
+        extract_shuffle_params(attributes_expected = using_attributes)
     }
   }
 
   # In the end, always make sure that final state of bc is the one with the best score
-  batch_container$move_samples(location_assignment = best_perm)
+  update_batchcontainer(batch_container, best_shuffle)
 
   trace$shrink(iteration)
   trace$seed <- save_random_seed
