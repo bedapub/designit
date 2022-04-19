@@ -14,7 +14,7 @@ validate_samples <- function(samples) {
     msg = "Samples should have at least one row"
   )
 
-  assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::across(tidyselect::everything(), is.na))) == 0,
+  assertthat::assert_that(nrow(dplyr::filter(samples, dplyr::if_all(tidyselect::everything(), is.na))) == 0,
     msg = "Samples contain all-NA rows"
   )
 }
