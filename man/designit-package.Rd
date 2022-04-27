@@ -6,15 +6,14 @@
 \alias{designit-package}
 \title{designit: Blocking and randomization for experimental design}
 \description{
-Blocking and randomization for experimental design.
-    TODO: expand this.
+Blocking and randomization for experimental design. TODO: expand this.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://docs.roche.com/#/designit/latest}
-  \item \url{https://code.roche.com/BEDA/designit/}
-  \item Report bugs at \url{https://code.roche.com/BEDA/designit/issues}
+  \item \url{https://code.roche.com/PMDA/packages/designit/}
+  \item Report bugs at \url{https://code.roche.com/PMDA/packages/designit/issues}
 }
 
 }

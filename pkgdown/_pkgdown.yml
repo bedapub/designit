@@ -1,10 +1,10 @@
-url: http://bioinfo.bas.roche.com:8080/biomics/_doc/packages/designit/
+url: https://docs.roche.com/#/designit/latest
 
 repo:
   url:
-    home: https://code.roche.com/BEDA/designit
-    source: https://code.roche.com/BEDA/designit/blob/master/
-    issue: https://code.roche.com/BEDA/designit/issues/
+    home: https://code.roche.com/PMDA/packages/designit
+    source: https://code.roche.com/PMDA/packages/designit/blob/master/
+    issue: https://code.roche.com/PMDA/packages/designit/issues/
 
 template:
   assets: pkgdown/assets

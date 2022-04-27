@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 # designit
 
 <!-- badges: start -->
-[![Pipeline Status](https://code.roche.com/BEDA/designit/badges/master/pipeline.svg)](https://code.roche.com/BEDA/designit/commits/master)
+[![Pipeline Status](https://code.roche.com/PMDA/packages/designit/badges/master/pipeline.svg)](https://code.roche.com/PMDA/packages/designit/commits/master)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
@@ -32,9 +32,9 @@ You can install the development version from Roche GitHub with:
 ```{r echo=TRUE, eval=FALSE}
 # install.packages("devtools")
 devtools::install_gitlab(
-  "BEDA/designit",
+  "PMDA/packages/designit",
   host = "code.roche.com",
-  auth_token = "eRd61K22yFhKPknvHHTD"
+  auth_token = "rNVzMHKpdnnD_TJ3nMGw"
 )
 ```
 
