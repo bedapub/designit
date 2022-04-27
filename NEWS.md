@@ -1,3 +1,8 @@
+# designit 0.2.4
+
+* fix dplyr filter issue (once again)
+* migrate from BEDA to PMDA
+
 # designit 0.2.3
 
 * fix dplyr filter issue
