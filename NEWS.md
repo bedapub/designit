@@ -1,3 +1,7 @@
+# designit 0.2.3
+
+* fix dplyr filter issue
+
 # designit 0.2.2
 
 * fix plate scoring example vignette caching
