@@ -19,6 +19,96 @@ validate_samples <- function(samples) {
   )
 }
 
+#' Create locations table from dimensions and exclude table
+#'
+#' @param dimensions A vector or list of dimensions. Every dimension
+#' should have a name. Could be an integer vector of dimensions or
+#' a named list. Every value of a list could be either dimension size
+#' or parameters for [BatchContainerDimension$new()][BatchContainerDimension].
+#' @param exclude [data.frame] with excluded locations of a container.
+#'
+#' @return a [tibble::tibble()] with all the available locations.
+locations_table_from_dimensions <- function(dimensions, exclude) {
+  assertthat::assert_that(length(dimensions) >= 1)
+
+  if (all(purrr::map_lgl(dimensions, inherits, "BatchContainerDimension")) &&
+    is.null(names(dimensions))) {
+    names(dimensions) <- purrr::map_chr(dimensions, ~ .$name)
+  }
+
+  assertthat::assert_that(!is.null(names(dimensions)),
+    msg = "Dimensions should have names"
+  )
+
+  dimensions <- purrr::imap(dimensions, function(dm, name) {
+    if (is.numeric(dm)) {
+      assertthat::assert_that(!is.null(name), msg = "dimension should have a name")
+      BatchContainerDimension$new(name = name, size = dm)
+    } else if (inherits(dm, "BatchContainerDimension")) {
+      assertthat::assert_that(
+        dm$name == name,
+        msg = "dimension names should match the list names"
+      )
+      dm
+    } else {
+      assertthat::assert_that(is.list(dm),
+        msg = "Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers"
+      )
+      assertthat::assert_that(is.null(dm$name) || dm$name == name,
+        msg = "dimension name should be set as a list name"
+      )
+      dm$name <- name
+      do.call(BatchContainerDimension$new, dm)
+    }
+  })
+
+  assertthat::assert_that(all(!duplicated(names(dimensions))),
+    msg = "duplicated dimension names"
+  )
+
+  ldf <- dimensions %>%
+    purrr::map(~ .x$values) %>%
+    expand.grid() %>%
+    dplyr::arrange(dplyr::across(dplyr::everything())) %>%
+    tibble::as_tibble()
+
+  if (!is.null(exclude)) {
+    assertthat::assert_that(
+      is.data.frame(exclude),
+      msg = "Exclude should be a data.frame/tibble or NULL"
+    )
+
+    assertthat::assert_that(setequal(colnames(exclude), names(dimensions)),
+      msg = "Columns of exclude should match dimensions"
+    )
+
+    exclude <- exclude[, names(dimensions), drop = FALSE] %>%
+      dplyr::mutate(
+        dplyr::across(where(is.numeric), as.integer),
+        dplyr::across(where(is.factor), as.character)
+      )
+
+    assertthat::assert_that(nrow(exclude) == dplyr::n_distinct(exclude),
+      msg = "non-unique rows in exclude"
+    )
+
+    assertthat::assert_that(nrow(exclude) < nrow(ldf),
+      msg = "All locations in a container cannot be excluded"
+    )
+
+    for (dim_name in names(dimensions)) {
+      assertthat::assert_that(
+        all(exclude[[dim_name]] %in% dimensions[[dim_name]]$values),
+        msg = stringr::str_glue("Some values are outside range in dimension '{dim_name}'")
+      )
+    }
+
+    exclude <- tibble::as_tibble(exclude)
+
+    ldf <- dplyr::anti_join(ldf, exclude, by = colnames(exclude))
+  }
+  ldf
+}
 
 
 #' R6 Class representing a batch container.
@@ -35,11 +125,15 @@ BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     #' @description
     #' Create a new BatchContainer object.
+    #' @param locations_table A table with available locations.
     #' @param dimensions A vector or list of dimensions. Every dimension
     #' should have a name. Could be an integer vector of dimensions or
     #' a named list. Every value of a list could be either dimension size
-    #' or parameters for [BatchContainerDimension$new()][BatchContainerDimension].
+    #' or parameters for
+    #' [BatchContainerDimension$new()][BatchContainerDimension].
+    #' Can be used as an alternative to passing `locations_table`.
     #' @param exclude [data.frame] with excluded locations of a container.
+    #' Only used together with dimensions.
     #' @examples
     #' bc <- BatchContainer$new(
     #'   dimensions = list(
@@ -51,46 +145,45 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' )
     #'
     #' bc
-    initialize = function(dimensions,
+    initialize = function(locations_table,
+                          dimensions,
                           exclude = NULL) {
-      assertthat::assert_that(length(dimensions) >= 1)
+      if (missing(locations_table)) {
+        locations_table <- locations_table_from_dimensions(
+          dimensions,
+          exclude
+        )
+      } else {
+        assertthat::assert_that(
+          missing(dimensions) && is.null(exclude),
+          msg = "dimensions and exclude cannot be used together with locations_table")
+      }
+      assertthat::assert_that(
+        is.data.frame(locations_table),
+        msg = "Locations table should be a data.frame/tibble or NULL"
+      )
+      locations_table <- tibble::as_tibble(locations_table)
 
-      if (all(purrr::map_lgl(dimensions, inherits, "BatchContainerDimension")) &&
-        is.null(names(dimensions))) {
-        names(dimensions) <- purrr::map_chr(dimensions, ~ .$name)
+      assertthat::assert_that(
+        nrow(locations_table) == dplyr::n_distinct(locations_table),
+        msg = "non-unique rows in locations table"
+      )
+
+      assertthat::assert_that(
+        all(colnames(locations_table) != ""),
+        msg = "Location table column names should a non-empty strings"
+      )
+
+      assertthat::assert_that(
+        ! ".sample_id" %in% colnames(locations_table),
+        msg = "Cannot use reserved name for a location table column names (.sample_id)"
+      )
+
+      if (0 %in% rowSums(!is.na(locations_table))) {
+        warning("Some batch container locations have only NA-attributes")
       }
 
-      assertthat::assert_that(!is.null(names(dimensions)),
-        msg = "Dimensions should have names"
-      )
-
-      private$dimensions <- purrr::imap(dimensions, function(dm, name) {
-        if (is.numeric(dm)) {
-          assertthat::assert_that(!is.null(name), msg = "dimension should have a name")
-          BatchContainerDimension$new(name = name, size = dm)
-        } else if (inherits(dm, "BatchContainerDimension")) {
-          assertthat::assert_that(
-            dm$name == name,
-            msg = "dimension names should match the list names"
-          )
-          dm
-        } else {
-          assertthat::assert_that(is.list(dm),
-            msg = "Dimensions should be named numeric vector, list of BatchContainerDimension or list of lists/integers"
-          )
-          assertthat::assert_that(is.null(dm$name) || dm$name == name,
-            msg = "dimension name should be set as a list name"
-          )
-          dm$name <- name
-          do.call(BatchContainerDimension$new, dm)
-        }
-      })
-
-      assertthat::assert_that(all(!duplicated(self$dimension_names)),
-        msg = "duplicated dimension names"
-      )
-
-      self$exclude <- exclude
+      private$locations_df <- locations_table
     },
 
 
@@ -164,15 +257,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Get a table with all the locations in a `BatchContainer`.
     #' @return A [`tibble`][tibble::tibble()] with all the available locations.
     get_locations = function() {
-      ldf <- private$dimensions %>%
-        purrr::map(~ .x$values) %>%
-        expand.grid() %>%
-        dplyr::arrange(dplyr::across(dplyr::everything())) %>%
-        tibble::as_tibble()
-      if (!is.null(self$exclude)) {
-        ldf <- dplyr::anti_join(ldf, self$exclude, by = self$dimension_names)
-      }
-      ldf
+      private$locations_df
     },
 
 
@@ -267,7 +352,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     copy = function() {
       # we do not name this method `clone` to avoid incorrect
       # autogenerated documentation (via roxygen2)
-      bc <- BatchContainer$new(private$dimensions, private$exclude_df)
+      bc <- BatchContainer$new(private$locations_df)
       if (!is.null(self$samples)) {
         bc$samples <- self$samples %>%
           dplyr::select(-.sample_id)
@@ -315,11 +400,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' List of scoring functions.
     scoring_funcs = NULL,
 
-    #' List of BatchContainerDimension elements.
-    dimensions = NULL,
-
-    #' Tibble with excluded locations.
-    exclude_df = NULL,
+    #' Tibble with batch container locations.
+    locations_df = NULL,
 
     #' Tibble with sample information and sample ids.
     samples_table = NULL,
@@ -341,7 +423,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         all(!is.infinite(assignment)),
         msg = "sample assignment should an integer vector without Infs"
       )
-      assertthat::assert_that(length(assignment) == self$n_available,
+      assertthat::assert_that(length(assignment) == self$n_locations,
         msg = "sample assignment length doesn't match the number of available locations"
       )
       assertthat::assert_that(!any(duplicated(na.omit(assignment))))
@@ -398,42 +480,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
     },
 
     #' @field n_locations
-    #' Returns number of locations in a `BatchContainer`. This number can be larger than
-    #' `n_available` since it does not take excluded locations into account.
-    #' This field cannot be assigned.
+    #' Returns number of locations in a `BatchContainer`.
     n_locations = function(value) {
       if (missing(value)) {
-        private$dimensions %>%
-          purrr::map_int(~ .x$size) %>%
-          prod()
+        nrow(private$locations_df)
       } else {
         stop("Cannot set number of locations in a container (read-only).")
-      }
-    },
-
-    #' @field n_excluded
-    #' Returns number of excluded locations in a `BatchContainer`.
-    #' This field cannot be assigned.
-    n_excluded = function(value) {
-      if (missing(value)) {
-        if (is.null(private$exclude_df)) {
-          0
-        } else {
-          nrow(private$exclude_df)
-        }
-      } else {
-        stop("Cannot set number of excluded locations in container (read-only).")
-      }
-    },
-
-    #' @field n_available
-    #' Returns number of available locations in a `BatchContainer`.
-    #' This field cannot be assigned.
-    n_available = function(value) {
-      if (missing(value)) {
-        self$n_locations - self$n_excluded
-      } else {
-        stop("Cannot set dimension names (read-only).")
       }
     },
 
@@ -442,7 +494,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' This field cannot be assigned.
     n_dimensions = function(value) {
       if (missing(value)) {
-        length(private$dimensions)
+        ncol(private$locations_df)
       } else {
         stop("Cannot set number of dimensions (read-only).")
       }
@@ -453,63 +505,9 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' This field cannot be assigned.
     dimension_names = function(value) {
       if (missing(value)) {
-        names(private$dimensions)
+        colnames(private$locations_df)
       } else {
         stop("Cannot set number of dimensions (read-only).")
-      }
-    },
-
-    #' @field exclude
-    #' Get or set excluded locations in the `BatchContainer`.
-    exclude = function(value) {
-      if (missing(value)) {
-        private$exclude_df
-      } else {
-        # Change of exclude will also change n_available, which can
-        # lead to the situation when there are more samples than locations.
-        # Or if samples are assigned to location, we can have samples in
-        # excluded locations.
-        # In rare cases when this is really needed, one could create a new
-        # BatchContainer.
-        assertthat::assert_that(
-          is.null(private$samples_table),
-          msg = "Cannot change excluded locations after samples have been added"
-        )
-        if (is.null(value) || nrow(value) == 0) {
-          private$exclude_df <- NULL
-          return()
-        }
-
-        assertthat::assert_that(is.data.frame(value), msg = "Exclude should be a data.frame/tibble or NULL")
-
-        assertthat::assert_that(setequal(colnames(value), names(private$dimensions)),
-          msg = "Columns of exclude should match dimensions"
-        )
-
-        value <- value[, names(private$dimensions), drop = FALSE] %>%
-          dplyr::mutate(
-            dplyr::across(where(is.numeric), as.integer),
-            dplyr::across(where(is.factor), as.character)
-          )
-
-        rownames(value) <- NULL
-
-        assertthat::assert_that(nrow(value) == dplyr::n_distinct(value),
-          msg = "non-unique rows in exclude"
-        )
-
-        assertthat::assert_that(nrow(value) < self$n_locations,
-          msg = "All locations in a container cannot be excluded"
-        )
-
-        for (dim_name in names(private$dimensions)) {
-          assertthat::assert_that(
-            all(value[[dim_name]] %in% private$dimensions[[dim_name]]$values),
-            msg = stringr::str_glue("Some values are outside range in dimension '{dim_name}'")
-          )
-        }
-
-        private$exclude_df <- tibble::as_tibble(value)
       }
     },
 
@@ -530,7 +528,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
         validate_samples(samples)
 
-        assertthat::assert_that(nrow(samples) <= self$n_available,
+        assertthat::assert_that(nrow(samples) <= self$n_locations,
           msg = "more samples than availble locations in the batch container"
         )
 
