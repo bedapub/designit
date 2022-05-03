@@ -60,7 +60,6 @@ bc <- BatchContainer$new(
 
 bc
 
-bc$exclude
 bc$n_locations
 bc$get_locations()
 
