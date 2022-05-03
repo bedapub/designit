@@ -41,23 +41,13 @@ In the later case each function is called.}
 
 \item{\code{has_samples_attr}}{Returns TRUE if \code{BatchContainer} has sample atrributes assigned.}
 
-\item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}. This number can be larger than
-\code{n_available} since it does not take excluded locations into account.
-This field cannot be assigned.}
-
-\item{\code{n_excluded}}{Returns number of excluded locations in a \code{BatchContainer}.
-This field cannot be assigned.}
-
-\item{\code{n_available}}{Returns number of available locations in a \code{BatchContainer}.
-This field cannot be assigned.}
+\item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}.}
 
 \item{\code{n_dimensions}}{Returns number of dimensions in a \code{BatchContainer}.
 This field cannot be assigned.}
 
 \item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
-
-\item{\code{exclude}}{Get or set excluded locations in the \code{BatchContainer}.}
 
 \item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
@@ -89,18 +79,23 @@ Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
 \subsection{Method \code{new()}}{
 Create a new BatchContainer object.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(dimensions, exclude = NULL)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(locations_table, dimensions, exclude = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
+\item{\code{locations_table}}{A table with available locations.}
+
 \item{\code{dimensions}}{A vector or list of dimensions. Every dimension
 should have a name. Could be an integer vector of dimensions or
 a named list. Every value of a list could be either dimension size
-or parameters for \link[=BatchContainerDimension]{BatchContainerDimension$new()}.}
+or parameters for
+\link[=BatchContainerDimension]{BatchContainerDimension$new()}.
+Can be used as an alternative to passing \code{locations_table}.}
 
-\item{\code{exclude}}{\link{data.frame} with excluded locations of a container.}
+\item{\code{exclude}}{\link{data.frame} with excluded locations of a container.
+Only used together with dimensions.}
 }
 \if{html}{\out{</div>}}
 }
@@ -239,8 +234,7 @@ Prints information about \code{BatchContainer}.
 \describe{
 \item{\code{...}}{not used.
 List of scoring functions.
-List of BatchContainerDimension elements.
-Tibble with excluded locations.
+Tibble with batch container locations.
 Tibble with sample information and sample ids.
 Sample attributes, a data.table.
 Vector with assignment of sample ids to locations.

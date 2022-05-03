@@ -31,15 +31,6 @@ bc
 \item{\code{name}}{dimension name.}
 
 \item{\code{values}}{vector of dimension values.}
-
-\item{\code{weight}}{dimension weight. This can be interpreted
-by the sample assignment function.}
-
-\item{\code{parent_dimension}}{name of the parent dimension.
-E.g., plate rows and columns belong to the plate.
-However, there is no nesting between rows and columns.
-This could be used by a sample assignment function
-taking plate effect into account.}
 }
 \if{html}{\out{</div>}}
 }
@@ -68,13 +59,7 @@ Create a new BatchContainerDimension object.
 
 This is usually used implicitly via \code{\link[=BatchContainer]{BatchContainer$new()}}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(
-  name,
-  size = NULL,
-  values = NULL,
-  weight = NA_real_,
-  parent_dimension = NULL
-)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(name, size = NULL, values = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -84,11 +69,7 @@ This is usually used implicitly via \code{\link[=BatchContainer]{BatchContainer$
 
 \item{\code{size}}{Dimension size. Setting this implies that dimension values are 1:\code{size}.}
 
-\item{\code{values}}{Explicit list of dimension values. Could be numeric, character or factor.}
-
-\item{\code{weight}}{Dimension weight. Currently this is not used.}
-
-\item{\code{parent_dimension}}{Name of the parent dimension. Currently this is not used.
+\item{\code{values}}{Explicit list of dimension values. Could be numeric, character or factor.
 
 It is required to provide dimension namd and either size of values.}
 }
