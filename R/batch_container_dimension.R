@@ -81,7 +81,6 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 
         self$values <- values
       }
-
     }
   ),
   active = list(

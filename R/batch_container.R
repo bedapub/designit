@@ -156,7 +156,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
       } else {
         assertthat::assert_that(
           missing(dimensions) && is.null(exclude),
-          msg = "dimensions and exclude cannot be used together with locations_table")
+          msg = "dimensions and exclude cannot be used together with locations_table"
+        )
       }
       assertthat::assert_that(
         is.data.frame(locations_table),
@@ -175,7 +176,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       )
 
       assertthat::assert_that(
-        ! ".sample_id" %in% colnames(locations_table),
+        !".sample_id" %in% colnames(locations_table),
         msg = "Cannot use reserved name for a location table column names (.sample_id)"
       )
 
