@@ -29,6 +29,8 @@ validate_samples <- function(samples) {
 #'
 #' @return a [tibble::tibble()] with all the available locations.
 locations_table_from_dimensions <- function(dimensions, exclude) {
+  # silence R check warning
+  where <- NULL
   assertthat::assert_that(length(dimensions) >= 1)
 
   if (all(purrr::map_lgl(dimensions, inherits, "BatchContainerDimension")) &&
