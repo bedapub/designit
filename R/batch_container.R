@@ -287,13 +287,24 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Prints information about `BatchContainer`.
     #' @param ... not used.
     print = function(...) {
+      if (self$has_samples) {
+        if (is.null(private$assignment_vector)) {
+          assigned_info <- "unassigned"
+        } else {
+          assigned_info <- "assigned"
+        }
+        sample_info <- stringr::str_glue(
+          " and {nrow(private$samples_table)} samples ({assigned_info})"
+        )
+      } else {
+        sample_info <- ""
+      }
       cat(stringr::str_glue(
-        "Batch container with {self$n_locations} locations and {self$n_excluded} excluded.\n",
+        "Batch container with {self$n_locations} locations{sample_info}.\n",
         .trim = FALSE
       ))
       cat("  Dimensions: ")
-      private$dimensions %>%
-        purrr::map_chr(~ .x$short_info) %>%
+      self$dimension_names %>%
         stringr::str_c(collapse = ", ") %>%
         cat()
       cat("\n")
