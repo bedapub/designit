@@ -3,7 +3,7 @@ bc <- BatchContainer$new(
 )
 
 samples <- data.frame(
-  sampleId = seq_len(bc$n_available - 5)
+  sampleId = seq_len(bc$n_locations - 5)
 )
 
 assign_in_order(bc, samples)
