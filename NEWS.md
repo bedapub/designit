@@ -1,3 +1,12 @@
+# designit 0.3.0
+
+* `BatchContainer` stores locations table (dimensions & excluded)
+* `BatchContainer$new()` accepts locations table
+* `BatchContainer` with samples can be created using
+  `batch_container_from_table`
+* `bc$n_available` was removed (use `bc$n_locations` instead)
+* minor improvements to `print(bc)`
+
 # designit 0.2.4
 
 * fix dplyr filter issue (once again)
