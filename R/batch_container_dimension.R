@@ -9,17 +9,6 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' @field values vector of dimension values.
     values = NULL,
 
-    #' @field weight dimension weight. This can be interpreted
-    #' by the sample assignment function.
-    weight = NULL,
-
-    #' @field parent_dimension name of the parent dimension.
-    #' E.g., plate rows and columns belong to the plate.
-    #' However, there is no nesting between rows and columns.
-    #' This could be used by a sample assignment function
-    #' taking plate effect into account.
-    parent_dimension = NULL,
-
     #' @description
     #' Create a new BatchContainerDimension object.
     #'
@@ -28,8 +17,6 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' @param name Dimension name, a character string. Requiered.
     #' @param size Dimension size. Setting this implies that dimension values are 1:`size`.
     #' @param values Explicit list of dimension values. Could be numeric, character or factor.
-    #' @param weight Dimension weight. Currently this is not used.
-    #' @param parent_dimension Name of the parent dimension. Currently this is not used.
     #'
     #' It is required to provide dimension namd and either size of values.
     #'
@@ -46,9 +33,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' bc
     initialize = function(name,
                           size = NULL,
-                          values = NULL,
-                          weight = NA_real_,
-                          parent_dimension = NULL) {
+                          values = NULL) {
       assertthat::assert_that(assertthat::is.string(name), name != "",
         msg = "Dimension name should a non-empty string"
       )
@@ -96,22 +81,6 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
 
         self$values <- values
       }
-
-      assertthat::assert_that(length(weight) == 1)
-
-      if (!is.na(weight)) {
-        assertthat::assert_that(is.numeric(weight), is.finite(weight), weight >= 0)
-      }
-
-      self$weight <- weight
-
-      if (!is.null(parent_dimension)) {
-        assertthat::assert_that(
-          assertthat::is.string(parent_dimension),
-          parent_dimension != ""
-        )
-      }
-      self$parent_dimension <- parent_dimension
     }
   ),
   active = list(

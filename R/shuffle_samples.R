@@ -14,7 +14,7 @@ pairwise_swapping <- function(batch_container, iteration) {
   # so we do not try to cache values in this function.
   non_empty_locations <- which(!is.na(batch_container$assignment))
   first_element <- sample(non_empty_locations, 1)
-  non_first_location <- seq_len(batch_container$n_available)[-first_element]
+  non_first_location <- seq_len(batch_container$n_locations)[-first_element]
   second_element <- sample(non_first_location, 1)
   return(list(src = c(first_element, second_element), dst = c(second_element, first_element)))
 }
@@ -46,8 +46,8 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
         redefined <- TRUE
       }
       draws <<- 2 * n_swaps
-      if (draws > batch_container$n_available) {
-        n_swaps <<- floor(batch_container$n_available / 2)
+      if (draws > batch_container$n_locations) {
+        n_swaps <<- floor(batch_container$n_locations / 2)
         draws <<- 2 * n_swaps
         redefined <- TRUE
       }
@@ -58,7 +58,7 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
     }
     non_empty_locations <- which(!is.na(batch_container$assignment))
     first_elements <- sample(non_empty_locations, n_swaps)
-    non_first_location <- seq_len(batch_container$n_available)[-first_elements]
+    non_first_location <- seq_len(batch_container$n_locations)[-first_elements]
     second_elements <- sample(non_first_location, n_swaps)
 
     # ensures that there are

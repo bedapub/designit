@@ -6,8 +6,14 @@ bc1 <- BatchContainer$new(
   )
 )
 
-bc2 <- bc1$copy()
-bc2$exclude <- data.frame(plate = 2, row = 3, column = letters[1:3])
+bc2 <- BatchContainer$new(
+  dimensions = list(
+    plate = 2,
+    column = list(values = letters[1:3]),
+    row = 3
+  ),
+  exclude = data.frame(plate = 2, row = 3, column = letters[1:3])
+)
 
 sample_sheet1 <- tibble::tribble(
   ~plate, ~column, ~row, ~sampleID,

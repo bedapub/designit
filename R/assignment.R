@@ -36,13 +36,13 @@ assign_in_order <- function(batch_container, samples = NULL) {
   }
 
   n_samples <- nrow(batch_container$samples)
-  n_available <- batch_container$n_available
+  n_locations <- batch_container$n_locations
 
-  assertthat::assert_that(n_available >= n_samples)
+  assertthat::assert_that(n_locations >= n_samples)
 
   batch_container$move_samples(location_assignment = c(
     1:n_samples,
-    rep(NA_integer_, n_available - n_samples)
+    rep(NA_integer_, n_locations - n_samples)
   ))
 
   invisible(batch_container)

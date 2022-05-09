@@ -21,18 +21,8 @@ bc4_excl <- BatchContainer$new(
 test_that("Test that BatchContainer size is correct", {
   expect_equal(bc1$n_locations, 100)
   expect_equal(bc2$n_locations, 100)
-  expect_equal(bc3_excl$n_locations, 100)
-  expect_equal(bc4_excl$n_locations, 100)
-
-  expect_equal(bc1$n_available, 100)
-  expect_equal(bc2$n_available, 100)
-  expect_equal(bc3_excl$n_available, 100 - 1)
-  expect_equal(bc4_excl$n_available, 100 - 3)
-
-  expect_equal(bc1$n_excluded, 0)
-  expect_equal(bc2$n_excluded, 0)
-  expect_equal(bc3_excl$n_excluded, 1)
-  expect_equal(bc4_excl$n_excluded, 3)
+  expect_equal(bc3_excl$n_locations, 100 - 1)
+  expect_equal(bc4_excl$n_locations, 100 - 3)
 })
 
 test_that("Test that numer of dimensions is correct", {
@@ -43,10 +33,10 @@ test_that("Test that numer of dimensions is correct", {
 })
 
 test_that("Test locations", {
-  expect_equal(nrow(bc1$get_locations()), bc1$n_available)
-  expect_equal(nrow(bc2$get_locations()), bc2$n_available)
-  expect_equal(nrow(bc3_excl$get_locations()), bc3_excl$n_available)
-  expect_equal(nrow(bc4_excl$get_locations()), bc4_excl$n_available)
+  expect_equal(nrow(bc1$get_locations()), bc1$n_locations)
+  expect_equal(nrow(bc2$get_locations()), bc2$n_locations)
+  expect_equal(nrow(bc3_excl$get_locations()), bc3_excl$n_locations)
+  expect_equal(nrow(bc4_excl$get_locations()), bc4_excl$n_locations)
 })
 
 samples <- data.frame(a = 1:10, b = rnorm(10))
@@ -60,14 +50,14 @@ test_that("Test adding samples and then assigning them", {
   assign_in_order(bc1_copy)
   expect_equal(
     bc1_copy$assignment,
-    c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples)))
+    c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_locations - nrow(samples)))
   )
 
   bc1_copy <- bc1$copy()
   assign_in_order(bc1_copy, samples)
   expect_equal(
     bc1_copy$assignment,
-    c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_available - nrow(samples)))
+    c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_locations - nrow(samples)))
   )
 })
 
@@ -84,9 +74,9 @@ test_that("Test assigning too many or empty samples", {
   bc3_copy <- bc3_excl$copy()
   bc4_copy <- bc4_excl$copy()
   expect_error(bc3_copy$samples <- data.frame())
-  expect_error(bc3_copy$samples <- data.frame(a = seq_len(bc3_copy$n_available + 1)))
+  expect_error(bc3_copy$samples <- data.frame(a = seq_len(bc3_copy$n_locations + 1)))
   expect_error(bc4_copy$samples <- data.frame())
-  expect_error(bc4_copy$samples <- data.frame(a = seq_len(bc4_copy$n_available + 1)))
+  expect_error(bc4_copy$samples <- data.frame(a = seq_len(bc4_copy$n_locations + 1)))
 })
 
 test_that("Test double sample assignment", {

@@ -54,20 +54,10 @@ bc <- BatchContainer$new(
 )
 
 bc
-#> Batch container with 18 locations and 2 excluded.
-#>   Dimensions: plate<size=3>, row<size=3>, column<size=2>
+#> Batch container with 16 locations.
+#>   Dimensions: plate, row, column
 
-bc$exclude
-#> # A tibble: 2 × 3
-#>   plate row   column
-#>   <int> <chr>  <int>
-#> 1     1 a          1
-#> 2     1 a          3
 bc$n_locations
-#> [1] 18
-bc$n_excluded
-#> [1] 2
-bc$n_available
 #> [1] 16
 bc$get_locations()
 #> # A tibble: 16 × 3
@@ -92,8 +82,6 @@ bc$get_locations()
 
 set.seed(1)
 assign_random(bc, samples)
-#> Warning: data frame results in `filter()` are deprecated, use `if_any()` or
-#> `if_all()`.
 
 head(bc$get_samples())
 #> # A tibble: 6 × 6

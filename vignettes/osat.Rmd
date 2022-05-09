@@ -116,7 +116,7 @@ bc <- BatchContainer$new(
 )
 bc
 
-bc$n_available
+bc$n_locations
 ```
 
 Assign samples and get initial setup.

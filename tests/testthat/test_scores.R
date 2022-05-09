@@ -3,7 +3,7 @@ bc <- BatchContainer$new(
 )
 
 samples <- data.frame(
-  sampleId = seq_len(bc$n_available)
+  sampleId = seq_len(bc$n_locations)
 )
 
 assign_random(bc, samples)

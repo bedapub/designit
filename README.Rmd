@@ -60,10 +60,7 @@ bc <- BatchContainer$new(
 
 bc
 
-bc$exclude
 bc$n_locations
-bc$n_excluded
-bc$n_available
 bc$get_locations()
 
 set.seed(1)

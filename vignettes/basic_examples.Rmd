@@ -84,7 +84,7 @@ bc <- BatchContainer$new(
 )
 bc
 
-bc$n_available
+bc$n_locations
 bc$exclude
 bc$get_locations() %>% head()
 ```
@@ -133,7 +133,7 @@ The example below orders samples by ID and adds the empty locations afterwards
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(
   location_assignment = c(1:nrow(samples), 
-                          rep(NA, (bc$n_available - nrow(samples)))))
+                          rep(NA, (bc$n_locations - nrow(samples)))))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE), 
            plate = plate, column = column, row = row,

@@ -14,9 +14,9 @@ test_that("$copy() does not preserve samples table cache", {
 
 test_that("Cloning preservs dimensions, samples, scores & assignment", {
   bc <- BatchContainer$new(
-    dimensions = c(row = 3, column = 3)
+    dimensions = c(row = 3, column = 3),
+    exclude = data.frame(row = 3, column = 1:3)
   )
-  bc$exclude <- data.frame(row = 3, column = 1:3)
   samp <- data.frame(i = 1:6)
   assign_in_order(bc, samp)
   bc$scoring_f <- function(...) 42L
@@ -24,7 +24,7 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
 
   expect_equal(bc$samples, bc_clone$samples)
   expect_equal(bc$get_locations(), bc_clone$get_locations())
-  expect_equal(bc$n_available, bc_clone$n_available)
+  expect_equal(bc$n_locations, bc_clone$n_locations)
   expect_equal(bc$score(), bc_clone$score())
   expect_equal(bc$n_dimensions, bc_clone$n_dimensions)
   expect_equal(bc$dimension_names, bc_clone$dimension_names)

@@ -4,7 +4,7 @@ bc <- BatchContainer$new(
 )
 
 samples <- data.frame(
-  sampleId = seq_len(bc$n_available)
+  sampleId = seq_len(bc$n_locations)
 )
 
 bc$scoring_f <- function(...) rnorm(1)
