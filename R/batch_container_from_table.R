@@ -8,6 +8,8 @@
 #'
 #' @return A [BatchContainer] assigned samples.
 #' @export
+#'
+#' @examples
 batch_container_from_table <- function(tab, location_cols) {
   assertthat::assert_that(
     is.data.frame(tab)

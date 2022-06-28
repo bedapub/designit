@@ -5,6 +5,8 @@
 #' @param batch_container Instance of BatchContainer class
 #'
 #' @return Returns `BatchContainer`, invisibly.
+#'
+#' @examples
 assign_random <- function(batch_container, samples = NULL) {
   assign_in_order(batch_container, samples)
 
@@ -134,6 +136,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #' assign_from_table(bc, sample_sheet)
 #'
 #' bc$get_samples(remove_empty_locations = TRUE)
+#'
 assign_from_table <- function(batch_container, samples) {
   # sample sheet has all the batch variable
   assertthat::assert_that(is.data.frame(samples) && nrow(samples) > 0,
