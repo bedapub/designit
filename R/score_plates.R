@@ -26,6 +26,8 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2)
 #'
 #' @return List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better)
 #' @export
+#'
+#' @examples
 mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group) {
   MAX_PLATE_DIM <- 200
 

@@ -158,6 +158,8 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @return A trace object
 #'
 #' @export
+#'
+#' @examples
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_strict_improvement,

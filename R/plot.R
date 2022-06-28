@@ -6,6 +6,10 @@
 #' @param .alpha the variable used for transparency
 #'
 #' @export
+#'
+#' @return
+#'
+#' @exmaples
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)
@@ -15,14 +19,14 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(
       x = combinations,
-      fill = {{ .color }},
-      color = {{ .color }}
+      fill = {{ .color }}#,
+      #color = {{ .color }}
     ) +
     ggplot2::geom_histogram(stat = "count") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
     alpha_levels <- .tbl %>%
-      dplyr::select({{ .alpha }}) %>%
+      dplyr::pull({{ .alpha }}) %>%
       unique() %>%
       length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)

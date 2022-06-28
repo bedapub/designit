@@ -38,6 +38,8 @@ simanneal_acceptance_prob <- function(current_score, best_score, temp, eps = 0.1
 #'
 #' @return Temperature at cycle k
 #' @export
+#'
+#' @examples
 mk_simanneal_temp_func <- function(T0, alpha, type = "Quadratic multiplicative") {
   force(T0)
   force(alpha)
@@ -81,6 +83,8 @@ mk_simanneal_temp_func <- function(T0, alpha, type = "Quadratic multiplicative")
 #'
 #' @return A function that takes parameters (current_score, best_score, iteration) for an optimization step and return a Boolean indicating whether the current solution should be accepted or dismissed. Acceptance probability of a worse solution decreases with annealing temperature.
 #' @export
+#'
+#' @examples
 mk_simanneal_acceptance_func <- function(temp_function = mk_simanneal_temp_func(T0 = 500, alpha = 0.8)) {
   force(temp_function)
 
