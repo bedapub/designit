@@ -24,11 +24,6 @@ library(dplyr)
 library(tidyr)
 ```
 
-```{r seed}
-set.seed(42)
-```
-
-
 # Example 1: An expensive way to construct a 4x4 latin square (one plate)
 
 (latin square should give the best score)
@@ -73,8 +68,11 @@ designit::.load_cache("trace1")
 ```
 
 ```{r eval=.eval_cached_chunk}
+
+set.seed(41)
+
 trace <- optimize_design(bc,
-                min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
+                max_iter = 300, # this is set to shorten vignette run-time based on known random seed, normally we don't know.
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
@@ -107,8 +105,10 @@ designit::.load_cache("trace2")
 ```
 
 ```{r eval=.eval_cached_chunk}
+
+set.seed(42)
 trace = optimize_design(bc,
-                        min_score = 6.1, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
+                        max_iter = 1000, # this is set to shorten vignette run-time based on random seed, normally we don't know.
                         n_shuffle = 2,
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                         quiet = TRUE
@@ -169,8 +169,9 @@ designit::.load_cache("trace3")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(41)
 trace = optimize_design(bc,
-                        n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
+                        n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1400)),
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
                         aggregate_scores_func = worst_score,
                         quiet = TRUE
@@ -208,9 +209,10 @@ bc <- example2$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
+set.seed(42)
 optimize_design(bc,
-                quiet = T,
-                min_score = 2, max_iter = 5e3,  # this is set to shorten vignette run-time, normally we don't know.
+                quiet = TRUE,
+                max_iter = 200,  # this is set to shorten vignette run-time, normally we don't know.
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
@@ -228,8 +230,9 @@ designit::.load_cache("trace4")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e2,
+                max_iter = 400,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm,
@@ -277,9 +280,10 @@ designit::.load_cache("trace5")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                quiet = T,
-                min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
+                quiet = TRUE,
+                max_iter = 150, # this is set to shorten vignette run-time, normally we don't know.
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
@@ -305,9 +309,10 @@ designit::.load_cache("trace6")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e3,
-                quiet=T,
+                max_iter = 150,
+                quiet=TRUE,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(1)),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
@@ -329,9 +334,10 @@ designit::.load_cache("trace7")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e3,
-                quiet=T,
+                max_iter = 550,
+                quiet=TRUE,
                 shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(2)),
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
                 aggregate_scores_func = L2s_norm
@@ -401,9 +407,10 @@ designit::.load_cache("trace8")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                quiet = T,
-                min_score = 1.49, max_iter = 5e3,
+                quiet = TRUE,
+                max_iter = 150,
                 n_shuffle = 2,
                 acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
 )
@@ -434,8 +441,9 @@ designit::.load_cache("trace9")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace = optimize_design(bc,
-                        min_score = 131.0, max_iter = 5e3,
+                        max_iter = 300,
                         shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"),
                                                                                n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
                         ),
@@ -510,14 +518,15 @@ designit::.load_cache("trace10")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace = optimize_design(bc,
-                        min_score = 17.75, max_iter = 5e3,
+                        max_iter = 750,
                         n_shuffle = 1,
                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
                         aggregate_scores_func = function(scores, ...) {
                           2 * scores["Group.Plate"] + scores["Sex.Plate"]
                         },
-                        quiet = T
+                        quiet = TRUE
 )
 ```
 
