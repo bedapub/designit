@@ -11,6 +11,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Contains a matrix of scores after aggregation.
     #' The matrix size is usually `c(iterations + 1, length(aggregated))`,
     #' where `length(aggregated)` is the length of aggregated scores vector.
+    #' Can be `NULL` if aggregated scores are not used.
     aggregated_scores = NULL,
 
     #' @field seed
