@@ -119,12 +119,12 @@ bc1$score()
 
 bc1$get_samples(assignment = TRUE) %>%
   dplyr::filter(!is.na(Treatment)) %>%
-  dplyr::mutate(anno = stringr::str_c(Time," hr")) %>%
-  ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
-  ggplot2::geom_tile(color="white") +
-  ggplot2::geom_hline(yintercept = 5.5, size=1) + 
-  ggplot2::geom_text(ggplot2::aes(label=anno)) +
-  ggplot2::labs(x="Batch", y="Position . Run")
+  dplyr::mutate(anno = stringr::str_c(Time, " hr")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = batch, y = interaction(position, run), fill = Treatment)) +
+  ggplot2::geom_tile(color = "white") +
+  ggplot2::geom_hline(yintercept = 5.5, size = 1) +
+  ggplot2::geom_text(ggplot2::aes(label = anno)) +
+  ggplot2::labs(x = "Batch", y = "Position . Run")
 ```
 
 ## Perform new iterations on optimized batch container
@@ -183,7 +183,7 @@ bc3$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
@@ -214,7 +214,7 @@ bc3_as$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3_as,
   n_shuffle = 3,
   max_iter = 200,
