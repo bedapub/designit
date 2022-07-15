@@ -112,8 +112,12 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #'
     #' @return `OptimizationTrace` invisibly.
     print = function(...) {
-      start_score <- self$aggregated_score[1]
-      final_score <- self$aggregated_score[length(self$aggregated_score)]
+      start_score <- self$scores[1, ] %>%
+        round(3) %>%
+        stringr::str_c(collapse = ",")
+      final_score <- tail(self$scores, 1) %>%
+        round(3) %>%
+        stringr::str_c(collapse = ",")
       cat(stringr::str_glue("Optimization trace ({self$n_steps} score values, elapsed {format(self$elapsed)}).\n\n"))
       cat("  Starting score: ", start_score, "\n", sep = "")
       cat("  Final score   : ", final_score, "\n", sep = "")
