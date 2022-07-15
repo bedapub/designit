@@ -296,7 +296,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     names(batch_container$scoring_f)
   )
 
-  if (aggregate_scores_func == identity) {
+  if (identical(aggregate_scores_func, identity)) {
     # Do not store aggregated scores if unnecessary
     trace$set_scores(1, best_score, NULL)
   } else {
@@ -336,7 +336,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     iteration <- iteration + 1
-    if (aggregate_scores_func == identity) {
+    if (identical(aggregate_scores_func, identity)) {
       # Do not store aggregated scores if unnecessary
       trace$set_scores(iteration, best_score, NULL)
     } else {
