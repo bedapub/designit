@@ -198,7 +198,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
 #'
 #' @param prefix Prefix to add if column names are empty.
 #' @keywords internal
-make_colnames <- function(m, prefix="X") {
+make_colnames <- function(m, prefix = "X") {
   if (is.null(colnames(m))) {
     colnames(m) <- rep("", ncol(m))
   }
