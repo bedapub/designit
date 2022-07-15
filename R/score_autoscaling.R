@@ -43,7 +43,10 @@ mk_autoscale_function <- function(batch_container, random_perm, use_boxcox = TRU
     return(
       function(score) {
         assertthat::assert_that(length(score) == score_dim)
-        setNames(purrr::map2_dbl(bc_transforms, score, stats::predict), nm=names(score))
+        purrr::set_names(
+          purrr::map2_dbl(bc_transforms, score, stats::predict),
+          nm=names(score)
+        )
       }
     )
   }
@@ -58,7 +61,7 @@ mk_autoscale_function <- function(batch_container, random_perm, use_boxcox = TRU
 
   function(score) {
     assertthat::assert_that(length(score) == score_dim)
-    setNames((score - mu) / sds, nm=names(score))
+    purrr::set_names((score - mu) / sds, nm=names(score))
   }
 }
 
