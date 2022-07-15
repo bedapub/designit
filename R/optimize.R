@@ -287,7 +287,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # Calculate and remember initial multi-variate & aggregated score
   best_score <- autoscale_func(initial_score)
   best_agg <- aggregate_scores_func(best_score)
-  prev_agg <- NA
+  prev_agg <- NULL
 
 
   trace <- OptimizationTrace$new(
@@ -344,7 +344,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     # Test stopping criteria
-    if (!is.na(min_delta) && !is.na(prev_agg)) {
+    if (!is.na(min_delta) && !is.null(prev_agg)) {
       delta <- sqrt(sum((best_agg - prev_agg)^2))
       if (delta < min_delta) {
         if (!quiet) message("Reached min delta in ", iteration - 1, " iterations.")
