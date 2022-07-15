@@ -296,7 +296,12 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     names(batch_container$scoring_f)
   )
 
-  trace$set_scores(1, best_score, first_score_only(best_agg))
+  if (aggregate_scores_func == identity) {
+    # Do not store aggregated scores if unnecessary
+    trace$set_scores(1, best_score, NULL)
+  } else {
+    trace$set_scores(1, best_score, best_agg)
+  }
   # to do: make work with >1-dim agg, line should read as
   # trace$set_scores(1, best_score, best_agg)
 
@@ -332,9 +337,12 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     iteration <- iteration + 1
-    trace$set_scores(iteration, best_score, first_score_only(best_agg))
-    # to do: make work with >1-dim agg, line should read as
-    # trace$set_scores(iteration, best_score, best_agg)
+    if (aggregate_scores_func == identity) {
+      # Do not store aggregated scores if unnecessary
+      trace$set_scores(iteration, best_score, NULL)
+    } else {
+      trace$set_scores(iteration, best_score, best_agg)
+    }
 
     # Test stopping criteria
     if (!is.na(min_delta) && !is.na(prev_agg)) {
