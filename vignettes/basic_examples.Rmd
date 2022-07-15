@@ -19,7 +19,6 @@ library(designit)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-
 ```
 
 # Plate layout with two factors
@@ -32,7 +31,6 @@ placed on 48 well plates.
 These are the conditions
 
 ```{r}
-
 # conditions to use
 conditions <- data.frame(group = c(1, 2, 3, 4, 5),
                       treatment = c("vehicle", "TRT1", "TRT2",
@@ -98,7 +96,6 @@ assign_random(bc, samples)
 
 bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
-
 ```
 
 Plot of the result using the `plot_plate` function
