@@ -1,5 +1,3 @@
-
-
 #' Extract relevant parameters from a generic shuffle function output
 #'
 #' Any shuffling function should return one of the following:
