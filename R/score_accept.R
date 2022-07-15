@@ -1,5 +1,3 @@
-
-
 #' Default acceptance function. Accept current score if and only if all elements are less than or equal than in best score
 #' and there's at least one improvement.
 #'
@@ -14,7 +12,9 @@ accept_strict_improvement <- function(current_score, best_score, ...) {
 
   # assertthat::assert_that(length(current_score)==length(best_score))
 
-  if (length(current_score)==1) return(current_score < best_score)
+  if (length(current_score) == 1) {
+    return(current_score < best_score)
+  }
 
   all(current_score <= best_score) && any(current_score < best_score)
 }
@@ -31,11 +31,14 @@ accept_strict_improvement <- function(current_score, best_score, ...) {
 #' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
 #'
 #' @export
-accept_leftmost_improvement <- function(current_score, best_score, tol=1e-6, ...) {
-
+accept_leftmost_improvement <- function(current_score, best_score, tol = 1e-6, ...) {
   for (i in seq_along(current_score)) {
-    if (current_score[i] > best_score[i] + tol) return(FALSE)
-    if (current_score[i] < best_score[i] - tol) return(TRUE)
+    if (current_score[i] > best_score[i] + tol) {
+      return(FALSE)
+    }
+    if (current_score[i] < best_score[i] - tol) {
+      return(TRUE)
+    }
   }
   if (any(current_score < best_score)) TRUE else FALSE
 }
@@ -51,21 +54,22 @@ accept_leftmost_improvement <- function(current_score, best_score, tol=1e-6, ...
 #' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
 #'
 #' @export
-mk_exponentially_weighted_acceptance_func <- function(kappa=0.5, simulated_annealing=FALSE,
+mk_exponentially_weighted_acceptance_func <- function(kappa = 0.5, simulated_annealing = FALSE,
                                                       temp_function = mk_simanneal_temp_func(T0 = 500, alpha = 0.8)) {
-
   force(kappa)
   force(temp_function)
-  assertthat::assert_that(kappa>0, kappa<1, msg="Exponential weighting parameter kappa has to be in the open inteval ]0,1[")
+  assertthat::assert_that(kappa > 0, kappa < 1, msg = "Exponential weighting parameter kappa has to be in the open inteval ]0,1[")
   if (simulated_annealing) {
-    acc_func = mk_simanneal_acceptance_func(temp_function=temp_function) # If SA, set up acceptance function with annealing protocol
+    acc_func <- mk_simanneal_acceptance_func(temp_function = temp_function) # If SA, set up acceptance function with annealing protocol
   } else {
-    acc_func = function(current_score, ...){ current_score < 0 } # else just check for an overall improvement of weighted sum of score differences
+    acc_func <- function(current_score, ...) {
+      current_score < 0
+    } # else just check for an overall improvement of weighted sum of score differences
   }
 
   function(current_score, best_score, iteration) {
-    weighted_imp = sum((current_score - best_score)*kappa^(seq_along(current_score)-1))
+    weighted_imp <- sum((current_score - best_score) * kappa^(seq_along(current_score) - 1))
 
-    acc_func(current_score = weighted_imp, best_score=0.0, iteration) # Comparing the improvement against 0.0 is actually deciding on the delta
+    acc_func(current_score = weighted_imp, best_score = 0.0, iteration) # Comparing the improvement against 0.0 is actually deciding on the delta
   }
 }
