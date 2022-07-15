@@ -7,10 +7,11 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' `c(iterations + 1, length(bc$scoring_f))`
     scores = NULL,
 
-    #' @field aggregated_score
-    #' Contains a vector of aggregated scores. The vector length is usually
-    #' `c(iterations + 1)`
-    aggregated_score = NULL,
+    #' @field aggregated_scores
+    #' Contains a matrix of scores after aggregation.
+    #' The matrix size is usually `c(iterations + 1, length(aggregated))`,
+    #' where `length(aggregated)` is the length of aggregated scores vector.
+    aggregated_scores = NULL,
 
     #' @field seed
     #' Saved value of [.Random.seed].
@@ -35,7 +36,6 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Names of scoring functions.
     initialize = function(n_steps, n_scores, score_names) {
       self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
-      self$aggregated_score <- rep(NA_real_, n_steps)
       if (!is.null(score_names)) {
         dimnames(self$scores) <- list(NULL, score_names)
       }
@@ -48,13 +48,31 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Step number.
     #' @param scores
     #' Scores, a vector or a value if no auxiliary functions are used.
-    #' @param aggregated_score
-    #' Aggregated score, a double value.
+    #' @param aggregated_scores
+    #' Vector of aggregated scores. Can be NULL.
     #'
     #' @return `OptimizationTrace` invisibly.
-    set_scores = function(i, scores, aggregated_score) {
+    set_scores = function(i, scores, aggregated_scores) {
+      assertthat::assert_that(
+        assertthat::is.count(i),
+        is.vector(scores),
+        is.null(aggregated_scores) || is.vector(aggregated_scores)
+      )
+      # initialize aggregated scores, in case they're empty
       self$scores[i, ] <- scores
-      self$aggregated_score[i] <- aggregated_score
+      if (!is.null(aggregated_scores)) {
+        if (is.null(self$aggregated_scores)) {
+          self$aggregated_scores <- matrix(
+            NA_real_,
+            nrow = nrow(self$scores),
+            ncol = length(aggregated_scores)
+          )
+        }
+        assertthat::assert_that(
+          length(aggregated_scores) == ncol(self$aggregated_scores)
+        )
+        self$aggregated_scores[i, ] <- aggregated_scores
+      }
       self$last_step <- i
       invisible(self)
     },
@@ -68,7 +86,9 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @return `OptimizationTrace` invisibly.
     shrink = function(last_step = self$last_step) {
       self$scores <- head(self$scores, last_step)
-      self$aggregated_score <- head(self$aggregated_score, last_step)
+      if (!is.null(self$aggregated_scores)) {
+        self$aggregated_scores <- head(self$aggregated_scores, last_step)
+      }
       invisible(self)
     },
 
@@ -100,28 +120,51 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     },
 
     #' @description
+    #' Convert to a [data.frame].
+    #'
+    #' @return [data.frame]
+    as_tibble = function() {
+      scores <- make_colnames(self$scores, "score") %>%
+        tibble::as_tibble() %>%
+        dplyr::mutate(step = dplyr::row_number()) %>%
+        tidyr::pivot_longer(
+          c(-step),
+          names_to = "score",
+          values_to = "value"
+        )
+      agg_scores <- self$aggregated_scores
+      if (!is.null(agg_scores)) {
+        colnames(agg_scores) <- stringr::str_c(
+          "agg.", seq_len(ncol(agg_scores))
+        )
+        agg_scores <- agg_scores %>%
+          tibble::as_tibble() %>%
+          dplyr::mutate(step = dplyr::row_number()) %>%
+          tidyr::pivot_longer(
+            c(-step),
+            names_to = "score",
+            values_to = "value"
+          )
+      }
+      dplyr::bind_rows(
+        score = scores,
+        aggregated = agg_scores,
+        .id = "type"
+      ) %>%
+        dplyr::mutate(type = factor(type, levels = c("score", "aggregated")))
+    },
+
+    #' @description
     #' Plot `OptimizationTrace`. Only the main score at the moment.
     #'
-    #' @param aggregated_only only plot the aggregated score
     #' @param ...
     #' Extra arguments passed to [ggplot2::ggplot()].
-    plot = function(aggregated_only = FALSE, ...) {
-      plot_data <- data.frame(
-        Iteration = 1:length(self$aggregated_score),
-        AggregatedScore = self$aggregated_score
-      )
-      if (!aggregated_only && (ncol(self$scores) > 1)) {
-        plot_data <- cbind(plot_data, self$scores)
-      }
-
-      tidyr::pivot_longer(plot_data,
-        names_to = "ScoreName", values_to = "Score",
-        cols = -Iteration
-      ) %>%
-        ggplot2::ggplot(ggplot2::aes(x = Iteration, y = Score)) +
+    plot = function(...) {
+      self$as_tibble() %>%
+        ggplot2::ggplot(ggplot2::aes(x = step, y = value, group = score)) +
         ggplot2::geom_point() +
         ggplot2::geom_line() +
-        ggplot2::facet_wrap(~ScoreName, scales = "free_y")
+        ggplot2::facet_wrap(~type, scales = "free_y", ncol = 1)
     }
   ),
   active = list(
@@ -136,3 +179,18 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     }
   )
 )
+
+#' @description Add unique column names for a matrix.
+#'
+#' @param prefix Prefix to add if column names are empty.
+#' @keywords internal
+make_colnames <- function(m, prefix="X") {
+  if (is.null(colnames(m))) {
+    colnames(m) <- rep("", ncol(m))
+  }
+  if (all(colnames(m) == "")) {
+    colnames(m) <- rep(prefix, ncol(m))
+  }
+  colnames(m) <- make.names(colnames(m), unique = TRUE)
+  m
+}
