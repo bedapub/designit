@@ -199,9 +199,11 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
   )
 )
 
-#' @description Add unique column names for a matrix.
+#' Make [matrix] column names unique.
 #'
 #' @param prefix Prefix to add if column names are empty.
+#' @return A [matrix] with updated column names.
+#'
 #' @keywords internal
 make_colnames <- function(m, prefix = "X") {
   if (is.null(colnames(m))) {
