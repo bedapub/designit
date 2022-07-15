@@ -9,13 +9,7 @@
 #'
 #' @keywords internal
 accept_strict_improvement <- function(current_score, best_score, ...) {
-
-  # assertthat::assert_that(length(current_score)==length(best_score))
-
-  if (length(current_score) == 1) {
-    return(current_score < best_score)
-  }
-
+  assertthat::assert_that(length(current_score) == length(best_score))
   all(current_score <= best_score) && any(current_score < best_score)
 }
 
