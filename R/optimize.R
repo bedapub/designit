@@ -305,7 +305,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # to do: make work with >1-dim agg, line should read as
   # trace$set_scores(1, best_score, best_agg)
 
-  if (!quiet) report_scores(best_score, best_agg, iteration=0)
+  if (!quiet) report_scores(best_score, best_agg, iteration = 0)
 
 
   while (!is.null(shuffle_params) && (iteration <= max_iter)) { # NULL may indicate end of permutation protocol
@@ -320,7 +320,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     assertthat::assert_that(!any(is.na(new_score)), msg = stringr::str_c("NA apprearing during scoring in iteration ", iteration))
     new_agg <- aggregate_scores_func(new_score)
 
-    if (acceptance_func(new_agg, best_agg, iteration=iteration)) {
+    if (acceptance_func(new_agg, best_agg, iteration = iteration)) {
       best_score <- new_score
       prev_agg <- best_agg
       best_agg <- new_agg
@@ -329,7 +329,6 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
         samples_attr = shuffle_params[["samples_attr"]]
       )
       if (!quiet) report_scores(best_score, best_agg, iteration)
-
     } else {
       if (is.null(shuffle_params[["location_assignment"]])) { # we used the permutation method and thus have to swap samples back!
         update_batchcontainer(batch_container, shuffle_params) # two swaps are in effect no swaps
@@ -346,8 +345,8 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
 
     # Test stopping criteria
     if (!is.na(min_delta) && !is.na(prev_agg)) {
-      delta = sqrt(sum((best_agg-prev_agg)^2))
-      if (delta<min_delta) {
+      delta <- sqrt(sum((best_agg - prev_agg)^2))
+      if (delta < min_delta) {
         if (!quiet) message("Reached min delta in ", iteration - 1, " iterations.")
         break
       }
