@@ -49,7 +49,7 @@ accept_leftmost_improvement <- function(current_score, best_score, tol = 0.0, ..
 mk_accept_leftmost_improvement_with_tolerance <- function(tolerance = 1e-6) {
   force(tolerance)
   assertthat::assert_that(tolerance > 0, msg = "Tolerance parameter has to be strictly greater than 0.0")
-  function(current_score, best_score, ..) {
+  function(current_score, best_score, ...) {
     accept_leftmost_improvement(current_score, best_score, tol = tolerance)
   }
 }
