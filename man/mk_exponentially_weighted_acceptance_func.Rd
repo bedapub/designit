@@ -19,7 +19,7 @@ mk_exponentially_weighted_acceptance_func(
 \item{temp_function}{In case SA is used, a temperature function that returns the annealing temperature for a certain iteration number}
 }
 \value{
-Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
+Acceptance function which returns TRUE if current score should be taken as the new optimal score, FALSE otherwise
 }
 \description{
 Alternative acceptance function for multi-dimensional scores with exponentially downweighted score improvements from left to right
