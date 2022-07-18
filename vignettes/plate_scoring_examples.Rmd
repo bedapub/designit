@@ -62,8 +62,8 @@ bc <- example1$copy()
 
 # # Set scoring function
 bc$scoring_f <- list(
-  osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
-  osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
+  Row.Score = osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
+  Column.Score = osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
 )
 ```
 
@@ -627,7 +627,7 @@ cowplot::plot_grid(
 
 We do the  same example with auto-scaling and position-dependent scoring now,
 not aggregating the score vector! This is more effective even when using the
-default acceptance function. We are prioritizing the leftmost score in addition
+default acceptance function. We are strictly prioritizing the leftmost score in addition
 to reflect relevance for the design.
 
 ```{r eval=.eval_cached_chunk}
@@ -664,6 +664,38 @@ cowplot::plot_grid(
   ncol = 2
 )
 ```
+
+Using a tolerance value to accept slightly worse solutions in the leftmost relevant score if overcompensated by other scores:
+
+```{r eval=.eval_cached_chunk}
+
+bc <- example4$copy()
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = mk_accept_leftmost_improvement_with_tolerance(tolerance = 0.1),
+  autoscale_scores = TRUE,
+  quiet = F
+)
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
 
 Testing an alternative left-to-right weighing of scores, based on exponential
 down-weighing of the respective score differences at position p with factor
