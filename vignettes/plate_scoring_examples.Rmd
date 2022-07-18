@@ -588,33 +588,32 @@ cowplot::plot_grid(
 We do the same example with auto-scaling, weighted scoring and SA to have a
 reference!
 
-```{r eval=.eval_cached_chunk}
-bc <- example4$copy()
 
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace11")
+```
 
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
-  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
-)
-
-bc$score()
-cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
-  ncol = 2
-)
-
+```{r, eval=.eval_cached_chunk}
 set.seed(42)
 trace <- optimize_design(bc,
   max_iter = 500,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
   aggregate_scores_func = function(scores, ...) {
-    setNames(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
+    purrr::set_names(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
   },
   autoscale_scores = T,
   quiet = F
 )
+
+```
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
 
 bc$score()
 
@@ -630,7 +629,11 @@ not aggregating the score vector! This is more effective even when using the
 default acceptance function. We are strictly prioritizing the leftmost score in addition
 to reflect relevance for the design.
 
-```{r eval=.eval_cached_chunk}
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace12")
+```
+
+```{r, eval=.eval_cached_chunk}
 
 bc <- example4$copy()
 
@@ -641,11 +644,6 @@ bc$scoring_f <- c(
 )
 
 bc$score()
-cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
-  ncol = 2
-)
 
 set.seed(42)
 trace <- optimize_design(bc,
@@ -655,6 +653,16 @@ trace <- optimize_design(bc,
   autoscale_scores = TRUE,
   quiet = F
 )
+
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
 
 bc$score()
 
@@ -667,7 +675,11 @@ cowplot::plot_grid(
 
 Using a tolerance value to accept slightly worse solutions in the leftmost relevant score if overcompensated by other scores:
 
-```{r eval=.eval_cached_chunk}
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace13")
+```
+
+```{r, eval=.eval_cached_chunk}
 
 bc <- example4$copy()
 
@@ -689,6 +701,18 @@ trace <- optimize_design(bc,
 
 bc$score()
 
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
+
+bc$score()
+
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
   plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
@@ -696,13 +720,16 @@ cowplot::plot_grid(
 )
 ```
 
-
 Testing an alternative left-to-right weighing of scores, based on exponential
 down-weighing of the respective score differences at position p with factor
 kappa^p, 0<kappa<1 We choose a kappa of 0.5, i.e. the second score's improvement
 counts half of that of the first one.
 
-```{r eval=.eval_cached_chunk}
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace14")
+```
+
+```{r, eval=.eval_cached_chunk}
 bc <- example4$copy()
 
 
@@ -712,11 +739,6 @@ bc$scoring_f <- c(
 )
 
 bc$score()
-cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
-  ncol = 2
-)
 
 set.seed(42)
 trace <- optimize_design(bc,
@@ -726,6 +748,15 @@ trace <- optimize_design(bc,
   autoscale_scores = TRUE,
   quiet = F
 )
+
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+```{r, fig.width=7, fig.height=3.5}
 
 bc$score()
 
