@@ -25,7 +25,7 @@ accept_strict_improvement <- function(current_score, best_score, ...) {
 #' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
 #'
 #' @export
-accept_leftmost_improvement <- function(current_score, best_score, tol = 1e-6, ...) {
+accept_leftmost_improvement <- function(current_score, best_score, tol = 0.0, ...) {
   for (i in seq_along(current_score)) {
     if (current_score[i] > best_score[i] + tol) {
       return(FALSE)
@@ -38,6 +38,23 @@ accept_leftmost_improvement <- function(current_score, best_score, tol = 1e-6, .
 }
 
 
+#' Create acceptance function in which order of scores (first to last) denotes relevance, using a tolerance parameter as well
+#'
+#' @param tolerance Tolerance value: When comparing score vectors from left to right, differences within +/- tol won't immediately
+#' shortcut the comparison at this point, allowing improvement in a less important score to exhibit some influence
+#'
+#' @return Acceptance function accept_leftmost_improvement, but using a fixed tolerance parameter
+#'
+#' @export
+mk_accept_leftmost_improvement_with_tolerance <- function(tolerance = 1e-6) {
+  force(tolerance)
+  assertthat::assert_that(tolerance > 0, msg = "Tolerance parameter has to be strictly greater than 0.0")
+  function(current_score, best_score, ..) {
+    accept_leftmost_improvement(current_score, best_score, tol = tolerance)
+  }
+}
+
+
 #' Alternative acceptance function for multi-dimensional scores with exponentially downweighted score improvements from left to right
 #'
 #' @param kappa Coefficient that determines how quickly the weights for the individual score improvements drop when going from left to right
@@ -45,7 +62,7 @@ accept_leftmost_improvement <- function(current_score, best_score, tol = 1e-6, .
 #' @param simulated_annealing Boolean; if TRUE, simulated annealing (SA) will be used to minimize the weighted improved score
 #' @param temp_function In case SA is used, a temperature function that returns the annealing temperature for a certain iteration number
 #'
-#' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
+#' @return Acceptance function which returns TRUE if current score should be taken as the new optimal score, FALSE otherwise
 #'
 #' @export
 mk_exponentially_weighted_acceptance_func <- function(kappa = 0.5, simulated_annealing = FALSE,
