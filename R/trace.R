@@ -1,5 +1,7 @@
 #' OptimizationTrace represents optimization trace.
 #' Usually it is created by [optimize_design()].
+#'
+#' @export
 OptimizationTrace <- R6::R6Class("OptimizationTrace",
   public = list(
     #' @field scores
