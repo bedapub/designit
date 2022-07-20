@@ -11,6 +11,22 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 OptimizationTrace represents optimization trace.
 Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 }
+\examples{
+
+## ------------------------------------------------
+## Method `OptimizationTrace$plot`
+## ------------------------------------------------
+
+tr <- OptimizationTrace$new(10, 3, letters[1:3])
+for (i in seq_len(10)) {
+  tr$set_scores(i, rnorm(3)*(1:3), rnorm(3)*(1:3))
+}
+
+# plot only the main scores
+plot(tr)
+# plot main and aggregated scores
+plot(tr, include_aggregated=TRUE)
+}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
@@ -191,10 +207,26 @@ Plot \code{OptimizationTrace}. Only the main score at the moment.
 \item{\code{include_aggregated}}{Include aggregated scores. Otherwise only
 raw scores are plotted.}
 
-\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.}
+\item{\code{...}}{Not used.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr <- OptimizationTrace$new(10, 3, letters[1:3])
+for (i in seq_len(10)) {
+  tr$set_scores(i, rnorm(3)*(1:3), rnorm(3)*(1:3))
+}
+
+# plot only the main scores
+plot(tr)
+# plot main and aggregated scores
+plot(tr, include_aggregated=TRUE)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-clone"></a>}}
