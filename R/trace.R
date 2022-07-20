@@ -139,7 +139,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
           c(-step),
           names_to = "score",
           values_to = "value"
-        )
+        ) %>%
+        dplyr::mutate(score = factor(score))
       if (include_aggregated) {
         agg_scores <- self$aggregated_scores
       } else {
@@ -156,7 +157,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
             c(-step),
             names_to = "score",
             values_to = "value"
-          )
+          ) %>%
+          dplyr::mutate(score = factor(score))
       }
       dplyr::bind_rows(
         score = scores,
@@ -172,17 +174,30 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' @param include_aggregated Include aggregated scores. Otherwise only
     #' raw scores are plotted.
     #' @param ...
-    #' Extra arguments passed to [ggplot2::ggplot()].
+    #' Not used.
+    #' @examples
+    #' tr <- OptimizationTrace$new(10, 3, letters[1:3])
+    #' for (i in seq_len(10)) {
+    #'   tr$set_scores(i, rnorm(3)*(1:3), rnorm(3)*(1:3))
+    #' }
+    #'
+    #' # plot only the main scores
+    #' plot(tr)
+    #' # plot main and aggregated scores
+    #' plot(tr, include_aggregated=TRUE)
     plot = function(include_aggregated = FALSE, ...) {
       p <- self$as_tibble(include_aggregated = include_aggregated) %>%
-        ggplot2::ggplot(ggplot2::aes(x = step, y = value, group = score)) +
+        ggplot2::ggplot() +
+        ggplot2::aes(x = step, y = value, group = score, color = score) +
         ggplot2::geom_point() +
         ggplot2::geom_line()
 
       if (include_aggregated) {
-        p + ggplot2::facet_wrap(~type, scales = "free_y", ncol = 1)
+        p +
+          ggplot2::facet_wrap(~type, scales = "free_y", ncol = 1)
       } else {
-        p + ggplot2::facet_wrap(~score, scales = "free_y", ncol = 1)
+        p +
+          ggplot2::facet_wrap(~score, scales = "free_y", ncol = 1)
       }
     }
   ),
