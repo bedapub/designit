@@ -1,0 +1,148 @@
+---
+title: "Plate layouts"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Plate layouts}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+library(designit)
+library(tidyverse)
+```
+
+# Introduction
+
+Distributing samples to wells plates for experimental procedures is a very
+common task. In the following we use a data set of longitudinal subject samples
+that are to be spread across several 96-well plates, balanced for 
+treatment group and time point `longitudinal_subject_samples`.
+
+```{r}
+data("longitudinal_subject_samples")
+```
+
+There are the following number of subject per group
+
+```{r}
+longitudinal_subject_samples %>% 
+  filter(SampleType == "Sample") %>% 
+  select(SubjectID, Group) %>% 
+  unique() %>% 
+  count(Group) %>% 
+  gt::gt()
+```
+
+
+In addition every subject has been sampled at 3-8 time points
+
+```{r}
+longitudinal_subject_samples %>% 
+  filter(SampleType == "Sample") %>% 
+  select(SubjectID, Week) %>% unique() %>% count(Week) %>% 
+  gt::gt()
+```
+
+For accommodation of samples to plates there are the following control samples available
+
+```{r}
+longitudinal_subject_samples %>% 
+  filter(SampleType != "Sample") %>% 
+  count(SampleType, Group) %>% 
+  gt::gt()
+```
+
+# Example: Blocking subjects to plates
+
+Assume we want to keep all samples of a subject on the same plate. 
+A first step could be grouping subjects into 3 batches blocking by 
+treatment, sex and age. 
+There are `r longitudinal_subject_samples$SubjectID %>% unique() %>% length()` 
+subjects with each 3 - 8 time points, i.e. we need ~ 11 subjects per plate.
+
+We first create a 'subjects' dataset.
+
+```{r}
+# get subject data for batching
+subjects <- longitudinal_subject_samples %>%
+  filter(SampleType == "Sample") %>% 
+  count(SubjectID, Group, Sex, Age, name = 'nTimePoints') %>% 
+  unique()
+```
+
+Then we create a batch container for the samples with 3 batches called `plate`
+that each fit 11 subjects i.e. have 11 virtual `locations`.
+
+```{r}
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "locations" = 11),
+)
+```
+
+For layout scoring we use Osat score on Group and Sex variable.
+
+```{r} 
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "plate", feature_vars = c("Group")),
+  sex = osat_score_generator(batch_vars = "plate", feature_vars = "Sex")
+)
+```
+
+Then we assign the samples randomly to the batches and look at their initial 
+distribution.
+
+```{r}
+set.seed(42)
+assign_random(bc, subjects)
+```
+
+```{r, fig.width= 8, fig.height=3}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) + geom_bar() + 
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) + geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) + 
+      geom_boxplot() + geom_point()
+  ),
+  nrow = 1
+)
+```
+Optimizing the layout with `optimize_design()
+
+```{r}
+trace <- optimize_design(
+  bc,
+  n_shuffle = 1,
+  acceptance_func = mk_accept_leftmost_improvement_with_tolerance(),
+  max_iter = 150
+)
+```
+After optimization the group and sex of samples are equally distributed across
+all plates. The lower right panel shows the optimization trace of the scores.
+
+```{r, fig.width= 5.5, fig.height=6}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) + geom_bar() + 
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) + geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) + 
+      geom_boxplot() + geom_point(),
+    trace$plot()
+  ),
+  nrow = 2
+)
+```
+
+# Example: Within plate sample distribution 
