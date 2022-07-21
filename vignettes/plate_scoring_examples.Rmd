@@ -603,7 +603,7 @@ trace <- optimize_design(bc,
     purrr::set_names(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
   },
   autoscale_scores = T,
-  quiet = F
+  quiet = T
 )
 
 ```
@@ -651,7 +651,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = accept_leftmost_improvement,
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = T
 )
 
 ```
@@ -696,7 +696,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = mk_accept_leftmost_improvement_with_tolerance(tolerance = 0.1),
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = T
 )
 
 bc$score()
@@ -746,7 +746,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = mk_exponentially_weighted_acceptance_func(kappa = 0.5, simulated_annealing = T),
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = T
 )
 
 ```
@@ -769,8 +769,19 @@ cowplot::plot_grid(
 
 # Example 5: Avoiding 'regular patterns' in plate layout
 
+In some cases it ma<y be essential to avoid samples of the same group being put into the same row or column
+on a plate, i.e. these variables are regarded as factor levels of their own, in addition to the spatial relation
+of the samples.
 
-```{r, fig.width=7, fig.height=3.5}
+The plate_scoring functions can use an specific penalty for these 'linearly arranged' samples on top of the
+distance metrics chosen. 
+
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace14")
+```
+
+```{r}
 # Setting up the batch container
 example5 <- BatchContainer$new(
   dimensions = c(
@@ -785,7 +796,7 @@ assign_random(example5, samples = tibble::tibble(
   ID=1:96
 ))
 
-penalize_lines = 'none'
+penalize_lines = 'soft'
 
 bc <- example5$copy()
 
@@ -797,14 +808,18 @@ bc$score()
 ```
 
 
-```{r}
+```{r, eval=.eval_cached_chunk}
 #set.seed(42)
 trace <- optimize_design(bc,
   max_iter = 5000,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 0.1)),
-  quiet = F
+  quiet = T
 )
+```
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
 ```
 
 
