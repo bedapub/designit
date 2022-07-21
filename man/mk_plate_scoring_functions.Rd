@@ -4,7 +4,15 @@
 \alias{mk_plate_scoring_functions}
 \title{Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate}
 \usage{
-mk_plate_scoring_functions(batch_container, plate = NULL, row, column, group)
+mk_plate_scoring_functions(
+  batch_container,
+  plate = NULL,
+  row,
+  column,
+  group,
+  p = 2,
+  penalize_lines = "soft"
+)
 }
 \arguments{
 \item{batch_container}{Batch container (bc) with all columns that denote plate related information}
@@ -16,6 +24,12 @@ mk_plate_scoring_functions(batch_container, plate = NULL, row, column, group)
 \item{column}{Name of the bc column that holds the plate column number (integer values starting at 1)}
 
 \item{group}{Name of the bc column that denotes a group/condition that should be distributed on the plate}
+
+\item{p}{p parameter for minkowski type of distance metrics. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance}
+
+\item{penalize_lines}{How to penalize samples of the same group in one row or column of the plate. Valid options are:
+'none' - there is no penalty and the pure distance metric counts, 'soft' - penalty will depend on the well distance within the
+shared plate row or column, 'hard' - samples in the same row/column will score a zero distance}
 }
 \value{
 List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better)
