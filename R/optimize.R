@@ -147,9 +147,9 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @param sample_attributes_fixed Logical; if TRUE, sample shuffle function may generate altered sample attributes at each iteration.
 #' This affects estimation of score distributions. (Parameter only relevant if shuffle function does introduce attributes!)
 #' @param max_iter Stop optimization after a maximum number of iterations,
-#' independent from other stopping criteria (user defined shuffle proposal or min_score)
+#' independent from other stopping criteria (user defined shuffle proposal or min_delta).
 #' @param min_delta If not NA, optimization is stopped as soon as successive improvement (i.e. euclidean distance between score vectors
-#' from current best and previously best solution) drops below min_delta
+#' from current best and previously best solution) drops below min_delta.
 #' @param quiet If TRUE, suppress non-critical warnings or messages.
 #'
 #' @return A trace object
