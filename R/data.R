@@ -26,8 +26,8 @@
 #'
 #' @docType data
 #' @keywords datasets
-#' @name longitudinal_patient_samples
-#' @usage data(longitudinal_patient_samples)
+#' @name longitudinal_subject_samples
+#' @usage data(longitudinal_subject_samples)
 #' @author Juliane Siebourg
 #' @format An object of class \code{"tibble"}
 #' \describe{
@@ -42,7 +42,7 @@
 #' \item{SamplesPerSubject}{Look up variable for the number of samples per subject.
 #' This varies as not subject have samples from all weeks.}
 #' }
-"longitudinal_patient_samples"
+"longitudinal_subject_samples"
 
 
 #' An artificial invivo sample list
