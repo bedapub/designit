@@ -34,8 +34,8 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2,
         for (x2 in seq_len(plate_x)) {
           for (y2 in seq_len(plate_y)) {
             a = (x2-1)*plate_y + y2
-            dx = round(abs(x2-x1),0)
-            dy = round(abs(y2-y1),0)
+            dx = abs(x2-x1)
+            dy = abs(y2-y1)
             if (dx==0 || dy==0) {
               m[a,b]=max(c(dx,dy))*sf
             }
@@ -175,3 +175,86 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 
   score_funcs
 }
+
+
+
+#' Convenience wrapper to optimize a typical multi-plate design
+#'
+#' @param batch_container Batch container (bc) with all columns that denote plate related information
+#' @param across_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be balanced across plates,
+#' sorted by relative importance of the factors
+#' @param within_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be spaced out within each plate,
+#' sorted by relative importance of the factors
+#' @param plate Name of the bc column that holds the plate identifier
+#' @param row Name of the bc column that holds the plate row number (integer values starting at 1)
+#' @param column Name of the bc column that holds the plate column number (integer values starting at 1)
+#' @param n_shuffle Vector of length 1 or larger, defining how many random sample
+#' swaps should be performed in each iteration. See [optimize_design()].
+#' @param max_iter Stop any of the optimization runs after this maximum number of iterations. See [optimize_design()].
+#' @param quiet If TRUE, suppress informative messages.
+#'
+#' @return Batch container with optimized solution
+#' @export
+multi_plate_layout <- function(batch_container, across_plate_variables=NULL, within_plate_variables=NULL,
+                               plate="plate", row="row", column="column",
+                               n_shuffle = 1,
+                               max_iter = 1000,
+                               quiet=FALSE) {
+
+  assertthat::assert_that(is.null(across_plate_variables) || is.vector(across_plate_variables),
+                          is.null(across_plate_variables) || all(across_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
+                          msg="All columns in 'across_plate_variable' argument have to be found in batch container samples.")
+
+  assertthat::assert_that(is.null(within_plate_variables) || is.vector(within_plate_variables),
+                          is.null(within_plate_variables) || all(within_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
+                          msg="All columns in 'within_plate_variable' argument have to be found in batch container samples.")
+
+  skip_osat = is.null(across_plate_variables) || is.null(plate)
+  if (skip_osat) plate_levels = 0 else plate_levels = unique(bc$get_locations()[[plate]])
+
+  if (length(plate_levels)>1) {
+    scoring_funcs =  purrr::map(across_plate_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
+      unlist()
+    names(scoring_funcs) = across_plate_variables
+    bc$scoring_f <- scoring_funcs
+
+    if (!quiet) message("\nAssigning samples to plates...")
+    trace1 <- optimize_design(bc,
+                              max_iter = max_iter,
+                              n_shuffle = n_shuffle,
+                              acceptance_func = accept_leftmost_improvement,
+                              quiet = TRUE
+    )
+  }
+
+  if (!is.null(within_plate_variables)) {
+
+    scoring_funcs = purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate=plate, row = row, column = column, group = .x)) %>%
+      unlist()
+    names(scoring_funcs) = within_plate_variables
+    bc$scoring_f <- scoring_funcs
+
+    if (!quiet) message("\nDistributing samples separately within ", length(plate_levels), " plate",
+                        ifelse(length(plate_levels)>1,"s",""), "...\n")
+
+    for (curr_plate in plate_levels) {
+
+      if (!quiet && length(plate_levels)>1) cat(curr_plate, "... ")
+
+      trace2 <- optimize_design(bc,
+                                max_iter = max_iter,
+                                quiet = TRUE,
+                                shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = plate,
+                                                                                       restrain_on_subgroup_levels = curr_plate),
+                                acceptance_func = accept_leftmost_improvement
+      )
+
+    }
+    if (!quiet) cat("\n")
+  }
+
+  if (length(plate_levels)<2 && is.null(within_plate_variables) && !quiet) message("\nNothing to do, batch container unchanged.\n")
+
+  invisible(bc)
+}
+
