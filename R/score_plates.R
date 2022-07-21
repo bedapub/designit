@@ -6,14 +6,46 @@
 #' @param plate_y Dimension of plate in y direction (i.e number of rows)
 #' @param dist Distance function as understood by \code{stats::dist()}
 #' @param p p parameter, used only if distance metric is 'minkowski'. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance
+#' @param penalize_lines How to penalize samples of the same group in one row or column of the plate. Valid options are:
+#' 'none' - there is no penalty and the pure distance metric counts, 'soft' - penalty will depend on the well distance within the
+#' shared plate row or column, 'hard' - samples in the same row/column will score a zero distance
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
-mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2) {
+mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2, penalize_lines="soft") {
   # Helper function: Sets up a euclidean or alternative distance matrix (supported by stats::dist) for a generic x*y plate
-  matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) %>%
+
+  assertthat::assert_that(penalize_lines %in% c("none", "soft", "hard"),
+                          msg="penalize_lines parameter has to be one of 'none', 'soft' or 'hard'.")
+
+  # Set up distance matrix without any penalty
+  m = matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) %>%
     stats::dist(method = dist, p = p) %>%
     as.matrix()
+
+  if (penalize_lines!="none") {
+    assertthat::assert_that(dist == "minkowski", msg="penalize_line option requires a Minkowski type of distance metric.")
+    min_dist = 2^(1/p)
+    max_line_dist = max(c(plate_x,plate_y))
+    if (penalize_lines=="hard") sf=0 else sf=min_dist/max_line_dist
+    for (x1 in seq_len(plate_x)) {
+      for (y1 in seq_len(plate_y)) {
+        b = (x1-1)*plate_y + y1
+        for (x2 in seq_len(plate_x)) {
+          for (y2 in seq_len(plate_y)) {
+            a = (x2-1)*plate_y + y2
+            dx = round(abs(x2-x1),0)
+            dy = round(abs(y2-y1),0)
+            if (dx==0 || dy==0) {
+              m[a,b]=max(c(dx,dy))*sf
+            }
+          }
+        }
+      }
+    }
+  }
+
+  m
 }
 
 #' Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate
@@ -23,10 +55,14 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2)
 #' @param row Name of the bc column that holds the plate row number (integer values starting at 1)
 #' @param column Name of the bc column that holds the plate column number (integer values starting at 1)
 #' @param group Name of the bc column that denotes a group/condition that should be distributed on the plate
+#' @param p p parameter for minkowski type of distance metrics. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance
+#' @param penalize_lines How to penalize samples of the same group in one row or column of the plate. Valid options are:
+#' 'none' - there is no penalty and the pure distance metric counts, 'soft' - penalty will depend on the well distance within the
+#' shared plate row or column, 'hard' - samples in the same row/column will score a zero distance
 #'
 #' @return List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better)
 #' @export
-mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group) {
+mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group, p=2, penalize_lines="soft") {
   MAX_PLATE_DIM <- 200
 
   # A function factory returning one specific scoring function
@@ -89,7 +125,8 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
     )
 
 
-    distance_matrix <- mk_dist_matrix(plate_x = plate_x, plate_y = plate_y)
+    distance_matrix <- mk_dist_matrix(plate_x = plate_x, plate_y = plate_y, dist = "minkowski",
+                                      p=p, penalize_lines = penalize_lines)
     trial_template <- double(plate_x * plate_y) # filled with 0 initially (=no sample at any position)
 
     # Create and return the actual scoring function for a specific sample permutation
