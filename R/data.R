@@ -15,6 +15,36 @@
 "multi_trt_day_samples"
 
 
+#' Subject sample list with group and time plus controls
+#'
+#' A sample list with 9 columns as described below.
+#' There are 3 types of records (rows) indicated by the `SampleType` variable.
+#' Patient samples, Controls and Spike In standards.
+#' Patient samples were collected over up to 7 weeks.
+#' Controls and SpikeIns are QC samples for distribution of the samples on
+#' 96 well plates.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name longitudinal_patient_samples
+#' @usage data(longitudinal_patient_samples)
+#' @author Juliane Siebourg
+#' @format An object of class \code{"tibble"}
+#' \describe{
+#' \item{SampleID}{A unique sample identifier.}
+#' \item{SampleType}{Indicates whether the sample is a patient sample, control oder spike in.}
+#' \item{SubjectID}{The subject identifier.}
+#' \item{Group}{Indicates the treatment group of a subject.}
+#' \item{Week}{Sampling time points in weeks of study.}
+#' \item{Sex}{Subject Sex, Female (F) or Male (M).}
+#' \item{Age}{Subject age.}
+#' \item{BMI}{Subject Body Mass Index.}
+#' \item{SamplesPerSubject}{Look up variable for the number of samples per subject.
+#' This varies as not subject have samples from all weeks.}
+#' }
+"longitudinal_patient_samples"
+
+
 #' An artificial invivo sample list
 #'
 #' An animal sample list with 7 columns.
