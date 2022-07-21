@@ -66,10 +66,10 @@ Requires installation of the \code{bestNormalize} package.}
 This affects estimation of score distributions. (Parameter only relevant if shuffle function does introduce attributes!)}
 
 \item{max_iter}{Stop optimization after a maximum number of iterations,
-independent from other stopping criteria (user defined shuffle proposal or min_score)}
+independent from other stopping criteria (user defined shuffle proposal or min_delta).}
 
 \item{min_delta}{If not NA, optimization is stopped as soon as successive improvement (i.e. euclidean distance between score vectors
-from current best and previously best solution) drops below min_delta}
+from current best and previously best solution) drops below min_delta.}
 
 \item{quiet}{If TRUE, suppress non-critical warnings or messages.}
 }
