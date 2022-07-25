@@ -694,7 +694,7 @@ set.seed(42)
 trace <- optimize_design(bc,
   max_iter = 5000,
   n_shuffle = 1,
-  acceptance_func = mk_accept_leftmost_improvement_with_tolerance(tolerance = 0.1),
+  acceptance_func = ~ accept_leftmost_improvement_with_tolerance(..., tolerance = 0.1),
   autoscale_scores = TRUE,
   quiet = F
 )
