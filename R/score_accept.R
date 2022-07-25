@@ -37,24 +37,6 @@ accept_leftmost_improvement <- function(current_score, best_score, ..., tol = 0.
   if (any(current_score < best_score)) TRUE else FALSE
 }
 
-
-#' Create acceptance function in which order of scores (first to last) denotes relevance, using a tolerance parameter as well
-#'
-#' @param tolerance Tolerance value: When comparing score vectors from left to right, differences within +/- tol won't immediately
-#' shortcut the comparison at this point, allowing improvement in a less important score to exhibit some influence
-#'
-#' @return Acceptance function accept_leftmost_improvement, but using a fixed tolerance parameter
-#'
-#' @export
-mk_accept_leftmost_improvement_with_tolerance <- function(tolerance = 1e-6) {
-  force(tolerance)
-  assertthat::assert_that(tolerance > 0, msg = "Tolerance parameter has to be strictly greater than 0.0")
-  function(current_score, best_score, ...) {
-    accept_leftmost_improvement(current_score, best_score, tol = tolerance)
-  }
-}
-
-
 #' Alternative acceptance function for multi-dimensional scores with exponentially downweighted score improvements from left to right
 #'
 #' @param kappa Coefficient that determines how quickly the weights for the individual score improvements drop when going from left to right
