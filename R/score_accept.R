@@ -25,7 +25,7 @@ accept_strict_improvement <- function(current_score, best_score, ...) {
 #' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
 #'
 #' @export
-accept_leftmost_improvement <- function(current_score, best_score, tol = 0.0, ...) {
+accept_leftmost_improvement <- function(current_score, best_score, ..., tol = 0.0) {
   for (i in seq_along(current_score)) {
     if (current_score[i] > best_score[i] + tol) {
       return(FALSE)
