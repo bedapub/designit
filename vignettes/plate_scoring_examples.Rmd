@@ -603,7 +603,7 @@ trace <- optimize_design(bc,
     purrr::set_names(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
   },
   autoscale_scores = T,
-  quiet = F
+  quiet = TRUE
 )
 
 ```
@@ -651,7 +651,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = accept_leftmost_improvement,
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = TRUE
 )
 
 ```
@@ -696,7 +696,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = TRUE
 )
 
 bc$score()
@@ -746,7 +746,7 @@ trace <- optimize_design(bc,
   n_shuffle = 1,
   acceptance_func = mk_exponentially_weighted_acceptance_func(kappa = 0.5, simulated_annealing = T),
   autoscale_scores = TRUE,
-  quiet = F
+  quiet = TRUE
 )
 
 ```
