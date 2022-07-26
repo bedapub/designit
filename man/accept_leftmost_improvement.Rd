@@ -4,7 +4,7 @@
 \alias{accept_leftmost_improvement}
 \title{Alternative acceptance function for multi-dimensional scores in which order (left to right, e.g. first to last) denotes relevance.}
 \usage{
-accept_leftmost_improvement(current_score, best_score, ..., tol = 0)
+accept_leftmost_improvement(current_score, best_score, ..., tolerance = 0)
 }
 \arguments{
 \item{current_score}{One- or multi-dimensional score from the current optimizing iteration (double or vector of doubles)}
@@ -13,7 +13,7 @@ accept_leftmost_improvement(current_score, best_score, ..., tol = 0)
 
 \item{...}{Ignored arguments that may be used by alternative acceptance functions}
 
-\item{tol}{Tolerance value: When comparing score vectors from left to right, differences within +/- tol won't immediately
+\item{tolerance}{Tolerance value: When comparing score vectors from left to right, differences within +/- tol won't immediately
 shortcut the comparison at this point, allowing improvement in a less important score to exhibit some influence}
 }
 \value{
