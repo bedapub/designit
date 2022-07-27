@@ -11,14 +11,32 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 OptimizationTrace represents optimization trace.
 Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 }
+\examples{
+
+## ------------------------------------------------
+## Method `OptimizationTrace$plot`
+## ------------------------------------------------
+
+tr <- OptimizationTrace$new(10, 3, letters[1:3])
+for (i in seq_len(10)) {
+  tr$set_scores(i, rnorm(3)*(1:3), rnorm(3)*(1:3))
+}
+
+# plot only the main scores
+plot(tr)
+# plot main and aggregated scores
+plot(tr, include_aggregated=TRUE)
+}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
 \item{\code{scores}}{Contains a matrix of scores. The matrix size is usually
 \code{c(iterations + 1, length(bc$scoring_f))}}
 
-\item{\code{aggregated_score}}{Contains a vector of aggregated scores. The vector length is usually
-\code{c(iterations + 1)}}
+\item{\code{aggregated_scores}}{Contains a matrix of scores after aggregation.
+The matrix size is usually \code{c(iterations + 1, length(aggregated))},
+where \code{length(aggregated)} is the length of aggregated scores vector.
+Can be \code{NULL} if aggregated scores are not used.}
 
 \item{\code{seed}}{Saved value of \link{.Random.seed}.}
 
@@ -38,18 +56,19 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{OptimizationTrace$new()}}
-\item \href{#method-set_scores}{\code{OptimizationTrace$set_scores()}}
-\item \href{#method-shrink}{\code{OptimizationTrace$shrink()}}
-\item \href{#method-get_scores}{\code{OptimizationTrace$get_scores()}}
-\item \href{#method-print}{\code{OptimizationTrace$print()}}
-\item \href{#method-plot}{\code{OptimizationTrace$plot()}}
-\item \href{#method-clone}{\code{OptimizationTrace$clone()}}
+\item \href{#method-OptimizationTrace-new}{\code{OptimizationTrace$new()}}
+\item \href{#method-OptimizationTrace-set_scores}{\code{OptimizationTrace$set_scores()}}
+\item \href{#method-OptimizationTrace-shrink}{\code{OptimizationTrace$shrink()}}
+\item \href{#method-OptimizationTrace-get_scores}{\code{OptimizationTrace$get_scores()}}
+\item \href{#method-OptimizationTrace-print}{\code{OptimizationTrace$print()}}
+\item \href{#method-OptimizationTrace-as_tibble}{\code{OptimizationTrace$as_tibble()}}
+\item \href{#method-OptimizationTrace-plot}{\code{OptimizationTrace$plot()}}
+\item \href{#method-OptimizationTrace-clone}{\code{OptimizationTrace$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-new"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{OptimizationTrace} object.
 \subsection{Usage}{
@@ -69,12 +88,12 @@ Create a new \code{OptimizationTrace} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_scores"></a>}}
-\if{latex}{\out{\hypertarget{method-set_scores}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-set_scores"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-set_scores}{}}}
 \subsection{Method \code{set_scores()}}{
 Set scores for i-th step.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores, aggregated_score)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$set_scores(i, scores, aggregated_scores)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -84,7 +103,7 @@ Set scores for i-th step.
 
 \item{\code{scores}}{Scores, a vector or a value if no auxiliary functions are used.}
 
-\item{\code{aggregated_score}}{Aggregated score, a double value.}
+\item{\code{aggregated_scores}}{Vector of aggregated scores. Can be NULL.}
 }
 \if{html}{\out{</div>}}
 }
@@ -93,8 +112,8 @@ Set scores for i-th step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-shrink"></a>}}
-\if{latex}{\out{\hypertarget{method-shrink}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-shrink"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-shrink}{}}}
 \subsection{Method \code{shrink()}}{
 Shrink scores by keeping only first \code{last_step} scores.
 \subsection{Usage}{
@@ -113,8 +132,8 @@ Shrink scores by keeping only first \code{last_step} scores.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_scores"></a>}}
-\if{latex}{\out{\hypertarget{method-get_scores}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-get_scores"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-get_scores}{}}}
 \subsection{Method \code{get_scores()}}{
 Return individual (not aggregated!) scores by keeping only first \code{last_step} scores.
 \subsection{Usage}{
@@ -133,8 +152,8 @@ Return individual (not aggregated!) scores by keeping only first \code{last_step
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-print"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{OptimizationTrace}.
 \subsection{Usage}{
@@ -153,27 +172,65 @@ Print \code{OptimizationTrace}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
-\subsection{Method \code{plot()}}{
-Plot \code{OptimizationTrace}. Only the main score at the moment.
+\if{html}{\out{<a id="method-OptimizationTrace-as_tibble"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-as_tibble}{}}}
+\subsection{Method \code{as_tibble()}}{
+Convert to a \link{data.frame}.
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(aggregated_only = FALSE, ...)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$as_tibble(include_aggregated = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{aggregated_only}}{only plot the aggregated score}
-
-\item{\code{...}}{Extra arguments passed to \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}}.}
+\item{\code{include_aggregated}}{Include aggregated scores. Otherwise only
+raw scores are exported.}
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Returns}{
+\link{data.frame}
+}
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-plot}{}}}
+\subsection{Method \code{plot()}}{
+Plot \code{OptimizationTrace}. Only the main score at the moment.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OptimizationTrace$plot(include_aggregated = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{include_aggregated}}{Include aggregated scores. Otherwise only
+raw scores are plotted.}
+
+\item{\code{...}}{Not used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr <- OptimizationTrace$new(10, 3, letters[1:3])
+for (i in seq_len(10)) {
+  tr$set_scores(i, rnorm(3)*(1:3), rnorm(3)*(1:3))
+}
+
+# plot only the main scores
+plot(tr)
+# plot main and aggregated scores
+plot(tr, include_aggregated=TRUE)
+}
+\if{html}{\out{</div>}}
+
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-OptimizationTrace-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

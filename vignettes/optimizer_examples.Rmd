@@ -28,7 +28,8 @@ library(designit)
 data("multi_trt_day_samples")
 ```
   
-  Samples are grouped by Treatment and Collection time with the following group sizes:
+Samples are grouped by Treatment and Collection time with the following group
+sizes:
   
 ```{r}
 multi_trt_day_samples %>%
@@ -45,13 +46,13 @@ Samples are to be blocked in batches for scRNA-seq.
 * 8 samples can be processed per day (batch)
 * Within day they need to be split into 2 parallel runs (4 + 4). 
 
-This data set is also used in the nested dimensions example. Here, we focus on using different
-methods for the optimization.
+This data set is also used in the nested dimensions example. Here, we focus on
+using different methods for the optimization.
 
 # Setting up batch container
 
-We allocate surplus positions in the batch container and some excluded positions to check that all optimization methods support empty
-container positions.
+We allocate surplus positions in the batch container and some excluded positions
+to check that all optimization methods support empty container positions.
 
 ```{r}
 # Setting up the batch container
@@ -73,12 +74,13 @@ bc
 
 # First optimization with fixed shuffling protocol
 
-The samples are distributed to 4 batches (processing days).
-We use the osat scoring on sample `Treatment` and `Time`, using first a shuffling protocol 
-with a fixed number of sample swaps on each iteration.
+The samples are distributed to 4 batches (processing days). We use the osat
+scoring on sample `Treatment` and `Time`, using first a shuffling protocol with
+a fixed number of sample swaps on each iteration.
 
-Note that doing 32 swaps on 38 free container positions does not make sense, since each swapping operation affects
-two different positions anyway. The upper limit is reduced to the max number of meaningful swaps (19) on the fly.
+Note that doing 32 swaps on 38 free container positions does not make sense,
+since each swapping operation affects two different positions anyway. The upper
+limit is reduced to the max number of meaningful swaps (19) on the fly.
 
 Optimization finishes after the list of permutations is exhausted.
 
@@ -111,7 +113,8 @@ Using the internal method...
 trace1$plot()
 ```
 
-We may safely apply the batch container methods get_samples() and score() also after using the new optimization code.
+We may safely apply the batch container methods get_samples() and score() also
+after using the new optimization code.
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
@@ -119,18 +122,18 @@ bc1$score()
 
 bc1$get_samples(assignment = TRUE) %>%
   dplyr::filter(!is.na(Treatment)) %>%
-  dplyr::mutate(anno = stringr::str_c(Time," hr")) %>%
-  ggplot2::ggplot(ggplot2::aes(x = batch, y=interaction(position,run), fill = Treatment)) +
-  ggplot2::geom_tile(color="white") +
-  ggplot2::geom_hline(yintercept = 5.5, size=1) + 
-  ggplot2::geom_text(ggplot2::aes(label=anno)) +
-  ggplot2::labs(x="Batch", y="Position . Run")
+  dplyr::mutate(anno = stringr::str_c(Time, " hr")) %>%
+  ggplot2::ggplot(ggplot2::aes(x = batch, y = interaction(position, run), fill = Treatment)) +
+  ggplot2::geom_tile(color = "white") +
+  ggplot2::geom_hline(yintercept = 5.5, size = 1) +
+  ggplot2::geom_text(ggplot2::aes(label = anno)) +
+  ggplot2::labs(x = "Batch", y = "Position . Run")
 ```
 
 ## Perform new iterations on optimized batch container
 
-Further optimization (using a different shuffling protocol maybe) can be done immediately
-on the same batch container.
+Further optimization (using a different shuffling protocol maybe) can be done
+immediately on the same batch container.
 
 ```{r}
 n_shuffle <- rep(c(5, 2, 1), c(30, 30, 30))
@@ -143,12 +146,14 @@ optimize_design(
 
 # Optimization with specified stopping criteria 
 
-Starting optimization from scratch, we are passing now some stopping criteria that may terminate optimization
-before a shuffling protocol has been exhausted.
+Starting optimization from scratch, we are passing now some stopping criteria
+that may terminate optimization before a shuffling protocol has been exhausted.
 
-For demonstration, we use a shuffling function now that will do 3 sample (position) swaps per iteration
-and can be called an arbitrary number of times. Thus, iteration has to be stopped by either the max_iter
-criterion or by reaching a specific target score.
+For demonstration, we use a shuffling function now that will do 3 sample
+(position) swaps per iteration and can be called an arbitrary number of times.
+Thus, iteration has to be stopped by either the max_iter criterion or by
+reaching a specific minimum delta threshold (score improvement from one selected
+solution to the next).
 
 ```{r}
 bc2 <- bc$copy()
@@ -156,23 +161,27 @@ bc2 <- bc$copy()
 optimize_design(
   bc2,
   n_shuffle = 3, # will implicitly generate a shuffling function that will do 3 swaps at each iteration
-  max_iter = 200,
-  min_score = 8.0
+  max_iter = 2000,
+  min_delta = 0.1
 )
 ```
 
 
 # Optimization with multi-variate scoring function
 
-Instead of passing a single scoring function, a list of multiple scoring functions can be assigned to a batch container,
-each of which to return a scalar value on evaluation.
+Instead of passing a single scoring function, a list of multiple scoring
+functions can be assigned to a batch container, each of which to return a scalar
+value on evaluation.
 
-By default, the first function is determining the overall (aggregated) score for the comparison of solutions.
-However, the user could specify other methods for the aggregating of the scores.
+By default, a strict improvement rule is applied for classifying a potential
+solution as "better": each of the individual scores has to be smaller than or
+equal to its previous value, and one of the scores has to be changed.
 
-Note: the scoring function is to be provided as a mandatory argument if a multi-dimensional score is used! 
+However, the user could specify other methods for aggregating the scores or
+defining the acceptance criterion. See later examples.
 
-The second scoring function used here is rather redundant and just serves as illustration.
+The second scoring function used here is by the way rather redundant and just
+serves for illustration.
 
 ```{r}
 bc3 <- bc$copy()
@@ -183,26 +192,30 @@ bc3$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
-  min_score = 2.6,
-  aggregate_scores_func = first_score_only
+  min_delta = 0.1
 )
 ```
 
-Note that the first score tends to yield higher values than the second one. This could be a problem when trying to select
-a solution based on an aggregated, overall score. We repeat the same optimization now by using the autoscaling functionality
-of the optimizer.
+Note that the first score tends to yield higher values than the second one. This
+could be a problem when trying to select a solution based on an aggregated,
+overall score. We repeat the same optimization now by using the autoscaling
+functionality of the optimizer.
 
 # Auto-scaling scores
 
-We're just adding the `autoscale_scores` option here to estimate the distribution of individual scores on a number
-of completely random sample assignments (200 in this case) and then apply a transformation to rescale each score
-to a standard normal. 
+We're just adding the `autoscale_scores` option here to estimate the
+distribution of individual scores on a number of completely random sample
+assignments (200 in this case) and then apply a transformation to rescale each
+score to a standard normal.
 
-Note that by changing the distribution of the scores we need to adjust the min_score parameter, too, if we are using it.
+Note that by 'normalizing' the distribution of the scores we obtain values
+centered around zero, thus that the optimized scores are likely to be negative.
+We may also want to decrease the delta_min parameter to match the new numerical
+range.
 
 ```{r}
 bc3_as <- bc$copy()
@@ -213,20 +226,24 @@ bc3_as$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3_as,
   n_shuffle = 3,
   max_iter = 200,
-  min_score = -4.0,
+  min_delta = 0.01,
   autoscale_scores = T,
-  autoscaling_permutations = 200,
-  aggregate_scores_func = first_score_only
+  autoscaling_permutations = 200
 )
 ```
 
 
-Having directly comparable scores, it makes sense now to use an aggregation function that takes the maximum value of the score vectors to
-decide on the best iteration (instead of looking at one score only).
+Having directly comparable scores, it may be reasonable now to use a function
+that somehow aggregates the scores to decide on the best iteration (instead of
+looking at the scores individually).
+
+An easy way to do this is to use the built-in worst_score function. This will
+simply set the aggregated score to whichever of the individual scores is larger
+(i.e. 'worse' in terms of the optimization).
 
 
 ```{r}
@@ -243,16 +260,17 @@ optimize_design(
   n_shuffle = 3,
   aggregate_scores_func = worst_score,
   max_iter = 200,
-  min_score = -4.0,
   autoscale_scores = TRUE,
   autoscaling_permutations = 200
 )
 ```
 
-Another option would be to aggregate the two scores by taking their sum. This way both scores influence
-the optimization at every step.
+Another - more interesting - option would be to aggregate the two scores by
+taking their sum. This way both scores will influence the optimization at every
+step.
 
-We omit the `n_shuffle` parameter here, which will lead by default to pairwise sample swaps being done on each iteration.
+For illustration, we omit the `n_shuffle` parameter here, which will lead by
+default to pairwise sample swaps being done on each iteration.
 
 ```{r, eval = FALSE}
 bc5 <- bc$copy()
@@ -266,7 +284,6 @@ optimize_design(
   bc5,
   aggregate_scores_func = sum_scores,
   max_iter = 200,
-  min_score = -4.0,
   autoscale_scores = TRUE,
   autoscaling_permutations = 200
 )
@@ -276,7 +293,8 @@ As a final example, we calculate the (squared) L2 norm to actually aggregate the
 is not really motivated in this case, but it could be used if optimization was carried on meaningful
 distance vectors or normalized n-tuples.
 
-Note that this optimization forces both normalized scores towards zero, not the minimal value!
+Note that we don't use the auto-scaling in this case as the L2-norm based optimization would force both normalized scores towards zero,
+not the minimal (negative) value that would be desired in that case.
 
 ```{r, eval = FALSE}
 bc5_2 <- bc$copy()
@@ -290,20 +308,20 @@ optimize_design(
   bc5_2,
   aggregate_scores_func = L2s_norm,
   max_iter = 200,
-  min_score = -4.0,
-  autoscale_scores = TRUE,
-  autoscaling_permutations = 200
 )
 ```
 
 # Passing a customized shuffling function
 
-It is recommended to use the `n_shuffle` parameter to steer the optimization protocol. However, you may also provide
-a dedicated shuffling function that on each call has to return a shuffling order (as integer vector) or a list with the
-source and destination positions (src and dst) of the sample positions to be swapped.
+It is recommended to use the `n_shuffle` parameter to steer the optimization
+protocol. However, you may also provide a dedicated shuffling function that on
+each call has to return a shuffling order (as integer vector) or a list with the
+source and destination positions (src and dst) of the sample positions to be
+swapped.
 
-The following example uses a template for creating complete random shuffles across all available positions in the batch container.
-Note that this is usually not a good strategy for converging to a solution.
+The following example uses a template for creating complete random shuffles
+across all available positions in the batch container. Note that this is usually
+not a good strategy for converging to a solution.
 
 ```{r}
 bc6 <- bc$copy()
@@ -311,20 +329,26 @@ bc6 <- bc$copy()
 optimize_design(
   bc6,
   shuffle_proposal_func = complete_random_shuffling,
-  max_iter = 200,
-  min_score = 2.6
+  max_iter = 200
 )
 ```
 
 # Using simulated annealing (SA) for optimization
 
-Esp. for very large search spaces, better solutions can be quite successfully obtained by a SA protocol which
-allows the optimizer to jump over 'energy barriers' to more likely converge at lower local minima.
+Esp. for very large search spaces, better solutions can be quite successfully
+obtained by a SA protocol which allows the optimizer to jump over 'energy
+barriers' to more likely converge at lower local minima.
 
-The optimizer usually remembers the permutation with the best overall score to start with, but this behavior
-can be changed by supplying a simulated annealing protocol, most simply by generating a ready-made function template.
+The optimizer usually remembers the permutation with the best overall score to
+start with, but this behavior can be changed by supplying a simulated annealing
+protocol, most simply by generating a ready-made function template.
 
-It is generally recommended for SA to make small changes at each step, like allowing just 1 sample swap per iteration.
+It is generally recommended for SA to make small changes at each step, like
+allowing just 1 sample swap per iteration.
+
+Currently the simulated annealing protocol requires a single double value score
+to be optimized. Choose an appropriate aggregation function if you happen to
+have multiple scores initially.
 
 ```{r}
 bc7 <- bc$copy()
@@ -336,14 +360,15 @@ trace7 <- optimize_design(
   max_iter = 200
 )
 ```
-The trace may show a non strictly monotonic behavior now, reflecting the SA protocol at work.
+The trace may show a non strictly monotonic behavior now, reflecting the SA
+protocol at work.
 
 ```{r, fig.width=5, fig.height= 4}
 trace7$plot()
 ```
 
-Better results and quicker convergence may be achieved by playing with the starting temperature (T0) and
-cooling speed (alpha) in a specific case.
+Better results and quicker convergence may be achieved by playing with the
+starting temperature (T0) and cooling speed (alpha) in a specific case.
 
 ```{r}
 bc8 <- bc$copy()
@@ -360,7 +385,8 @@ trace8$plot()
 
 # Full blown example
 
-The following example puts together all possible options to illustrate the flexibility of the optimization.
+The following example puts together all possible options to illustrate the
+flexibility of the optimization.
 
 ```{r}
 bc$scoring_f <- list(
@@ -369,7 +395,7 @@ bc$scoring_f <- list(
   osat_score_generator(c("batch"), c("Time"))
 )
 
-n_shuffle <- rep(c(3, 2, 1), c(20, 20, 100))
+n_shuffle <- rep(c(3, 2, 1), c(20, 20, 200))
 
 trace <- optimize_design(
   bc,
@@ -377,7 +403,7 @@ trace <- optimize_design(
   aggregate_scores_func = sum_scores,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 1)),
   max_iter = 200,
-  min_score = -6.0,
+  min_delta = 1e-8,
   autoscale_scores = T
 )
 
