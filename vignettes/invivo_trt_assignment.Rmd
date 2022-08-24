@@ -191,7 +191,7 @@ We can finally use the customized shuffling function in the optimization and may
 ```{r}
 bc2 <- bc$copy()
 
-trace = optimize_design(
+trace <- optimize_design(
   bc2,
   shuffle_proposal_func = shuffle_proposal,
   max_iter = 200
