@@ -13,6 +13,7 @@ Authors@R: c(
            email = "juliane.siebourg-polster@roche.com",
            comment = c(ORCID = "0000-0002-1759-3223")),
     person(given = "Iakov",
+           middle = "I.",
            family = "Davydov",
            role = c("aut", "cph"),
            email = "iakov.davydov@roche.com",
@@ -23,8 +24,12 @@ Authors@R: c(
            email = "guido.steiner@roche.com",
            comment = c(ORCID = "")))
 Description:
-    Blocking and randomization for experimental design.
-    TODO: expand this.
+    Reducing batch effect by intellegently assigning samples to batches.
+    Batch-effect have a strong influence in data analysis, especially when
+    samples-to-batches assignent is coinciding with contrast groups.
+    By defining your batch container and a scoring function reflecting
+    the contrasts, you can assign samples in such a way that the potential
+    batch-effect has minimal effect on the comparison of interest.
 License: MIT + file LICENSE
 URL: https://docs.roche.com/#/designit/latest, https://code.roche.com/PMDA/packages/designit/
 BugReports: https://code.roche.com/PMDA/packages/designit/-/issues
@@ -42,7 +47,6 @@ Imports:
     tidyr,
     assertthat,
     stringr,
-    AlgDesign,
     R6,
     ineq,
     data.table,

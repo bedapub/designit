@@ -24,18 +24,14 @@ library(dplyr)
 library(tidyr)
 ```
 
-```{r seed}
-set.seed(42)
-```
-
-
 # Example 1: An expensive way to construct a 4x4 latin square (one plate)
 
 (latin square should give the best score)
 
 First using a combination of two OSAT scores (for row and column)
 
-This usually produces a latin square when using the squared L2 norm (L2s) for aggregation of the 2 scores.
+This usually produces a latin square when using the squared L2 norm (L2s) for
+aggregation of the 2 scores.
 
 ```{r}
 # Setting up the batch container
@@ -48,11 +44,14 @@ example1 <- BatchContainer$new(
 
 # Add samples to container
 # Need unique Sample ID. Can we drop this constraint?
-assign_in_order(example1, 
-                samples = tibble::tibble(Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4), 
-                                         ID = 1:16))
+assign_in_order(example1,
+  samples = tibble::tibble(
+    Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4),
+    ID = 1:16
+  )
+)
 
-# The following does not work (an gives a constant score of 144!) 
+# The following does not work (an gives a constant score of 144!)
 # example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
 # First analysis of problem indicates that osat_score generates a full row*col vector of 'ideal scores'
 # which are in fact the same value, implying an identical overall result as each position can be either
@@ -63,8 +62,8 @@ bc <- example1$copy()
 
 # # Set scoring function
 bc$scoring_f <- list(
-  osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
-  osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
+  Row.Score = osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
+  Column.Score = osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
 )
 ```
 
@@ -73,11 +72,14 @@ designit::.load_cache("trace1")
 ```
 
 ```{r eval=.eval_cached_chunk}
+
+set.seed(41)
+
 trace <- optimize_design(bc,
-                min_score = 0, max_iter = 1e4, # this is set to shorten vignette run-time, normally we don't know.
-                n_shuffle = 2,
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-                aggregate_scores_func = L2s_norm
+  max_iter = 300, # this is set to shorten vignette run-time based on known random seed, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
 )
 ```
 
@@ -88,13 +90,16 @@ designit::.save_cache(trace, bc)
 ```{r}
 trace
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 1: Using OSAT scores for plate design\n(not the recommended way!)")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 1: Using OSAT scores for plate design\n(not the recommended way!)"
+)
 ```
 
 Now using a dedicated scoring for the group distances on a plate. 
 
-This should reliably lead to a nice symmetry-bearing latin square design with only a one-dimensional score to look at.
+This should reliably lead to a nice symmetry-bearing latin square design with
+only a one-dimensional score to look at.
 
 ```{r}
 bc <- example1$copy()
@@ -107,11 +112,13 @@ designit::.load_cache("trace2")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                         min_score = 6.1, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
-                         n_shuffle = 2,
-                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-                         quiet = TRUE)
+  max_iter = 1000, # this is set to shorten vignette run-time based on random seed, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  quiet = TRUE
+)
 ```
 
 ```{r include=FALSE, message = FALSE}
@@ -121,22 +128,26 @@ designit::.save_cache(trace, bc)
 ```{r}
 trace$elapsed
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 1: Using a dedicated plate scoring function:\nThis should show a latin square!")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 1: Using a dedicated plate scoring function:\nThis should show a latin square!"
+)
 ```
 
 # Example 2: Scoring two plates at once
 
 (latin square for each plate should give the best score)
 
-We set up in one go 2 plate scoring functions, each one acting locally on a specific plate, 
-plus one osat score to guarantee uniform distribution of groups across plates.
+We set up in one go 2 plate scoring functions, each one acting locally on a
+specific plate, plus one osat score to guarantee uniform distribution of groups
+across plates.
 
-The initial sample allocation (by assign_in_order) leads to a poor starting point 
-since each plate has only 2 of the 4 groups represented. 
+The initial sample allocation (by assign_in_order) leads to a poor starting
+point since each plate has only 2 of the 4 groups represented.
 
-This is not a problem as long as we make sure that initial permutations are likely to remedy the situation. 
-That's why we ensure 10 pairwise sample swaps for the first iterations.
+This is not a problem as long as we make sure that initial permutations are
+likely to remedy the situation. That's why we ensure 10 pairwise sample swaps
+for the first iterations.
 
 ```{r}
 # Setting up the batch container
@@ -148,17 +159,21 @@ example2 <- BatchContainer$new(
 )
 
 # Add samples to container
-assign_in_order(example2, samples = tibble::tibble(Group = c(rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8)),
-                                                   ID = 1:32))
+assign_in_order(example2, samples = tibble::tibble(
+  Group = c(rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8)),
+  ID = 1:32
+))
 
 bc <- example2$copy()
 
 bc$scoring_f <- c(mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group"),
-                  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 )
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: Initial sample arrangement")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: Initial sample arrangement"
+)
 
 bc$score()
 ```
@@ -168,11 +183,13 @@ designit::.load_cache("trace3")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(41)
 trace <- optimize_design(bc,
-                         n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1800)),
-                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
-                         aggregate_scores_func = worst_score,
-                         quiet = TRUE)
+  n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1400)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+  aggregate_scores_func = worst_score,
+  quiet = TRUE
+)
 ```
 
 ```{r include=FALSE, message = FALSE}
@@ -184,20 +201,22 @@ trace$elapsed
 
 bc$score()
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: Design created by swapping samples 'globally' across the plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: Design created by swapping samples 'globally' across the plates"
+)
 ```
 
-While this 'global' optimization is possible, it does probably not converge to an (almost) ideal solution 
-in an acceptable time if there are more samples involved.
-This is due to a lot of unproductive sample swapping happening across the plates.
+While this 'global' optimization is possible, it does probably not converge to
+an (almost) ideal solution in an acceptable time if there are more samples
+involved. This is due to a lot of unproductive sample swapping happening across
+the plates.
 
-One way to address this: we may split the optimization into two cycles, 
-first assigning samples to plates (balancing groups),
-then improving the positions of the samples within each plate. 
-This motivates the use of a dedicated sample permutation function
-which takes the plate structure into account and only shuffles samples around within one plate.
-
+One way to address this: we may split the optimization into two cycles, first
+assigning samples to plates (balancing groups), then improving the positions of
+the samples within each plate. This motivates the use of a dedicated sample
+permutation function which takes the plate structure into account and only
+shuffles samples around within one plate.
 
 ```{r}
 # Setting up the batch container
@@ -206,15 +225,18 @@ bc <- example2$copy()
 
 bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
+set.seed(42)
 optimize_design(bc,
-                quiet = T,
-                min_score = 2, max_iter = 5e3,  # this is set to shorten vignette run-time, normally we don't know.
-                n_shuffle = 2,
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+  quiet = TRUE,
+  max_iter = 200, # this is set to shorten vignette run-time, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: 'Plate wise' design\nStep 1: after allocating samples to plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: 'Plate wise' design\nStep 1: after allocating samples to plates"
+)
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
@@ -226,12 +248,13 @@ designit::.load_cache("trace4")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e2,
-                shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-                aggregate_scores_func = L2s_norm,
-                quiet = TRUE
+  max_iter = 400,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm,
+  quiet = TRUE
 )
 ```
 
@@ -244,23 +267,25 @@ trace
 
 bc$score()
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: 'Plate wise' design\nStep 2: after arranging samples within plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: 'Plate wise' design\nStep 2: after arranging samples within plates"
+)
 ```
 
-In this case, the shuffling function exchanges 1 pair of sample assignments every time (the default). 
-However, any number of constant swaps or a swapping protocol (formally a vector of integers) 
-can be supplied as well.
+In this case, the shuffling function exchanges 1 pair of sample assignments
+every time (the default). However, any number of constant swaps or a swapping
+protocol (formally a vector of integers) can be supplied as well.
 
 
-Now for the most efficient solution:
-we start again by first assigning samples to plates (balancing groups),
-then making use of the independence of the two within-plate optimizations and improving them
-one after the other. 
+Now for the most efficient solution: we start again by first assigning samples
+to plates (balancing groups), then making use of the independence of the two
+within-plate optimizations and improving them one after the other.
 
-This is possible by passing the argument \code{restrain_on_subgroup_levels} to the function that generates
-the permutations. It enforces permutation only to happen first within plate 1, then within plate 2, so that
-the two scores can be optimized in succeeding runs.
+This is possible by passing the argument \code{restrain_on_subgroup_levels} to
+the function that generates the permutations. It enforces permutation only to
+happen first within plate 1, then within plate 2, so that the two scores can be
+optimized in succeeding runs.
 
 ```{r}
 # Setting up the batch container
@@ -275,11 +300,12 @@ designit::.load_cache("trace5")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                quiet = T,
-                min_score = 2, max_iter = 5e3, # this is set to shorten vignette run-time, normally we don't know.
-                n_shuffle = 2,
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+  quiet = TRUE,
+  max_iter = 150, # this is set to shorten vignette run-time, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
 ```
 
@@ -290,8 +316,10 @@ designit::.save_cache(trace, bc)
 ```{r}
 trace
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: 'Serial plate' design\nStep 1: after allocating samples to plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: 'Serial plate' design\nStep 1: after allocating samples to plates"
+)
 
 bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
@@ -303,12 +331,13 @@ designit::.load_cache("trace6")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e3,
-                quiet=T,
-                shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(1)),
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-                aggregate_scores_func = L2s_norm
+  max_iter = 150,
+  quiet = TRUE,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(1)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
 )
 ```
 
@@ -327,12 +356,13 @@ designit::.load_cache("trace7")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                max_iter = 5e3,
-                quiet=T,
-                shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels=c(2)),
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
-                aggregate_scores_func = L2s_norm
+  max_iter = 550,
+  quiet = TRUE,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(2)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
 )
 ```
 
@@ -345,28 +375,32 @@ trace
 
 bc$score()
 
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 2: 'Serial plate' design\nStep 2: after optimizing each plate in turn")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 2: 'Serial plate' design\nStep 2: after optimizing each plate in turn"
+)
 ```
 
 
 # Example 3: 3 plates with different dimension and different sample group sizes
 
-We simulate one ordinary 96 well plate and two smaller ones with sizes 6x8 and 4x6, respectively. 
-There are 3 experimental groups as well with sample sizes of 69, 30 and 69, respectively. 
-This example should demonstrate that an empirically determined normalization of the scores 
-yield 3 comparable numerical values, independent of the different plate and group sizes.  
+We simulate one ordinary 96 well plate and two smaller ones with sizes 6x8 and
+4x6, respectively. There are 3 experimental groups as well with sample sizes of
+69, 30 and 69, respectively. This example should demonstrate that an empirically
+determined normalization of the scores yield 3 comparable numerical values,
+independent of the different plate and group sizes.
 
-Again, a first optimization aims to achieve same group allocation on each plate, 
+Again, a first optimization aims to achieve same group allocation on each plate,
 while the second run takes care of the sample distribution on each plate.
 
-We use assign_random in this example to start from a more balanced initial position as compared to example 2.
+We use assign_random in this example to start from a more balanced initial
+position as compared to example 2.
 
-Aggregation of scores is done by the L2s method (square of L2 norm). 
-Because of the comparable numerical range of scores, 
-also the worst_score method could be used for aggregation. 
-However, the L2s method always takes into account all individual scores,
-providing more stability in case the 3 plate scores are not exactly normalized. 
+Aggregation of scores is done by the L2s method (square of L2 norm). Because of
+the comparable numerical range of scores, also the worst_score method could be
+used for aggregation. However, the L2s method always takes into account all
+individual scores, providing more stability in case the 3 plate scores are not
+exactly normalized.
 
 ```{r}
 # Setting up the batch container
@@ -384,10 +418,14 @@ example3 <- BatchContainer$new(
 
 
 # Assign samples randomly to start from a better initial state
-assign_random(example3, 
-              samples = tibble::tibble(Group = rep.int(c("Grp 1", "Grp 2", "Grp3"), 
-                                                       times = c(69, 30, 69)), 
-                                       ID = 1:168))
+assign_random(example3,
+  samples = tibble::tibble(
+    Group = rep.int(c("Grp 1", "Grp 2", "Grp3"),
+      times = c(69, 30, 69)
+    ),
+    ID = 1:168
+  )
+)
 
 bc <- example3$copy()
 
@@ -399,11 +437,12 @@ designit::.load_cache("trace8")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                quiet = T,
-                min_score = 1.49, max_iter = 5e3,
-                n_shuffle = 2,
-                acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  quiet = TRUE,
+  max_iter = 150,
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
 )
 ```
 
@@ -416,13 +455,17 @@ trace
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 3: Dealing with plates of different size\nStep 1: after distributing groups across plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 3: Dealing with plates of different size\nStep 1: after distributing groups across plates"
+)
 ```
 
 ```{r}
-bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", 
-                                           column = "col", group = "Group")
+bc$scoring_f <- mk_plate_scoring_functions(bc,
+  plate = "plate", row = "row",
+  column = "col", group = "Group"
+)
 
 bc$score()
 ```
@@ -432,13 +475,17 @@ designit::.load_cache("trace9")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                         min_score = 131.0, max_iter = 5e3,
-                         shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"),
-                                                                                n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))),
-                        # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
-                        aggregate_scores_func = L2s_norm,
-                        quiet = TRUE)
+  max_iter = 300,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(
+    subgroup_vars = c("plate"),
+    n_swaps = c(rep(5, 500), rep(3, 1500), rep(2, 3000), rep(1, 5000))
+  ),
+  # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+  aggregate_scores_func = L2s_norm,
+  quiet = TRUE
+)
 ```
 
 ```{r include=FALSE, message = FALSE}
@@ -449,28 +496,30 @@ designit::.save_cache(trace, bc)
 trace$elapsed
 
 bc$score()
-
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-plot_plate(bc, plate = plate, row = row, column = col, .color = Group,
-           title = "Exa 3: Dealing with plates of different size\nStep 2: after swapping samples within plates")
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Exa 3: Dealing with plates of different size\nStep 2: after swapping samples within plates"
+)
 ```
 
 # Example 4: More than one group factor to balance and empty plate positions
 
-In this example, we have 2 factors to distribute across one plate: Treatment and (animal) sex.
+In this example, we have 2 factors to distribute across one plate: Treatment and
+(animal) sex.
 
-To indicate that the balancing of treatment is considered more important than the animal sex we assign a custom aggregation
-function giving more weight to the treatment variable. (A better aggregation mechanism has to be implemented!!!)
+To indicate that the balancing of treatment is considered more important than
+the animal sex we assign a custom aggregation function giving more weight to the
+treatment variable. (A better aggregation mechanism has to be implemented!!!)
 
-There can be less samples than possible positions on the plate(s). In this case, we simulate 20 animal derived samples distributed
-on a plate with 24 locations.
+There can be less samples than possible positions on the plate(s). In this case,
+we simulate 20 animal derived samples distributed on a plate with 24 locations.
 
 
 ```{r, fig.width=7, fig.height=3.5}
 # Setting up the batch container
-
 example4 <- BatchContainer$new(
   dimensions = c(
     plate = 1, row = 6, col = 4
@@ -481,14 +530,14 @@ example4 <- BatchContainer$new(
 # Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
 assign_in_order(example4, samples = tibble::tibble(
   Group = rep.int(c("Treatment 1", "Treatment 2"), times = c(10, 10)),
-  Sex = c(rep(c("M", "F", "F", "M"), times = 4), "M",NA,NA,"F"), ID = 1:20
+  Sex = c(rep(c("M", "F", "F", "M"), times = 4), "M", NA, NA, "F"), ID = 1:20
 ))
 
 bc <- example4$copy()
 
 cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title="Initial layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title="Initial layout by Sex"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex"),
   ncol = 2
 )
 
@@ -506,14 +555,16 @@ designit::.load_cache("trace10")
 ```
 
 ```{r eval=.eval_cached_chunk}
+set.seed(42)
 trace <- optimize_design(bc,
-                         min_score = 17.75, max_iter = 5e3,
-                         n_shuffle = 1,
-                         acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
-                         aggregate_scores_func = function(scores, ...) {
-                           2 * scores["Group.Plate"] + scores["Sex.Plate"]
-                         },
-                         quiet = T)
+  max_iter = 750,
+  n_shuffle = 1,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+  aggregate_scores_func = function(scores, ...) {
+    2 * scores["Group.Plate"] + scores["Sex.Plate"]
+  },
+  quiet = TRUE
+)
 ```
 
 ```{r include=FALSE, message = FALSE}
@@ -526,8 +577,191 @@ trace$elapsed
 bc$score()
 
 cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title="Final layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title="Final layout by Sex"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+
+We do the same example with auto-scaling, weighted scoring and SA to have a
+reference!
+
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace11")
+```
+
+```{r, eval=.eval_cached_chunk}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 500,
+  n_shuffle = 1,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+  aggregate_scores_func = function(scores, ...) {
+    purrr::set_names(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
+  },
+  autoscale_scores = T,
+  quiet = TRUE
+)
+
+```
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+We do the  same example with auto-scaling and position-dependent scoring now,
+not aggregating the score vector! This is more effective even when using the
+default acceptance function. We are strictly prioritizing the leftmost score in addition
+to reflect relevance for the design.
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace12")
+```
+
+```{r, eval=.eval_cached_chunk}
+
+bc <- example4$copy()
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+bc$score()
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = accept_leftmost_improvement,
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+Using a tolerance value to accept slightly worse solutions in the leftmost relevant score if overcompensated by other scores:
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace13")
+```
+
+```{r, eval=.eval_cached_chunk}
+
+bc <- example4$copy()
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+
+bc$score()
+
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+
+```{r, fig.width=7, fig.height=3.5}
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+Testing an alternative left-to-right weighing of scores, based on exponential
+down-weighing of the respective score differences at position p with factor
+kappa^p, 0<kappa<1 We choose a kappa of 0.5, i.e. the second score's improvement
+counts half of that of the first one.
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("trace14")
+```
+
+```{r, eval=.eval_cached_chunk}
+bc <- example4$copy()
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+bc$score()
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 1000,
+  n_shuffle = 1,
+  acceptance_func = mk_exponentially_weighted_acceptance_func(kappa = 0.5, simulated_annealing = T),
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+
+```
+
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(trace, bc)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
   ncol = 2
 )
 ```

@@ -89,6 +89,7 @@ mk_simanneal_acceptance_func <- function(temp_function = mk_simanneal_temp_func(
   force(temp_function)
 
   function(current_score, best_score, iteration) {
+    assertthat::assert_that(length(current_score)==1, msg="Multi-dimensional scores have to be aggregated for simulated annealing to work.\nPlease specify a suitable aggregation function.")
     if (current_score < best_score) {
       return(TRUE)
     }

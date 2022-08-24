@@ -87,17 +87,3 @@ L1_norm <- function(scores, ...) {
   sum(abs(scores))
 }
 
-
-
-#' Default acceptance function for optimizer (always accept the current score if it is smaller than the best one obtained before)
-#'
-#' @param current_score Score from the current optimizing iteration (scalar value, double)
-#' @param best_score Score from the current optimizing iteration (scalar value, double)
-#' @param ... Ignored arguments that may be used by alternative acceptance functions
-#'
-#' @return Boolean, TRUE if current score should be taken as the new optimal score, FALSE otherwise
-#'
-#' @keywords internal
-accept_best_solution <- function(current_score, best_score, ...) { # ignore iteration parameter in case it's passed
-  current_score < best_score
-}

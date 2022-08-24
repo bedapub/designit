@@ -5,8 +5,7 @@
 #' @param batch_container Instance of BatchContainer class
 #'
 #' @return Returns `BatchContainer`, invisibly.
-#'
-#' @examples
+#' @example man/examples/assignment.R
 assign_random <- function(batch_container, samples = NULL) {
   assign_in_order(batch_container, samples)
 
