@@ -9,7 +9,7 @@
 #'
 #' @return
 #'
-#' @exmaples
+#' @examples
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)
@@ -58,7 +58,6 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @author siebourj
 #'
 #' @examples
-#'
 #' nPlate <- 3
 #' nColumn <- 4
 #' nRow <- 6

@@ -77,11 +77,12 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
 #' @param batch_container The batch-container.
 #' @param ... Other params that are passed to a generic shuffling function (like the iteration number).
 #'
-#' @return A random permutation of the sample assignment in the container
+#' @return A random permutation of the sample assignment in the container.
 #'
 #' @export
 #'
 #' @examples
+#'
 complete_random_shuffling <- function(batch_container, ...) {
   sample(batch_container$assignment)
 }
@@ -95,11 +96,12 @@ complete_random_shuffling <- function(batch_container, ...) {
 #'
 #' @param n_swaps Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..`floor(n_samples/2)`)
 #'
-#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+#' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached.
 #'
 #' @export
 #'
 #' @examples
+#'
 mk_swapping_function <- function(n_swaps = 1) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
@@ -152,6 +154,7 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' @export
 #'
 #' @examples
+#'
 mk_subgroup_shuffling_function <- function(subgroup_vars,
                                            restrain_on_subgroup_levels = c(),
                                            n_swaps = 1) {
