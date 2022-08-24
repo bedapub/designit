@@ -114,6 +114,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #' `samples` argument.
 #'
 #' @return Returns `BatchContainer`, invisibly.
+#'
 #' @examples
 #' bc <- BatchContainer$new(
 #'   dimensions = list(
