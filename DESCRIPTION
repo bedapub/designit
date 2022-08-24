@@ -13,6 +13,7 @@ Authors@R: c(
            email = "juliane.siebourg-polster@roche.com",
            comment = c(ORCID = "0000-0002-1759-3223")),
     person(given = "Iakov",
+           middle = "I.",
            family = "Davydov",
            role = c("aut", "cph"),
            email = "iakov.davydov@roche.com",
