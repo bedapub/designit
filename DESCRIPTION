@@ -46,7 +46,6 @@ Imports:
     tidyr,
     assertthat,
     stringr,
-    AlgDesign,
     R6,
     ineq,
     data.table,
