@@ -37,6 +37,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Number of scoring functions.
     #' @param score_names
     #' Names of scoring functions.
+    #' @example man/examples/trace.R
     initialize = function(n_steps, n_scores, score_names) {
       self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
       if (!is.null(score_names)) {
@@ -55,6 +56,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Vector of aggregated scores. Can be NULL.
     #'
     #' @return `OptimizationTrace` invisibly.
+    #' @example man/examples/trace.R
     set_scores = function(i, scores, aggregated_scores) {
       assertthat::assert_that(
         assertthat::is.count(i),
@@ -87,6 +89,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Last step to keep.
     #'
     #' @return `OptimizationTrace` invisibly.
+    #' @example man/examples/trace.R
     shrink = function(last_step = self$last_step) {
       self$scores <- head(self$scores, last_step)
       if (!is.null(self$aggregated_scores)) {
