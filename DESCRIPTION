@@ -27,7 +27,7 @@ Description:
     TODO: expand this.
 License: MIT + file LICENSE
 URL: https://docs.roche.com/#/designit/latest, https://code.roche.com/PMDA/packages/designit/
-BugReports: https://code.roche.com/PMDA/packages/designit/issues
+BugReports: https://code.roche.com/PMDA/packages/designit/-/issues
 Depends:
     R (>= 3.5.0)
 Imports: 
@@ -70,7 +70,7 @@ Suggests:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 VignetteBuilder: knitr
 Remotes:
     bioc::release/OSAT,
