@@ -12,7 +12,7 @@ L2s_norm(scores, ...)
 \item{...}{Parameters to be ignored by this aggregation function}
 }
 \value{
-The squared L2 norm as an aggregated score
+The squared L2 norm as an aggregated score.
 }
 \description{
 This function enables comparison of the results of two scoring functions by calculating

@@ -12,7 +12,7 @@ complete_random_shuffling(batch_container, ...)
 \item{...}{Other params that are passed to a generic shuffling function (like the iteration number).}
 }
 \value{
-A random permutation of the sample assignment in the container
+A random permutation of the sample assignment in the container.
 }
 \description{
 This function was just added to test early on the functionality of optimize_design() to accept a

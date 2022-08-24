@@ -47,7 +47,6 @@ the ggplot object
 Plot plate layouts
 }
 \examples{
-
 nPlate <- 3
 nColumn <- 4
 nRow <- 6
