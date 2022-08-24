@@ -38,18 +38,18 @@ Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{OptimizationTrace$new()}}
-\item \href{#method-set_scores}{\code{OptimizationTrace$set_scores()}}
-\item \href{#method-shrink}{\code{OptimizationTrace$shrink()}}
-\item \href{#method-get_scores}{\code{OptimizationTrace$get_scores()}}
-\item \href{#method-print}{\code{OptimizationTrace$print()}}
-\item \href{#method-plot}{\code{OptimizationTrace$plot()}}
-\item \href{#method-clone}{\code{OptimizationTrace$clone()}}
+\item \href{#method-OptimizationTrace-new}{\code{OptimizationTrace$new()}}
+\item \href{#method-OptimizationTrace-set_scores}{\code{OptimizationTrace$set_scores()}}
+\item \href{#method-OptimizationTrace-shrink}{\code{OptimizationTrace$shrink()}}
+\item \href{#method-OptimizationTrace-get_scores}{\code{OptimizationTrace$get_scores()}}
+\item \href{#method-OptimizationTrace-print}{\code{OptimizationTrace$print()}}
+\item \href{#method-OptimizationTrace-plot}{\code{OptimizationTrace$plot()}}
+\item \href{#method-OptimizationTrace-clone}{\code{OptimizationTrace$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-new"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new \code{OptimizationTrace} object.
 \subsection{Usage}{
@@ -69,8 +69,8 @@ Create a new \code{OptimizationTrace} object.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-set_scores"></a>}}
-\if{latex}{\out{\hypertarget{method-set_scores}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-set_scores"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-set_scores}{}}}
 \subsection{Method \code{set_scores()}}{
 Set scores for i-th step.
 \subsection{Usage}{
@@ -93,8 +93,8 @@ Set scores for i-th step.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-shrink"></a>}}
-\if{latex}{\out{\hypertarget{method-shrink}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-shrink"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-shrink}{}}}
 \subsection{Method \code{shrink()}}{
 Shrink scores by keeping only first \code{last_step} scores.
 \subsection{Usage}{
@@ -113,8 +113,8 @@ Shrink scores by keeping only first \code{last_step} scores.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_scores"></a>}}
-\if{latex}{\out{\hypertarget{method-get_scores}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-get_scores"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-get_scores}{}}}
 \subsection{Method \code{get_scores()}}{
 Return individual (not aggregated!) scores by keeping only first \code{last_step} scores.
 \subsection{Usage}{
@@ -133,8 +133,8 @@ Return individual (not aggregated!) scores by keeping only first \code{last_step
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-print"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-print}{}}}
 \subsection{Method \code{print()}}{
 Print \code{OptimizationTrace}.
 \subsection{Usage}{
@@ -153,8 +153,8 @@ Print \code{OptimizationTrace}.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-plot"></a>}}
-\if{latex}{\out{\hypertarget{method-plot}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-plot"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-plot}{}}}
 \subsection{Method \code{plot()}}{
 Plot \code{OptimizationTrace}. Only the main score at the moment.
 \subsection{Usage}{
@@ -172,8 +172,8 @@ Plot \code{OptimizationTrace}. Only the main score at the moment.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-OptimizationTrace-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-OptimizationTrace-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

@@ -47,13 +47,13 @@ E.g., "mydim<size=10>".}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{BatchContainerDimension$new()}}
-\item \href{#method-clone}{\code{BatchContainerDimension$clone()}}
+\item \href{#method-BatchContainerDimension-new}{\code{BatchContainerDimension$new()}}
+\item \href{#method-BatchContainerDimension-clone}{\code{BatchContainerDimension$clone()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-BatchContainerDimension-new"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainerDimension-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new BatchContainerDimension object.
 
@@ -94,8 +94,8 @@ bc
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-clone"></a>}}
-\if{latex}{\out{\hypertarget{method-clone}{}}}
+\if{html}{\out{<a id="method-BatchContainerDimension-clone"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainerDimension-clone}{}}}
 \subsection{Method \code{clone()}}{
 The objects of this class are cloneable with this method.
 \subsection{Usage}{

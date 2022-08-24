@@ -64,18 +64,18 @@ Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
 \section{Methods}{
 \subsection{Public methods}{
 \itemize{
-\item \href{#method-new}{\code{BatchContainer$new()}}
-\item \href{#method-get_samples}{\code{BatchContainer$get_samples()}}
-\item \href{#method-get_locations}{\code{BatchContainer$get_locations()}}
-\item \href{#method-move_samples}{\code{BatchContainer$move_samples()}}
-\item \href{#method-score}{\code{BatchContainer$score()}}
-\item \href{#method-copy}{\code{BatchContainer$copy()}}
-\item \href{#method-print}{\code{BatchContainer$print()}}
+\item \href{#method-BatchContainer-new}{\code{BatchContainer$new()}}
+\item \href{#method-BatchContainer-get_samples}{\code{BatchContainer$get_samples()}}
+\item \href{#method-BatchContainer-get_locations}{\code{BatchContainer$get_locations()}}
+\item \href{#method-BatchContainer-move_samples}{\code{BatchContainer$move_samples()}}
+\item \href{#method-BatchContainer-score}{\code{BatchContainer$score()}}
+\item \href{#method-BatchContainer-copy}{\code{BatchContainer$copy()}}
+\item \href{#method-BatchContainer-print}{\code{BatchContainer$print()}}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
+\if{html}{\out{<a id="method-BatchContainer-new"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-new}{}}}
 \subsection{Method \code{new()}}{
 Create a new BatchContainer object.
 \subsection{Usage}{
@@ -118,8 +118,8 @@ bc
 
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-get_samples}{}}}
+\if{html}{\out{<a id="method-BatchContainer-get_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-get_samples}{}}}
 \subsection{Method \code{get_samples()}}{
 Return table with samples and sample assignment.
 \subsection{Usage}{
@@ -154,8 +154,8 @@ table with samples and sample assignment.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-get_locations"></a>}}
-\if{latex}{\out{\hypertarget{method-get_locations}{}}}
+\if{html}{\out{<a id="method-BatchContainer-get_locations"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-get_locations}{}}}
 \subsection{Method \code{get_locations()}}{
 Get a table with all the locations in a \code{BatchContainer}.
 \subsection{Usage}{
@@ -167,8 +167,8 @@ A \code{\link[tibble:tibble]{tibble}} with all the available locations.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-move_samples"></a>}}
-\if{latex}{\out{\hypertarget{method-move_samples}{}}}
+\if{html}{\out{<a id="method-BatchContainer-move_samples"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-move_samples}{}}}
 \subsection{Method \code{move_samples()}}{
 Move samples between locations
 
@@ -195,8 +195,8 @@ The length of the vector should match the number of locations,
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-score"></a>}}
-\if{latex}{\out{\hypertarget{method-score}{}}}
+\if{html}{\out{<a id="method-BatchContainer-score"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-score}{}}}
 \subsection{Method \code{score()}}{
 Score current sample assignment,
 \subsection{Usage}{
@@ -208,8 +208,8 @@ Returns a vector of all scoring functions values.
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-copy"></a>}}
-\if{latex}{\out{\hypertarget{method-copy}{}}}
+\if{html}{\out{<a id="method-BatchContainer-copy"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-copy}{}}}
 \subsection{Method \code{copy()}}{
 Create an independent copy (clone) of a \code{BatchContainer}
 \subsection{Usage}{
@@ -221,8 +221,8 @@ Returns a new \code{BatchContainer}
 }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-print"></a>}}
-\if{latex}{\out{\hypertarget{method-print}{}}}
+\if{html}{\out{<a id="method-BatchContainer-print"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-print}{}}}
 \subsection{Method \code{print()}}{
 Prints information about \code{BatchContainer}.
 \subsection{Usage}{
