@@ -183,7 +183,7 @@ bc3$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3,
   n_shuffle = 3,
   max_iter = 200,
@@ -213,7 +213,7 @@ bc3_as$scoring_f <- list(
 )
 
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3_as,
   n_shuffle = 3,
   max_iter = 200,
