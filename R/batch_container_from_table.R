@@ -7,7 +7,7 @@
 #' @param location_cols Names of columns containing information about locations.
 #'
 #' @return A [BatchContainer] assigned samples.
-#' @example
+#' @examples
 #' tab <- data.frame(
 #'   row = rep(1:3, each = 3),
 #'   column = rep(1:3, 3),
