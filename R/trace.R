@@ -1,5 +1,7 @@
+#' @title
 #' OptimizationTrace represents optimization trace.
 #'
+#' @description
 #' Usually it is created by [optimize_design()].
 #'
 #' @export

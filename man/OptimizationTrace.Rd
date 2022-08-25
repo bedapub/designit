@@ -4,11 +4,6 @@
 \alias{OptimizationTrace}
 \title{OptimizationTrace represents optimization trace.}
 \description{
-OptimizationTrace represents optimization trace.
-
-OptimizationTrace represents optimization trace.
-}
-\details{
 Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 }
 \examples{
