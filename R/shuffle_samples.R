@@ -82,7 +82,16 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
 #' @export
 #'
 #' @examples
-#'
+#' data("invivo_samples")
+#' bc <- BatchContainer$new(
+#'   dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+#' )
+#' bc$scoring_f <- osat_score_generator("plate", "Sex")
+#' optimize_design(
+#'   bc, invivo_samples,
+#'   max_iter = 100,
+#'   shuffle_proposal_func = complete_random_shuffling
+#' )
 complete_random_shuffling <- function(batch_container, ...) {
   sample(batch_container$assignment)
 }
@@ -101,7 +110,16 @@ complete_random_shuffling <- function(batch_container, ...) {
 #' @export
 #'
 #' @examples
-#'
+#' data("invivo_samples")
+#' bc <- BatchContainer$new(
+#'   dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+#' )
+#' bc$scoring_f <- osat_score_generator("plate", "Sex")
+#' optimize_design(
+#'   bc, invivo_samples,
+#'   max_iter = 100,
+#'   shuffle_proposal_func = mk_swapping_function(1)
+#' )
 mk_swapping_function <- function(n_swaps = 1) {
   # Function factory for creator of a 'neighboring' sample arrangement with a defined number of position swaps
 
