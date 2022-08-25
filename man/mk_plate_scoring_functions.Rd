@@ -18,7 +18,7 @@ mk_plate_scoring_functions(batch_container, plate = NULL, row, column, group)
 \item{group}{Name of the bc column that denotes a group/condition that should be distributed on the plate}
 }
 \value{
-List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better)
+List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better).
 }
 \description{
 Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate

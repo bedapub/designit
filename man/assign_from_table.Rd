@@ -42,4 +42,5 @@ sample_sheet <- tibble::tribble(
 assign_from_table(bc, sample_sheet)
 
 bc$get_samples(remove_empty_locations = TRUE)
+
 }

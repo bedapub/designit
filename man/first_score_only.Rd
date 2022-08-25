@@ -12,7 +12,7 @@ first_score_only(scores, ...)
 \item{...}{Parameters to be ignored by this aggregation function}
 }
 \value{
-The aggregated score, i.e. the first element of a multiple-component score vector
+The aggregated score, i.e. the first element of a multiple-component score vector.
 }
 \description{
 This function enables comparison of the results of two scoring functions by just basing
