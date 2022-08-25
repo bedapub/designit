@@ -12,7 +12,7 @@
 #' @export
 #'
 #' @examples
-#'
+#' first_score_only(c(1, 2, 3))
 first_score_only <- function(scores, ...) {
   scores[1]
 }
@@ -32,7 +32,7 @@ first_score_only <- function(scores, ...) {
 #' @export
 #'
 #' @examples
-#'
+#' worst_score(c(3, 2, 1))
 worst_score <- function(scores, na.rm = FALSE, ...) {
   max(scores, na.rm = na.rm)
 }
@@ -49,7 +49,7 @@ worst_score <- function(scores, na.rm = FALSE, ...) {
 #' @export
 #'
 #' @examples
-#'
+#' sum_scores(c(3, 2, 1))
 sum_scores <- function(scores, na.rm = FALSE, ...) {
   sum(scores, na.rm = na.rm)
 }
@@ -69,7 +69,7 @@ sum_scores <- function(scores, na.rm = FALSE, ...) {
 #' @export
 #'
 #' @examples
-#'
+#' L2s_norm(c(2, 2))
 L2s_norm <- function(scores, ...) {
   sum(scores^2)
 }
@@ -87,7 +87,7 @@ L2s_norm <- function(scores, ...) {
 #' @export
 #'
 #' @examples
-#'
+#' L1_norm(c(2, 2))
 L1_norm <- function(scores, ...) {
   sum(abs(scores))
 }
