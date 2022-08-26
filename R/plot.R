@@ -30,7 +30,7 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
       ggplot2::aes(alpha = {{ .alpha }}) +
       ggplot2::scale_alpha_ordinal(range = alpha_range)
   }
-  print(g)
+  return(g)
 }
 
 
