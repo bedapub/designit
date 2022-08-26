@@ -68,3 +68,47 @@
 #' \item{Litter_alloc}{Litter with which the animal can be allocated}
 #' }
 "invivo_samples"
+
+
+#' A sample list from an in vivo experiment with multiple treatments and 2 strains
+#'
+#' This sample list is intended to be used in connection with the \code{"invivo_study_treatments"} data object
+#'
+#' @docType data
+#' @keywords datasets
+#' @name invivo_study_samples
+#' @usage data(invivo_study_samples)
+#' @author Guido Steiner
+#'
+#' @format An object of class \code{"tibble"}
+#' \describe{
+#' \item{AnimalID}{The animal IDs, i.e. unique identifiers for each animal}
+#' \item{Strain}{Strain (A or B)}
+#' \item{Sex}{Female (F) or Male (M)}
+#' \item{BirthDate}{Date of birth, not available for all the animals}
+#' \item{Earmark}{Markings to distinguish individual animals, applied on the left (L), right (R) or both(B) ears}
+#' \item{ArrivalWeight}{Initial body weight of the animal}
+#' \item{Arrival weight Unit}{Unit of the body weight, here: grams}
+#' \item{Litter}{The litter IDs}
+#' }
+"invivo_study_samples"
+
+
+#' A treatment list together with additional constraints on the strain and sex of animals
+#'
+#' This treatment list is intended to be used in connection with the \code{"invivo_study_samples"} data object
+#'
+#' @docType data
+#' @keywords datasets
+#' @name invivo_study_treatments
+#' @usage data(invivo_study_treatments)
+#' @author Guido Steiner
+#'
+#' @format An object of class \code{"tibble"}
+#' \describe{
+#' \item{Treatment}{The treatment to be given to an individual animal (1-3, plus a few untreated cases)}
+#' \item{Strain}{Strain (A or B) - a constraint which kind of animal may receive the respective treatment}
+#' \item{Sex}{Female (F) or Male (M) - a constraint which kind of animal may receive the respective treatment}
+#' }
+"invivo_study_treatments"
+
