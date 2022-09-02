@@ -15,6 +15,9 @@ plot_design(.tbl, ..., .color, .alpha = NULL)
 
 \item{.alpha}{the variable used for transparency}
 }
+\value{
+the ggplot object
+}
 \description{
 Plot batch design
 }
