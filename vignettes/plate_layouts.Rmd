@@ -123,7 +123,7 @@ Optimizing the layout with `optimize_design()
 trace <- optimize_design(
   bc,
   n_shuffle = 1,
-  acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
+  acceptance_func = ~accept_leftmost_improvement(..., tolerance = 0.1),
   max_iter = 150
 )
 ```
@@ -148,7 +148,7 @@ cowplot::plot_grid(
 # Example: Within plate sample distribution 
 
 
-# Using the multi plate wrapper function
+## Using the multi plate wrapper function
 
 We start here by creating the batch container for all samples and making an initial assignment.
 Note there will be empty positions on the plates.
@@ -166,7 +166,8 @@ assign_in_order(bc, longitudinal_subject_samples)
 cowplot::plot_grid(
   plotlist = list(
     plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Initial layout by SubjectID"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Initial layout by SubjectID") +  
+      theme(legend.key.size = unit(.25, 'cm')),
     plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex")
   ),
   nrow = 3
@@ -195,7 +196,8 @@ bc = multi_plate_layout(bc,
 cowplot::plot_grid(
   plotlist = list(
     plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Final layout by SubjectID"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Final layout by SubjectID") +  
+      theme(legend.key.size = unit(.25, 'cm')),
     plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex")
   ),
   nrow = 3
