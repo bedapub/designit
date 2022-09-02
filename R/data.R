@@ -89,7 +89,7 @@
 #' \item{Earmark}{Markings to distinguish individual animals, applied on the left (L), right (R) or both(B) ears}
 #' \item{ArrivalWeight}{Initial body weight of the animal}
 #' \item{Arrival weight Unit}{Unit of the body weight, here: grams}
-#' \item{Litter}{The litter IDs}
+#' \item{Litter}{The litter IDs, grouping offspring from one set of parents}
 #' }
 "invivo_study_samples"
 
