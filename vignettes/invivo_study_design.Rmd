@@ -7,6 +7,9 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
+params:
+  regenerate_cache: FALSE
+  verbose_cache: TRUE
 ---
   
 ```{r, include = FALSE}
@@ -764,7 +767,12 @@ sub-grids may be used of any rack to accommodate the cages.
 A full run of the three wrapper functions is executed below, printing messages on the level of processing steps,
 but not the iterations within every optimization.
 
-```{r echo=TRUE}
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("result")
+```
+
+```{r echo=TRUE, eval=.eval_cached_chunk}
 
 set.seed(44)
 
@@ -796,6 +804,10 @@ design_rack = Invivo_arrangeCages(design_cage,
                                quiet_process = FALSE,
                                quiet_optimize = TRUE)
 
+```
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(design_trt, design_cage, design_rack)
 ```
 
 # Visualization of the study design
