@@ -19,3 +19,6 @@ This function enables comparison of the results of two scoring functions by calc
 an L2 norm (euclidean distance from origin). Since this is only used for ranking solutions,
 the squared L2 norm is returned.
 }
+\examples{
+L2s_norm(c(2, 2))
+}
