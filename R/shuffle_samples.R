@@ -171,8 +171,7 @@ mk_swapping_function <- function(n_swaps = 1) {
 #' @return Function to return a list with length n vectors `src` and `dst`, denoting source and destination index for the swap operation, or `NULL` if the user provided a defined protocol for the number of swaps and the last iteration has been reached
 #' @export
 #'
-#' @examples
-#'
+#' @example man/examples/two_step_optimization.R
 mk_subgroup_shuffling_function <- function(subgroup_vars,
                                            restrain_on_subgroup_levels = c(),
                                            n_swaps = 1) {
