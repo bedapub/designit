@@ -7,7 +7,7 @@
 #'
 #' @export
 #'
-#' @return
+#' @return the ggplot object
 #'
 #' @examples
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
