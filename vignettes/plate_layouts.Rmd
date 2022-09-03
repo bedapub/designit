@@ -330,30 +330,30 @@ cowplot::plot_grid(
 )
 ```
 
-# Example: Within plate sample distribution 
-
-
-## Using the multi plate wrapper function
+## Step 2: Within plate sample distribution 
 
 We start here by creating the batch container for all samples and making an initial assignment.
 Note there will be empty positions on the plates.
 
 ```{r}
 bc <- BatchContainer$new(
-  dimensions = list(plate = 3, row=8, col=12),
+  dimensions = list(plate = 3, row = 8, col = 12),
+  exclude = crossing(plate = 1:3, row = 1:8, col = 11:12)
 )
 
 assign_in_order(bc, longitudinal_subject_samples)
-
 ```
 
 ```{r, fig.width= 8, fig.height=10}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Initial layout by SubjectID") +  
-      theme(legend.key.size = unit(.25, 'cm')),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex")
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, 
+               title = "Initial layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, 
+               title = "Initial layout by SubjectID") +
+      theme(legend.key.size = unit(.25, "cm")),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, 
+               title = "Initial layout by Sex")
   ),
   nrow = 3
 )
@@ -363,29 +363,33 @@ For assigning the samples to the plates, we use Osat scoring on Group and Sex va
 For distributing samples within each plate, we use variables Group, SubjectID and Sex.
 Order of the factors indicate their relative importance.
 
+For the optimization function we use the multi plate wrapper function
+
 ```{r} 
 
-bc = multi_plate_layout(bc,
-                   across_plate_variables=c("Group", "Sex"),
-                   within_plate_variables=c("Group", "SubjectID", "Sex"),
-                   plate="plate",
-                   row="row",
-                   column="col",
-                   n_shuffle = 2,
-                   max_iter = 1000,
-                   quiet=FALSE)
-
+bc <- multi_plate_layout(bc,
+  across_plate_variables = c("Group", "Sex"),
+  within_plate_variables = c("Group", "SubjectID", "Sex"),
+  plate = "plate",
+  row = "row",
+  column = "col",
+  n_shuffle = 2,
+  max_iter = 1000,
+  quiet = FALSE
+)
 ```
 
 ```{r, fig.width= 8, fig.height=10}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = SubjectID, title = "Final layout by SubjectID") +  
-      theme(legend.key.size = unit(.25, 'cm')),
-    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex")
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, 
+               title = "Final layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = 
+                 SubjectID, title = "Final layout by SubjectID") +
+      theme(legend.key.size = unit(.25, "cm")),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, 
+               title = "Final layout by Sex")
   ),
   nrow = 3
 )
 ```
-
