@@ -19,50 +19,224 @@ library(designit)
 library(tidyverse)
 ```
 
-# Introduction
+# Two step plate layout
 
 Distributing samples to wells plates for experimental procedures is a very
 common task. In the following we use a data set of longitudinal subject samples
-that are to be spread across several 96-well plates, balanced for 
+that are to be spread across several n-well plates, balanced for 
 treatment group and time point `longitudinal_subject_samples`.
 
 ```{r}
 data("longitudinal_subject_samples")
+head(longitudinal_subject_samples)
 ```
 
-There are the following number of subject per group
+In the fist example we'll use a subset of samples to demonstrate the process.
+
+* We have 33 subject with each 2 samples.
+* Factors we want to balance are treatment group and Sex.
 
 ```{r}
-longitudinal_subject_samples %>% 
-  filter(SampleType == "Sample") %>% 
-  select(SubjectID, Group) %>% 
-  unique() %>% 
-  count(Group) %>% 
-  gt::gt()
+dat <- longitudinal_subject_samples %>% 
+  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+  select(SampleID, SubjectID, Group, Sex, Week)
 ```
 
+## Step 1: Subjects to plates
 
-In addition every subject has been sampled at 3-8 time points
+Assume we want to keep all samples of a subject on the same 24 well plate.
+There are `r dat$SubjectID %>% unique() %>% length()` 
+subjects with each 2 time points, i.e. we need ~ 11 subjects per plate
+and want to balance by treatment, sex. 
+
+First we create a batch container with 3 plates
+that each fit 11 subjects i.e. have 11 virtual `locations`.
 
 ```{r}
-longitudinal_subject_samples %>% 
-  filter(SampleType == "Sample") %>% 
-  select(SubjectID, Week) %>% unique() %>% count(Week) %>% 
-  gt::gt()
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+)
 ```
+
+For layout scoring we use Osat score on Group and Sex variable.
+
+```{r} 
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "plate", feature_vars = "Group"),
+  sex = osat_score_generator(batch_vars = "plate", feature_vars = "Sex")
+)
+```
+
+Then we assign the samples randomly to the batches and look at their initial 
+distribution.
+
+```{r}
+set.seed(42)
+assign_in_order(bc, dat)
+
+head(bc$get_samples()) %>% gt::gt()
+```
+
+
+
+```{r, fig.width= 5.5, fig.height=3}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) +
+      geom_bar() +
+      labs(y = "subject count")
+  ),
+  nrow = 1
+)
+```
+
+Optimizing the layout with `optimize_design()
+
+```{r}
+trace <- optimize_design(
+  bc,
+  n_shuffle = 1,
+  acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
+  max_iter = 100
+)
+```
+
+After optimization the group and sex of samples are equally distributed across
+all plates. The lower right panel shows the optimization trace of the scores.
+
+```{r, fig.width= 8, fig.height=3}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    trace$plot(include_aggregated = TRUE)
+  ),
+  ncol = 3
+)
+```
+
+## Step 2: Within plate sample distribution 
+
+Using the result from step 1 we now optimize the layout within plates.
+
+```{r, fig.width= 5, fig.height=4.5}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, 
+               title = "Initial layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, 
+               title = "Initial layout by Sex")
+  ),
+  nrow = 2
+)
+```
+
+For assigning the samples to the plates, we use Osat scoring on Group and Sex variable, as before.
+For distributing samples within each plate, we use variables Group and Sex as well.
+Order of the factors indicate their relative importance.
+
+```{r} 
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                     group = "Group", penalize_lines = 'hard'),
+  Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                   group = "Sex", penalize_lines = 'hard')
+)
+
+
+# QUESTIONS: 
+# - why does this not actually run? Do we NEED to restrain on subgroup level?
+# - if we don't restrain to one level, what happens?
+# - why does this complain about missing values?
+
+# trace <- optimize_design(
+#   bc,
+#   n_shuffle = 1,
+#   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
+#   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = "plate",   restrain_on_subgroup_levels = 1),
+#   max_iter = 100
+# )
+
+```
+
+```{r, fig.width= 5, fig.height=4.5}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, 
+               title = "Final layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, 
+               title = "Final layout by Sex")
+  ),
+  nrow = 2
+)
+```
+
+# Layout in one go
+
+```{r}
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6)
+)
+
+assign_in_order(bc, dat)
+  
+# QUESTIONS:
+# - since we run within AND across plate optimization, is step 1 here even needed?
+# - ... and we don't need to set up a scoring function here it's done internally? Why not setting them outside so that they can be adjusted? How to I set the line penalty now?
+# - could we have 'keep_together' vars here? 
+# - how do I improve the solution? Even ignoring Subject id, the result is not great.
+
+bc <- multi_plate_layout(bc,
+  across_plate_variables = c("Group", "Sex"),
+  within_plate_variables = c("Group", "Sex"),
+  plate = "plate",
+  row = "row",
+  column = "col",
+  n_shuffle = 2,
+  max_iter = 1000,
+  quiet = FALSE
+)
+```
+
+```{r, fig.width= 5, fig.height=6}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Group, 
+               title = "Final layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, 
+               title = "Final layout by Sex")
+  ),
+  nrow = 3
+)
+```
+
+
+
+# Full dataset using controls
+
+In the following we use the full data set of longitudinal subject samples
+that are to be spread across several n-well plates, balanced for 
+treatment group and time point `longitudinal_subject_samples`.
 
 For accommodation of samples to plates there are the following control samples available
 
 ```{r}
-longitudinal_subject_samples %>% 
-  filter(SampleType != "Sample") %>% 
-  count(SampleType, Group) %>% 
+longitudinal_subject_samples %>%
+  filter(SampleType != "Sample") %>%
+  count(SampleType, Group) %>%
   gt::gt()
 ```
 
-# Example: Blocking subjects to plates
+## Step 1: Batching
 
-Assume we want to keep all samples of a subject on the same plate. 
+Again we want to keep all samples of a subject on the same plate. 
 A first step could be grouping subjects into 3 batches blocking by 
 treatment, sex and age. 
 There are `r longitudinal_subject_samples$SubjectID %>% unique() %>% length()` 
@@ -73,9 +247,14 @@ We first create a 'subjects' dataset.
 ```{r}
 # get subject data for batching
 subjects <- longitudinal_subject_samples %>%
-  filter(SampleType == "Sample") %>% 
-  count(SubjectID, Group, Sex, Age, name = 'nTimePoints') %>% 
+  filter(SampleType == "Sample") %>%
+  count(SubjectID, Group, Sex, Age, name = "nTimePoints") %>%
   unique()
+
+subjects %>% select(-nTimePoints) %>% 
+  slice(1:5) %>% 
+  gt::gt() %>% gt::tab_options()
+
 ```
 
 Then we create a batch container for the samples with 3 batches called `plate`
@@ -107,12 +286,15 @@ assign_random(bc, subjects)
 ```{r, fig.width= 8, fig.height=3}
 cowplot::plot_grid(
   plotlist = list(
-    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) + geom_bar() + 
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) +
+      geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) + geom_bar() +
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) +
+      geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) + 
-      geom_boxplot() + geom_point()
+    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) +
+      geom_boxplot() +
+      geom_point()
   ),
   nrow = 1
 )
@@ -123,7 +305,7 @@ Optimizing the layout with `optimize_design()
 trace <- optimize_design(
   bc,
   n_shuffle = 1,
-  acceptance_func = ~accept_leftmost_improvement(..., tolerance = 0.1),
+  acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
   max_iter = 150
 )
 ```
@@ -133,12 +315,15 @@ all plates. The lower right panel shows the optimization trace of the scores.
 ```{r, fig.width= 5.5, fig.height=6}
 cowplot::plot_grid(
   plotlist = list(
-    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) + geom_bar() + 
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Group)) +
+      geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) + geom_bar() +
+    bc$get_samples() %>% ggplot(aes(x = plate, fill = Sex)) +
+      geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) + 
-      geom_boxplot() + geom_point(),
+    bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) +
+      geom_boxplot() +
+      geom_point(),
     trace$plot()
   ),
   nrow = 2
