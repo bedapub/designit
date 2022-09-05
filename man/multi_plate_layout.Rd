@@ -39,8 +39,8 @@ swaps should be performed in each iteration. See \code{\link[=optimize_design]{o
 \item{quiet}{If TRUE, suppress informative messages.}
 }
 \value{
-Batch container with optimized solution
+A list with named traces, one for each optimization step
 }
 \description{
-Convenience wrapper to optimize a typical multi-plate design
+The batch container will in the end contain the updated experimental layout
 }

@@ -180,6 +180,8 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 
 #' Convenience wrapper to optimize a typical multi-plate design
 #'
+#' The batch container will in the end contain the updated experimental layout
+#'
 #' @param batch_container Batch container (bc) with all columns that denote plate related information
 #' @param across_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be balanced across plates,
 #' sorted by relative importance of the factors
@@ -193,7 +195,7 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 #' @param max_iter Stop any of the optimization runs after this maximum number of iterations. See [optimize_design()].
 #' @param quiet If TRUE, suppress informative messages.
 #'
-#' @return Batch container with optimized solution
+#' @return A list with named traces, one for each optimization step
 #' @export
 multi_plate_layout <- function(batch_container, across_plate_variables=NULL, within_plate_variables=NULL,
                                plate="plate", row="row", column="column",
@@ -208,6 +210,8 @@ multi_plate_layout <- function(batch_container, across_plate_variables=NULL, wit
   assertthat::assert_that(is.null(within_plate_variables) || is.vector(within_plate_variables),
                           is.null(within_plate_variables) || all(within_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
                           msg="All columns in 'within_plate_variable' argument have to be found in batch container samples.")
+
+  traces = list()
 
   skip_osat = is.null(across_plate_variables) || is.null(plate)
   if (skip_osat) plate_levels = 0 else plate_levels = unique(bc$get_locations()[[plate]])
@@ -225,10 +229,12 @@ multi_plate_layout <- function(batch_container, across_plate_variables=NULL, wit
                               acceptance_func = accept_leftmost_improvement,
                               quiet = TRUE
     )
+    traces = c(traces, osat_across_plates=trace1)
   }
 
   if (!is.null(within_plate_variables)) {
 
+    within_traces = list()
     scoring_funcs = purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate=plate, row = row, column = column, group = .x)) %>%
       unlist()
     names(scoring_funcs) = within_plate_variables
@@ -248,13 +254,15 @@ multi_plate_layout <- function(batch_container, across_plate_variables=NULL, wit
                                                                                        restrain_on_subgroup_levels = curr_plate),
                                 acceptance_func = accept_leftmost_improvement
       )
-
+      within_traces = c(within_traces, trace2)
     }
     if (!quiet) cat("\n")
+    names(within_traces) = paste0("within_plate_",plate_levels)
+    traces=c(traces, within_traces)
   }
 
   if (length(plate_levels)<2 && is.null(within_plate_variables) && !quiet) message("\nNothing to do, batch container unchanged.\n")
 
-  invisible(bc)
+  invisible(traces)
 }
 
