@@ -23,3 +23,15 @@ List of scoring functions, one per plate, that calculate a real valued measure f
 \description{
 Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate
 }
+\examples{
+data("invivo_samples")
+bc <- BatchContainer$new(
+  dimensions = c('column' = 6, 'row' = 4)
+)
+assign_random(bc, invivo_samples)
+bc$scoring_f <- mk_plate_scoring_functions(
+  bc, row = "row", column = "column", group = "Sex"
+)
+optimize_design(bc, max_iter = 100)
+plot_plate(bc$get_samples(), .col=Sex)
+}

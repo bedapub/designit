@@ -1,6 +1,6 @@
 Package: designit
 Title: Blocking and Randomization for Experimental Design
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: c(
     person(given = "Balazs",
            family = "Banfai",

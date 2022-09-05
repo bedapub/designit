@@ -19,3 +19,6 @@ This function enables comparison of the results of two scoring functions by just
 the decision on the first element. This reflects the original behavior of the optimization
 function, just evaluating the 'auxiliary' scores for the user's information.
 }
+\examples{
+first_score_only(c(1, 2, 3))
+}

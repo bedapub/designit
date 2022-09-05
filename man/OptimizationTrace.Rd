@@ -2,16 +2,48 @@
 % Please edit documentation in R/trace.R
 \name{OptimizationTrace}
 \alias{OptimizationTrace}
-\title{OptimizationTrace represents optimization trace.
-Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.}
+\title{OptimizationTrace represents optimization trace.}
 \description{
-OptimizationTrace represents optimization trace.
-Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
-
-OptimizationTrace represents optimization trace.
 Usually it is created by \code{\link[=optimize_design]{optimize_design()}}.
 }
 \examples{
+
+## ------------------------------------------------
+## Method `OptimizationTrace$new`
+## ------------------------------------------------
+
+tr <- OptimizationTrace$new(10, 2, c("score1", "score2"))
+
+## ------------------------------------------------
+## Method `OptimizationTrace$set_scores`
+## ------------------------------------------------
+
+tr$set_scores(1, c(0.5, 0.5), NULL)
+tr$set_scores(2, c(0.5, 0.5), NULL)
+
+## ------------------------------------------------
+## Method `OptimizationTrace$shrink`
+## ------------------------------------------------
+
+tr$shrink(2)
+
+## ------------------------------------------------
+## Method `OptimizationTrace$get_scores`
+## ------------------------------------------------
+
+tr$get_scores()
+
+## ------------------------------------------------
+## Method `OptimizationTrace$print`
+## ------------------------------------------------
+
+print(tr)
+
+## ------------------------------------------------
+## Method `OptimizationTrace$as_tibble`
+## ------------------------------------------------
+
+tr$as_tibble()
 
 ## ------------------------------------------------
 ## Method `OptimizationTrace$plot`
@@ -86,6 +118,14 @@ Create a new \code{OptimizationTrace} object.
 }
 \if{html}{\out{</div>}}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr <- OptimizationTrace$new(10, 2, c("score1", "score2"))
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-set_scores"></a>}}
@@ -110,6 +150,15 @@ Set scores for i-th step.
 \subsection{Returns}{
 \code{OptimizationTrace} invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr$set_scores(1, c(0.5, 0.5), NULL)
+tr$set_scores(2, c(0.5, 0.5), NULL)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-shrink"></a>}}
@@ -130,6 +179,14 @@ Shrink scores by keeping only first \code{last_step} scores.
 \subsection{Returns}{
 \code{OptimizationTrace} invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr$shrink(2)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-get_scores"></a>}}
@@ -150,6 +207,14 @@ Return individual (not aggregated!) scores by keeping only first \code{last_step
 \subsection{Returns}{
 \code{OptimizationTrace} invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr$get_scores()
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-print"></a>}}
@@ -170,6 +235,14 @@ Print \code{OptimizationTrace}.
 \subsection{Returns}{
 \code{OptimizationTrace} invisibly.
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{print(tr)
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-as_tibble"></a>}}
@@ -191,6 +264,14 @@ raw scores are exported.}
 \subsection{Returns}{
 \link{data.frame}
 }
+\subsection{Examples}{
+\if{html}{\out{<div class="r example copy">}}
+\preformatted{tr$as_tibble()
+}
+\if{html}{\out{</div>}}
+
+}
+
 }
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-OptimizationTrace-plot"></a>}}

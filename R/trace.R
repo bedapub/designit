@@ -1,4 +1,7 @@
+#' @title
 #' OptimizationTrace represents optimization trace.
+#'
+#' @description
 #' Usually it is created by [optimize_design()].
 #'
 #' @export
@@ -37,7 +40,9 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Number of scoring functions.
     #' @param score_names
     #' Names of scoring functions.
-    #' @example man/examples/trace.R
+    #'
+    #' @examples
+    #' tr <- OptimizationTrace$new(10, 2, c("score1", "score2"))
     initialize = function(n_steps, n_scores, score_names) {
       self$scores <- matrix(NA_real_, nrow = n_steps, ncol = n_scores)
       if (!is.null(score_names)) {
@@ -56,7 +61,10 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Vector of aggregated scores. Can be NULL.
     #'
     #' @return `OptimizationTrace` invisibly.
-    #' @example man/examples/trace.R
+    #'
+    #' @examples
+    #' tr$set_scores(1, c(0.5, 0.5), NULL)
+    #' tr$set_scores(2, c(0.5, 0.5), NULL)
     set_scores = function(i, scores, aggregated_scores) {
       assertthat::assert_that(
         assertthat::is.count(i),
@@ -89,7 +97,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Last step to keep.
     #'
     #' @return `OptimizationTrace` invisibly.
-    #' @example man/examples/trace.R
+    #' @examples
+    #' tr$shrink(2)
     shrink = function(last_step = self$last_step) {
       self$scores <- head(self$scores, last_step)
       if (!is.null(self$aggregated_scores)) {
@@ -105,6 +114,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Last step to keep.
     #'
     #' @return `OptimizationTrace` invisibly.
+    #' @examples
+    #' tr$get_scores()
     get_scores = function(last_step = self$last_step) {
       head(self$scores, last_step)
     },
@@ -116,6 +127,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' Unused.
     #'
     #' @return `OptimizationTrace` invisibly.
+    #' @examples
+    #' print(tr)
     print = function(...) {
       start_score <- self$scores[1, ] %>%
         round(3) %>%
@@ -136,6 +149,8 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' raw scores are exported.
     #'
     #' @return [data.frame]
+    #' @examples
+    #' tr$as_tibble()
     as_tibble = function(include_aggregated = TRUE) {
       scores <- make_colnames(self$scores, "score") %>%
         tibble::as_tibble() %>%
@@ -180,6 +195,7 @@ OptimizationTrace <- R6::R6Class("OptimizationTrace",
     #' raw scores are plotted.
     #' @param ...
     #' Not used.
+    #'
     #' @examples
     #' tr <- OptimizationTrace$new(10, 3, letters[1:3])
     #' for (i in seq_len(10)) {

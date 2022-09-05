@@ -19,3 +19,6 @@ The aggregated score, i.e. the sum of all indicidual scores.
 \description{
 Aggregation of scores: sum up all individual scores
 }
+\examples{
+sum_scores(c(3, 2, 1))
+}
