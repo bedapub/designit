@@ -116,10 +116,31 @@ cowplot::plot_grid(
   nrow = 2
 )
 ```
+
+We can look at the trace objects for each internal `optimize_design` run,
+returned from the wrapper function.
+
 ```{r fig.width=3, fig.height=3}
-purrr::imap(traces, ~ .x$plot() + labs(title = .y))
+purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
 
 ```
+
+## Plate scoring
+
+Note that internally the wrapper function sets up plate specific scoring functions
+that could manually be set up in the following way.
+
+```{r, eval = FALSE}
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                     group = "Group", penalize_lines = 'hard'),
+  Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                   group = "Sex", penalize_lines = 'hard')
+)
+```
+
+For more information on customized plate scoring see vignette `Plate scoring examples`.
+
 
 # Two step approach
 
