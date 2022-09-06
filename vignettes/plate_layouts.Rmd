@@ -48,7 +48,7 @@ dat <- dat %>%
   filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID)) 
 ```
 
-# Optimization in one go
+# Layout optimization in one go
 
 For placing samples on plates and optimizing across plate distribution of factors
 as well as the within plate spacial distribution, 
@@ -59,20 +59,21 @@ within  plates.
 To place all 66 samples on 24-well plates we create a `batch_container`
 with 3 plates
 
-```{r}
-bc <- BatchContainer$new(
-  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
-)
-```
-
 We do the initial assignment of sample to plates and plot it
 
 ```{r}
 set.seed(42)
+
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+)
+
 assign_in_order(bc, dat)
 
 head(bc$get_samples()) %>% gt::gt()
 ```
+
+We can view the initial assignment with `plot_plate`
 
 ```{r, fig.width= 5, fig.height=4.5}
 cowplot::plot_grid(
@@ -90,6 +91,8 @@ For optimization `multi_plate_layout()` iteratively calls
 `optimize_design()` for different steps of the experiment.
 For across plate optimization osat scoring is used. 
 For within plate optimization spatial scoreing is used.
+The order of the factors indicate their relative importance.
+In this case we prioritize Group over Sex.
 
 ```{r} 
 traces <- multi_plate_layout(bc,
@@ -99,8 +102,8 @@ traces <- multi_plate_layout(bc,
   row = "row",
   column = "col",
   n_shuffle = 2,
-  max_iter = 1000,
-  quiet = FALSE
+  max_iter = 700,
+  quiet = TRUE
 )
 ```
 
@@ -115,10 +118,31 @@ cowplot::plot_grid(
   nrow = 2
 )
 ```
+
+We can look at the trace objects for each internal `optimize_design` run,
+returned from the wrapper function.
+
 ```{r fig.width=3, fig.height=3}
-purrr::imap(traces, ~ .x$plot() + labs(title = .y))
+purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
 
 ```
+
+## Plate scoring
+
+Note that internally the wrapper function sets up plate specific scoring functions
+that could manually be set up in the following way.
+
+```{r, eval = FALSE}
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                     group = "Group", penalize_lines = 'hard'),
+  Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+                                   group = "Sex", penalize_lines = 'hard')
+)
+```
+
+For more information on customized plate scoring see vignette `Plate scoring examples`.
+
 
 # Two step approach
 
@@ -137,27 +161,24 @@ and want to balance by treatment, sex.
 First we create a batch container with 3 batches
 that each fit 11 subjects i.e. have 11 virtual `locations`.
 
-```{r}
-bc <- BatchContainer$new(
-  dimensions = list("batch" = 3, "location" = 11),
-)
-```
-
 For layout scoring we use Osat score on Group and Sex variable.
-
-```{r} 
-bc$scoring_f <- list(
-  group = osat_score_generator(batch_vars = "batch", feature_vars = "Group"),
-  sex = osat_score_generator(batch_vars = "batch", feature_vars = "Sex")
-)
-```
 
 Then we assign the samples randomly to the batches and look at their initial 
 distribution.
 
 ```{r}
-set.seed(42)
-assign_in_order(bc, 
+set.seed(17) # gives `bad` random assignment
+
+bc <- BatchContainer$new(
+  dimensions = list("batch" = 3, "location" = 11),
+)
+
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "batch", feature_vars = "Group"),
+  sex = osat_score_generator(batch_vars = "batch", feature_vars = "Sex")
+)
+
+assign_random(bc, 
                 dat %>% select(SubjectID, Group, Sex) %>% unique())
 
 head(bc$get_samples()) %>% gt::gt()
@@ -185,7 +206,7 @@ trace <- optimize_design(
   bc,
   n_shuffle = 1,
   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
-  max_iter = 130,
+  max_iter = 150,
   quiet = TRUE
 )
 ```
@@ -211,6 +232,8 @@ cowplot::plot_grid(
 ## Step 2: Within plate sample distribution 
 
 Using the result from step 1 we now optimize the layout within plates.
+For this we still need to add empty wells to each batch and assign the
+pre-allocated sample sheet in the right way to the new batch container.
 
 ```{r, fig.width= 5, fig.height=4.5}
 dat <- dat %>% 
@@ -224,7 +247,7 @@ dat <- dat %>%
                        batch = rep(1:3, 24 - (dat %>% count(batch) %>% .$n))))
 
 bc <- BatchContainer$new(
-  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6)
 )
 
 # initial assignment such that the original plate assigned stays the same
@@ -243,21 +266,12 @@ cowplot::plot_grid(
 )
 ```
 
-For assigning the samples to the plates, we use Osat scoring on Group and Sex variable, as before.
-For distributing samples within each plate, we use variables Group and Sex as well.
-Order of the factors indicate their relative importance.
+As we have already assigned samples to plates, the across plate optimization
+can be skipped in the wrapper.
+For distributing samples within each plate, we use variables Group and Sex again.
+The order of the factors indicate their relative importance.
 
-```{r} 
-# Commented this out: user defined scoring functions will be overridden anyway
-# bc$scoring_f <- c(
-#   Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-#                                      group = "Group", penalize_lines = 'hard'),
-#   Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-#                                    group = "Sex", penalize_lines = 'hard')
-# )
-
-
-
+```{r}
 traces <- multi_plate_layout(bc,
   within_plate_variables = c("Group", "Sex"),
   plate = "plate",
@@ -265,20 +279,8 @@ traces <- multi_plate_layout(bc,
   column = "col",
   n_shuffle = 2,
   max_iter = 1000,
-  quiet = FALSE
+  quiet = TRUE
 )
-
-# Alternative: 
-# loop through plates and optimize one by one
-# 
-
-# trace <- optimize_design(
-#   bc,
-#   n_shuffle = 1,
-#   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
-#   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = "plate",   restrain_on_subgroup_levels = 1),
-#   max_iter = 100
-# )
 
 ```
 
@@ -294,12 +296,18 @@ cowplot::plot_grid(
 )
 ```
 
+```{r fig.width=3, fig.height=3}
+purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
+```
 
-# Full dataset using controls
+# Full dataset
 
 In the following we use the full data set of longitudinal subject samples
 that are to be spread across several n-well plates, balanced for 
 treatment group and time point `longitudinal_subject_samples`.
+
+In addition to the normal samples there are also controls to be placed on each
+plate. These are added after the sample batching step.
 
 For accommodation of samples to plates there are the following control samples available
 
@@ -336,26 +344,21 @@ subjects %>% select(-nTimePoints) %>%
 Then we create a batch container for the samples with 3 batches called `plate`
 that each fit 11 subjects i.e. have 11 virtual `locations`.
 
-```{r}
-bc <- BatchContainer$new(
-  dimensions = list("plate" = 3, "locations" = 11),
-)
-```
-
 For layout scoring we use Osat score on Group and Sex variable.
+We initially assign the samples randomly to the batches and check the layout.
 
-```{r} 
+```{r}
+set.seed(42)
+
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "locations" = 11)
+)
+
 bc$scoring_f <- list(
   group = osat_score_generator(batch_vars = "plate", feature_vars = c("Group")),
   sex = osat_score_generator(batch_vars = "plate", feature_vars = "Sex")
 )
-```
 
-Then we assign the samples randomly to the batches and look at their initial 
-distribution.
-
-```{r}
-set.seed(42)
 assign_random(bc, subjects)
 ```
 
@@ -375,6 +378,7 @@ cowplot::plot_grid(
   nrow = 1
 )
 ```
+
 Optimizing the layout with `optimize_design()
 
 ```{r}
@@ -382,9 +386,11 @@ trace <- optimize_design(
   bc,
   n_shuffle = 1,
   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
-  max_iter = 150
+  max_iter = 150,
+  quiet = TRUE
 )
 ```
+
 After optimization the group and sex of samples are equally distributed across
 all plates. The lower right panel shows the optimization trace of the scores.
 
@@ -400,7 +406,7 @@ cowplot::plot_grid(
     bc$get_samples() %>% ggplot(aes(x = factor(plate), y = Age)) +
       geom_boxplot() +
       geom_point(),
-    trace$plot()
+    trace$plot(include_aggregated=TRUE)
   ),
   nrow = 2
 )
@@ -409,15 +415,41 @@ cowplot::plot_grid(
 ## Step 2: Within plate sample distribution 
 
 We start here by creating the batch container for all samples and making an initial assignment.
-Note there will be empty positions on the plates.
+Note there will be empty positions on the plates which we have to add before
+we assign the samples to the batch container `in order`.
 
 ```{r}
+samples_with_plate <- longitudinal_subject_samples %>%
+  left_join(bc$get_samples() %>% 
+              select(-locations)) %>% 
+  mutate(plate = ifelse(SampleType == "Sample", plate, str_extract(SampleID, ".$")))
+
+# not all plates have same amount of samples
+samples_with_plate %>% count(plate)
+
+# add empty wells depending on how full the batch plate is
+# column 11 and 12 are left empty: 96 - 16 = 80 samples per plate
+samples_with_plate <- samples_with_plate %>% 
+  bind_rows(data.frame(SubjectID = 'empty', 
+                       SampleID = paste("empty", 1:(3 * 80 - nrow(samples_with_plate))), 
+                       plate = rep(1:3, 80 - (samples_with_plate %>% count(plate) %>% .$n)) %>% 
+                         as.character()))
+
+
+# new batch container for step 2
 bc <- BatchContainer$new(
   dimensions = list(plate = 3, row = 8, col = 12),
   exclude = crossing(plate = 1:3, row = 1:8, col = 11:12)
 )
 
-assign_in_order(bc, longitudinal_subject_samples)
+# assign samples in order of plate
+assign_in_order(bc, 
+                samples_with_plate %>% 
+                  arrange(plate) %>% 
+                  rename(orig_plate = plate))
+
+# check if plate assignment is still correct
+bc$get_samples() %>% summarize(all(plate == orig_plate)) %>% unlist()
 ```
 
 ```{r, fig.width= 8, fig.height=10}
@@ -435,23 +467,20 @@ cowplot::plot_grid(
 )
 ```
 
-For assigning the samples to the plates, we use Osat scoring on Group and Sex variable, as before.
-For distributing samples within each plate, we use variables Group, SubjectID and Sex.
-Order of the factors indicate their relative importance.
-
-For the optimization function we use the multi plate wrapper function
+As we have already assigned samples to plates, the across plate optimization
+can be skipped in the wrapper.
+For distributing samples within each plate, we use variables Group and Sex again.
+The order of the factors indicate their relative importance.
 
 ```{r} 
-
 traces <- multi_plate_layout(bc,
-  across_plate_variables = c("Group", "Sex"),
   within_plate_variables = c("Group", "SubjectID", "Sex"),
   plate = "plate",
   row = "row",
   column = "col",
   n_shuffle = 2,
   max_iter = 1000,
-  quiet = FALSE
+  quiet = TRUE
 )
 ```
 
@@ -468,4 +497,9 @@ cowplot::plot_grid(
   ),
   nrow = 3
 )
+```
+
+
+```{r fig.width=5, fig.height=5}
+purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
 ```
