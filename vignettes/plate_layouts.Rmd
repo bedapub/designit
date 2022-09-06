@@ -3,8 +3,10 @@ title: "Plate layouts"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Plate layouts}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -246,17 +248,17 @@ For distributing samples within each plate, we use variables Group and Sex as we
 Order of the factors indicate their relative importance.
 
 ```{r} 
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-                                     group = "Group", penalize_lines = 'hard'),
-  Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-                                   group = "Sex", penalize_lines = 'hard')
-)
+# Commented this out: user defined scoring functions will be overridden anyway
+# bc$scoring_f <- c(
+#   Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+#                                      group = "Group", penalize_lines = 'hard'),
+#   Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
+#                                    group = "Sex", penalize_lines = 'hard')
+# )
 
 
 
 traces <- multi_plate_layout(bc,
-#  across_plate_variables = NULL, # c("Group", "Sex"), # nothing will change here
   within_plate_variables = c("Group", "Sex"),
   plate = "plate",
   row = "row",
@@ -441,7 +443,7 @@ For the optimization function we use the multi plate wrapper function
 
 ```{r} 
 
-bc <- multi_plate_layout(bc,
+traces <- multi_plate_layout(bc,
   across_plate_variables = c("Group", "Sex"),
   within_plate_variables = c("Group", "SubjectID", "Sex"),
   plate = "plate",
