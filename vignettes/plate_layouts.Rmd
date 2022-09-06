@@ -48,7 +48,7 @@ dat <- dat %>%
   filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID)) 
 ```
 
-# Optimization in one go
+# Layout optimization in one go
 
 For placing samples on plates and optimizing across plate distribution of factors
 as well as the within plate spacial distribution, 
@@ -279,7 +279,7 @@ traces <- multi_plate_layout(bc,
   column = "col",
   n_shuffle = 2,
   max_iter = 1000,
-  quiet = FALSE
+  quiet = TRUE
 )
 
 ```
