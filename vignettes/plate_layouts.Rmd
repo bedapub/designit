@@ -230,6 +230,8 @@ cowplot::plot_grid(
 ## Step 2: Within plate sample distribution 
 
 Using the result from step 1 we now optimize the layout within plates.
+For this we still need to add empty wells to each batch and assign the
+pre-allocated sample sheet in the right way to the new batch container.
 
 ```{r, fig.width= 5, fig.height=4.5}
 dat <- dat %>% 
@@ -262,22 +264,15 @@ cowplot::plot_grid(
 )
 ```
 
-For assigning the samples to the plates, we use Osat scoring on Group and Sex variable, as before.
-For distributing samples within each plate, we use variables Group and Sex as well.
-Order of the factors indicate their relative importance.
+As we have already assigned samples to plates, the across plate optimization
+can be skipped in the wrapper.
+For distributing samples within each plate, we use variables Group and Sex again.
+The order of the factors indicate their relative importance.
 
-```{r} 
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-                                     group = "Group", penalize_lines = 'hard'),
-  Sex = mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", 
-                                   group = "Sex", penalize_lines = 'hard')
-)
-
-
-
+```{r}
 traces <- multi_plate_layout(bc,
-#  across_plate_variables = NULL, # c("Group", "Sex"), # nothing will change here
+  # TODO: remove next line when working!
+  across_plate_variables =  c("Group", "Sex"), # nothing will change here but inefficient
   within_plate_variables = c("Group", "Sex"),
   plate = "plate",
   row = "row",
@@ -286,18 +281,6 @@ traces <- multi_plate_layout(bc,
   max_iter = 1000,
   quiet = FALSE
 )
-
-# Alternative: 
-# loop through plates and optimize one by one
-# 
-
-# trace <- optimize_design(
-#   bc,
-#   n_shuffle = 1,
-#   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
-#   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = "plate",   restrain_on_subgroup_levels = 1),
-#   max_iter = 100
-# )
 
 ```
 
@@ -466,8 +449,7 @@ Order of the factors indicate their relative importance.
 For the optimization function we use the multi plate wrapper function
 
 ```{r} 
-
-bc <- multi_plate_layout(bc,
+traces <- multi_plate_layout(bc,
   across_plate_variables = c("Group", "Sex"),
   within_plate_variables = c("Group", "SubjectID", "Sex"),
   plate = "plate",
@@ -498,3 +480,4 @@ cowplot::plot_grid(
 ```{r fig.width=3, fig.height=3}
 purrr::imap(traces, ~ .x$plot() + labs(title = .y))
 
+```
