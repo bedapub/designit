@@ -57,20 +57,21 @@ within  plates.
 To place all 66 samples on 24-well plates we create a `batch_container`
 with 3 plates
 
-```{r}
-bc <- BatchContainer$new(
-  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
-)
-```
-
 We do the initial assignment of sample to plates and plot it
 
 ```{r}
 set.seed(42)
+
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+)
+
 assign_in_order(bc, dat)
 
 head(bc$get_samples()) %>% gt::gt()
 ```
+
+We can view the initial assignment with `plot_plate`
 
 ```{r, fig.width= 5, fig.height=4.5}
 cowplot::plot_grid(
@@ -88,6 +89,8 @@ For optimization `multi_plate_layout()` iteratively calls
 `optimize_design()` for different steps of the experiment.
 For across plate optimization osat scoring is used. 
 For within plate optimization spatial scoreing is used.
+The order of the factors indicate their relative importance.
+In this case we prioritize Group over Sex.
 
 ```{r} 
 traces <- multi_plate_layout(bc,
@@ -97,7 +100,7 @@ traces <- multi_plate_layout(bc,
   row = "row",
   column = "col",
   n_shuffle = 2,
-  max_iter = 1000,
+  max_iter = 700,
   quiet = FALSE
 )
 ```
@@ -135,27 +138,24 @@ and want to balance by treatment, sex.
 First we create a batch container with 3 batches
 that each fit 11 subjects i.e. have 11 virtual `locations`.
 
-```{r}
-bc <- BatchContainer$new(
-  dimensions = list("batch" = 3, "location" = 11),
-)
-```
-
 For layout scoring we use Osat score on Group and Sex variable.
-
-```{r} 
-bc$scoring_f <- list(
-  group = osat_score_generator(batch_vars = "batch", feature_vars = "Group"),
-  sex = osat_score_generator(batch_vars = "batch", feature_vars = "Sex")
-)
-```
 
 Then we assign the samples randomly to the batches and look at their initial 
 distribution.
 
 ```{r}
-set.seed(42)
-assign_in_order(bc, 
+set.seed(17) # gives `bad` random assignment
+
+bc <- BatchContainer$new(
+  dimensions = list("batch" = 3, "location" = 11),
+)
+
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "batch", feature_vars = "Group"),
+  sex = osat_score_generator(batch_vars = "batch", feature_vars = "Sex")
+)
+
+assign_random(bc, 
                 dat %>% select(SubjectID, Group, Sex) %>% unique())
 
 head(bc$get_samples()) %>% gt::gt()
@@ -183,7 +183,7 @@ trace <- optimize_design(
   bc,
   n_shuffle = 1,
   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.01),
-  max_iter = 130,
+  max_iter = 120,
   quiet = TRUE
 )
 ```
@@ -373,6 +373,7 @@ cowplot::plot_grid(
   nrow = 1
 )
 ```
+
 Optimizing the layout with `optimize_design()
 
 ```{r}
@@ -383,6 +384,7 @@ trace <- optimize_design(
   max_iter = 150
 )
 ```
+
 After optimization the group and sex of samples are equally distributed across
 all plates. The lower right panel shows the optimization trace of the scores.
 
