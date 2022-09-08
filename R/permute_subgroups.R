@@ -15,6 +15,8 @@
 #'
 #' @return Subgroup object to be used in subsequent calls to `compile_possible_subgroup_allocation()`
 #' @export
+#'
+#' @examples
 form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_together_vars = c(),
                                        n_min = NA, n_max = NA, n_ideal = NA, subgroup_var_name = NULL,
                                        prefer_big_groups = TRUE, strict = TRUE) {
@@ -212,6 +214,8 @@ find_possible_block_allocations <- function(block_sizes, group_nums, fullTree = 
 #'
 #' @return List of possible allocations; Each allocation is an integer vector of allocation levels that are assigned in that order to the subgroups with given sizes
 #' @export
+#'
+#' @examples
 compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FALSE, maxCalls = 1e6) {
   validate_subgrouping_object(subgroup_object)
 
@@ -234,6 +238,8 @@ compile_possible_subgroup_allocation <- function(subgroup_object, fullTree = FAL
 #'
 #' @return Shuffling function that on each call returns an index vector for a valid sample permutation
 #' @export
+#'
+#' @examples
 shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocations,
                                             keep_separate_vars = c(),
                                             report_grouping_as_attribute = FALSE) {
@@ -397,6 +403,8 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
 #'
 #' @return Shuffling function that on each call returns an index vector for a valid sample permutation
 #' @export
+#'
+#' @examples
 shuffle_grouped_data <- function(batch_container, allocate_var,
                                  keep_together_vars = c(),
                                  keep_separate_vars = c(),

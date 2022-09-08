@@ -12,7 +12,7 @@ mk_simanneal_acceptance_func(
 \item{temp_function}{A temperature function that returns the annealing temperature for a certain cycle k}
 }
 \value{
-A function that takes parameters (current_score, best_score, iteration) for an optimization step and return a Boolean indicating whether the current solution should be accepted or dismissed. Acceptance probability of a worse solution decreases with annealing temperature.
+A function that takes parameters (\code{current_score}, \code{best_score}, \code{iteration}) for an optimization step and return a Boolean indicating whether the current solution should be accepted or dismissed. Acceptance probability of a worse solution decreases with annealing temperature.
 }
 \description{
 Generate acceptance function for an optimization protocol based on simulated annealing

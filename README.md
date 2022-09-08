@@ -6,9 +6,9 @@
 <!-- badges: start -->
 
 [![Pipeline
-Status](https://code.roche.com/PMDA/packages/designit/badges/master/pipeline.svg)](https://code.roche.com/PMDA/packages/designit/commits/master)
+Status](https://code.roche.com/PMDA/packages/designit/badges/master/pipeline.svg)](https://code.roche.com/PMDA/packages/designit/-/commits/master)
 [![Lifecycle:
-experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
 

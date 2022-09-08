@@ -4,27 +4,27 @@
 \name{designit-package}
 \alias{designit}
 \alias{designit-package}
-\title{designit: Blocking and randomization for experimental design}
+\title{designit: Blocking and Randomization for Experimental Design}
 \description{
-Blocking and randomization for experimental design. TODO: expand this.
+Reducing batch effect by intellegently assigning samples to batches. Batch-effect have a strong influence in data analysis, especially when samples-to-batches assignent is coinciding with contrast groups. By defining your batch container and a scoring function reflecting the contrasts, you can assign samples in such a way that the potential batch-effect has minimal effect on the comparison of interest.
 }
 \seealso{
 Useful links:
 \itemize{
   \item \url{https://docs.roche.com/#/designit/latest}
   \item \url{https://code.roche.com/PMDA/packages/designit/}
-  \item Report bugs at \url{https://code.roche.com/PMDA/packages/designit/issues}
+  \item Report bugs at \url{https://code.roche.com/PMDA/packages/designit/-/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID})
+\strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
-  \item Juliane Siebourg-Polster \email{juliane.siebourg-polster@roche.com} (\href{https://orcid.org/0000-0002-1759-3223}{ORCID})
-  \item Iakov Davydov \email{iakov.davydov@roche.com} (\href{https://orcid.org/0000-0003-3510-3926}{ORCID})
-  \item Guido Steiner \email{guido.steiner@roche.com}
+  \item Juliane Siebourg-Polster \email{juliane.siebourg-polster@roche.com} (\href{https://orcid.org/0000-0002-1759-3223}{ORCID}) [copyright holder]
+  \item Iakov I. Davydov \email{iakov.davydov@roche.com} (\href{https://orcid.org/0000-0003-3510-3926}{ORCID}) [copyright holder]
+  \item Guido Steiner \email{guido.steiner@roche.com} [copyright holder]
 }
 
 }

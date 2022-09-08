@@ -6,6 +6,8 @@
 #' @return [`terms.object`][stats::terms.object()]
 #'
 #' @export
+#'
+#' @examples
 generate_terms <- function(.tbl, ...) {
   if (!tibble::is_tibble(.tbl)) .tbl <- tibble::as_tibble(.tbl)
   .tbl <- dplyr::select(.tbl, tidyselect::everything(), ...)
@@ -38,7 +40,11 @@ generate_terms <- function(.tbl, ...) {
 #' @param .terms [`terms.object`][stats::terms.object()]
 #' @param m order of interaction (highest available if -1)
 #'
+#' @return
+#'
 #' @export
+#'
+#' @examples
 drop_order <- function(.terms, m = -1) {
   if (m == -1) m <- max(attr(.terms, "order"))
   if (m < 2) stop("there are no interactions left in the model.", call. = FALSE)
@@ -51,6 +57,8 @@ drop_order <- function(.terms, m = -1) {
 #'
 #' @return highest order (numeric).
 #' @export
+#'
+#' @examples
 get_order <- function(.terms) {
   max(attr(.terms, "order"))
 }

@@ -136,6 +136,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Can be used as an alternative to passing `locations_table`.
     #' @param exclude [data.frame] with excluded locations of a container.
     #' Only used together with dimensions.
+    #'
     #' @examples
     #' bc <- BatchContainer$new(
     #'   dimensions = list(

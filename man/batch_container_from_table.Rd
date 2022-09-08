@@ -21,3 +21,11 @@ A \link{BatchContainer} assigned samples.
 Creates a \link{BatchContainer} from a table
 (\link{data.frame}/\link[tibble:tibble]{tibble::tibble}) containing sample and location information.
 }
+\examples{
+tab <- data.frame(
+  row = rep(1:3, each = 3),
+  column = rep(1:3, 3),
+  sample_id = c(1, 2, 3, NA, 5, 6, 7, NA, 9)
+)
+bc <- batch_container_from_table(tab, location_cols = c("row", "column"))
+}

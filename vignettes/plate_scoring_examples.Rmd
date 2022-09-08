@@ -112,7 +112,6 @@ designit::.load_cache("trace2")
 ```
 
 ```{r eval=.eval_cached_chunk}
-
 set.seed(42)
 trace <- optimize_design(bc,
   max_iter = 1000, # this is set to shorten vignette run-time based on random seed, normally we don't know.

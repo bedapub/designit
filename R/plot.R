@@ -5,7 +5,9 @@
 #' @param .color the variable used for coloring
 #' @param .alpha the variable used for transparency
 #'
-#' @export
+#' @return The ggplot object.
+#'
+#' @noRd
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)
@@ -15,14 +17,13 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(
       x = combinations,
-      fill = {{ .color }},
-      color = {{ .color }}
+      fill = {{ .color }}
     ) +
     ggplot2::geom_histogram(stat = "count") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
     alpha_levels <- .tbl %>%
-      dplyr::select({{ .alpha }}) %>%
+      dplyr::pull({{ .alpha }}) %>%
       unique() %>%
       length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)
@@ -54,7 +55,6 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @author siebourj
 #'
 #' @examples
-#'
 #' nPlate <- 3
 #' nColumn <- 4
 #' nRow <- 6
@@ -82,13 +82,13 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'
 #' plot_plate(bc$get_samples(),
 #'   plate = plate, column = column, row = row,
-#'   .color = Treatment, .alpha = Timepoint
-#' )
+#'   .color = Treatment, .alpha = Timepoint)
 #'
-#' plot_plate(bc$get_samples(),
-#'   plate = plate, column = column, row = row,
-#'   .color = Treatment, .pattern = Timepoint
-#' )
+#' \dontrun{
+#'   plot_plate(bc$get_samples(),
+#'     plate = plate, column = column, row = row,
+#'     .color = Treatment, .pattern = Timepoint)
+#' }
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL,
                        title = paste("Layout by", rlang::as_name(rlang::enquo(plate))),

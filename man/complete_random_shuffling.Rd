@@ -12,9 +12,21 @@ complete_random_shuffling(batch_container, ...)
 \item{...}{Other params that are passed to a generic shuffling function (like the iteration number).}
 }
 \value{
-A random permutation of the sample assignment in the container
+A random permutation of the sample assignment in the container.
 }
 \description{
 This function was just added to test early on the functionality of optimize_design() to accept a
 permutation vector rather than a list with src and dst indices.
+}
+\examples{
+data("invivo_samples")
+bc <- BatchContainer$new(
+  dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+)
+bc$scoring_f <- osat_score_generator("plate", "Sex")
+optimize_design(
+  bc, invivo_samples,
+  max_iter = 100,
+  shuffle_proposal_func = complete_random_shuffling
+)
 }
