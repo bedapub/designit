@@ -5,11 +5,9 @@
 #' @param .color the variable used for coloring
 #' @param .alpha the variable used for transparency
 #'
-#' @export
-#'
 #' @return The ggplot object.
 #'
-#' @examples
+#' @noRd
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)
@@ -19,8 +17,7 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(
       x = combinations,
-      fill = {{ .color }}#,
-      #color = {{ .color }}
+      fill = {{ .color }}
     ) +
     ggplot2::geom_histogram(stat = "count") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
