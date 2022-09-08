@@ -1,8 +1,0 @@
-trace <- OptimizationTrace$new(10, 2, c("score1", "score2"))
-trace$set_scores(1, c(0.5, 0.5), NULL)
-trace$set_scores(2, c(0.5, 0.5), NULL)
-trace$shrink(2)
-trace$get_scores()
-print(trace)
-trace$as_tibble()
-plot(trace)
