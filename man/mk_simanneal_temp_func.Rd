@@ -14,7 +14,7 @@ mk_simanneal_temp_func(T0, alpha, type = "Quadratic multiplicative")
 \item{type}{Type of annealing protocol. Defaults to the quadratic multiplicative method which seems to perform well.}
 }
 \value{
-Temperature at cycle k
+Temperature at cycle \code{k}.
 }
 \description{
 Supported annealing types are currently "Exponential multiplicative", "Logarithmic multiplicative", "Quadratic multiplicative" and "Linear multiplicative", each with dedicated constraints on alpha. For information, see http://what-when-how.com/artificial-intelligence/a-comparison-of-cooling-schedules-for-simulated-annealing-artificial-intelligence/

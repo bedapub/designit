@@ -7,9 +7,12 @@
 #' @param scores A score or multiple component score vector
 #' @param ... Parameters to be ignored by this aggregation function
 #'
-#' @return The aggregated score, i.e. the first element of a multiple-component score vector
+#' @return The aggregated score, i.e. the first element of a multiple-component score vector.
 #'
 #' @export
+#'
+#' @examples
+#' first_score_only(c(1, 2, 3))
 first_score_only <- function(scores, ...) {
   scores[1]
 }
@@ -27,13 +30,15 @@ first_score_only <- function(scores, ...) {
 #' @return The aggregated score, i.e. the value of the largest element in a multiple-component score vector.
 #'
 #' @export
+#'
+#' @examples
+#' worst_score(c(3, 2, 1))
 worst_score <- function(scores, na.rm = FALSE, ...) {
   max(scores, na.rm = na.rm)
 }
 
 
 #' Aggregation of scores: sum up all individual scores
-#'
 #'
 #' @param scores A score or multiple component score vector
 #' @param na.rm Boolean. Should NA values be ignored when obtaining the maximum? FALSE by default as ignoring NA values may render the sum meaningless.
@@ -42,6 +47,9 @@ worst_score <- function(scores, na.rm = FALSE, ...) {
 #' @return The aggregated score, i.e. the sum of all indicidual scores.
 #'
 #' @export
+#'
+#' @examples
+#' sum_scores(c(3, 2, 1))
 sum_scores <- function(scores, na.rm = FALSE, ...) {
   sum(scores, na.rm = na.rm)
 }
@@ -56,9 +64,12 @@ sum_scores <- function(scores, na.rm = FALSE, ...) {
 #' @param scores A score or multiple component score vector
 #' @param ... Parameters to be ignored by this aggregation function
 #'
-#' @return The squared L2 norm as an aggregated score
+#' @return The squared L2 norm as an aggregated score.
 #'
 #' @export
+#'
+#' @examples
+#' L2s_norm(c(2, 2))
 L2s_norm <- function(scores, ...) {
   sum(scores^2)
 }
@@ -71,9 +82,12 @@ L2s_norm <- function(scores, ...) {
 #' @param scores A score or multiple component score vector
 #' @param ... Parameters to be ignored by this aggregation function
 #'
-#' @return The L1 norm as an aggregated score
+#' @return The L1 norm as an aggregated score.
 #'
 #' @export
+#'
+#' @examples
+#' L1_norm(c(2, 2))
 L1_norm <- function(scores, ...) {
   sum(abs(scores))
 }

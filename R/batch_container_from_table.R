@@ -6,8 +6,16 @@
 #' locations.
 #' @param location_cols Names of columns containing information about locations.
 #'
-#' @return A [BatchContainer] assigned samples.
 #' @export
+#' @return A [BatchContainer] assigned samples.
+#'
+#' @examples
+#' tab <- data.frame(
+#'   row = rep(1:3, each = 3),
+#'   column = rep(1:3, 3),
+#'   sample_id = c(1, 2, 3, NA, 5, 6, 7, NA, 9)
+#' )
+#' bc <- batch_container_from_table(tab, location_cols = c("row", "column"))
 batch_container_from_table <- function(tab, location_cols) {
   assertthat::assert_that(
     is.data.frame(tab)

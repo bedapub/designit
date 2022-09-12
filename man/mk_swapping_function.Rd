@@ -11,9 +11,21 @@ mk_swapping_function(n_swaps = 1)
 \item{n_swaps}{Vector with number of swaps to be proposed in successive calls to the returned function (each value should be in valid range from 1..\code{floor(n_samples/2)})}
 }
 \value{
-Function to return a list with length n vectors \code{src} and \code{dst}, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached
+Function to return a list with length n vectors \code{src} and \code{dst}, denoting source and destination index for the swap operation, or NULL if the user provided a defined protocol for the number of swaps and the last iteration has been reached.
 }
 \description{
 If \code{length(n_swaps)==1}, the returned function may be called an arbitrary number of times.
 If \code{length(n_swaps)>1} and called without argument, the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted. Alternatively, the function may be called with an iteration number as the only argument, giving the user some freedom how to iterate over the sample swapping protocol.
+}
+\examples{
+data("invivo_samples")
+bc <- BatchContainer$new(
+  dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+)
+bc$scoring_f <- osat_score_generator("plate", "Sex")
+optimize_design(
+  bc, invivo_samples,
+  max_iter = 100,
+  shuffle_proposal_func = mk_swapping_function(1)
+)
 }

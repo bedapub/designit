@@ -20,3 +20,6 @@ The aggregated score, i.e. the value of the largest element in a multiple-compon
 This function enables comparison of the results of two scoring functions by just basing
 the decision on the largest element. This corresponds to the infinity-norm in ML terms.
 }
+\examples{
+worst_score(c(3, 2, 1))
+}

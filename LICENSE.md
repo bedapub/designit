@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2020 Balazs Banfai, Juliane Siebourg-Polster, Iakov Davydov, Guido Steiner
+Copyright (c) 2022 Balazs Banfai, Juliane Siebourg-Polster, Iakov Davydov, Guido Steiner
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

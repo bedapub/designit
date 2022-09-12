@@ -12,10 +12,13 @@ first_score_only(scores, ...)
 \item{...}{Parameters to be ignored by this aggregation function}
 }
 \value{
-The aggregated score, i.e. the first element of a multiple-component score vector
+The aggregated score, i.e. the first element of a multiple-component score vector.
 }
 \description{
 This function enables comparison of the results of two scoring functions by just basing
 the decision on the first element. This reflects the original behavior of the optimization
 function, just evaluating the 'auxiliary' scores for the user's information.
+}
+\examples{
+first_score_only(c(1, 2, 3))
 }

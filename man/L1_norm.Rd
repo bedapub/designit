@@ -12,9 +12,12 @@ L1_norm(scores, ...)
 \item{...}{Parameters to be ignored by this aggregation function}
 }
 \value{
-The L1 norm as an aggregated score
+The L1 norm as an aggregated score.
 }
 \description{
 This function enables comparison of the results of two scoring functions by calculating
 an L1 norm (Manhattan distance from origin).
+}
+\examples{
+L1_norm(c(2, 2))
 }
