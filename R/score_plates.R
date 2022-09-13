@@ -64,11 +64,11 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2,
 #' @export
 #'
 #' @examples
-#' data("invivo_samples")
+#' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('column' = 6, 'row' = 4)
+#'   dimensions = c('column' = 6, 'row' = 10)
 #' )
-#' assign_random(bc, invivo_samples)
+#' assign_random(bc, invivo_study_samples)
 #' bc$scoring_f <- mk_plate_scoring_functions(
 #'   bc, row = "row", column = "column", group = "Sex"
 #' )

@@ -160,12 +160,12 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @export
 #'
 #' @examples
-#' data("invivo_samples")
+#' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+#'   dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 #' )
 #' bc$scoring_f <- osat_score_generator("plate", "Sex")
-#' optimize_design(bc, invivo_samples, max_iter = 100)
+#' optimize_design(bc, invivo_study_samples, max_iter = 100)
 #' plot_plate(bc$get_samples(), .col=Sex)
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
