@@ -83,11 +83,11 @@ A trace object
 Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
 }
 \examples{
-data("invivo_samples")
+data("invivo_study_samples")
 bc <- BatchContainer$new(
-  dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+  dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 )
 bc$scoring_f <- osat_score_generator("plate", "Sex")
-optimize_design(bc, invivo_samples, max_iter = 100)
+optimize_design(bc, invivo_study_samples, max_iter = 100)
 plot_plate(bc$get_samples(), .col=Sex)
 }
