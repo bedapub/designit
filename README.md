@@ -12,6 +12,11 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
 
+<figure>
+<img src="logo.png" width="200" alt="logo" />
+<figcaption aria-hidden="true">logo</figcaption>
+</figure>
+
 The goal of designit is to generate optimal sample allocations for
 experimental designs.
 

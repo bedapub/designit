@@ -23,6 +23,8 @@ knitr::opts_chunk$set(
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
 
+![logo](logo.png){width=200px}
+
 The goal of designit is to generate optimal sample allocations for experimental designs. 
 
 ## Installation
