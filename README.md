@@ -14,6 +14,11 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 <img src="logo.png" title="logo" width="270" />
 
+<sub><sup><span style="color:gray"> The logo is inspired by [DALL-E
+2](https://openai.com/dall-e-2/) and [pipette icon by
+gsagri04](https://openclipart.org/detail/140941/micropipette).
+</span></sup></sub>
+
 The goal of designit is to generate optimal sample allocations for
 experimental designs.
 
