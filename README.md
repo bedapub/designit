@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# designit
+# designit <a href="https://docs.roche.com/#/designit/latest"><img src="man/figures/logo.png" align="right" width="135" alt="hexagon logo" /></a>
 
 <!-- badges: start -->
 
@@ -11,13 +11,6 @@ Status](https://code.roche.com/PMDA/packages/designit/badges/master/pipeline.svg
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
-
-<img src="logo.png" title="logo" width="270" />
-
-<sub><sup><span style="color:gray"> The logo is inspired by [DALL-E
-2](https://openai.com/dall-e-2/) and [pipette icon by
-gsagri04](https://openclipart.org/detail/140941/micropipette).
-</span></sup></sub>
 
 The goal of designit is to generate optimal sample allocations for
 experimental designs.
@@ -137,3 +130,9 @@ bc$get_samples(remove_empty_locations=TRUE)
 ## Examples
 
 See vignettes `vignette("basic_examples")`.
+
+## Acknowledgement
+
+The logo is inspired by [DALL-E 2](https://openai.com/dall-e-2/) and
+[pipette icon by
+gsagri04](https://openclipart.org/detail/140941/micropipette).
