@@ -11,7 +11,7 @@ Reducing batch effect by intellegently assigning samples to batches. Batch-effec
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://docs.roche.com/#/designit/latest}
+  \item \url{https://docs.roche.com/#/designit/latest/}
   \item \url{https://code.roche.com/PMDA/packages/designit/}
   \item Report bugs at \url{https://code.roche.com/PMDA/packages/designit/-/issues}
 }
