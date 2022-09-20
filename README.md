@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# designit <a href="https://docs.roche.com/#/designit/latest"><img src="man/figures/logo.svg" align="right" height="139" /></a>
+# designit <a href="https://docs.roche.com/#/designit/latest/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
 
 <!-- badges: start -->
 
