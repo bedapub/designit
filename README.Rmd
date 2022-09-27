@@ -34,7 +34,7 @@ You can install the development version from Roche GitHub with:
 devtools::install_gitlab(
   "PMDA/packages/designit",
   host = "code.roche.com",
-  auth_token = "rNVzMHKpdnnD_TJ3nMGw"
+  auth_token = "X7Q9wd23Y-jCyMocyA7h"
 )
 ```
 
