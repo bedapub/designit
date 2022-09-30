@@ -61,22 +61,28 @@ extract_shuffle_params <- function(shuffle, attributes_expected) {
 #' @param iteration Iteration number
 #'
 #' @keywords internal
-report_scores = function(score, agg_score, iteration) {
-  if (length(score)==1) {
+report_scores <- function(score, agg_score, iteration) {
+  if (length(score) == 1) {
     if (identical(score, agg_score)) {
-      message(ifelse(iteration==0, "Initial", "Achieved"), " score: ", round(score, 3),
-              ifelse(iteration==0, "", stringr::str_c(" at iteration ", iteration)))
+      message(
+        ifelse(iteration == 0, "Initial", "Achieved"), " score: ", round(score, 3),
+        ifelse(iteration == 0, "", stringr::str_c(" at iteration ", iteration))
+      )
     } else {
-      message(ifelse(iteration==0, "Initial", "Achieved"), " score: ", round(score, 3),
-              ifelse(iteration==0, "", stringr::str_c(" at iteration ", iteration)),
-              "   Aggregated: ", round(agg_score, 3))
+      message(
+        ifelse(iteration == 0, "Initial", "Achieved"), " score: ", round(score, 3),
+        ifelse(iteration == 0, "", stringr::str_c(" at iteration ", iteration)),
+        "   Aggregated: ", round(agg_score, 3)
+      )
     }
   } else {
-    message(ifelse(iteration==0, "Initial", "Achieved"), " score: ",
-            stringr::str_c("c(", stringr::str_c(round(score, 3), collapse = ", "), ")"),
-            ifelse(iteration==0, "", stringr::str_c(" at iteration ", iteration)))
-    if (!identical(score,agg_score)) {
-      if (length(agg_score)==1) {
+    message(
+      ifelse(iteration == 0, "Initial", "Achieved"), " score: ",
+      stringr::str_c("c(", stringr::str_c(round(score, 3), collapse = ", "), ")"),
+      ifelse(iteration == 0, "", stringr::str_c(" at iteration ", iteration))
+    )
+    if (!identical(score, agg_score)) {
+      if (length(agg_score) == 1) {
         message("   Aggregated: ", round(agg_score, 3))
       } else {
         message("   Aggregated: ", stringr::str_c(" c(", stringr::str_c(round(agg_score, 3), collapse = ", "), ")"))
@@ -162,11 +168,11 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @examples
 #' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
+#'   dimensions = c("plate" = 2, "column" = 5, "row" = 6)
 #' )
 #' bc$scoring_f <- osat_score_generator("plate", "Sex")
 #' optimize_design(bc, invivo_study_samples, max_iter = 100)
-#' plot_plate(bc$get_samples(), .col=Sex)
+#' plot_plate(bc$get_samples(), .col = Sex)
 optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_strict_improvement,

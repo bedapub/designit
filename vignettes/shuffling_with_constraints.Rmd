@@ -51,9 +51,9 @@ We refer to a simplified version of the *in vivo* example which is examined deep
 
 data("invivo_study_samples")
 
-invivo_study_samples = dplyr::mutate(invivo_study_samples,
-                                      Litter_combine_females =  ifelse(Sex == "F", "female_all", Litter)
-                                      )
+invivo_study_samples <- dplyr::mutate(invivo_study_samples,
+  Litter_combine_females = ifelse(Sex == "F", "female_all", Litter)
+)
 str(invivo_study_samples)
 
 invivo_study_samples %>%
@@ -69,14 +69,14 @@ In the simplified setup we want to assign two treatments to those animals, balan
 suspected confounders. The batch container is prepared as follows:
 
 ```{r echo=TRUE}
-treatments = factor(rep(c("Treatment A", "Treatment B"), c(30,29)))
+treatments <- factor(rep(c("Treatment A", "Treatment B"), c(30, 29)))
 table(treatments)
 
-bc <- BatchContainer$new(locations_table = data.frame(Treatment=treatments, Position=seq_along(treatments)))
+bc <- BatchContainer$new(locations_table = data.frame(Treatment = treatments, Position = seq_along(treatments)))
 
 assign_in_order(bc, invivo_study_samples)
 
-bc$scoring_f <- osat_score_generator( batch_vars = "Treatment", feature_vars = c("Strain", "Sex") )
+bc$scoring_f <- osat_score_generator(batch_vars = "Treatment", feature_vars = c("Strain", "Sex"))
 
 bc
 ```
@@ -115,7 +115,7 @@ optimize_design(
     keep_together_vars = c("Strain", "Sex"),
     keep_separate_vars = c("Earmark"),
     subgroup_var_name = "Cage",
-    n_min = 2, n_ideal=3, n_max = 5,
+    n_min = 2, n_ideal = 3, n_max = 5,
     strict = TRUE,
     report_grouping_as_attribute = TRUE
   ),
@@ -246,7 +246,7 @@ We can finally use the customized shuffling function in the optimization.
 ```{r echo=TRUE}
 bc3 <- bc$copy()
 
-trace = optimize_design(
+trace <- optimize_design(
   bc3,
   shuffle_proposal_func = shuffle_proposal,
   max_iter = 300

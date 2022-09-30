@@ -82,12 +82,14 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #'
 #' plot_plate(bc$get_samples(),
 #'   plate = plate, column = column, row = row,
-#'   .color = Treatment, .alpha = Timepoint)
+#'   .color = Treatment, .alpha = Timepoint
+#' )
 #'
 #' \dontrun{
-#'   plot_plate(bc$get_samples(),
-#'     plate = plate, column = column, row = row,
-#'     .color = Treatment, .pattern = Timepoint)
+#' plot_plate(bc$get_samples(),
+#'   plate = plate, column = column, row = row,
+#'   .color = Treatment, .pattern = Timepoint
+#' )
 #' }
 plot_plate <- function(.tbl, plate = plate, row = row, column = column,
                        .color, .alpha = NULL, .pattern = NULL,

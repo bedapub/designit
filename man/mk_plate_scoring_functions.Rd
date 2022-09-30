@@ -40,13 +40,14 @@ Create a list of scoring functions (one per plate) that quantify the spatially h
 \examples{
 data("invivo_study_samples")
 bc <- BatchContainer$new(
-  dimensions = c('column' = 6, 'row' = 10)
+  dimensions = c("column" = 6, "row" = 10)
 )
 assign_random(bc, invivo_study_samples)
 bc$scoring_f <- mk_plate_scoring_functions(
-  bc, row = "row", column = "column", group = "Sex"
+  bc,
+  row = "row", column = "column", group = "Sex"
 )
 optimize_design(bc, max_iter = 100)
-plot_plate(bc$get_samples(), .col=Sex)
+plot_plate(bc$get_samples(), .col = Sex)
 
 }

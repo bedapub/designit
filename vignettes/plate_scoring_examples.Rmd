@@ -604,7 +604,6 @@ trace <- optimize_design(bc,
   autoscale_scores = T,
   quiet = TRUE
 )
-
 ```
 
 ```{r include=FALSE, message = FALSE}
@@ -652,7 +651,6 @@ trace <- optimize_design(bc,
   autoscale_scores = TRUE,
   quiet = TRUE
 )
-
 ```
 
 
@@ -699,7 +697,6 @@ trace <- optimize_design(bc,
 )
 
 bc$score()
-
 ```
 
 
@@ -747,7 +744,6 @@ trace <- optimize_design(bc,
   autoscale_scores = TRUE,
   quiet = TRUE
 )
-
 ```
 
 
@@ -791,11 +787,11 @@ example5 <- BatchContainer$new(
 
 # Assign samples randomly to start from lower score (avoid `Inf` values when doing the 'hard' penalization)
 assign_random(example5, samples = tibble::tibble(
-  Group = rep.int(paste("Group", 1:5), times = c(8,8,8,8,64)),
-  ID=1:96
+  Group = rep.int(paste("Group", 1:5), times = c(8, 8, 8, 8, 64)),
+  ID = 1:96
 ))
 
-penalize_lines = 'hard'
+penalize_lines <- "hard"
 
 bc <- example5$copy()
 

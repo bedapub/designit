@@ -29,7 +29,8 @@ data("multi_trt_day_samples")
 Samples are grouped by Treatment and Collection time with the following group sizes:
 
 ```{r}
-multi_trt_day_samples %>% count(Time, Treatment) %>% 
+multi_trt_day_samples %>%
+  count(Time, Treatment) %>%
   gt::gt()
 ```
 
@@ -47,8 +48,10 @@ Samples are to be blocked in batches for scRNA-seq.
 ```{r}
 # Setting up the batch container
 bc <- BatchContainer$new(
-  dimensions = c(batch = ceiling(nrow(multi_trt_day_samples) / 8), 
-                 run=2, position=4)
+  dimensions = c(
+    batch = ceiling(nrow(multi_trt_day_samples) / 8),
+    run = 2, position = 4
+  )
 )
 
 # Add samples to container
@@ -65,17 +68,18 @@ The samples are distributed to 4 batches (processing days).
 This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling.
 
 ```{r}
-n_shuffle <- rep(c(32, 10, 2), c(100, 80, 20)) 
+n_shuffle <- rep(c(32, 10, 2), c(100, 80, 20))
 n_iterations <- length(n_shuffle)
 
 set.seed(42) # should we have conventions for this?
 
 # initial score
-#bc$score()
+# bc$score()
 trace <- optimize_design(
-   bc,
-   n_shuffle = n_shuffle, 
-   max_iter = n_iterations) # default is 10000
+  bc,
+  n_shuffle = n_shuffle,
+  max_iter = n_iterations
+) # default is 10000
 ```
 
 NOTE: Here the shuffling procedure is short, as it was optimized for this vignette. 
@@ -84,15 +88,17 @@ I practice you will have to run for a much higher number of iterations.
 ## Optimization trace 
 
 ```{r, fig.width=5, fig.height= 4}
-qplot(x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)), 
-      main = str_glue("Final score={bc$score()}"), geom = "point")
+qplot(
+  x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)),
+  main = str_glue("Final score={bc$score()}"), geom = "point"
+)
 ```
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
 bc$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>% 
-  ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
+  mutate(batch = factor(batch)) %>%
+  ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   geom_bar()
 ```
 
@@ -110,20 +116,23 @@ n_iterations <- 200
 set.seed(42) # should we have conventions for this?
 
 trace2 <- optimize_design(
-   bc2,
-   shuffle_proposal = shuffle_with_constraints(
+  bc2,
+  shuffle_proposal = shuffle_with_constraints(
     src = TRUE,
     # batch needs to change for shuffle to be accepted
-    dst=.src$batch != batch
-   ),
-   max_iter = n_iterations)
+    dst = .src$batch != batch
+  ),
+  max_iter = n_iterations
+)
 
-qplot(x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle), 
-      main = str_glue("Final score={bc2$score()}"), geom = "point")
+qplot(
+  x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle),
+  main = str_glue("Final score={bc2$score()}"), geom = "point"
+)
 
 bc2$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>% 
-  ggplot(aes(x = batch, fill =  Treatment, alpha = factor(Time))) + 
+  mutate(batch = factor(batch)) %>%
+  ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   geom_bar()
 ```
 NOTE: It is not possible to calculate the theoretically minimal osat score, right?
@@ -158,8 +167,10 @@ trace_run <- optimize_design(
 ```
 
 ```{r, fig.width=6, fig.height= 4}
-qplot(x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations), 
-      main = str_glue("Final score={bc$score()}"), geom = "point")
+qplot(
+  x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations),
+  main = str_glue("Final score={bc$score()}"), geom = "point"
+)
 ```
 
 ## Final run layout
@@ -168,10 +179,9 @@ This is not giving the expected mix of treatments across runs.
 
 ```{r, fig.width=6, fig.height= 4}
 
-bc$get_samples() %>% 
- mutate(run = factor(run)) %>% 
-  ggplot(aes(x = run, fill =  Treatment, alpha = factor(Time))) + 
+bc$get_samples() %>%
+  mutate(run = factor(run)) %>%
+  ggplot(aes(x = run, fill = Treatment, alpha = factor(Time))) +
   geom_bar() +
   facet_wrap(~batch)
-
 ```

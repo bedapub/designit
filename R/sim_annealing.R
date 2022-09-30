@@ -40,7 +40,6 @@ simanneal_acceptance_prob <- function(current_score, best_score, temp, eps = 0.1
 #' @export
 #'
 #' @examples
-#'
 mk_simanneal_temp_func <- function(T0, alpha, type = "Quadratic multiplicative") {
   force(T0)
   force(alpha)
@@ -86,12 +85,11 @@ mk_simanneal_temp_func <- function(T0, alpha, type = "Quadratic multiplicative")
 #' @export
 #'
 #' @examples
-#'
 mk_simanneal_acceptance_func <- function(temp_function = mk_simanneal_temp_func(T0 = 500, alpha = 0.8)) {
   force(temp_function)
 
   function(current_score, best_score, iteration) {
-    assertthat::assert_that(length(current_score)==1, msg="Multi-dimensional scores have to be aggregated for simulated annealing to work.\nPlease specify a suitable aggregation function.")
+    assertthat::assert_that(length(current_score) == 1, msg = "Multi-dimensional scores have to be aggregated for simulated annealing to work.\nPlease specify a suitable aggregation function.")
     if (current_score < best_score) {
       return(TRUE)
     }

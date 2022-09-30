@@ -91,4 +91,3 @@ L2s_norm <- function(scores, ...) {
 L1_norm <- function(scores, ...) {
   sum(abs(scores))
 }
-

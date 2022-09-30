@@ -86,4 +86,3 @@
 #' \item{Sex}{Female (F) or Male (M) - a constraint which kind of animal may receive the respective treatment}
 #' }
 "invivo_study_treatments"
-

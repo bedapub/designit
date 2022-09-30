@@ -74,12 +74,14 @@ assign_random(bc, samples = sample_sheet)
 
 plot_plate(bc$get_samples(),
   plate = plate, column = column, row = row,
-  .color = Treatment, .alpha = Timepoint)
+  .color = Treatment, .alpha = Timepoint
+)
 
 \dontrun{
-  plot_plate(bc$get_samples(),
-    plate = plate, column = column, row = row,
-    .color = Treatment, .pattern = Timepoint)
+plot_plate(bc$get_samples(),
+  plate = plate, column = column, row = row,
+  .color = Treatment, .pattern = Timepoint
+)
 }
 }
 \author{

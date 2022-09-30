@@ -21,7 +21,7 @@ permutation vector rather than a list with src and dst indices.
 \examples{
 data("invivo_study_samples")
 bc <- BatchContainer$new(
-  dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
+  dimensions = c("plate" = 2, "column" = 5, "row" = 6)
 )
 bc$scoring_f <- osat_score_generator("plate", "Sex")
 optimize_design(

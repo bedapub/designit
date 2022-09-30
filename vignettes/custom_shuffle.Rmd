@@ -97,9 +97,9 @@ shuffling is limited to locations with males and enforces change of cage on ever
 
 ```{r}
 bc$scoring_f <- osat_score_generator(
-    "cage",
-    "sex"
-  )
+  "cage",
+  "sex"
+)
 
 set.seed(10)
 
