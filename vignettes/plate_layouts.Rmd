@@ -89,7 +89,7 @@ cowplot::plot_grid(
 )
 ```
 
-For optimization `multi_plate_layout()` iteratively calls 
+For optimization `optimize_multi_plate_design()` iteratively calls 
 `optimize_design()` for different steps of the experiment.
 For across plate optimization osat scoring is used. 
 For within plate optimization spatial scoreing is used.
@@ -97,8 +97,8 @@ The order of the factors indicate their relative importance.
 In this case we prioritize Group over Sex.
 
 ```{r} 
-traces <- multi_plate_layout(bc,
-  across_plate_variables = c("Group", "Sex"),
+traces <- optimize_multi_plate_design(bc,
+  across_plates_variables = c("Group", "Sex"),
   within_plate_variables = c("Group"),
   plate = "plate",
   row = "row",
@@ -275,7 +275,7 @@ For distributing samples within each plate, we use variables Group and Sex again
 The order of the factors indicate their relative importance.
 
 ```{r}
-traces <- multi_plate_layout(bc,
+traces <- optimize_multi_plate_design(bc,
   within_plate_variables = c("Group", "Sex"),
   plate = "plate",
   row = "row",
@@ -477,7 +477,7 @@ For distributing samples within each plate, we use variables Group and Sex again
 The order of the factors indicate their relative importance.
 
 ```{r} 
-traces <- multi_plate_layout(bc,
+traces <- optimize_multi_plate_design(bc,
   within_plate_variables = c("Group", "SubjectID", "Sex"),
   plate = "plate",
   row = "row",
