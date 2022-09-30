@@ -19,13 +19,13 @@ This function was just added to test early on the functionality of optimize_desi
 permutation vector rather than a list with src and dst indices.
 }
 \examples{
-data("invivo_samples")
+data("invivo_study_samples")
 bc <- BatchContainer$new(
-  dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+  dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 )
 bc$scoring_f <- osat_score_generator("plate", "Sex")
 optimize_design(
-  bc, invivo_samples,
+  bc, invivo_study_samples,
   max_iter = 100,
   shuffle_proposal_func = complete_random_shuffling
 )

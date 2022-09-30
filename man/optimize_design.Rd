@@ -69,10 +69,10 @@ Requires installation of the \code{bestNormalize} package.}
 This affects estimation of score distributions. (Parameter only relevant if shuffle function does introduce attributes!)}
 
 \item{max_iter}{Stop optimization after a maximum number of iterations,
-independent from other stopping criteria (user defined shuffle proposal or min_score)}
+independent from other stopping criteria (user defined shuffle proposal or min_delta).}
 
 \item{min_delta}{If not NA, optimization is stopped as soon as successive improvement (i.e. euclidean distance between score vectors
-from current best and previously best solution) drops below min_delta}
+from current best and previously best solution) drops below min_delta.}
 
 \item{quiet}{If TRUE, suppress non-critical warnings or messages.}
 }
@@ -83,11 +83,11 @@ A trace object
 Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
 }
 \examples{
-data("invivo_samples")
+data("invivo_study_samples")
 bc <- BatchContainer$new(
-  dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+  dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 )
 bc$scoring_f <- osat_score_generator("plate", "Sex")
-optimize_design(bc, invivo_samples, max_iter = 100)
+optimize_design(bc, invivo_study_samples, max_iter = 100)
 plot_plate(bc$get_samples(), .col=Sex)
 }

@@ -82,13 +82,13 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
 #' @export
 #'
 #' @examples
-#' data("invivo_samples")
+#' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+#'   dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 #' )
 #' bc$scoring_f <- osat_score_generator("plate", "Sex")
 #' optimize_design(
-#'   bc, invivo_samples,
+#'   bc, invivo_study_samples,
 #'   max_iter = 100,
 #'   shuffle_proposal_func = complete_random_shuffling
 #' )
@@ -110,13 +110,13 @@ complete_random_shuffling <- function(batch_container, ...) {
 #' @export
 #'
 #' @examples
-#' data("invivo_samples")
+#' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('plate' = 2, 'column' = 4, 'row' = 3)
+#'   dimensions = c('plate' = 2, 'column' = 5, 'row' = 6)
 #' )
 #' bc$scoring_f <- osat_score_generator("plate", "Sex")
 #' optimize_design(
-#'   bc, invivo_samples,
+#'   bc, invivo_study_samples,
 #'   max_iter = 100,
 #'   shuffle_proposal_func = mk_swapping_function(1)
 #' )

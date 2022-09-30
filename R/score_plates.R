@@ -6,14 +6,46 @@
 #' @param plate_y Dimension of plate in y direction (i.e number of rows)
 #' @param dist Distance function as understood by \code{stats::dist()}
 #' @param p p parameter, used only if distance metric is 'minkowski'. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance
+#' @param penalize_lines How to penalize samples of the same group in one row or column of the plate. Valid options are:
+#' 'none' - there is no penalty and the pure distance metric counts, 'soft' - penalty will depend on the well distance within the
+#' shared plate row or column, 'hard' - samples in the same row/column will score a zero distance
 #'
 #' @return The  matrix with pairwise distances between any wells on the plate
 #' @keywords internal
-mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2) {
+mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2, penalize_lines="soft") {
   # Helper function: Sets up a euclidean or alternative distance matrix (supported by stats::dist) for a generic x*y plate
-  matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) %>%
+
+  assertthat::assert_that(penalize_lines %in% c("none", "soft", "hard"),
+                          msg="penalize_lines parameter has to be one of 'none', 'soft' or 'hard'.")
+
+  # Set up distance matrix without any penalty
+  m = matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) %>%
     stats::dist(method = dist, p = p) %>%
     as.matrix()
+
+  if (penalize_lines!="none") {
+    assertthat::assert_that(dist == "minkowski", msg="penalize_line option requires a Minkowski type of distance metric.")
+    min_dist = 2^(1/p)
+    max_line_dist = max(c(plate_x,plate_y))
+    if (penalize_lines=="hard") sf=0 else sf=min_dist/max_line_dist
+    for (x1 in seq_len(plate_x)) {
+      for (y1 in seq_len(plate_y)) {
+        b = (x1-1)*plate_y + y1
+        for (x2 in seq_len(plate_x)) {
+          for (y2 in seq_len(plate_y)) {
+            a = (x2-1)*plate_y + y2
+            dx = abs(x2-x1)
+            dy = abs(y2-y1)
+            if (dx==0 || dy==0) {
+              m[a,b]=max(c(dx,dy))*sf
+            }
+          }
+        }
+      }
+    }
+  }
+
+  m
 }
 
 #' Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate
@@ -23,22 +55,28 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2)
 #' @param row Name of the bc column that holds the plate row number (integer values starting at 1)
 #' @param column Name of the bc column that holds the plate column number (integer values starting at 1)
 #' @param group Name of the bc column that denotes a group/condition that should be distributed on the plate
+#' @param p p parameter for minkowski type of distance metrics. Special cases: p=1 - Manhattan distance; p=2 - Euclidean distance
+#' @param penalize_lines How to penalize samples of the same group in one row or column of the plate. Valid options are:
+#' 'none' - there is no penalty and the pure distance metric counts, 'soft' - penalty will depend on the well distance within the
+#' shared plate row or column, 'hard' - samples in the same row/column will score a zero distance
 #'
 #' @return List of scoring functions, one per plate, that calculate a real valued measure for the quality of the group distribution (the lower the better).
 #' @export
 #'
 #' @examples
-#' data("invivo_samples")
+#' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
-#'   dimensions = c('column' = 6, 'row' = 4)
+#'   dimensions = c('column' = 6, 'row' = 10)
 #' )
-#' assign_random(bc, invivo_samples)
+#' assign_random(bc, invivo_study_samples)
 #' bc$scoring_f <- mk_plate_scoring_functions(
 #'   bc, row = "row", column = "column", group = "Sex"
 #' )
 #' optimize_design(bc, max_iter = 100)
 #' plot_plate(bc$get_samples(), .col=Sex)
-mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group) {
+#'
+mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group, p=2, penalize_lines="soft") {
+
   MAX_PLATE_DIM <- 200
 
   # A function factory returning one specific scoring function
@@ -101,7 +139,8 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
     )
 
 
-    distance_matrix <- mk_dist_matrix(plate_x = plate_x, plate_y = plate_y)
+    distance_matrix <- mk_dist_matrix(plate_x = plate_x, plate_y = plate_y, dist = "minkowski",
+                                      p=p, penalize_lines = penalize_lines)
     trial_template <- double(plate_x * plate_y) # filled with 0 initially (=no sample at any position)
 
     # Create and return the actual scoring function for a specific sample permutation
@@ -150,3 +189,99 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 
   score_funcs
 }
+
+
+
+#' Convenience wrapper to optimize a typical multi-plate design
+#'
+#' The batch container will in the end contain the updated experimental layout
+#'
+#' @param batch_container Batch container (bc) with all columns that denote plate related information
+#' @param across_plates_variables Vector with bc column name(s) that denote(s) groups/conditions to be balanced across plates,
+#' sorted by relative importance of the factors
+#' @param within_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be spaced out within each plate,
+#' sorted by relative importance of the factors
+#' @param plate Name of the bc column that holds the plate identifier
+#' @param row Name of the bc column that holds the plate row number (integer values starting at 1)
+#' @param column Name of the bc column that holds the plate column number (integer values starting at 1)
+#' @param n_shuffle Vector of length 1 or larger, defining how many random sample
+#' swaps should be performed in each iteration. See [optimize_design()].
+#' @param max_iter Stop any of the optimization runs after this maximum number of iterations. See [optimize_design()].
+#' @param quiet If TRUE, suppress informative messages.
+#'
+#' @return A list with named traces, one for each optimization step
+#' @export
+optimize_multi_plate_design <- function(batch_container, across_plates_variables=NULL, within_plate_variables=NULL,
+                               plate="plate", row="row", column="column",
+                               n_shuffle = 1,
+                               max_iter = 1000,
+                               quiet=FALSE) {
+
+  assertthat::assert_that(is.null(across_plates_variables) || is.vector(across_plates_variables),
+                          is.null(across_plates_variables) || all(across_plates_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
+                          msg="All columns in 'across_plates_variable' argument have to be found in batch container samples.")
+
+  assertthat::assert_that(is.null(within_plate_variables) || is.vector(within_plate_variables),
+                          is.null(within_plate_variables) || all(within_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
+                          msg="All columns in 'within_plate_variable' argument have to be found in batch container samples.")
+
+  traces = list()
+
+  skip_osat = is.null(across_plates_variables) || is.null(plate) || dplyr::n_distinct(bc$get_locations()[[plate]])<2
+
+  if (skip_osat && !quiet) message("\nNo balancing of variables across plates required...")
+
+  if (!skip_osat) {
+    scoring_funcs =  purrr::map(across_plates_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
+      unlist()
+    names(scoring_funcs) = across_plates_variables
+    bc$scoring_f <- scoring_funcs
+
+    if (!quiet) message("\nAssigning samples to plates...")
+    trace1 <- optimize_design(bc,
+                              max_iter = max_iter,
+                              n_shuffle = n_shuffle,
+                              acceptance_func = accept_leftmost_improvement,
+                              quiet = TRUE
+    )
+    traces = c(traces, osat_across_plates=trace1)
+  }
+
+  if (!is.null(within_plate_variables)) {
+
+    within_traces = list()
+    plate_levels = unique(bc$get_locations()[[plate]])
+    scoring_funcs = purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate=plate, row = row, column = column, group = .x)) %>%
+      unlist()
+    names(scoring_funcs) = paste(rep(within_plate_variables, each=length(plate_levels)), names(scoring_funcs))
+    bc$scoring_f <- scoring_funcs
+
+
+    if (!quiet) message("\nDistributing samples separately within ", length(plate_levels), " plate",
+                        ifelse(length(plate_levels)>1,"s",""), "...\n")
+
+    for (curr_plate in plate_levels) {
+
+      if (!quiet && length(plate_levels)>1) cat(curr_plate, "... ")
+
+      trace2 <- optimize_design(bc,
+                                max_iter = max_iter,
+                                quiet = TRUE,
+                                shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = plate,
+                                                                                       restrain_on_subgroup_levels = curr_plate),
+                                acceptance_func = accept_leftmost_improvement
+      )
+      within_traces = c(within_traces, trace2)
+    }
+    if (!quiet) cat("\n")
+    names(within_traces) = paste0("within_plate_",plate_levels)
+    traces=c(traces, within_traces)
+  }
+
+  if (skip_osat && is.null(within_plate_variables) && !quiet) {
+    message("\nBoth across plates and within plate optimization skipped ('within_plate_variables' is empty).\nBatch container unchanged.\n")
+  }
+
+  invisible(traces)
+}
+
