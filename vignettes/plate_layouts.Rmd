@@ -507,16 +507,3 @@ cowplot::plot_grid(
 ```{r fig.width=5, fig.height=5}
 purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
 ```
-
-# Plot plate from existing layout
-
-```{r, fig.width=5, fig.hight = 4.5}
-layout <- crossing(row = 1:9, column = 1:12) %>%
-  mutate(Questions = "no") 
-layout$Questions[c(16, 17, 18, 19, 20, 21, 
-                  27, 28, 33, 34, 
-                  45, 46, 
-                  55, 56, 66, 67, 90, 91)] <- "yes"
-
-plot_plate(layout, .color = Questions, title = "Thank you")
-```
