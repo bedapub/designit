@@ -16,10 +16,6 @@ before_script:
   - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), if (packageVersion("remotes") < "2.3.0") remotes::install_github("r-lib/remotes", ref = "v2.3.0"))'
   - R -e 'withr::with_libpaths(Sys.getenv("R_LIBS_USER"), devtools::install_dev_deps(dep = TRUE))'
 
-document:
-  script:
-  - R -e 'devtools::document()'
-
 test:
   script:
   - R -e 'devtools::check(cran = FALSE, error_on = "error", check_dir = Sys.getenv("CHECK_DIR"))'
