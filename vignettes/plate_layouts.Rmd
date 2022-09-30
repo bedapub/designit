@@ -124,7 +124,6 @@ returned from the wrapper function.
 
 ```{r fig.width=3, fig.height=3}
 purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))
-
 ```
 
 ## Plate scoring
