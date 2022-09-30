@@ -197,7 +197,7 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 #' The batch container will in the end contain the updated experimental layout
 #'
 #' @param batch_container Batch container (bc) with all columns that denote plate related information
-#' @param across_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be balanced across plates,
+#' @param across_plates_variables Vector with bc column name(s) that denote(s) groups/conditions to be balanced across plates,
 #' sorted by relative importance of the factors
 #' @param within_plate_variables Vector with bc column name(s) that denote(s) groups/conditions to be spaced out within each plate,
 #' sorted by relative importance of the factors
@@ -211,15 +211,15 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
 #'
 #' @return A list with named traces, one for each optimization step
 #' @export
-multi_plate_layout <- function(batch_container, across_plate_variables=NULL, within_plate_variables=NULL,
+optimize_multi_plate_design <- function(batch_container, across_plates_variables=NULL, within_plate_variables=NULL,
                                plate="plate", row="row", column="column",
                                n_shuffle = 1,
                                max_iter = 1000,
                                quiet=FALSE) {
 
-  assertthat::assert_that(is.null(across_plate_variables) || is.vector(across_plate_variables),
-                          is.null(across_plate_variables) || all(across_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
-                          msg="All columns in 'across_plate_variable' argument have to be found in batch container samples.")
+  assertthat::assert_that(is.null(across_plates_variables) || is.vector(across_plates_variables),
+                          is.null(across_plates_variables) || all(across_plates_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
+                          msg="All columns in 'across_plates_variable' argument have to be found in batch container samples.")
 
   assertthat::assert_that(is.null(within_plate_variables) || is.vector(within_plate_variables),
                           is.null(within_plate_variables) || all(within_plate_variables %in% colnames(batch_container$get_samples(assignment=FALSE))),
@@ -227,12 +227,14 @@ multi_plate_layout <- function(batch_container, across_plate_variables=NULL, wit
 
   traces = list()
 
-  skip_osat = is.null(across_plate_variables) || is.null(plate) || dplyr::n_distinct(bc$get_locations()[[plate]])<2
+  skip_osat = is.null(across_plates_variables) || is.null(plate) || dplyr::n_distinct(bc$get_locations()[[plate]])<2
+
+  if (skip_osat && !quiet) message("\nNo balancing of variables across plates required...")
 
   if (!skip_osat) {
-    scoring_funcs =  purrr::map(across_plate_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
+    scoring_funcs =  purrr::map(across_plates_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
       unlist()
-    names(scoring_funcs) = across_plate_variables
+    names(scoring_funcs) = across_plates_variables
     bc$scoring_f <- scoring_funcs
 
     if (!quiet) message("\nAssigning samples to plates...")
@@ -276,7 +278,9 @@ multi_plate_layout <- function(batch_container, across_plate_variables=NULL, wit
     traces=c(traces, within_traces)
   }
 
-  if (skip_osat && is.null(within_plate_variables) && !quiet) message("\nNothing to do, batch container unchanged.\n")
+  if (skip_osat && is.null(within_plate_variables) && !quiet) {
+    message("\nBoth across plates and within plate optimization skipped ('within_plate_variables' is empty).\nBatch container unchanged.\n")
+  }
 
   invisible(traces)
 }
