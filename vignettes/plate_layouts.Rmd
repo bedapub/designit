@@ -160,7 +160,7 @@ and want to balance by treatment, sex.
 First we create a batch container with 3 batches
 that each fit 11 subjects i.e. have 11 virtual `locations`.
 
-For layout scoring we use Osat score on Group and Sex variable.
+For layout scoring we use OSAT score on `Group` and `Sex` variables.
 
 Then we assign the samples randomly to the batches and look at their initial 
 distribution.
