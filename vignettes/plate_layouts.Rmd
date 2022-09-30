@@ -45,7 +45,9 @@ dat <- longitudinal_subject_samples %>%
 
 # for simplicity: remove two subjects that don't have both visits  
 dat <- dat %>% 
-  filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID)) 
+  group_by(SubjectID) %>%
+  filter(n() == 2) %>%
+  ungroup()
 ```
 
 # Layout optimization in one go
@@ -169,7 +171,7 @@ distribution.
 set.seed(17) # gives `bad` random assignment
 
 bc <- BatchContainer$new(
-  dimensions = list("batch" = 3, "location" = 11),
+  dimensions = list("batch" = 3, "location" = 11)
 )
 
 bc$scoring_f <- list(
@@ -178,9 +180,11 @@ bc$scoring_f <- list(
 )
 
 assign_random(bc, 
-                dat %>% select(SubjectID, Group, Sex) %>% unique())
+                dat %>% select(SubjectID, Group, Sex) %>% distinct())
 
-head(bc$get_samples()) %>% gt::gt()
+bc$get_samples() %>%
+  head() %>%
+  gt::gt()
 ```
 
 
@@ -332,18 +336,19 @@ We first create a 'subjects' dataset.
 subjects <- longitudinal_subject_samples %>%
   filter(SampleType == "Sample") %>%
   count(SubjectID, Group, Sex, Age, name = "nTimePoints") %>%
-  unique()
+  distinct()
 
-subjects %>% select(-nTimePoints) %>% 
+subjects %>%
+  select(-nTimePoints) %>% 
   slice(1:5) %>% 
-  gt::gt() %>% gt::tab_options()
-
+  gt::gt() %>%
+  gt::tab_options()
 ```
 
 Then we create a batch container for the samples with 3 batches called `plate`
 that each fit 11 subjects i.e. have 11 virtual `locations`.
 
-For layout scoring we use Osat score on Group and Sex variable.
+For layout scoring we use OSAT score on `Group` and `Sex` variables.
 We initially assign the samples randomly to the batches and check the layout.
 
 ```{r}
@@ -378,7 +383,7 @@ cowplot::plot_grid(
 )
 ```
 
-Optimizing the layout with `optimize_design()
+Optimizing the layout with `optimize_design()`
 
 ```{r}
 trace <- optimize_design(
@@ -415,7 +420,7 @@ cowplot::plot_grid(
 
 We start here by creating the batch container for all samples and making an initial assignment.
 Note there will be empty positions on the plates which we have to add before
-we assign the samples to the batch container `in order`.
+we assign the samples to the batch container _in order_.
 
 ```{r}
 samples_with_plate <- longitudinal_subject_samples %>%
