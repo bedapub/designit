@@ -1,5 +1,9 @@
 url: https://bedapub.github.io/designit/
 
+authors:
+  F. Hoffman-La Roche:
+    href: https://www.roche.com
+
 repo:
   url:
     home: https://github.com/BEDApub/designit

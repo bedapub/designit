@@ -21,7 +21,8 @@ Authors@R: c(
            family = "Banfai",
            role = c("aut", "cph"),
            email = "balazs.banfai@roche.com",
-           comment = c(ORCID = "0000-0003-0422-7977")))
+           comment = c(ORCID = "0000-0003-0422-7977")),
+    person(given = "F. Hoffman-La Roche", role = c("cph", "fnd")))
 Description:
     Reducing batch effect by intellegently assigning samples to batches.
     Batch-effect have a strong influence in data analysis, especially when
