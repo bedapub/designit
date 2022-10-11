@@ -1,15 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# designit <a href="https://docs.roche.com/#/designit/latest/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
+# designit <a href="https://bedapub.github.com/designit/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
 
 <!-- badges: start -->
 
-[![Pipeline
-Status](https://code.roche.com/PMDA/packages/designit/badges/master/pipeline.svg)](https://code.roche.com/PMDA/packages/designit/-/commits/master)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](http://docs.roche.com/#/designit/latest)
 <!-- badges: end -->
 
 The goal of designit is to generate optimal sample allocations for
@@ -17,15 +14,11 @@ experimental designs.
 
 ## Installation
 
-You can install the development version from Roche GitHub with:
+You can install the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_gitlab(
-  "PMDA/packages/designit",
-  host = "code.roche.com",
-  auth_token = "X7Q9wd23Y-jCyMocyA7h"
-)
+devtools::install_github("BEDApub/designit")
 ```
 
 ## Usage

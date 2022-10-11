@@ -11,20 +11,25 @@ Reducing batch effect by intellegently assigning samples to batches. Batch-effec
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://docs.roche.com/#/designit/latest/}
-  \item \url{https://code.roche.com/PMDA/packages/designit/}
-  \item Report bugs at \url{https://code.roche.com/PMDA/packages/designit/-/issues}
+  \item \url{https://bedapub.github.io/designit/}
+  \item \url{https://github.com/BEDApub/designit/}
+  \item Report bugs at \url{https://github.com/BEDApub/designit/issues}
 }
 
 }
 \author{
-\strong{Maintainer}: Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID}) [copyright holder]
+\strong{Maintainer}: Iakov I. Davydov \email{iakov.davydov@roche.com} (\href{https://orcid.org/0000-0003-3510-3926}{ORCID}) [copyright holder]
 
 Authors:
 \itemize{
   \item Juliane Siebourg-Polster \email{juliane.siebourg-polster@roche.com} (\href{https://orcid.org/0000-0002-1759-3223}{ORCID}) [copyright holder]
-  \item Iakov I. Davydov \email{iakov.davydov@roche.com} (\href{https://orcid.org/0000-0003-3510-3926}{ORCID}) [copyright holder]
   \item Guido Steiner \email{guido.steiner@roche.com} [copyright holder]
+  \item Balazs Banfai \email{balazs.banfai@roche.com} (\href{https://orcid.org/0000-0003-0422-7977}{ORCID}) [copyright holder]
+}
+
+Other contributors:
+\itemize{
+  \item F. Hoffman-La Roche [copyright holder, funder]
 }
 
 }

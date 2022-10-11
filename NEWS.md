@@ -1,3 +1,9 @@
+# designit 0.4.0
+
+* multiplate wrapper
+* fixes in the OptimizationTrace
+* cleanup
+
 # designit 0.3.0
 
 * `BatchContainer` stores locations table (dimensions & excluded)
