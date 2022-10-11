@@ -1,10 +1,10 @@
-url: https://docs.roche.com/#/designit/latest
+url: https://bedapub.github.io/designit/
 
 repo:
   url:
-    home: https://code.roche.com/PMDA/packages/designit
-    source: https://code.roche.com/PMDA/packages/designit/blob/master/
-    issue: https://code.roche.com/PMDA/packages/designit/issues/
+    home: https://github.com/BEDApub/designit
+    source: https://github.com/BEDApub/designit/tree/main
+    issue: https://github.com/BEDApub/designit/issues/
 
 template:
   assets: pkgdown/assets
