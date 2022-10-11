@@ -1,3 +1,5 @@
+# This file will be removed before publishing to github.
+
 # This CI file is based on
 # https://www.r-bloggers.com/2019/02/developing-r-packages-with-usethis-and-gitlab-ci-part-iii/
 image: registry.code.roche.com/beda/rocker-plus:latest
