@@ -30,8 +30,8 @@ Description:
     the contrasts, you can assign samples in such a way that the potential
     batch-effect has minimal effect on the comparison of interest.
 License: MIT + file LICENSE
-URL: https://docs.roche.com/#/designit/latest/, https://code.roche.com/PMDA/packages/designit/
-BugReports: https://code.roche.com/PMDA/packages/designit/-/issues
+URL: https://bedapub.github.io/designit/, https://github.com/BEDApub/designit/
+BugReports: https://github.com/BEDApub/designit/issues
 Depends:
     R (>= 3.5.0)
 Imports: 
