@@ -7,6 +7,7 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![Documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://bedapub.github.io/designit/)
 <!-- badges: end -->
 
 The goal of designit is to generate optimal sample allocations for
