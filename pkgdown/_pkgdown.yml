@@ -1,0 +1,18 @@
+url: https://bedapub.github.io/designit/
+
+authors:
+  F. Hoffman-La Roche:
+    href: https://www.roche.com
+
+repo:
+  url:
+    home: https://github.com/BEDApub/designit
+    source: https://github.com/BEDApub/designit/tree/main
+    issue: https://github.com/BEDApub/designit/issues/
+
+template:
+  assets: pkgdown/assets
+
+development:
+  mode: auto
+  destination: docs

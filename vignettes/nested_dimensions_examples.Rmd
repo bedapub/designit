@@ -1,0 +1,187 @@
+---
+title: "Nested dimension example"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Nested dimension example}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(designit)
+library(tidyverse)
+```
+
+
+# Sample annotation overview
+
+```{r}
+data("multi_trt_day_samples")
+```
+
+Samples are grouped by Treatment and Collection time with the following group sizes:
+
+```{r}
+multi_trt_day_samples %>%
+  count(Time, Treatment) %>%
+  gt::gt()
+```
+
+Total number of samples is: `r nrow(multi_trt_day_samples)`
+
+# Task
+
+Samples are to be blocked in batches for scRNA-seq. 
+
+* 8 samples can be processed per day (batch)
+* Within day they need to be split into 2 parallel runs (4 + 4). 
+
+# Optimize batch
+
+```{r}
+# Setting up the batch container
+bc <- BatchContainer$new(
+  dimensions = c(
+    batch = ceiling(nrow(multi_trt_day_samples) / 8),
+    run = 2, position = 4
+  )
+)
+
+# Add samples to container
+bc$samples <- multi_trt_day_samples
+# Initial random assignment
+assign_in_order(bc)
+# Set scoring function
+bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
+
+bc
+```
+
+The samples are distributed to 4 batches (processing days).
+This is done using osat scoring on sample `Treatment` and `Time`, optimizing by shuffling.
+
+```{r}
+n_shuffle <- rep(c(32, 10, 2), c(100, 80, 20))
+n_iterations <- length(n_shuffle)
+
+set.seed(42) # should we have conventions for this?
+
+# initial score
+# bc$score()
+trace <- optimize_design(
+  bc,
+  n_shuffle = n_shuffle,
+  max_iter = n_iterations
+) # default is 10000
+```
+
+NOTE: Here the shuffling procedure is short, as it was optimized for this vignette. 
+I practice you will have to run for a much higher number of iterations.
+
+## Optimization trace 
+
+```{r, fig.width=5, fig.height= 4}
+qplot(
+  x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)),
+  main = str_glue("Final score={bc$score()}"), geom = "point"
+)
+```
+
+## Final batch layout
+```{r, fig.width=6, fig.height=5}
+bc$get_samples(assignment = TRUE) %>%
+  mutate(batch = factor(batch)) %>%
+  ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
+  geom_bar()
+```
+
+# Repeat but use shuffle with contraints 
+
+```{r, fig.width=6, fig.height= 4}
+
+# copy batch container for second optimization
+bc2 <- bc$copy()
+# Initial random assignment
+assign_in_order(bc2)
+
+n_iterations <- 200
+
+set.seed(42) # should we have conventions for this?
+
+trace2 <- optimize_design(
+  bc2,
+  shuffle_proposal = shuffle_with_constraints(
+    src = TRUE,
+    # batch needs to change for shuffle to be accepted
+    dst = .src$batch != batch
+  ),
+  max_iter = n_iterations
+)
+
+qplot(
+  x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle),
+  main = str_glue("Final score={bc2$score()}"), geom = "point"
+)
+
+bc2$get_samples(assignment = TRUE) %>%
+  mutate(batch = factor(batch)) %>%
+  ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
+  geom_bar()
+```
+NOTE: It is not possible to calculate the theoretically minimal osat score, right?
+
+# Optimize runs within batch
+
+Using shuffle with constraints
+
+Within each day there will be 2 runs (samples processed together) with 4 samples each. 
+For this we keep the optimized `batch` and now only optimize `run` with constraint.
+
+```{r}
+n_iterations <- 100
+
+# assign new optimization function
+bc$scoring_f <- osat_score_generator(c("run"), c("Treatment", "Time"))
+# like this the optimization score is wrong because it tries to optimize across Batches.
+# Possible ways to go:
+# - we'd need something like c("batch", batch/run") for optimize by batch and run within batch.
+# - or we add "batch/run" to the constraints somehow.
+bc$score()
+
+trace_run <- optimize_design(
+  bc,
+  shuffle_proposal = shuffle_with_constraints(
+    src = TRUE,
+    # batch remains the same and run needs to change
+    dst = batch == .src$batch & run != .src$run
+  ),
+  max_iter = n_iterations
+)
+```
+
+```{r, fig.width=6, fig.height= 4}
+qplot(
+  x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations),
+  main = str_glue("Final score={bc$score()}"), geom = "point"
+)
+```
+
+## Final run layout
+
+This is not giving the expected mix of treatments across runs.
+
+```{r, fig.width=6, fig.height= 4}
+
+bc$get_samples() %>%
+  mutate(run = factor(run)) %>%
+  ggplot(aes(x = run, fill = Treatment, alpha = factor(Time))) +
+  geom_bar() +
+  facet_wrap(~batch)
+```

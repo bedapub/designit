@@ -1,0 +1,84 @@
+---
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# designit <a href="https://bedapub.github.com/designit/"><img src="man/figures/logo.svg" align="right" height="139" /></a>
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+The goal of designit is to generate optimal sample allocations for experimental designs. 
+
+## Installation
+
+You can install the development version from GitHub with:
+
+```{r echo=TRUE, eval=FALSE}
+# install.packages("devtools")
+devtools::install_github("BEDApub/designit")
+```
+
+## Usage
+
+The main class used is `BatchContainer`, which holds the dimensions for sample allocation.
+After creating such a container, a list of samples can be allocated in it using a given assignment function.
+
+```{r message=FALSE}
+library(designit)
+# define samples data.frame
+samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
+samples
+
+bc <- BatchContainer$new(
+  dimensions = list(
+    "plate" = 3,
+    "row" = list(values = letters[1:3]),
+    "column" = list(values = c(1, 3))
+  ),
+  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+)
+
+bc
+
+bc$n_locations
+bc$get_locations()
+
+set.seed(1)
+assign_random(bc, samples)
+
+head(bc$get_samples())
+bc$get_samples(remove_empty_locations=TRUE)
+
+# You can reassign samples starting from the current assignment.
+set.seed(2)
+assign_random(bc)
+head(bc$get_samples())
+
+# Results should be reproducible if the seed is set.
+set.seed(1)
+assign_random(bc)
+bc$get_samples(remove_empty_locations=TRUE)
+```
+
+## Examples
+
+See vignettes `vignette("basic_examples")`.
+
+## Acknowledgement
+
+The logo is inspired by [DALL-E 2](https://openai.com/dall-e-2/) and
+[pipette icon by gsagri04](https://openclipart.org/detail/140941/micropipette).

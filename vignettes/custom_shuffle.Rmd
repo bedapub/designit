@@ -1,0 +1,161 @@
+---
+title: "Using custom shuffle schedule"
+output: rmarkdown::html_vignette
+params:
+  iterations: 100
+  n_samples: 50
+vignette: >
+  %\VignetteIndexEntry{Using custom shuffle schedule}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 6
+)
+```
+
+```{r setup}
+library(designit)
+library(tidyverse)
+```
+
+In this example we would like to distribute animals among cages with constraints:
+
+* There should be not more than one male per cage.
+* Number of treatment/control animals should be comparable per cage
+* Average weight per cage should be comparable between cages
+
+```{r}
+set.seed(43)
+samples <- tibble(
+  id = 1:params$n_samples,
+  sex = sample(c("F", "M"), params$n_samples, replace = TRUE, prob = c(0.8, 0.2)),
+  group = sample(c("treatment", "control"), params$n_samples, replace = TRUE),
+  weight = runif(params$n_samples, 20, 30)
+)
+samples %>%
+  head()
+```
+
+```{r}
+samples %>%
+  count(sex)
+```
+We create a `BatchContainer` with 11 cages and 5 positions per cage. Note that positions do not
+actually matter; this is just to limit the number of animals per cage.
+
+We start by assigning samples randomly.
+
+```{r}
+set.seed(42)
+bc <- BatchContainer$new(
+  dimensions = c("cage" = 11, "position" = 5)
+)
+assign_random(bc, samples)
+bc
+```
+
+Functions to plot number of males per cage, weights per cage and treatment/control ratios.
+```{r}
+males_per_cage <- function(bc) {
+  bc$get_samples() %>%
+    filter(sex == "M") %>%
+    count(cage) %>%
+    ggplot(aes(cage, n)) +
+    geom_col()
+}
+
+weight_d <- function(bc) {
+  bc$get_samples() %>%
+    ggplot(aes(factor(cage), weight)) +
+    geom_violin() +
+    geom_point() +
+    stat_summary(fun = mean, geom = "point", size = 2, shape = 23, color = "red")
+}
+
+group_d <- function(bc) {
+  bc$get_samples(remove_empty_locations = TRUE) %>%
+    ggplot(aes(factor(cage), fill = group)) +
+    geom_bar(position = "fill")
+}
+```
+
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```
+
+First, we use OSAT scoring function to ensure even distribution of males among cages. Only `cage`
+and `sex` interactions are considered in the scoring function. We only use 10 iterations, since
+shuffling is limited to locations with males and enforces change of cage on every iteration.
+
+```{r}
+bc$scoring_f <- osat_score_generator(
+  "cage",
+  "sex"
+)
+
+set.seed(10)
+
+res <- optimize_design(
+  bc,
+  shuffle_proposal_func = shuffle_with_constraints(
+    sex == "M",
+    cage != .src$cage
+  ),
+  max_iter = 10
+)
+
+plot(res)
+```
+We expect the distribution of males become even, while other variables are not significantly
+affected.
+
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```
+
+Here we only define our custom scoring function which ensures even distribution of weights and
+treatment/control groups. Only female samples are shuffled and male samples are kept in their
+locations. We also ensure that on every iteration the cage number is changed; we do this because
+`position` dimension does affect actual animal allocation.
+
+```{r}
+bc$scoring_f <- function(bc) {
+  samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
+  avg_w <- samples[, mean(weight, na.rm = TRUE)]
+  avg_w_per_cage <- samples[!is.na(weight), mean(weight), by = cage]$V1
+  trt_per_cage <- samples[!is.na(group), sum(group == "treatment") / .N, by = cage]$V1
+
+  w_score <- mean((avg_w - avg_w_per_cage)**2)
+  trt_score <- mean((trt_per_cage - 0.5)**2)
+  w_score + 10 * trt_score
+}
+
+set.seed(12)
+res <- optimize_design(bc,
+  shuffle_proposal = shuffle_with_constraints(
+    sex == "F",
+    cage != .src$cage & (is.na(sex) | sex != "M")
+  ),
+  n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
+  max_iter = 200
+)
+plot(res)
+bc$score()
+```
+
+Now we have a much more even distribution of weights and treatment/control balance.
+```{r}
+males_per_cage(bc)
+weight_d(bc)
+group_d(bc)
+```

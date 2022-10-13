@@ -1,0 +1,923 @@
+---
+title: "In-vivo study design"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{In-vivo study design}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+params:
+  regenerate_cache: FALSE
+  verbose_cache: TRUE
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE,
+  fig.width = 6,
+  fig.height = 6
+)
+```
+  
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
+library(designit)
+library(dplyr)
+library(forcats)
+library(assertthat)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(cowplot)
+```
+
+```{r helper_functions, echo=FALSE}
+
+# -----------------------------------------------------------------------------
+# Helper functions used by the in vivo wrappers
+
+DoE_multipleLevelCols <- function(df, na.rm = FALSE) {
+  tmp <- dplyr::summarise(df, across(everything(), ~ dplyr::n_distinct(.x, na.rm = na.rm)))
+
+  colnames(tmp)[tmp > 1]
+}
+
+DoE_numericalCols <- function(df, na.rm = FALSE) {
+  dplyr::select(df, where(is.numeric)) %>%
+    colnames()
+}
+```
+
+```{r scoring_functions, echo=FALSE}
+
+# -----------------------------------------------------------------------------
+# Dedicated scoring functions used by the in vivo wrappers
+
+
+# Scoring function to assess more specific constraints of the type Column A == Column B
+bc_misaligned <- function(batch_vars, feature_vars, weight = 1, test_data = NULL) {
+  force(batch_vars)
+  force(feature_vars)
+  force(weight)
+
+  assertthat::assert_that(length(batch_vars) > 0, length(batch_vars) == length(feature_vars),
+    msg = "Batch and feature variables must be of equal length (>0)"
+  )
+  if (!is.null(test_data)) {
+    batch_match <- match(batch_vars, colnames(test_data))
+    feature_match <- match(feature_vars, colnames(test_data))
+    assertthat::assert_that(!any(is.na(batch_match)), !any(is.na(feature_match)),
+      msg = "All columns must exist in passed sample data"
+    )
+    assertthat::assert_that(length(intersect(batch_vars, feature_vars)) == 0,
+      msg = "There should be no overlap between batch and feature variables"
+    )
+    # Could do more checks, like matching number of levels
+  }
+
+
+  function(bc) {
+    samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
+    misaligns <- 0
+    for (i in seq_along(batch_vars)) {
+      misaligns <- misaligns + sum(samples[[batch_vars[i]]] != samples[[feature_vars[i]]])
+    }
+    weight * misaligns
+  }
+}
+
+
+# Scoring function to assess more specific constraints of the type 'Feature levels unique in Container'
+bc_homogenicity_violations <- function(container_var, feature_var, weight = 1, test_data = NULL) {
+  force(container_var)
+  force(feature_var)
+  force(weight)
+
+  assertthat::assert_that(length(container_var) == 1, length(feature_var) == 1,
+    msg = "Container and feature variables must be of length 1"
+  )
+  if (!is.null(test_data)) {
+    container_match <- match(container_var, colnames(test_data))
+    feature_match <- match(feature_var, colnames(test_data))
+    assertthat::assert_that(!any(is.na(container_match)), !any(is.na(feature_match)),
+      msg = "All columns must exist in passed sample data"
+    )
+    assertthat::assert_that(container_var != feature_var,
+      msg = "Container and feature variable must be different"
+    )
+  }
+
+
+  function(bc) {
+    samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
+    viol <- table(samples[[container_var]], samples[[feature_var]]) %>%
+      apply(1, function(a) {
+        sum(a > 0) - 1
+      }) %>%
+      sum()
+    weight * viol
+  }
+}
+
+# Scoring function with one-way-ANOVA; Only model with one descriptor variable possible yet
+anova_logP <- function(batch_var, feature_var, weight = 1, test_data = NULL) {
+  force(batch_var)
+  force(feature_var)
+  force(weight)
+
+  assertthat::assert_that(length(batch_var) == 1, length(feature_var) == 1,
+    msg = "Batch and feature variable must be of length 1"
+  )
+  if (!is.null(test_data)) {
+    assertthat::assert_that(batch_var != feature_var, !any(is.na(match(c(batch_var, feature_var), colnames(test_data)))),
+      msg = "All columns must exist in passed sample data and be different from each other"
+    )
+    assertthat::assert_that(is.numeric(test_data[[feature_var]]), msg = "Feature variable must be numeric")
+    # assertthat::assert_that(is.factor(test_data[[batch_var]]) || is.character(test_data[[batch_var]]), msg="Batch variable must be categorical")
+  }
+
+
+  function(bc) {
+    samples <- bc$get_samples(include_id = TRUE, as_tibble = TRUE)
+    mod <- lm(samples[[feature_var]] ~ factor(samples[[batch_var]]), na.action = na.omit)
+
+    f <- summary(mod)$fstatistic
+    p <- pf(f[1], f[2], f[3], lower.tail = F)
+    weight * unname(-log10(p))
+  }
+}
+```
+
+```{r invivo_functions, echo=FALSE}
+
+# -----------------------------------------------------------------------------
+# User callable functions for helping with the design of in vivo studies
+
+# Assignment of treatments to an animal list
+InVivo_assignTreatments <- function(animal_list, treatments,
+                                    balance_treatment_vars = c(),
+                                    form_cages_by = c(),
+                                    n_shuffle = c(rep(5, 100), rep(3, 200), rep(2, 500), rep(1, 20000)),
+                                    quiet_process = FALSE, quiet_optimize = TRUE) {
+  if (is.vector(treatments)) treatments <- data.frame(Treatment = treatments)
+
+  if (!quiet_process) message("Performing treatment assignment with constrained animal selection.")
+
+  assertthat::assert_that("Treatment" %in% colnames(treatments), msg = "Column 'Treatment' missing from treatment object")
+
+  # Make sure we have defined factor levels for categorical variables
+  treatments_sortedfac <- dplyr::mutate(treatments, across(where(is_character), as.factor)) # here we want alphabetic sort order!
+  treatments <- dplyr::mutate(treatments, across(where(is_character), forcats::as_factor)) # Keep orig sort order in treatment object!
+
+  # Create a CageGroup variable if not yet provided in animal list or overridden by specific argument
+  if (!is.null(form_cages_by) && length(form_cages_by) > 0) {
+    animal_list <- tidyr::unite(animal_list, "CageGroup", any_of(form_cages_by), sep = "_", remove = F)
+  }
+
+  # Do we have batch container columns that are multi-value and have to align with identically named sample columns?
+  # In this case, make those columns factors, check that numbers match and thus a solution is possible at all
+  # Append '_bc' to the common variables in the batch container to allow both sets of variables in the same container
+  bc_columns <- intersect(colnames(treatments), colnames(animal_list)) %>% intersect(DoE_multipleLevelCols(treatments))
+
+  ani_fac <- dplyr::mutate(animal_list, across(all_of(bc_columns), as.factor)) # here we want alphabetic sort order!
+
+  if (length(bc_columns) > 0) {
+    if (!quiet_process) {
+      message(
+        "Using constraints in variables: ", stringr::str_c(bc_columns, collapse = ", "),
+        "\nChecking if solution is possible:"
+      )
+    }
+
+    ani_counts <- dplyr::count(as_tibble(ani_fac), across(all_of(bc_columns))) %>% dplyr::arrange(across(all_of(bc_columns)))
+    treat_counts <- dplyr::count(as_tibble(treatments_sortedfac), across(all_of(bc_columns))) %>% dplyr::arrange(across(all_of(bc_columns)))
+    assertthat::assert_that(identical(ani_counts, treat_counts), msg = "Levels of common variables don't match between animal list and treatment list")
+    if (!quiet_process) message("   ... Yes!")
+    for (i in seq_along(bc_columns)) { # add bc_ prefix to constraint variables to allow both variable sets in batch container
+      treatments_sortedfac <- dplyr::rename(treatments_sortedfac, !!stringr::str_c(bc_columns[i], "_bc") := bc_columns[i])
+    }
+  }
+
+  if (!quiet_process) message("Setting up batch container.")
+
+  # Set up batch container. Now it would be VERY handy to be able to just pass the treatment object directly. ;)
+  # Instead, have to set up dimension vector and exclude table to reflect the valid container positions.
+  n_lev <- dplyr::summarize(treatments_sortedfac, across(everything(), nlevels))
+  all_fac_combs <- dplyr::count(treatments_sortedfac, across(everything()), .drop = F)
+  positions <- max(all_fac_combs$n)
+
+  dimension_vector <- c(setNames(as.integer(n_lev), nm = colnames(n_lev)), Position = positions)
+
+  exclude_table <- tidyr::expand_grid(dplyr::select(all_fac_combs, -c("n")), Position = 1:positions) %>%
+    dplyr::left_join(all_fac_combs, by = setdiff(colnames(all_fac_combs), "n")) %>%
+    dplyr::filter(Position > n) %>%
+    dplyr::select(-c("n")) %>%
+    dplyr::mutate(across(everything(), as.integer))
+
+
+  # Prepare all constraint columns to hold integer level numbers --> comparable to batch container
+  ani_bclevels <- dplyr::mutate(ani_fac, across(all_of(bc_columns), as.integer))
+
+  # Initial batch container, treatments will be assigned in first step
+  bc_treatment <- BatchContainer$new(
+    dimensions = dimension_vector,
+    exclude = exclude_table
+  )
+
+  assign_in_order(bc_treatment, ani_bclevels)
+
+  if (!quiet_process) message("Constructing scoring functions:")
+
+  # Set up required scoring functions; most relevant ones come first to allow later application of relevance ranking
+  scoring_functions <- list()
+  bc_data <- bc_treatment$get_samples()
+
+  if (length(bc_columns) > 0) {
+    if (!quiet_process) {
+      message(
+        "     ... user specified treatment allocation constraint (Treatment-",
+        stringr::str_c(bc_columns, collapse = "-"), ")"
+      )
+    }
+    scoring_functions <- c(scoring_functions, trt_constraints = bc_misaligned(
+      batch_vars = str_c(bc_columns, "_bc"),
+      feature_vars = bc_columns,
+      weight = 1,
+      test_data = bc_data
+    ))
+  }
+
+  # This constraint is there to restrict number of distinct treatments within the cage groups, in order to find
+  # viable solutions if treatment should be homogeneous in every cage
+  if ("Treatment" %in% colnames(bc_data) && "CageGroup" %in% colnames(bc_data) &&
+    "CageGroup" %in% DoE_multipleLevelCols(bc_data)) {
+    if (!quiet_process) message("     ... facilitating homogeneity of treatment in cages (CageGroup)")
+    scoring_functions <- c(scoring_functions, cage_trt_homogeneity = bc_homogenicity_violations(
+      container_var = "CageGroup",
+      feature_var = "Treatment",
+      weight = 1,
+      test_data = bc_data
+    ))
+  }
+
+  trt_vars_cat <- intersect(balance_treatment_vars, colnames(bc_data)) %>%
+    setdiff(bc_columns) %>%
+    intersect(DoE_multipleLevelCols(bc_data)) %>%
+    setdiff(DoE_numericalCols(bc_data))
+  if (length(trt_vars_cat) > 0) {
+    if (!quiet_process) message("     ... OSAT for categorical variables balanced across treatment (", stringr::str_c(trt_vars_cat, collapse = ", "), ")")
+    scoring_functions <- c(scoring_functions, balanced_categorical = osat_score_generator(batch_vars = "Treatment", feature_vars = trt_vars_cat))
+  }
+
+  trt_vars_num <- intersect(balance_treatment_vars, colnames(bc_data)) %>%
+    setdiff(bc_columns) %>%
+    intersect(DoE_multipleLevelCols(bc_data)) %>%
+    intersect(DoE_numericalCols(bc_data))
+  if (length(trt_vars_num) > 0) {
+    if (!quiet_process) message("     ... ANOVA -logP for numerical variables balanced across treatment (", stringr::str_c(trt_vars_num, collapse = ", "), ")")
+    sf <- list()
+    for (i in seq_along(trt_vars_num)) {
+      sf <- c(sf, anova_logP(batch_var = "Treatment", feature_var = trt_vars_num[i], test_data = bc_data))
+    }
+    names(sf) <- stringr::str_c("balanced_", trt_vars_num)
+    scoring_functions <- c(scoring_functions, sf)
+  }
+
+  assertthat::assert_that(length(scoring_functions) > 0, msg = "No variables for scoring found or all have only one level. Nothing to do.")
+  bc_treatment$scoring_f <- scoring_functions
+  bc_treatment$score()
+
+
+  trace <- optimize_design(
+    bc_treatment,
+    n_shuffle = n_shuffle,
+    acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
+    quiet = quiet_optimize
+  )
+
+  # Check if user given constraints (if provided) could be satisfied
+  if ("trt_constraints" %in% names(bc_treatment$score())) {
+    if (bc_treatment$score()[["trt_constraints"]] > 0) {
+      message("CAUTION: User defined constraints could not be fully met (remaining score ", bc_treatment$score()[["trt_constraints"]], ")")
+    } else {
+      if (!quiet_process) message("Success. User provided constraints could be fully met.")
+    }
+  }
+
+  design_trt <- bc_treatment$get_samples()
+
+  # Translate back integer codes for 'used' factors into meaningful labels and remove intermediate helper columns
+  design_trt[["Treatment"]] <- levels(treatments_sortedfac[["Treatment"]])[design_trt[["Treatment"]]]
+  for (i in seq_along(bc_columns)) {
+    design_trt[[bc_columns[i]]] <- levels(treatments_sortedfac[[stringr::str_c(bc_columns[i], "_bc")]])[design_trt[[bc_columns[i]]]]
+  }
+
+  dplyr::select(design_trt, -all_of(ends_with("_bc"))) %>%
+    dplyr::select(-any_of(c("Position")))
+}
+
+
+# Form cages from animal list with treatment groups assigned
+
+Invivo_assignCages <- function(design_trt,
+                               cagegroup_vars,
+                               unique_vars = c(),
+                               balance_cage_vars = c(),
+                               n_min = 2, n_max = 5, n_ideal = 2, prefer_big_groups = TRUE, strict = TRUE,
+                               maxiter = 5e3,
+                               quiet_process = FALSE, quiet_optimize = TRUE) {
+
+  # Set up batch container
+  # We just need the subgrouping functionality of shuffle_grouped_data(), so the obligatory assignment variable
+  # is just a dummy with one factor level. (Initially thought that Treatment would be assigned at this step, too.)
+
+  if (!quiet_process) message("Setting up batch container.")
+
+  bc_cage <- BatchContainer$new(
+    dimensions = c("Dummy" = 1, ID = nrow(design_trt))
+  )
+  assign_in_order(bc_cage, design_trt)
+
+  shuffle_proposal <- shuffle_grouped_data(bc_cage,
+    allocate_var = "Dummy",
+    keep_together_vars = cagegroup_vars,
+    keep_separate_vars = unique_vars,
+    subgroup_var_name = "Cage",
+    report_grouping_as_attribute = TRUE,
+    n_min = n_min, n_max = n_max, n_ideal = n_ideal,
+    prefer_big_groups = prefer_big_groups, strict = strict
+  )
+
+  if (!quiet_process) {
+    message(
+      "\nExpecting ", dplyr::n_distinct(shuffle_proposal()$samples_attr$Cage),
+      " cages to be created and ", sum(table(shuffle_proposal()$samples_attr$Cage) == 1),
+      " single-housed animals.\n"
+    )
+  }
+
+
+  if (!quiet_process) message("Constructing scoring functions:")
+
+  # Set up required scoring functions; most relevant ones come first to allow later application of relevance ranking
+  scoring_functions <- list()
+  bc_data <- bc_cage$get_samples()
+
+  trt_vars_cat <- intersect(balance_cage_vars, colnames(bc_data)) %>%
+    intersect(DoE_multipleLevelCols(bc_data)) %>%
+    setdiff(DoE_numericalCols(bc_data))
+  if (length(trt_vars_cat) > 0) {
+    if (!quiet_process) message("     ... OSAT for categorical variables balanced across cages (", stringr::str_c(trt_vars_cat, collapse = ", "), ")")
+    scoring_functions <- c(scoring_functions, balanced_categorical = osat_score_generator(batch_vars = "Cage", feature_vars = trt_vars_cat))
+  }
+
+  trt_vars_num <- intersect(balance_cage_vars, colnames(bc_data)) %>%
+    intersect(DoE_multipleLevelCols(bc_data)) %>%
+    intersect(DoE_numericalCols(bc_data))
+  if (length(trt_vars_num) > 0) {
+    if (!quiet_process) message("     ... ANOVA -logP for numerical variables balanced across cages (", stringr::str_c(trt_vars_num, collapse = ", "), ")")
+    sf <- list()
+    for (i in seq_along(trt_vars_num)) {
+      sf <- c(sf, anova_logP(batch_var = "Cage", feature_var = trt_vars_num[i]))
+    }
+    names(sf) <- stringr::str_c("balanced_", trt_vars_num)
+    scoring_functions <- c(scoring_functions, sf)
+  }
+
+  if (length(scoring_functions) > 0) {
+    bc_cage$scoring_f <- scoring_functions
+  } else {
+    if (!quiet_process) message("     ... just a dummy score as there are no user provided balancing variables")
+    bc_cage$scoring_f <- osat_score_generator(batch_vars = "Dummy", feature_vars = c("Treatment"))
+  }
+
+
+  trace <- optimize_design(
+    bc_cage,
+    shuffle_proposal_func = shuffle_proposal,
+    acceptance_func = accept_leftmost_improvement,
+    max_iter = maxiter,
+    sample_attributes_fixed = F,
+    quiet = quiet_optimize
+  )
+
+  bc_cage$get_samples() %>%
+    dplyr::select(-any_of(c("Dummy", "ID", "alloc_var_level", "group", "subgroup")))
+}
+
+
+# Arrange cages in a rack
+
+Invivo_arrangeCages <- function(design_cage,
+                                distribute_cagerack_vars = "Treatment",
+                                rack_size_x = 4,
+                                rack_size_y = 4,
+                                n_shuffle = c(rep(5, 100), rep(3, 400), rep(2, 500), rep(1, 4000)),
+                                quiet_process = FALSE, quiet_optimize = TRUE) {
+
+  # How many racks do we need?
+  nr_cages <- dplyr::n_distinct(design_cage[["Cage"]])
+  nr_racks <- ceiling(nr_cages / (rack_size_x * rack_size_y))
+
+  # Identify a minimal n x m rectangle to use from every rack
+  approx_cages_per_rack <- ceiling(nr_cages / nr_racks)
+  n_cage_x <- rack_size_x
+  n_cage_y <- rack_size_y
+  may_shrink <- TRUE
+  while (may_shrink) {
+    may_shrink <- FALSE
+    if ((n_cage_y - 1) * n_cage_x >= approx_cages_per_rack) {
+      n_cage_y <- n_cage_y - 1
+      may_shrink <- TRUE
+    }
+    if ((n_cage_x - 1) * n_cage_y >= approx_cages_per_rack) {
+      n_cage_x <- n_cage_x - 1
+      may_shrink <- TRUE
+    }
+  }
+
+  if (!quiet_process) message("Needing ", nr_racks, " rack", ifelse(nr_racks == 1, "", "s"), " with a grid of ", n_cage_x, " x ", n_cage_y, " cages.")
+
+  empty <- nr_racks * (n_cage_x * n_cage_y) - nr_cages
+  if (!quiet_process && empty > 0) message("There will be ", empty, " empty position", ifelse(empty == 1, "", "s"), " overall.")
+
+  if (!quiet_process) message("Setting up batch container.")
+
+
+  design_rack <- dplyr::select(design_cage, all_of(c("Cage", distribute_cagerack_vars))) %>% dplyr::distinct()
+  assertthat::assert_that(!any(duplicated(design_rack[["Cage"]])), msg = "'Distribute rack' variables are not homogeneous within cages")
+
+  bc_rack <- BatchContainer$new(
+    dimensions = c(Rack = nr_racks, CageRow = n_cage_x, CageCol = n_cage_y)
+  )
+
+  assign_random(bc_rack, design_rack)
+
+  # Firstly, distribute variables across racks if necessary
+  if (nr_racks > 1) {
+    if (!quiet_process) {
+      message(
+        " \nDistributing target variables evenly across racks (OSAT score for ",
+        stringr::str_c(distribute_cagerack_vars, collapse = ", "), ")"
+      )
+    }
+
+    bc_rack$scoring_f <- list(across_rack = osat_score_generator(batch_vars = c("Rack"), feature_vars = distribute_cagerack_vars))
+
+    optimize_design(bc_rack,
+      quiet = quiet_optimize,
+      min_score = 0, max_iter = 1e3,
+      n_shuffle = 2,
+      acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5))
+    )
+
+    if (!quiet_process) message("   ... final score: ", bc_rack$score())
+  }
+
+  if (!quiet_process) {
+    message(
+      "\nDistributing target variables (", stringr::str_c(distribute_cagerack_vars, collapse = ", "),
+      ") within rack", ifelse(nr_racks == 1, "", "s")
+    )
+  }
+
+  scoring_functions <- list()
+  for (tv in distribute_cagerack_vars) {
+    scoring_functions <- c(scoring_functions, mk_plate_scoring_functions(bc_rack,
+      plate = "Rack", row = "CageRow", column = "CageCol",
+      group = tv, penalize_lines = "none"
+    ))
+  }
+  names(scoring_functions) <- stringr::str_c(names(scoring_functions), rep(distribute_cagerack_vars, each = nr_racks), sep = "_")
+
+  bc_rack$scoring_f <- scoring_functions
+
+  for (i in 1:nr_racks) {
+    if (!quiet_process) message("   ... Rack ", i)
+
+    trace <- optimize_design(
+      bc_rack,
+      shuffle_proposal_func = mk_subgroup_shuffling_function(
+        subgroup_vars = "Rack",
+        restrain_on_subgroup_levels = c(i),
+        n_swaps = n_shuffle
+      ),
+      # aggregate_scores_func = sum_scores,  # L2s aggregation doesn't make sense for autoscaled scores!
+      # acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+      autoscale_scores = TRUE,
+      acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
+      quiet = quiet_optimize
+    )
+  }
+
+  if (!quiet_process) message("   ... final scores: ", paste(names(bc_rack$score()), round(bc_rack$score(), 2), sep = ": ", collapse = ", "))
+
+  # Translate Rack numbers to some text output and assign CageNr
+  design_rack <- bc_rack$get_samples() %>%
+    dplyr::filter(!is.na(Cage)) %>% # strip empty locations in rack
+    dplyr::arrange(Rack, CageRow, CageCol) %>%
+    dplyr::mutate(
+      CageNr = 1:nr_cages,
+      Rack = stringr::str_c("Rack ", Rack)
+    )
+
+  # Join animal list with cage information and add Group variable needed for the ScoreSheet generator
+  dplyr::inner_join(design_cage, design_rack, by = intersect(colnames(design_cage), colnames(design_rack)))
+}
+```
+
+```{r plotting_functions, echo=FALSE}
+
+Invivo_plotByRack <- function(design, colorBy = "Treatment", showAnimals = FALSE, animalLabel = "AnimalID", showLegend = FALSE) {
+  ps <- list()
+
+  paste_animals <- function(animalids, earmarks) {
+    if (any(earmarks != "")) {
+      return(stringr::str_c(animalids, " (", earmarks, ")", collapse = "\n"))
+    }
+    stringr::str_c(animalids, collapse = "\n")
+  }
+
+  if (!"Earmark" %in% colnames(design)) {
+    design$Earmark <- "-"
+  }
+
+  if (!"Rack" %in% colnames(design)) {
+    design$Rack <- "Rack 1"
+  }
+
+  for (rack in unique(design$Rack)) {
+    design_f <- dplyr::filter(design, Rack == rack)
+    design_u <- dplyr::select(design_f, all_of(c("CageNr", "CageRow", "CageCol", colorBy))) %>% dplyr::distinct()
+
+    p <- ggplot2::ggplot(design_f, aes(x = NA, y = NA)) +
+      facet_grid(CageRow ~ CageCol) +
+      geom_raster(data = design_u, aes(fill = !!as.symbol(colorBy)), alpha = 0.9) +
+      theme(
+        axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank()
+      )
+
+    if (showAnimals) {
+      cage_list <- dplyr::group_by(design_f, across(all_of(c("CageNr", "CageRow", "CageCol")))) %>%
+        dplyr::summarize(Animals = paste_animals(!!as.symbol(animalLabel), Earmark), .groups = "drop")
+      p <- p + geom_text(data = cage_list, aes(label = Animals), size = 3) +
+        theme(legend.position = "none") +
+        labs(title = rack, subtitle = paste("Animals labeled by", animalLabel, "(Earmark)"))
+    } else {
+      p <- p + geom_text(data = design_u, aes(label = CageNr), size = 3) +
+        labs(title = rack, fill = "", subtitle = paste("Cage by", colorBy))
+      if (showLegend) {
+        p <- p + theme(legend.position = "bottom")
+      } else {
+        p <- p + theme(legend.position = "none")
+      }
+    }
+
+    ps[[rack]] <- p
+  }
+
+  ps
+}
+```
+# Purpose of vignette
+
+This example demonstrates how recurring complex design problems of similar structure may be handled by writing
+dedicated wrappers that use designIt functionality in the background while presenting a simplified interface to
+the user. These wrapper functions may completely hide the construction of batch containers, scoring functions and
+other fundamental package concepts from the user, allowing to focus on the correct specification of the concrete design
+task at hand.
+
+We are using the very specific design constraints of certain *in vivo* studies as an example. The implementation of
+the respective wrapper functions won't be discussed here, but code may be inspected in the .Rmd file of the vignette
+if desired.
+
+# Data set and design task
+
+We would like to assign 3 treatment conditions to a cohort of 59 animals, representing 2 relevant strains.
+There are a few concrete user specified constraints for the study, on top we have to avoid confounding by common
+variables such as animal sex, body weight and age.
+
+The animal information is provided in a sample sheet, the treatment list has to be stored separately. The example data
+we are looking at is included in the package.
+
+```{r}
+data("invivo_study_samples")
+
+data("invivo_study_treatments")
+```
+
+## The animal (sample) sheet
+
+```{r echo=TRUE}
+
+str(invivo_study_samples)
+
+invivo_study_samples %>%
+  dplyr::count(Strain, Sex, BirthDate) %>%
+  gt::gt()
+```
+
+A simple data summary reveals that the cohort is almost equally composed of Strains A and B. There are male and female
+animals in quite different proportions, with a noticeable excess of the males. Birth dates are available for Strain A,
+but missing completely for Strain B.
+
+Initial body weights (arrival weights), identifying ear marks and litter information are available for all animals.
+The litter is nested within the strain and all individuals within one litter naturally share one birth date.
+
+```{r echo=TRUE}
+
+invivo_study_samples %>%
+  dplyr::count(Strain, Litter, BirthDate) %>%
+  gt::gt()
+```
+
+## The treatment list
+
+```{r echo=TRUE}
+
+str(invivo_study_treatments)
+
+invivo_study_treatments %>%
+  dplyr::count(Treatment, Strain, Sex) %>%
+  gt::gt()
+```
+
+We have 3 treatments that should each be administered to a defined number of animals. In addition, some satellite animals
+of either strain will not receive any treatment at all, which is specified by a fourth ('untreated') condition.
+
+In most cases the treatment list could be reduced to the first column, i.e. repeating each label for the right number
+of times so that the total length matches the sample sheet.
+
+However, additional study specific constraints may be specified by adding columns that also appear in the animal list
+and indicate how the treatments should be assigned to subgroups of the cohort. In this example, a different number of animals
+is used for each of the treatments, balanced across strains. However, female animals are only to be used for treatment 2.
+
+## Design constraints and data preparation
+
+The specific constraints for our type of *in vivo* study may be summarized as follows:
+
+* We want to form cages, each hosting ideally 3 animals (preferred range from 2-5)
+* Strain, Sex and Treatment must be homogeneous within a cage
+* Males from different litters must not be put into the same cage; litter mixing is possible however for female animals!
+* Average body weight and age composition should be comparable between treatment groups and cages
+* If at all possible, we avoid putting animals with identical ear markings into the same cage
+* The distribution of treatments across animal subgroups (if specified by the treatment list!) has to be respected
+
+The very special and intricate nature of these requirements motivate the creation of dedicated functionality on top
+of this package, as demonstrated by this vignette.
+
+Before using these functions, we add two auxiliary columns to the sample sheet:
+
+**AgeGroup** represents the different birth dates as an integer variable, where unknown (NA) values get their own code.
+
+**Litter_combine_females** groups all female animals in a pseudo litter, facilitating the assignment of animals to cages
+at which point only the females can be freely combined (co-housed). 
+
+```{r echo=TRUE}
+
+invivo_study_samples <- dplyr::mutate(invivo_study_samples,
+  AgeGroup = as.integer(factor(BirthDate, exclude = NULL)),
+  Litter_combine_females = ifelse(Sex == "F", "female_all", Litter)
+)
+
+invivo_study_samples %>%
+  dplyr::count(Strain, Litter_combine_females, BirthDate, AgeGroup) %>%
+  gt::gt()
+```
+
+# Design steps
+
+The process of solving the design problem can be divided into 3 successive steps, each of which is addressed
+by a specific *in vivo*-specific wrapper function.
+
+1. Assign treatments to individuals animals (function **InVivo_assignTreatments()**)
+
+2. Allocate animals to cages (function **Invivo_assignCages()**)
+
+3. Arrange cages in one or more racks of given dimension (function **Invivo_arrangeCages()**)
+
+
+Dedicated constraints have to be handled at each step, as is reflected in the interface of those wrappers.
+
+As stated above, implementation details are beyond the scope of this example. We will instead just show the
+interfaces of the three wrappers, run the example case and visualize the resulting design.
+
+## Assign treatments to animal list
+
+```{r echo=TRUE, eval=FALSE}
+
+InVivo_assignTreatments <- function(animal_list, treatments,
+                                    balance_treatment_vars = c(),
+                                    form_cages_by = c(),
+                                    n_shuffle = c(rep(5, 100), rep(3, 200), rep(2, 500), rep(1, 20000)),
+                                    quiet_process = FALSE, quiet_optimize = TRUE) {
+  (...)
+}
+```
+
+The function works with the initial animal and treatment lists.
+
+Most importantly, **balance_treatment_vars** lists the variables that should be balanced across treatments (e.g. strain,
+sex, body weight, age, litter). Different scoring functions will be created for categorical and numerical covariates.
+
+**form_cages_by** is not mandatory, but gives important clues regarding the variables that will later be homogeneous
+within each cage (e.g. strain, sex, litter). Providing this may be crucial for finding good solutions with a low number
+of single-housed animals that don't fit into any other cage.
+
+It is also possible to modify the shuffling protocol and toggle messaging on the level of processing steps
+as well as optimization iterations.
+
+
+## Populate cages
+
+```{r echo=TRUE, eval=FALSE}
+
+Invivo_assignCages <- function(design_trt,
+                               cagegroup_vars,
+                               unique_vars = c(),
+                               balance_cage_vars = c(),
+                               n_min = 2, n_max = 5, n_ideal = 2, prefer_big_groups = TRUE, strict = TRUE,
+                               maxiter = 5e3,
+                               quiet_process = FALSE, quiet_optimize = TRUE) {
+  (...)
+}
+```
+
+This wrapper takes the output of the previous step ('design_trt') as input. 
+
+**cagegroup_vars** is a list of variables that must be uniform within each cage (e.g. treatment", strain, sex, litter).
+
+**unique_vars** is a list of variables whose values should be unique per cage (e.g. ear marking). This constraint will be
+relaxed in a stepwise way if no solution can be found under strict adherence.
+
+**balance_cage_vars** lists variables which should be evenly distributed across cages, as far as possible (e.g. age,
+body weight).
+
+**n_min**, **n_max** and **n_ideal** specify the minimal, maximal and ideal cage sizes, respectively. It is often necessary
+to release the **strict** criterion to find any solution at all or reduce the number of remaining single-housed animals.
+
+
+## Arrange cages in rack(s)
+
+```{r echo=TRUE, eval=FALSE}
+
+Invivo_arrangeCages <- function(design_cage,
+                                distribute_cagerack_vars = "Treatment",
+                                rack_size_x = 4,
+                                rack_size_y = 4,
+                                n_shuffle = c(rep(5, 100), rep(3, 400), rep(2, 500), rep(1, 4000)),
+                                quiet_process = FALSE, quiet_optimize = TRUE) {
+  (...)
+}
+```
+
+This wrapper takes the output of the previous step ('design_cage') as input. 
+
+**distribute_cagerack_vars** is a list of variables that should be evenly spaced out across the rows and columns
+of a rack (or several racks, if needed). Typical cases may include treatment, strain and sex of the animals.
+
+**rack_size_x** and **rack_size_y** specify the number of cages that fit into the rows and columns of a grid like rack,
+respectively. Depending on the actual number of cages, one or more racks are automatically assigned. Only rectangular
+sub-grids may be used of any rack to accommodate the cages.
+
+# Calculating the design
+
+A full run of the three wrapper functions is executed below, printing messages on the level of processing steps,
+but not the iterations within every optimization.
+
+
+```{r include=FALSE, message = FALSE}
+designit::.load_cache("result")
+```
+
+```{r echo=TRUE, eval=.eval_cached_chunk}
+
+set.seed(44)
+
+# Assign treatments to animals, respecting user provided as well as passed constraints
+design_trt <- InVivo_assignTreatments(invivo_study_samples, invivo_study_treatments,
+  form_cages_by = c("Strain", "Sex", "Litter_combine_females"),
+  balance_treatment_vars = c("Strain", "Sex", "ArrivalWeight", "AgeGroup"),
+  n_shuffle = c(rep(5, 200), rep(3, 300), rep(2, 500), rep(1, 3000)),
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+
+
+# Form cages with reasonable animal numbers and compliant with all constraints
+design_cage <- Invivo_assignCages(design_trt,
+  cagegroup_vars = c("Treatment", "Strain", "Sex", "Litter_combine_females"),
+  unique_vars = c("Earmark"),
+  balance_cage_vars = c("ArrivalWeight", "AgeGroup"),
+  n_min = 2, n_max = 5, n_ideal = 2, prefer_big_groups = T, strict = F,
+  maxiter = 1000,
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+
+# Arrange cages in sub-grid of one rack (or several racks), avoiding spatial clusters
+design_rack <- Invivo_arrangeCages(design_cage,
+  distribute_cagerack_vars = c("Treatment", "Strain", "Sex"),
+  rack_size_x = 7,
+  rack_size_y = 10,
+  n_shuffle = c(rep(5, 100), rep(3, 200), rep(2, 300), rep(1, 500)),
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+```
+
+```{r include=FALSE, message = FALSE}
+designit::.save_cache(design_trt, design_cage, design_rack)
+```
+
+# Visualization of the study design
+
+## Cage composition
+
+There are `r dplyr::n_distinct(design_rack$CageNr)` cages in total.
+
+Strains and age groups should be evenly split (balanced) across the treatments. Also,in each cage there should be
+only animals with the same treatment, strain and sex.
+
+Females are exclusively used for treatment 2, as was specified in the treatment list.
+
+```{r echo=FALSE, fig.width = 8, fig.height = 5, warning=FALSE, message=FALSE}
+
+p1 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = Strain, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of strains")
+
+p2 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = Sex, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of sex")
+
+p3 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = BirthDate, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of birth dates")
+
+cowplot::plot_grid(p1, p2, p3, ncol = 1)
+```
+
+## Body weights
+
+Body weights should be balanced across treatments as well as possible.
+
+The plot illustrates that this is true for the overall weight distribution (box plots). Interestingly, as there
+are females (associated with considerable less body weight) involved in treatment 2, the optimization favored the
+selection of heavier males in this group to compensate, achieving better cross-treatment balance of this factor.
+
+Red diamonds mark the mean values for a specific sex within each treatment group.
+
+```{r echo=FALSE, fig.width = 8, fig.height = 5, warning=FALSE, message=FALSE}
+
+ggplot2::ggplot(design_rack, aes(x = Sex, y = ArrivalWeight, color = Treatment, fill = Treatment)) +
+  facet_grid(Strain ~ Treatment, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  geom_boxplot(aes(group = Treatment), alpha = 0.2) +
+  geom_jitter(width = 0.2, height = 0.2) +
+  stat_summary(fun = "mean", colour = "red", shape = 18, size = 10, geom = "point", aes(group = Treatment), alpha = 0.3, show.legend = F) +
+  labs(y = "Arrival weight [g]")
+```
+
+## Cage arrangement in rack
+
+The following plots show the organization of the cage rack, individual cages colored by different
+variables each time.
+
+```{r echo=FALSE, fig.width = 10, fig.height = 4, warning=FALSE, message=FALSE}
+
+p1 <- Invivo_plotByRack(design_rack, colorBy = "Treatment", showLegend = T)
+
+p2 <- Invivo_plotByRack(design_rack, colorBy = "Strain", showLegend = T)
+
+p3 <- Invivo_plotByRack(design_rack, colorBy = "Sex", showLegend = T)
+
+cowplot::plot_grid(plotlist = c(p1, p2, p3), ncol = 3)
+```
+
+
+## Individual animals in cages
+
+Finally, an overview plot illustrates the placement of animals in the cages. Notice the distinct earmarks
+within each cage, a 'soft' design constraint that could be achieved with the given solution.
+
+```{r echo=FALSE, fig.width = 7, fig.height = 5, warning=FALSE, message=FALSE, results="asis"}
+
+pl <- Invivo_plotByRack(design_rack, colorBy = "Treatment", showAnimals = TRUE)
+
+cowplot::plot_grid(plotlist = pl)
+```

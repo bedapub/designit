@@ -1,0 +1,17 @@
+^designit\.Rproj$
+^\.Rproj\.user$
+^LICENSE\.md$
+^CODE_OF_CONDUCT\.md$
+^README\.Rmd$
+^cran-comments\.md$
+^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^doc$
+^Meta$
+^tmp$
+
+# gitlab ci files and directories
+^ci$
+^\.gitlab-ci\.yml$
