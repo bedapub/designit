@@ -2,7 +2,7 @@
 output:
   github_document:
     fig_width: 5
-    fig_height: 5
+    fig_height: 3
 editor_options: 
   chunk_output_type: console
 ---
@@ -13,8 +13,7 @@ editor_options:
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  fig.path = "man/figures/README-"
 )
 ```
 
@@ -80,7 +79,7 @@ bc$get_samples() %>%
   geom_bar()
 ```
 
-Random assignemt of samples to batches produced an uneven distribution.
+Random assignmet of samples to batches produced an uneven distribution.
 
 ### Optimizing the assignemnt
 ```{r "optimized assignment", warning=FALSE}
