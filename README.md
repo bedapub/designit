@@ -28,98 +28,88 @@ The main class used is `BatchContainer`, which holds the dimensions for
 sample allocation. After creating such a container, a list of samples
 can be allocated in it using a given assignment function.
 
-``` r
-library(designit)
-# define samples data.frame
-samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
-samples
-#>   a b c
-#> 1 a a b
-#> 2 a b b
-#> 3 a c c
+### Creating a table with sample information
 
+``` r
+library(tidyverse)
+library(designit)
+
+data("longitudinal_subject_samples")
+
+# we use a subset of longitudinal_subject_samples data
+subject_data <- longitudinal_subject_samples %>% 
+  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+  select(SampleID, SubjectID, Group, Sex, Week) %>%
+  # with two observations per patient
+  group_by(SubjectID) %>%
+  filter(n() == 2) %>%
+  ungroup() %>%
+  select(SubjectID, Group, Sex) %>%
+  distinct()
+
+head(subject_data)
+#> # A tibble: 6 × 3
+#>   SubjectID Group Sex  
+#>   <chr>     <chr> <chr>
+#> 1 P01       1     F    
+#> 2 P02       1     M    
+#> 3 P03       1     M    
+#> 4 P04       1     F    
+#> 5 P19       1     M    
+#> 6 P20       1     F
+```
+
+### Creating a `BatchContainer` and assigning samples
+
+``` r
+# a batch container with 3 batches and 11 locations per batch
 bc <- BatchContainer$new(
-  dimensions = list(
-    "plate" = 3,
-    "row" = list(values = letters[1:3]),
-    "column" = list(values = c(1, 3))
-  ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  dimensions = list("batch" = 3, "location" = 11),
 )
 
-bc
-#> Batch container with 16 locations.
-#>   Dimensions: plate, row, column
+# assign samples randomly
+set.seed(17)
+assign_random(bc, subject_data)
 
-bc$n_locations
-#> [1] 16
-bc$get_locations()
-#> # A tibble: 16 × 3
-#>    plate row   column
-#>    <int> <fct>  <int>
-#>  1     1 b          1
-#>  2     1 b          3
-#>  3     1 c          1
-#>  4     1 c          3
-#>  5     2 a          1
-#>  6     2 a          3
-#>  7     2 b          1
-#>  8     2 b          3
-#>  9     2 c          1
-#> 10     2 c          3
-#> 11     3 a          1
-#> 12     3 a          3
-#> 13     3 b          1
-#> 14     3 b          3
-#> 15     3 c          1
-#> 16     3 c          3
-
-set.seed(1)
-assign_random(bc, samples)
-
-head(bc$get_samples())
-#> # A tibble: 6 × 6
-#>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <chr> <chr> <chr>
-#> 1     1 b          1 <NA>  <NA>  <NA> 
-#> 2     1 b          3 <NA>  <NA>  <NA> 
-#> 3     1 c          1 <NA>  <NA>  <NA> 
-#> 4     1 c          3 a     a     b    
-#> 5     2 a          1 a     b     b    
-#> 6     2 a          3 <NA>  <NA>  <NA>
-bc$get_samples(remove_empty_locations=TRUE)
-#> # A tibble: 3 × 6
-#>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <chr> <chr> <chr>
-#> 1     1 c          3 a     a     b    
-#> 2     2 a          1 a     b     b    
-#> 3     2 b          3 a     c     c
-
-# You can reassign samples starting from the current assignment.
-set.seed(2)
-assign_random(bc)
-head(bc$get_samples())
-#> # A tibble: 6 × 6
-#>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <chr> <chr> <chr>
-#> 1     1 b          1 <NA>  <NA>  <NA> 
-#> 2     1 b          3 <NA>  <NA>  <NA> 
-#> 3     1 c          1 <NA>  <NA>  <NA> 
-#> 4     1 c          3 <NA>  <NA>  <NA> 
-#> 5     2 a          1 <NA>  <NA>  <NA> 
-#> 6     2 a          3 a     a     b
-
-# Results should be reproducible if the seed is set.
-set.seed(1)
-assign_random(bc)
-bc$get_samples(remove_empty_locations=TRUE)
-#> # A tibble: 3 × 6
-#>   plate row   column a     b     c    
-#>   <int> <fct>  <int> <chr> <chr> <chr>
-#> 1     1 c          3 a     a     b    
-#> 2     2 a          1 a     b     b    
-#> 3     2 b          3 a     c     c
+bc$get_samples() %>%
+  ggplot() +
+  aes(x = batch, fill = Group) +
+  geom_bar()
 ```
+
+<img src="man/figures/README-random assignment-1.png" width="100%" />
+
+Random assignemt of samples to batches produced an uneven distribution.
+
+### Optimizing the assignemnt
+
+``` r
+# set scoring functions
+bc$scoring_f <- list(
+  # first priority, groups are evenly distributed
+  group = osat_score_generator(batch_vars = "batch", 
+                               feature_vars = "Group"),
+  # second priority, sexes are evenly distributed
+  sex = osat_score_generator(batch_vars = "batch", 
+                             feature_vars = "Sex")
+)
+
+trace <- optimize_design(bc, max_iter = 150, quiet = TRUE)
+
+bc$get_samples() %>%
+  ggplot() +
+  aes(x = batch, fill = Group) +
+  geom_bar()
+```
+
+<img src="man/figures/README-optimized assignment-1.png" width="100%" />
+
+``` r
+# show optimization trace
+plot(trace)
+```
+
+<img src="man/figures/README-optimized assignment-2.png" width="100%" />
 
 ## Examples
 

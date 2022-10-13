@@ -1,5 +1,8 @@
 ---
-output: github_document
+output:
+  github_document:
+    fig_width: 5
+    fig_height: 5
 editor_options: 
   chunk_output_type: console
 ---
@@ -38,41 +41,68 @@ devtools::install_github("BEDApub/designit")
 The main class used is `BatchContainer`, which holds the dimensions for sample allocation.
 After creating such a container, a list of samples can be allocated in it using a given assignment function.
 
-```{r message=FALSE}
-library(designit)
-# define samples data.frame
-samples <- data.frame(a='a', b=letters[1:3], c=c('b', 'b', 'c'))
-samples
+### Creating a table with sample information
 
+```{r "samples table", message=FALSE}
+library(tidyverse)
+library(designit)
+
+data("longitudinal_subject_samples")
+
+# we use a subset of longitudinal_subject_samples data
+subject_data <- longitudinal_subject_samples %>% 
+  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+  select(SampleID, SubjectID, Group, Sex, Week) %>%
+  # with two observations per patient
+  group_by(SubjectID) %>%
+  filter(n() == 2) %>%
+  ungroup() %>%
+  select(SubjectID, Group, Sex) %>%
+  distinct()
+
+head(subject_data)
+```
+
+### Creating a `BatchContainer` and assigning samples
+```{r "random assignment"}
+# a batch container with 3 batches and 11 locations per batch
 bc <- BatchContainer$new(
-  dimensions = list(
-    "plate" = 3,
-    "row" = list(values = letters[1:3]),
-    "column" = list(values = c(1, 3))
-  ),
-  exclude = data.frame(plate = 1, row = "a", column = c(1, 3), stringsAsFactors = F)
+  dimensions = list("batch" = 3, "location" = 11),
 )
 
-bc
+# assign samples randomly
+set.seed(17)
+assign_random(bc, subject_data)
 
-bc$n_locations
-bc$get_locations()
+bc$get_samples() %>%
+  ggplot() +
+  aes(x = batch, fill = Group) +
+  geom_bar()
+```
 
-set.seed(1)
-assign_random(bc, samples)
+Random assignemt of samples to batches produced an uneven distribution.
 
-head(bc$get_samples())
-bc$get_samples(remove_empty_locations=TRUE)
+### Optimizing the assignemnt
+```{r "optimized assignment", warning=FALSE}
+# set scoring functions
+bc$scoring_f <- list(
+  # first priority, groups are evenly distributed
+  group = osat_score_generator(batch_vars = "batch", 
+                               feature_vars = "Group"),
+  # second priority, sexes are evenly distributed
+  sex = osat_score_generator(batch_vars = "batch", 
+                             feature_vars = "Sex")
+)
 
-# You can reassign samples starting from the current assignment.
-set.seed(2)
-assign_random(bc)
-head(bc$get_samples())
+trace <- optimize_design(bc, max_iter = 150, quiet = TRUE)
 
-# Results should be reproducible if the seed is set.
-set.seed(1)
-assign_random(bc)
-bc$get_samples(remove_empty_locations=TRUE)
+bc$get_samples() %>%
+  ggplot() +
+  aes(x = batch, fill = Group) +
+  geom_bar()
+
+# show optimization trace
+plot(trace)
 ```
 
 ## Examples
