@@ -3,8 +3,6 @@ output:
   github_document:
     fig_width: 5
     fig_height: 3
-editor_options: 
-  chunk_output_type: console
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -42,7 +40,7 @@ After creating such a container, a list of samples can be allocated in it using 
 
 ### Creating a table with sample information
 
-```{r "samples table", message=FALSE}
+```{r samples_table, message=FALSE}
 library(tidyverse)
 library(designit)
 
@@ -63,7 +61,7 @@ head(subject_data)
 ```
 
 ### Creating a `BatchContainer` and assigning samples
-```{r "random assignment"}
+```{r random_assignment}
 # a batch container with 3 batches and 11 locations per batch
 bc <- BatchContainer$new(
   dimensions = list("batch" = 3, "location" = 11),
@@ -82,7 +80,7 @@ bc$get_samples() %>%
 Random assignmet of samples to batches produced an uneven distribution.
 
 ### Optimizing the assignemnt
-```{r "optimized assignment", warning=FALSE}
+```{r optimized_assignment, warning=FALSE}
 # set scoring functions
 bc$scoring_f <- list(
   # first priority, groups are evenly distributed
