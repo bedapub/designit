@@ -1,0 +1,218 @@
+---
+title: "Plate scoring example 4"
+output: html_fragment
+knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+---  
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(designit)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Example 4: More than one group factor to balance and empty plate positions
+
+In this example, we have 2 factors to distribute across one plate: Treatment and
+(animal) sex.
+
+To indicate that the balancing of treatment is considered more important than
+the animal sex we assign a custom aggregation function giving more weight to the
+treatment variable. (A better aggregation mechanism has to be implemented!!!)
+
+There can be less samples than possible positions on the plate(s). In this case,
+we simulate 20 animal derived samples distributed on a plate with 24 locations.
+
+
+```{r, fig.width=7, fig.height=3.5}
+# Setting up the batch container
+example4 <- BatchContainer$new(
+  dimensions = c(
+    plate = 1, row = 6, col = 4
+  )
+)
+
+
+# Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
+assign_in_order(example4, samples = tibble::tibble(
+  Group = rep.int(c("Treatment 1", "Treatment 2"), times = c(10, 10)),
+  Sex = c(rep(c("M", "F", "F", "M"), times = 4), "M", NA, NA, "F"), ID = 1:20
+))
+
+bc <- example4$copy()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex"),
+  ncol = 2
+)
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+bc$score()
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 750,
+  n_shuffle = 1,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+  aggregate_scores_func = function(scores, ...) {
+    2 * scores["Group.Plate"] + scores["Sex.Plate"]
+  },
+  quiet = TRUE
+)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+trace$elapsed
+
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+We do the same example with auto-scaling, weighted scoring and SA to have a
+reference!
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 500,
+  n_shuffle = 1,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
+  aggregate_scores_func = function(scores, ...) {
+    purrr::set_names(2 * scores["Group.Plate"] + scores["Sex.Plate"], nm = "Weighted.Score")
+  },
+  autoscale_scores = T,
+  quiet = TRUE
+)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+We do the  same example with auto-scaling and position-dependent scoring now,
+not aggregating the score vector! This is more effective even when using the
+default acceptance function. We are strictly prioritizing the leftmost score in
+addition to reflect relevance for the design.
+
+```{r}
+bc <- example4$copy()
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+bc$score()
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = accept_leftmost_improvement,
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+Using a tolerance value to accept slightly worse solutions in the leftmost
+relevant score if overcompensated by other scores:
+
+```{r}
+bc <- example4$copy()
+
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+
+bc$score()
+```
+
+```{r, fig.width=7, fig.height=3.5}
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```
+
+Testing an alternative left-to-right weighing of scores, based on exponential
+down-weighing of the respective score differences at position $p$ with factor
+$\kappa^p$, $0 < \kappa < 1$ We choose a $\kappa$ of 0.5, i.e. the second
+score's improvement counts half of that of the first one.
+
+```{r}
+bc <- example4$copy()
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+)
+
+bc$score()
+
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 1000,
+  n_shuffle = 1,
+  acceptance_func = mk_exponentially_weighted_acceptance_func(kappa = 0.5, simulated_annealing = T),
+  autoscale_scores = TRUE,
+  quiet = TRUE
+)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+bc$score()
+
+cowplot::plot_grid(
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
+  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
+  ncol = 2
+)
+```

@@ -1,0 +1,68 @@
+---
+title: "Plate scoring example 5"
+output: html_fragment
+knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+---  
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(designit)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Example 5: Avoiding 'regular patterns' in plate layout
+
+In some cases it may be essential to avoid samples of the same group being put
+into the same row or column on a plate, i.e. these variables are regarded as
+factor levels of their own, in addition to the spatial relation of the samples.
+
+Plate scoring functions can use an specific penalty for these
+'linearly arranged' samples on top of the distance metrics chosen. 
+
+```{r}
+# Setting up the batch container
+example5 <- BatchContainer$new(
+  dimensions = c(
+    plate = 1, row = 8, col = 12
+  )
+)
+
+# Assign samples randomly to start from lower score (avoid `Inf` values when doing the 'hard' penalization)
+assign_random(example5, samples = tibble::tibble(
+  Group = rep.int(paste("Group", 1:5), times = c(8, 8, 8, 8, 64)),
+  ID = 1:96
+))
+
+penalize_lines <- "hard"
+
+bc <- example5$copy()
+
+bc$scoring_f <- c(
+  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group", p = 2, penalize_lines = penalize_lines)
+)
+
+bc$score()
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 5000,
+  n_shuffle = 1,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 0.1)),
+  quiet = T
+)
+```
+
+```{r, fig.width=7, fig.height=3.5}
+trace$elapsed
+
+bc$score()
+
+plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = stringr::str_c("Line penalization: ", penalize_lines))
+```

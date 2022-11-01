@@ -1,0 +1,110 @@
+---
+title: "Plate scoring example 1"
+output: html_fragment
+knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(designit)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Example 1: An expensive way to construct a 4x4 latin square (one plate)
+
+(latin square should give the best score)
+
+First using a combination of two OSAT scores (for row and column).
+
+This usually produces a latin square when using the squared L2 norm (L2s) for
+aggregation of the 2 scores.
+
+```{r}
+# Setting up the batch container
+example1 <- BatchContainer$new(
+  dimensions = c(
+    plate = 1,
+    row = 4, col = 4
+  )
+)
+
+# Add samples to container
+# Need unique Sample ID. Can we drop this constraint?
+assign_in_order(example1,
+  samples = tibble::tibble(
+    Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4),
+    ID = 1:16
+  )
+)
+
+# The following does not work (an gives a constant score of 144!)
+# example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
+# First analysis of problem indicates that osat_score generates a full row*col vector of 'ideal scores'
+# which are in fact the same value, implying an identical overall result as each position can be either
+# allocated by 1 sample or 0 samples, the sum of 1's being the sample count.
+# --> don't use osat_score if there's a lack of samples as compared to possible positioning
+
+bc <- example1$copy()
+
+# # Set scoring function
+bc$scoring_f <- list(
+  Row.Score = osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
+  Column.Score = osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
+)
+```
+
+```{r}
+
+set.seed(41)
+
+trace <- optimize_design(bc,
+  max_iter = 300, # this is set to shorten vignette run-time based on known random seed, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
+)
+```
+
+```{r}
+trace
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex1: Using OSAT scores for plate design\n(not the recommended way!)"
+)
+```
+
+Now using a dedicated scoring for the group distances on a plate. 
+
+This should reliably lead to a nice symmetry-bearing latin square design with
+only a one-dimensional score to look at.
+
+```{r}
+bc <- example1$copy()
+
+bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 1000, # this is set to shorten vignette run-time based on random seed, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  quiet = TRUE
+)
+```
+
+```{r}
+trace$elapsed
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex1: Using a dedicated plate scoring function:\nThis should show a latin square!"
+)
+```

@@ -5,8 +5,6 @@ vignette: >
   %\VignetteIndexEntry{Plate layouts}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-editor_options: 
-  chunk_output_type: inline
 ---
 
 ```{r, include = FALSE}

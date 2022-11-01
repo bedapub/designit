@@ -1,0 +1,160 @@
+---
+title: "In vivo examples computed"
+output: html_fragment
+knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE,
+  fig.width = 6,
+  fig.height = 6
+)
+```
+  
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(designit)
+library(dplyr)
+library(forcats)
+library(assertthat)
+library(stringr)
+library(tidyr)
+library(purrr)
+library(ggplot2)
+library(cowplot)
+```
+
+```{r include=FALSE}
+# load all data and functions from the main vignette
+.incache <- TRUE
+knitr::purl("../invivo_study_design.Rmd",
+            output = tempfile(),
+            documentation = 0) %>% 
+  source(echo = FALSE)
+```
+
+# Calculating the design
+
+A full run of the three wrapper functions is executed below, printing messages
+on the level of processing steps, but not the iterations within every
+optimization.
+
+```{r echo=TRUE}
+set.seed(44)
+
+# Assign treatments to animals, respecting user provided as well as passed constraints
+design_trt <- InVivo_assignTreatments(invivo_study_samples, invivo_study_treatments,
+  form_cages_by = c("Strain", "Sex", "Litter_combine_females"),
+  balance_treatment_vars = c("Strain", "Sex", "ArrivalWeight", "AgeGroup"),
+  n_shuffle = c(rep(5, 200), rep(3, 300), rep(2, 500), rep(1, 3000)),
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+
+# Form cages with reasonable animal numbers and compliant with all constraints
+design_cage <- Invivo_assignCages(design_trt,
+  cagegroup_vars = c("Treatment", "Strain", "Sex", "Litter_combine_females"),
+  unique_vars = c("Earmark"),
+  balance_cage_vars = c("ArrivalWeight", "AgeGroup"),
+  n_min = 2, n_max = 5, n_ideal = 2, prefer_big_groups = T, strict = F,
+  maxiter = 1000,
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+
+# Arrange cages in sub-grid of one rack (or several racks), avoiding spatial clusters
+design_rack <- Invivo_arrangeCages(design_cage,
+  distribute_cagerack_vars = c("Treatment", "Strain", "Sex"),
+  rack_size_x = 7,
+  rack_size_y = 10,
+  n_shuffle = c(rep(5, 100), rep(3, 200), rep(2, 300), rep(1, 500)),
+  quiet_process = FALSE,
+  quiet_optimize = TRUE
+)
+```
+
+# Visualization of the study design
+
+## Cage composition
+
+There are `r dplyr::n_distinct(design_rack$CageNr)` cages in total.
+
+Strains and age groups should be evenly split (balanced) across the treatments. Also,in each cage there should be
+only animals with the same treatment, strain and sex.
+
+Females are exclusively used for treatment 2, as was specified in the treatment list.
+
+```{r echo=FALSE, fig.width = 8, fig.height = 5, warning=FALSE, message=FALSE}
+
+p1 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = Strain, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of strains")
+
+p2 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = Sex, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of sex")
+
+p3 <- ggplot2::ggplot(design_rack, aes(x = factor(CageNr), y = BirthDate, color = Treatment)) +
+  facet_grid(~Treatment, scales = "free_x", space = "free_x") +
+  geom_jitter(width = 0.2, height = 0) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  labs(x = "Cage Nr", y = "", title = "Distribution of birth dates")
+
+cowplot::plot_grid(p1, p2, p3, ncol = 1)
+```
+
+## Body weights
+
+Body weights should be balanced across treatments as well as possible.
+
+The plot illustrates that this is true for the overall weight distribution (box plots). Interestingly, as there
+are females (associated with considerable less body weight) involved in treatment 2, the optimization favored the
+selection of heavier males in this group to compensate, achieving better cross-treatment balance of this factor.
+
+Red diamonds mark the mean values for a specific sex within each treatment group.
+
+```{r echo=FALSE, fig.width = 8, fig.height = 5, warning=FALSE, message=FALSE}
+
+ggplot2::ggplot(design_rack, aes(x = Sex, y = ArrivalWeight, color = Treatment, fill = Treatment)) +
+  facet_grid(Strain ~ Treatment, scales = "free_x") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), legend.position = "none") +
+  geom_boxplot(aes(group = Treatment), alpha = 0.2) +
+  geom_jitter(width = 0.2, height = 0.2) +
+  stat_summary(fun = "mean", colour = "red", shape = 18, size = 10, geom = "point", aes(group = Treatment), alpha = 0.3, show.legend = F) +
+  labs(y = "Arrival weight [g]")
+```
+
+## Cage arrangement in rack
+
+The following plots show the organization of the cage rack, individual cages colored by different
+variables each time.
+
+```{r echo=FALSE, fig.width = 10, fig.height = 4, warning=FALSE, message=FALSE}
+
+p1 <- Invivo_plotByRack(design_rack, colorBy = "Treatment", showLegend = T)
+
+p2 <- Invivo_plotByRack(design_rack, colorBy = "Strain", showLegend = T)
+
+p3 <- Invivo_plotByRack(design_rack, colorBy = "Sex", showLegend = T)
+
+cowplot::plot_grid(plotlist = c(p1, p2, p3), ncol = 3)
+```
+
+
+## Individual animals in cages
+
+Finally, an overview plot illustrates the placement of animals in the cages. Notice the distinct earmarks
+within each cage, a 'soft' design constraint that could be achieved with the given solution.
+
+```{r echo=FALSE, fig.width = 7, fig.height = 5, warning=FALSE, message=FALSE, results="asis"}
+
+pl <- Invivo_plotByRack(design_rack, colorBy = "Treatment", showAnimals = TRUE)
+
+cowplot::plot_grid(plotlist = pl)
+```
