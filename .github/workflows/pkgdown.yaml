@@ -24,9 +24,9 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: khan/pull-request-comment-trigger@v1.1.0
-          id: check
-          with:
-            trigger: '/pgkdown'
+        id: check
+        with:
+          trigger: '/pgkdown'
       
       - uses: actions/checkout@v2
 
