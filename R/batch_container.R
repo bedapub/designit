@@ -278,9 +278,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @return `BatchContainer`, invisibly
     move_samples = function(src, dst, location_assignment) {
       if (!missing(src) && !is.null(src)) {
-        assertthat::assert_that(missing(location_assignment) ||
-          is.null(location_assignment),
-        msg = "move_samples supports either src & dst, or location_assignment, not both"
+        assertthat::assert_that(
+          missing(location_assignment) ||
+            is.null(location_assignment),
+          msg = "move_samples supports either src & dst, or location_assignment, not both"
         )
         assertthat::assert_that(
           # is.integer is much faster, but we want to allow

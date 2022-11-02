@@ -194,19 +194,21 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
     assertthat::assert_that(nrow(bc_loc) > 9, msg = "Subgroup shuffling is pointless for small containers (n<10)")
     assertthat::assert_that(all(subgroup_vars %in% colnames(bc_loc)), msg = "All subgroup defining variables have to be part of the container locations")
 
-    assertthat::assert_that(nrow(dplyr::filter(
-      dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
-      dplyr::if_any(dplyr::everything(), ~ !is.na(.))
-    )) == nrow(bc_loc),
-    msg = "Selected subgrouping variables should not contain any NA values"
+    assertthat::assert_that(
+      nrow(dplyr::filter(
+        dplyr::select(bc_loc, dplyr::all_of(subgroup_vars)),
+        dplyr::if_any(dplyr::everything(), ~ !is.na(.))
+      )) == nrow(bc_loc),
+      msg = "Selected subgrouping variables should not contain any NA values"
     )
 
     assertthat::assert_that(!(!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0 && length(subgroup_vars) != 1),
       msg = "Exactly one subgrouping variable must be specified if specific subgrouping levels are passed"
     )
-    assertthat::assert_that(is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
-      all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
-    msg = "All selected subgroup levels have to be present in the subgrouping variable"
+    assertthat::assert_that(
+      is.null(restrain_on_subgroup_levels) || length(restrain_on_subgroup_levels) == 0 ||
+        all(restrain_on_subgroup_levels %in% bc_loc[[subgroup_vars]]),
+      msg = "All selected subgroup levels have to be present in the subgrouping variable"
     )
 
     if (!is.null(restrain_on_subgroup_levels) && length(restrain_on_subgroup_levels) > 0) { # we focus on selected subgroups only

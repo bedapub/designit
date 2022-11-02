@@ -156,20 +156,22 @@ assign_from_table <- function(batch_container, samples) {
   if (is.null(batch_container$samples)) {
     batch_container$samples <- only_samples
   } else {
-    assertthat::assert_that(dplyr::all_equal(only_samples,
-      batch_container$get_samples(assignment = FALSE),
-      ignore_col_order = TRUE,
-      ignore_row_order = TRUE,
-      convert = TRUE
-    ),
-    msg = "sample sheet should be compatible with samples inside the batch container"
+    assertthat::assert_that(
+      dplyr::all_equal(only_samples,
+        batch_container$get_samples(assignment = FALSE),
+        ignore_col_order = TRUE,
+        ignore_row_order = TRUE,
+        convert = TRUE
+      ),
+      msg = "sample sheet should be compatible with samples inside the batch container"
     )
   }
   only_locations <- samples[location_columns]
-  assertthat::assert_that(nrow(dplyr::anti_join(only_locations, batch_container$get_locations(),
-    by = location_columns
-  )) == 0,
-  msg = "sample sheed has locations not available in the batch container"
+  assertthat::assert_that(
+    nrow(dplyr::anti_join(only_locations, batch_container$get_locations(),
+      by = location_columns
+    )) == 0,
+    msg = "sample sheed has locations not available in the batch container"
   )
   samples_with_id <- batch_container$get_locations() %>%
     dplyr::left_join(samples, by = location_columns) %>%

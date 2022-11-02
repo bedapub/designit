@@ -99,7 +99,6 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
   )
 
   plate_scoring_func <- function(samples, plate, plate_name, row, column, group) {
-
     # Have to distinguish between empty positions on plate and NA-levels of experimental factors which may happen for real samples, too
     nonempty_pos <- !is.na(samples[[".sample_id"]])
 

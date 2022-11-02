@@ -47,8 +47,8 @@ library(designit)
 data("longitudinal_subject_samples")
 
 # we use a subset of longitudinal_subject_samples data
-subject_data <- longitudinal_subject_samples %>% 
-  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+subject_data <- longitudinal_subject_samples %>%
+  filter(Group %in% 1:5, Week %in% c(1, 4)) %>%
   select(SampleID, SubjectID, Group, Sex, Week) %>%
   # with two observations per patient
   group_by(SubjectID) %>%
@@ -84,11 +84,15 @@ Random assignmet of samples to batches produced an uneven distribution.
 # set scoring functions
 bc$scoring_f <- list(
   # first priority, groups are evenly distributed
-  group = osat_score_generator(batch_vars = "batch", 
-                               feature_vars = "Group"),
+  group = osat_score_generator(
+    batch_vars = "batch",
+    feature_vars = "Group"
+  ),
   # second priority, sexes are evenly distributed
-  sex = osat_score_generator(batch_vars = "batch", 
-                             feature_vars = "Sex")
+  sex = osat_score_generator(
+    batch_vars = "batch",
+    feature_vars = "Sex"
+  )
 )
 
 trace <- optimize_design(bc, max_iter = 150, quiet = TRUE)

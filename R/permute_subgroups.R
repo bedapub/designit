@@ -141,9 +141,10 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
 #'
 #' @keywords internal
 validate_subgrouping_object <- function(subgroup_object) {
-  assertthat::assert_that(all(c("Grouped_Samples", "Subgroup_Sizes", "Allocate_Var", "Subgroup_Var_Name", "Allocate_Levels")
-  %in% names(subgroup_object)),
-  msg = "Invalid subgroup object passed."
+  assertthat::assert_that(
+    all(c("Grouped_Samples", "Subgroup_Sizes", "Allocate_Var", "Subgroup_Var_Name", "Allocate_Levels")
+    %in% names(subgroup_object)),
+    msg = "Invalid subgroup object passed."
   )
 }
 

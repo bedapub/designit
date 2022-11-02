@@ -15,7 +15,6 @@
 #' of the specific shuffling function
 #' @keywords internal
 extract_shuffle_params <- function(shuffle, attributes_expected) {
-
   # Extracts relevant parameters from shuffle function output and monitors correctness/consistency
   # Tried to avoid redundant checks that are performed on batch container level
 
@@ -213,9 +212,10 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     msg = stringr::str_c(".sample_id from batch container must exist and numerate samples from 1 to ", n_samples)
   )
 
-  assertthat::assert_that(is.null(n_shuffle) ||
-    (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
-  msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
+  assertthat::assert_that(
+    is.null(n_shuffle) ||
+      (all(rlang::is_integerish(n_shuffle, finite = TRUE)) && all(n_shuffle >= 1)),
+    msg = "n_shuffle should be an integer or an integer vector (>=1), or NULL"
   )
 
 

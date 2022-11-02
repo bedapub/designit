@@ -118,24 +118,32 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 }
 
 
-#' This function generates a randomized experimental layout based on given
-#' experimental dimensions and factors to be balanced
+#' Randomize experimental layout
 #'
-#' @title randomize experimental layout
+#' This function generates a randomized experimental layout based on given
+#' experimental dimensions and factors to be balanced.
+#'
 #' @param design a data.frame with the sample ids, experimental conditions and
-#' information about fixed samples (columns with 'Fix' prefix and then the dimension name)
+#'   information about fixed samples (columns with 'Fix' prefix and then the
+#'   dimension name)
 #' @param report a string with the sample identifier
 #' @param layout_dim a named vector with the experimental dimensions
-#' @param balance a vector with the names of experimental conditions to be balanced
-#' @param scoring_groups list of dimension name groups to be used jointly for scoring
-#' @param scoring_tests list of dimension name groups to be used jointly for scoring
+#' @param balance a vector with the names of experimental conditions to be
+#'   balanced
+#' @param scoring_groups list of dimension name groups to be used jointly for
+#'   scoring
+#' @param scoring_tests list of dimension name groups to be used jointly for
+#'   scoring
 #' @param burnin a number of initial burnin runs (default=100)
-#' @param annealprotocol a vector with the number of pairs to swap in each annealing step
-#' @param scoring_weights named vector of weights for the dimensions (default all 1)
-#' @param balance_weights named vector of weights for the factors to be balanced (default all 1)
+#' @param annealprotocol a vector with the number of pairs to swap in each
+#'   annealing step
+#' @param scoring_weights named vector of weights for the dimensions
+#'   (default all 1)
+#' @param balance_weights named vector of weights for the factors to be
+#'   balanced (default all 1)
 #' @param distribute a starting distribution
 #'
-#' @return the value of the Gini index
+#' @return Value of the Gini index.
 #'
 #' @author Juliane Siebourg-Polster
 #'
@@ -233,7 +241,6 @@ randomize <- function(design, report, layout_dim, balance,
                       balance_weights = rep(1, length(balance)),
                       # initial sample distribution
                       distribute = 1:(prod(layout_dim))) {
-
   # initialization
   nloc <- prod(layout_dim) # available locations
   nsamp <- nrow(design) # number of samples

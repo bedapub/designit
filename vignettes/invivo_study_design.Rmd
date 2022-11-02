@@ -315,7 +315,6 @@ Invivo_assignCages <- function(design_trt,
                                n_min = 2, n_max = 5, n_ideal = 2, prefer_big_groups = TRUE, strict = TRUE,
                                maxiter = 5e3,
                                quiet_process = FALSE, quiet_optimize = TRUE) {
-
   # Set up batch container
   # We just need the subgrouping functionality of shuffle_grouped_data(), so the obligatory assignment variable
   # is just a dummy with one factor level. (Initially thought that Treatment would be assigned at this step, too.)
@@ -400,7 +399,6 @@ Invivo_arrangeCages <- function(design_cage,
                                 rack_size_y = 4,
                                 n_shuffle = c(rep(5, 100), rep(3, 400), rep(2, 500), rep(1, 4000)),
                                 quiet_process = FALSE, quiet_optimize = TRUE) {
-
   # How many racks do we need?
   nr_cages <- dplyr::n_distinct(design_cage[["Cage"]])
   nr_racks <- ceiling(nr_cages / (rack_size_x * rack_size_y))
