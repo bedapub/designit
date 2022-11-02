@@ -44,8 +44,15 @@ jobs:
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         if: ${{ (steps.check.outputs.triggered == 'true') || (github.event_name != 'pull_request') && (github.event_name != 'issue_comment') }}
-
         shell: Rscript {0}
+      
+      - name: Save pkgdown artifact
+        if: ${{ (steps.check.outputs.triggered == 'true') || (github.event_name != 'pull_request') && (github.event_name != 'issue_comment') }}    
+        uses: actions/upload-artifact@v3
+        with:
+          name: pkgdown
+          path: docs
+          retention-days: 14
 
       - name: Deploy to GitHub pages 🚀
         if: ${{ (github.event_name != 'pull_request') && (github.event_name != 'issue_comment') }}
