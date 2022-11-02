@@ -5,18 +5,17 @@
 * add the following header:
     - output is `html_fragment`
     - `title` is mandatory
-    - `knit` is needed for RStudio to knit to the correct place (they cannot be
-      in a subdirectory, because then CHECK fails)
+    - `knit` is needed for RStudio to knit to the correct place
   ````
   ---
   title: "Title of vignette child"
   output: html_fragment
-  knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes"))
+  knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
   ---
   ````
-* knit child (either in RStudio or with `rmarkdown::render()`)
-* add link to child to vignette
+* knit child to HTML fragment (either in RStudio or with `rmarkdown::render()`)
+* in the main vignette add link to child
   ````
-  ```{r, child="_something.html"}
+  ```{r, child="cached/_something.html"}
   ```
   ````
