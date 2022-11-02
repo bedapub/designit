@@ -4,6 +4,14 @@
 <pre class="r"><code>library(designit)
 library(ggplot2)
 library(dplyr)
+#&gt; 
+#&gt; Attaching package: &#39;dplyr&#39;
+#&gt; The following objects are masked from &#39;package:stats&#39;:
+#&gt; 
+#&gt;     filter, lag
+#&gt; The following objects are masked from &#39;package:base&#39;:
+#&gt; 
+#&gt;     intersect, setdiff, setequal, union
 library(tidyr)</code></pre>
 <div id="example-1-an-expensive-way-to-construct-a-4x4-latin-square-one-plate" class="section level1">
 <h1>Example 1: An expensive way to construct a 4x4 latin square (one
@@ -114,7 +122,7 @@ trace &lt;- optimize_design(bc,
 #&gt; Achieved score: c(0, 0) at iteration 284
 #&gt;    Aggregated: 0</code></pre>
 <pre class="r"><code>trace
-#&gt; Optimization trace (301 score values, elapsed 8.383878 secs).
+#&gt; Optimization trace (301 score values, elapsed 21.10947 secs).
 #&gt;   Starting score: 48,0
 #&gt;   Final score   : 0,0
 
@@ -137,7 +145,7 @@ trace &lt;- optimize_design(bc,
   quiet = TRUE
 )</code></pre>
 <pre class="r"><code>trace$elapsed
-#&gt; Time difference of 6.204842 secs
+#&gt; Time difference of 11.43023 secs
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,

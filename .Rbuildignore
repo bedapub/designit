@@ -18,5 +18,4 @@
 ^\.gitlab-ci\.yml$
 
 # vignette cache
-^vignettes/cached$
-^vignettes/_.*$
+^vignettes/cached/.*\.Rmd$

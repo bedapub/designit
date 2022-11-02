@@ -792,5 +792,5 @@ sub-grids may be used of any rack to accommodate the cages.
 if (exists(".precompile")) knitr::knit_exit()
 ```
 
-```{r, child="_invivo_computed.html"}
+```{r, child="cached/_invivo_computed.html"}
 ```
