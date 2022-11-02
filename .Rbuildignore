@@ -5,6 +5,7 @@
 ^README\.Rmd$
 ^cran-comments\.md$
 ^\.github$
+^\.gitlab$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
@@ -15,4 +16,7 @@
 # gitlab ci files and directories
 ^ci$
 ^\.gitlab-ci\.yml$
+
+# vignette cache
 ^vignettes/cached$
+^vignettes/_.*$
