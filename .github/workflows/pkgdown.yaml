@@ -6,9 +6,7 @@ on:
   release:
     types: [published]
   pull_request:
-    types: [opened]
-  issue_comment:
-    types: [created]
+    types: [labeled]
   workflow_dispatch:
 
 name: pkgdown
@@ -22,11 +20,6 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: Khan/pull-request-comment-trigger@1.0.0
-        id: check
-        with:
-          trigger: '/pgkdown'
-      
       - uses: actions/checkout@v2
 
       - uses: r-lib/actions/setup-pandoc@v2
@@ -42,31 +35,23 @@ jobs:
           
       - name: Test trigger
         run: 'echo Trigger works!'
-        if: steps.check.outputs.triggered == 'true'
+        if: ${{ contains(github.event.label.name, 'document') }}
 
       - name: Test pull request event
         run: 'echo ${{ github.event_name }}'
         if: github.event_name == 'pull_request'
 
-      - name: Test issue comment event
-        run: 'echo ${{ github.event_name }}'
-        if: github.event_name == 'issue_comment'
-      
       - name: Test push evenet
         run: 'echo ${{ github.event_name }}'
         if: github.event_name == 'push'
 
-      - name: Test combined condition
-        run: 'echo ${{ github.event_name }}'
-        if: (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
-        
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        if: steps.check.outputs.triggered == 'true' || (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
+        if: ${{ contains(github.event.label.name, 'document') || github.event_name != 'pull_request' }}
         shell: Rscript {0}
       
       - name: Save pkgdown artifact
-        if: steps.check.outputs.triggered == 'true' || (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
+        if: ${{ contains(github.event.label.name, 'document') || github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v3
         with:
           name: pkgdown
@@ -74,7 +59,7 @@ jobs:
           retention-days: 14
 
       - name: Deploy to GitHub pages 🚀
-        if: ${{ (github.event_name != 'pull_request') && (github.event_name != 'issue_comment') }}
+        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           clean: false
