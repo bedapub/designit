@@ -12,7 +12,11 @@ on:
 name: pkgdown
 
 jobs:
+  condition:
+    if: ${{ contains(github.event.label.name, 'document') || github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
   pkgdown:
+    needs: condition
     runs-on: ubuntu-latest
     # Only restrict concurrency for non-PR jobs
     concurrency:
@@ -33,33 +37,27 @@ jobs:
           extra-packages: any::pkgdown, local::.
           needs: website
           
-      - name: Test trigger
-        run: 'echo Trigger works!'
-        if: ${{ contains(github.event.label.name, 'document') }}
-
-      - name: Test pull request event
-        run: 'echo ${{ github.event_name }}'
-        if: github.event_name == 'pull_request'
-
-      - name: Test push evenet
-        run: 'echo ${{ github.event_name }}'
-        if: github.event_name == 'push'
-
-      - name: Build site
+      - name: Build pkgdown site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        if: ${{ contains(github.event.label.name, 'document') || github.event_name != 'pull_request' }}
         shell: Rscript {0}
       
       - name: Save pkgdown artifact
-        if: ${{ contains(github.event.label.name, 'document') || github.event_name != 'pull_request' }}
         uses: actions/upload-artifact@v3
         with:
           name: pkgdown
           path: docs
           retention-days: 14
 
+  deploy:
+    needs: [condition, pkgdown]
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest    
+    steps:
+      - name: Load pkgdown artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: pkgdown
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
           clean: false
