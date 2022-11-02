@@ -793,7 +793,7 @@ if (exists(".precompile")) knitr::knit_exit()
 ```
 
 ```{r}
-warning(getwd())
+stop(getwd())
 ```
 
 ```{r, child="cached/_invivo_computed.html"}
