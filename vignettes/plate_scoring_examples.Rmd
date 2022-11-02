@@ -7,17 +7,17 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-```{r, child="cached/_plate_scoring_ex1.html"}
+```{r, child="_plate_scoring_ex1.html"}
 ```
 
-```{r, child="cached/_plate_scoring_ex2.html"}
+```{r, child="_plate_scoring_ex2.html"}
 ```
 
-```{r, child="cached/_plate_scoring_ex3.html"}
+```{r, child="_plate_scoring_ex3.html"}
 ```
 
-```{r, child="cached/_plate_scoring_ex4.html"}
+```{r, child="_plate_scoring_ex4.html"}
 ```
 
-```{r, child="cached/_plate_scoring_ex5.html"}
+```{r, child="_plate_scoring_ex5.html"}
 ```
