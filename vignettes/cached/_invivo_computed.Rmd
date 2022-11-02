@@ -28,7 +28,7 @@ library(cowplot)
 
 ```{r include=FALSE}
 # load all data and functions from the main vignette
-.incache <- TRUE
+.precompile <- TRUE
 knitr::purl("../invivo_study_design.Rmd",
             output = tempfile(),
             documentation = 0) %>% 

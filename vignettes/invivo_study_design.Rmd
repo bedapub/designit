@@ -787,6 +787,10 @@ the rows and columns of a grid like rack, respectively. Depending on the actual
 number of cages, one or more racks are automatically assigned. Only rectangular
 sub-grids may be used of any rack to accommodate the cages.
 
-```{r child=if (!exists(".incache")) "cached/_invivo_computed.html"}
+```{r include=FALSE}
+# stop if called from precompiling the child
+if (exists(".precompile")) knitr::knit_exit()
 ```
 
+```{r, child="cached/_invivo_computed.html"}
+```
