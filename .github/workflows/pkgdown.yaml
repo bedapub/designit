@@ -39,14 +39,34 @@ jobs:
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
+          
+      - name: Test trigger
+        run: 'echo Trigger works!'
+        if: steps.check.outputs.triggered == 'true'
 
+      - name: Test pull request event
+        run: 'echo ${{ github.event_name }}'
+        if: github.event_name == 'pull_request'
+
+      - name: Test issue comment event
+        run: 'echo ${{ github.event_name }}'
+        if: github.event_name == 'issue_comment'
+      
+      - name: Test push evenet
+        run: 'echo ${{ github.event_name }}'
+        if: github.event_name == 'push'
+
+      - name: Test combined condition
+        run: 'echo ${{ github.event_name }}'
+        if: (github.event_name =! 'pull_request' && github.event_name != 'issue_comment')
+        
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        if: ${{ (steps.check.outputs.triggered == true) || ((github.event_name != 'pull_request') && (github.event_name != 'issue_comment')) }}
+        if: steps.check.outputs.triggered == 'true' || (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
         shell: Rscript {0}
       
       - name: Save pkgdown artifact
-        if: ${{ (steps.check.outputs.triggered == true) || ((github.event_name != 'pull_request') && (github.event_name != 'issue_comment')) }}    
+        if: steps.check.outputs.triggered == 'true' || (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
         uses: actions/upload-artifact@v3
         with:
           name: pkgdown
