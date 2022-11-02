@@ -22,7 +22,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: khan/pull-request-comment-trigger@v1.1.0
+      - uses: Khan/pull-request-comment-trigger@1.0.0
         id: check
         with:
           trigger: '/pgkdown'
