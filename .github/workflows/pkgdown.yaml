@@ -58,7 +58,7 @@ jobs:
 
       - name: Test combined condition
         run: 'echo ${{ github.event_name }}'
-        if: (github.event_name =! 'pull_request' && github.event_name != 'issue_comment')
+        if: (github.event_name != 'pull_request' && github.event_name != 'issue_comment')
         
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
