@@ -5,11 +5,6 @@ vignette: >
   %\VignetteIndexEntry{Shuffling with constraints}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-params:
-  regenerate_cache: FALSE
-  verbose_cache: TRUE
-editor_options: 
-  chunk_output_type: console
 ---
   
 ```{r, include = FALSE}
@@ -48,7 +43,6 @@ that relate to grouped samples may be specified by the passed parameters.
 We refer to a simplified version of the *in vivo* example which is examined deeper in a dedicated vignette.
 
 ```{r echo=TRUE}
-
 data("invivo_study_samples")
 
 invivo_study_samples <- dplyr::mutate(invivo_study_samples,

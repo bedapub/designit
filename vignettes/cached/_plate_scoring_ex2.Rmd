@@ -1,0 +1,223 @@
+---
+title: "Plate scoring example 2"
+output: html_fragment
+knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+```{r setup}
+library(designit)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Example 2: Scoring two plates at once
+
+(latin square for each plate should give the best score)
+
+We set up in one go 2 plate scoring functions, each one acting locally on a
+specific plate, plus one osat score to guarantee uniform distribution of groups
+across plates.
+
+The initial sample allocation (by assign_in_order) leads to a poor starting
+point since each plate has only 2 of the 4 groups represented.
+
+This is not a problem as long as we make sure that initial permutations are
+likely to remedy the situation. That's why we ensure 10 pairwise sample swaps
+for the first iterations.
+
+```{r}
+# Setting up the batch container
+example2 <- BatchContainer$new(
+  dimensions = c(
+    plate = 2,
+    row = 4, col = 4
+  )
+)
+
+# Add samples to container
+assign_in_order(example2, samples = tibble::tibble(
+  Group = c(rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8)),
+  ID = 1:32
+))
+
+bc <- example2$copy()
+
+bc$scoring_f <- c(mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group"),
+  osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+)
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: Initial sample arrangement"
+)
+
+bc$score()
+```
+
+```{r}
+set.seed(41)
+trace <- optimize_design(bc,
+  n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1400)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+  aggregate_scores_func = worst_score,
+  quiet = TRUE
+)
+```
+
+```{r}
+trace$elapsed
+
+bc$score()
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: Design created by swapping samples 'globally' across the plates"
+)
+```
+
+While this 'global' optimization is possible, it does probably not converge to
+an (almost) ideal solution in an acceptable time if there are more samples
+involved. This is due to a lot of unproductive sample swapping happening across
+the plates.
+
+One way to address this: we may split the optimization into two cycles, first
+assigning samples to plates (balancing groups), then improving the positions of
+the samples within each plate. This motivates the use of a dedicated sample
+permutation function which takes the plate structure into account and only
+shuffles samples around within one plate.
+
+```{r}
+# Setting up the batch container
+
+bc <- example2$copy()
+
+bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+
+set.seed(42)
+optimize_design(bc,
+  quiet = TRUE,
+  max_iter = 200, # this is set to shorten vignette run-time, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+)
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: 'Plate wise' design\nStep 1: after allocating samples to plates"
+)
+
+bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
+
+bc$score()
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 400,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm,
+  quiet = TRUE
+)
+```
+
+```{r}
+trace
+
+bc$score()
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: 'Plate wise' design\nStep 2: after arranging samples within plates"
+)
+```
+
+In this case, the shuffling function exchanges 1 pair of sample assignments
+every time (the default). However, any number of constant swaps or a swapping
+protocol (formally a vector of integers) can be supplied as well.
+
+
+Now for the most efficient solution: we start again by first assigning samples
+to plates (balancing groups), then making use of the independence of the two
+within-plate optimizations and improving them one after the other.
+
+This is possible by passing the argument \code{restrain_on_subgroup_levels} to
+the function that generates the permutations. It enforces permutation only to
+happen first within plate 1, then within plate 2, so that the two scores can be
+optimized in succeeding runs.
+
+```{r}
+# Setting up the batch container
+
+bc <- example2$copy()
+
+bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  quiet = TRUE,
+  max_iter = 150, # this is set to shorten vignette run-time, normally we don't know.
+  n_shuffle = 2,
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
+)
+```
+
+```{r}
+trace
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: 'Serial plate' design\nStep 1: after allocating samples to plates"
+)
+
+bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
+
+bc$score()
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 150,
+  quiet = TRUE,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(1)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
+)
+```
+
+```{r}
+trace
+
+bc$score()
+```
+
+```{r}
+set.seed(42)
+trace <- optimize_design(bc,
+  max_iter = 550,
+  quiet = TRUE,
+  shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(2)),
+  acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
+  aggregate_scores_func = L2s_norm
+)
+```
+
+```{r}
+trace
+
+bc$score()
+
+plot_plate(bc,
+  plate = plate, row = row, column = col, .color = Group,
+  title = "Ex2: 'Serial plate' design\nStep 2: after optimizing each plate in turn"
+)
+```

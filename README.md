@@ -77,7 +77,7 @@ bc$get_samples() %>%
   geom_bar()
 ```
 
-![](man/figures/README-random%20assignment-1.png)<!-- -->
+![](man/figures/README-random_assignment-1.png)<!-- -->
 
 Random assignmet of samples to batches produced an uneven distribution.
 
@@ -102,14 +102,15 @@ bc$get_samples() %>%
   geom_bar()
 ```
 
-![](man/figures/README-optimized%20assignment-1.png)<!-- -->
+![](man/figures/README-optimized_assignment-1.png)<!-- -->
 
 ``` r
+
 # show optimization trace
 plot(trace)
 ```
 
-![](man/figures/README-optimized%20assignment-2.png)<!-- -->
+![](man/figures/README-optimized_assignment-2.png)<!-- -->
 
 ## Examples
 
