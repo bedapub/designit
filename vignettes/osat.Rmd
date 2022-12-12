@@ -21,8 +21,10 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(designit)
 library(tidyverse)
-if (!requireNamespace("OSAT")) print("This vignette can only be rendered if `OSAT` package is installed.")
-knitr::knit_exit()
+if (!requireNamespace("OSAT", quietly = TRUE)) {
+  print("This vignette can only be rendered if `OSAT` package is installed.")
+  knitr::knit_exit()
+}
 ```
 
 Loading samples. We add two dummy columns to demonstrate how to choose batch columns of interest.
