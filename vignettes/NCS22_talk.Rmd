@@ -1,0 +1,356 @@
+---
+title: "designit: a flexible engine to generate experiment layouts"
+author: "Juliane Siebourg-Polster, Iakov Davydov, Guido Steiner, Balazs Banfai"
+output: 
+  rmarkdown::html_vignette: 
+vignette: >
+  %\VignetteIndexEntry{NCS Talk}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+library(designit)
+library(tidyverse)
+```
+
+
+# Introduction
+
+Examples in this vignette are used in a talk at NCS22.
+
+It uses a subset of the `longitudinal_subject_samples` dataset.
+
+```{r get_data, include = TRUE}
+data("longitudinal_subject_samples")
+
+dat <- longitudinal_subject_samples %>% 
+  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+  select(SampleID, SubjectID, Group, Sex, Week)
+
+# for simplicity: remove two subjects that don't have both visits  
+dat <- dat %>% 
+  filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID)) 
+
+
+subject_data <- dat %>% select(SubjectID, Group, Sex) %>% unique()
+```
+
+## Go fully random? 
+
+* Could it be sufficient to randomly distribute samples across batches?
+* Not necessarily!
+    * Often sample sizes are too small to avoid grouping by change
+    * Experimental constraints might not allow for a fully random layout
+
+```{r, echo = FALSE}
+set.seed(17) # gives `bad` random assignment
+
+bc <- BatchContainer$new(
+  dimensions = list("batch" = 3, "location" = 11),
+)
+
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "batch", 
+                               feature_vars = "Group"),
+  sex = osat_score_generator(batch_vars = "batch", 
+                             feature_vars = "Sex")
+)
+
+assign_random(bc, subject_data)
+```
+
+Gone wrong: Random distribution of 31 grouped subjects into 3 batches 
+turns out unbalanced: 
+
+```{r, fig.width= 3, fig.height=3, echo = FALSE}
+bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+  geom_bar() + 
+  labs(y = "subject count")
+```
+
+“**Block** what you can and **randomize** what you cannot.”  (G. Box, 1978)
+
+
+## designit
+
+::: {#hello .greeting .message style="color: darkgreen;"}
+To **avoid batch or gradient effects** in complex experiments, 
+`designit` is an R package that offers flexible ways to **allocate a given set of 
+samples to experiment layouts**. 
+It's strength is that it implements a very general framework that can 
+easily be customized and extended to fit specific constrained layouts.
+:::
+
+* Data structure: `BatchContainer` class
+  * R6 object storing:
+      * Experiment dimensions (cages, plates…)
+      * Sample annotation
+      * Scoring functions for sample distribution
+* Main function: `optimize_design()`
+  * Optimizes the layout with user defined
+    * Scores for sample distribution
+    * Optimization protocols
+    * Sample shuffling functions
+  * Returns improved design and optimization trace
+
+
+# Sample Batching 
+
+## Setup
+
+* Assign 31 samples to 3 equally sized batches
+* Balance by: 
+    * treatment group (higher priority)
+    * sex (lower priority)
+
+```{r, include=FALSE}
+set.seed(17) # gives `bad` random assignment
+```
+```{r}
+bc <- BatchContainer$new(
+  dimensions = list("batch" = 3, "location" = 11),
+)
+bc$scoring_f <- list(
+  group = osat_score_generator(batch_vars = "batch", 
+                               feature_vars = "Group"),
+  sex = osat_score_generator(batch_vars = "batch", 
+                             feature_vars = "Sex")
+)
+assign_random(bc, subject_data)
+```
+
+
+**Batch composition before optimization**
+
+```{r, fig.width= 5.5, fig.height=3, echo = FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = batch, fill = Sex)) +
+      geom_bar() +
+      labs(y = "subject count")
+  ),
+  nrow = 1
+)
+```
+
+```{r, eval = FALSE}
+bc$get_samples()
+```
+
+```{r, echo=FALSE}
+bind_rows(head(bc$get_samples(), 3) %>% 
+            mutate(across(, as.character)),
+          tibble(batch = "...", 
+                 location = " ...", 
+                 SubjectID = "...", 
+                 Group = "...", Sex = "..."),
+          tail(bc$get_samples(), 3) %>% 
+            mutate(across(, as.character))) %>% 
+  gt::gt() %>% gt::tab_options(table.font.size = 11, 
+                               data_row.padding = 0.1)
+```
+
+
+## Optimization
+
+* Assign 31 samples to 3 equally sized batches
+* Balance by: 
+    * treatment group (higher priority)
+    * sex (lower priority)
+
+```{r, warning=FALSE}
+trace <- optimize_design(
+  bc,
+  n_shuffle = 1,
+  acceptance_func = 
+    ~ accept_leftmost_improvement(..., tolerance = 0.01),
+  max_iter = 150,
+  quiet = TRUE
+)
+```
+
+**Batch composition after optimization**
+
+```{r, fig.width= 8, fig.height=3, echo = FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    bc$get_samples() %>% ggplot(aes(x = batch, fill = Sex)) +
+      geom_bar() +
+      labs(y = "subject count"),
+    trace$plot(include_aggregated = TRUE)
+  ),
+  ncol = 3
+)
+```
+
+
+```{r, echo=FALSE}
+bind_rows(head(bc$get_samples(), 3) %>% 
+            mutate(across(, as.character)),
+          tibble(batch = "...", 
+                 location = " ...", 
+                 SubjectID = "...", 
+                 Group = "...", Sex = "..."),
+          tail(bc$get_samples(), 3) %>% 
+            mutate(across(, as.character))) %>% 
+  gt::gt() %>% gt::tab_options(table.font.size = 11, 
+                               data_row.padding = 0.1)
+```
+
+
+# Plate layouts
+
+## Continuous confounding
+
+Assays are often performed in well plates  (24, 96, 384) 
+
+Observed effects
+
+* Edge effects (bad plate sealing)
+* Gradients (non-equal temperature distribution)
+* Row / column effects (pipetting issues)
+
+Since plate effects often cannot be avoided, we aim to distribute sample groups 
+of interest evenly across the plate and adjust for the effect computationally.
+
+
+## Setup
+
+* Assume previous batches are 24-well plates 
+* Within plate optimization & across plate blocking
+* Balanced by: 
+    * treatment group (higher priority)
+    * sex (lower priority)
+
+```{r}
+set.seed(1) #1 #2
+
+bc <- BatchContainer$new(
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+)
+assign_random(bc, dat)
+#assign_in_order(bc, dat)
+```
+
+```{r, fig.width= 5, fig.height=4.5, eval=FALSE}
+plot_plate(bc, plate = plate, row = row, column = col,
+           .color = Group, title = "Initial layout by Group")
+plot_plate(bc, plate = plate, row = row, column = col, 
+           .color = Sex, title = "Initial layout by Sex")
+```
+
+```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc, plate = plate, row = row, column = col, 
+               .color = Group, title = "Initial layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, 
+               .color = Sex, title = "Initial layout by Sex")
+  ),
+  nrow = 2
+)
+```
+
+**2-step optimization** `multi_plate_layout()`
+
+* Across plate optimization using osat score as before
+* Within plate optimization using distance based sample scoring function
+
+
+## Spatial arrangement
+
+```{r, warning=FALSE, message=FALSE} 
+traces <- optimize_multi_plate_design(
+  bc,
+  across_plates_variables = c("Group", "Sex"),
+  within_plate_variables = c("Group"),
+  plate = "plate", row = "row", column = "col",
+  n_shuffle = 2,
+  max_iter = 500 #2000
+)
+```
+
+
+```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc, plate = plate, row = row, column = col, 
+               .color = Group, title = "Initial layout by Group"),
+    plot_plate(bc, plate = plate, row = row, column = col, 
+               .color = Sex, title = "Initial layout by Sex")
+  ),
+  nrow = 2
+)
+```
+
+```{r fig.width=3, fig.height=3, echo=FALSE}
+purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))[1:2]
+```
+
+
+# Glimpse on more complex application
+
+Goal: 
+
+* Assign 3 treatment conditions to 59 animals, 
+  representing 2 relevant strains
+* Avoid confounding by sex, weight and age
+
+Constraints:
+
+* Cages host ideally 3 animals (preferably 2-5)
+* Strain, Sex and Treatment must be homogeneous within a cage
+* Don’t put males from different litters same cage; 
+  litter mixing is possible for females!
+* Average weight and age composition comparable between treatment groups and cages
+* Avoid animals with identical ear markings in same cage (if possible)
+* Treatment distribution across animal subgroups (if specified) has to be respected
+
+see vignette `invivo_study_design` for the full story.
+
+
+# Conclusion
+
+* designit aims to be general and adaptable
+    * One framework to address simple batching as well as complex multi-step procedures
+    * Easy add-ons: custom scoring-functions, acceptance-criteria and
+    shuffling-procedures can be passed to optimize_design by the user
+* Includes functions and vignettes for frequently used layouts such as plates.
+
+
+**Acknowledgements**
+
+* Martha Serrano
+* Sabine Wilson
+* David Jitao Zhang
+* Fabian Birzele
+* PMDA group for feedback?
+
+
+```{r, fig.width=4.0, fig.hight = 5.0, echo = FALSE}
+layout <- crossing(row = 1:9, column = 1:12) %>%
+  mutate(Questions = "no") 
+layout$Questions[c(16, 17, 18, 19, 20, 21, 
+                  27, 28, 33, 34, 
+                  45, 46, 
+                  55, 56, 66, 67, 90, 91)] <- "yes"
+
+plot_plate(layout, .color = Questions, title = "Thank you")
+
+```
