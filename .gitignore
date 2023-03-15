@@ -3,6 +3,7 @@
 doc
 Meta
 tmp
+check
 
 # do not store generated docs
 docs
