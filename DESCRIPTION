@@ -77,6 +77,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 VignetteBuilder: knitr
 Remotes:
-    bioc::release/OSAT,
+    bioc::OSAT,
     github::trevorld/gridpattern,
     github::coolbutuseless/ggpattern
