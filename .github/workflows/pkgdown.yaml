@@ -38,13 +38,13 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
+          extra-packages: any::pkgdown, any::BiocManager, local::.
           needs: website
-          
+
       - name: Build pkgdown 📦 site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
-      
+
       - name: Save pkgdown 📦 artifact
         uses: actions/upload-artifact@v3
         with:
@@ -55,16 +55,16 @@ jobs:
   deploy:
     needs: [condition, pkgdown]
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest    
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Load pkgdown artifacts
         uses: actions/download-artifact@v3
         with:
           name: pkgdown
           path: docs
-          
+
       - name: Deploy to GitHub pages 🚀
         uses: JamesIves/github-pages-deploy-action@4.1.4
         with:
