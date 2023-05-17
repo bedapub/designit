@@ -32,6 +32,11 @@ Authors@R: c(
            role = c("aut", "cph"),
            email = "balazs.banfai@roche.com",
            comment = c(ORCID = "0000-0003-0422-7977")),
+    person(given = "Jitao David",
+           family = "Zhang",
+           role = c("aut", "cph"),
+           email = "jitao_david.zhang@roche.com",
+           comment = c(ORCID="0000-0002-3085-0909")),
     person(given = "F. Hoffman-La Roche", role = c("cph", "fnd")))
 Description:
     Intelligently assign samples to batches in order to reduce batch effects.
