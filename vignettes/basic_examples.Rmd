@@ -287,8 +287,8 @@ samples with the method `bc$move_samples()`.
 we can optimize the design, for instance by shuffling the samples.
 4. Various options are available to further customize the design.
 
-Now you have already the first experience of using _designit_ for randomization.
-It is time to apply the learning in your work. If you need more examples or 
+Now you have already the first experience of using _designit_ for randomization,
+it is time to apply the learning to your work. If you need more examples or 
 if you want to understand more details of the package, please explore other
 vignettes of the package as well as check out the documentations.
 
