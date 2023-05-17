@@ -1,14 +1,29 @@
 ---
-title: "Basic example"
-output: rmarkdown::html_vignette
+title: "Basic example of using designit: plate layout with two factors"
+output: 
+  rmarkdown::html_vignette:
+    html_document:
+    df_print: paged
+    mathjax: default
+    number_sections: true
+    toc: true
+    toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Basic example}
+  %\VignetteIndexEntry{Basic example of using designit: plate layout with two factors}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+This vignette demonstrates the use of the _deisngit_ package with a series 
+of examples deriving from the same task, namely to randomize samples of a 
+two-factor experiment into plate layouts. We shall start with the most basic
+use and gradually exploring some basic yet useful utilities provided
+by the package.
+
+```{r include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.height = 6, fig.width = 6,
   collapse = TRUE,
   comment = "#>"
 )
@@ -21,14 +36,11 @@ library(dplyr)
 library(tidyr)
 ```
 
-# Plate layout with two factors
+# The samples and the conditions
 
-## The samples
+Our task is to randomize samples of an in-vivo experiment with multiple conditions. Our aim is to place them in several 48-well plates.
 
-Samples of a 2-condition in-vivo experiment are to be
-placed on 48 well plates.
-
-These are the conditions
+These are the conditions:
 
 ```{r}
 # conditions to use
@@ -44,10 +56,10 @@ conditions <- data.frame(
 gt::gt(conditions)
 ```
 
-We will have 3 animals per groups with 4 replicates each
+We will have 3 animals per group, with 4 replicates of each animal.
 
 ```{r}
-# sample table (2 animals per group with 3 replicates)
+# sample table
 n_reps <- 4
 n_animals <- 3
 animals <- bind_rows(replicate(n_animals, conditions, simplify = FALSE),
@@ -64,14 +76,16 @@ samples <- bind_rows(replicate(n_reps, animals, simplify = FALSE),
 
 samples |>
   head(10) |>
+  arrange(animal, group, replicate) %>%
   gt::gt()
 ```
-## Plate layout requirements
+
+# Plate layout requirements
 
 Corner wells of the plates should be left empty.
 This means on a 48 well plate we can place 44 samples.
 Since we have `r nrow(samples)` samples, they will fit on
-`r ceiling(nrow(samples)/44)` plates
+`r ceiling(nrow(samples)/44)` plates.
 
 ```{r}
 n_samp <- nrow(samples)
@@ -81,9 +95,9 @@ n_plates <- ceiling(n_samp / n_loc_per_plate)
 exclude_wells <- expand.grid(plate = seq(n_plates), column = c(1, 8), row = c(1, 6))
 ```
 
-## Setting up a Batch container
+# Setting up a BatchContainer object
 
-Create a BatchContainer object that provides all possible locations
+First, we create a BatchContainer object that provides all possible locations.
 
 ```{r}
 bc <- BatchContainer$new(
@@ -97,9 +111,9 @@ bc$exclude
 bc$get_locations() |> head()
 ```
 
-## Moving samples
+# Moving samples
 
-Use random assignment function to place samples to plate locations
+Next, we use the random assignment function to place samples to plate locations.
 
 ```{r}
 bc <- assign_random(bc, samples)
@@ -108,7 +122,7 @@ bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
 ```
 
-Plot of the result using the `plot_plate` function
+To check the results visually, we can plot of the result using the `plot_plate` function.
 
 ```{r, fig.width=6, fig.height=3.5}
 plot_plate(bc,
@@ -116,7 +130,7 @@ plot_plate(bc,
   .color = treatment, .alpha = dose
 )
 ```
-To not show empty wells, we can directly plot the sample table as well
+To not show empty wells, we can directly plot the sample table as well.
 
 ```{r, fig.width=6, fig.height=3.5}
 plot_plate(bc$get_samples(remove_empty_locations = TRUE),
@@ -125,12 +139,11 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE),
 )
 ```
 
-To move individual samples or manually assigning all locations we can use the 
-`batchContainer$move_samples()` method
+Sometimes we may wish to move samples, or to swap samples, or to manually 
+assign some locations. To move individual samples or manually assigning all
+locations we can use the `batchContainer$move_samples()` method.
 
-To swap two or more samples use:
-
-**Warning**: This will change your BatchContainer in-place.
+To swap two or more samples, use
 
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
@@ -143,9 +156,8 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE),
 
 To assign all samples in one go, use the option `location_assignment`.
 
-**Warning**: This will change your BatchContainer in-place.
-
 The example below orders samples by ID and adds the empty locations afterwards
+
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(
   location_assignment = c(
@@ -160,13 +172,17 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE),
 )
 ```
 
-## Run an optimization
 
-The optimization procedure is invoked with e.g. `optimize_design`.
-Here we use a simple shuffling schedule: 
-swap 10 samples for 100 times, then swap 2 samples for 400 times.
+# Running an optimization
 
-To evaluate how good a layout is, we need a scoring function. 
+Once we have setup an initial layout, which may be suboptimal, we can optimize it in multiple ways, for instance by sample shuffling. The optimization procedure is invoked with e.g. `optimize_design`.
+Here we use a simple shuffling schedule: swap 10 samples for 100 times, then swap 2 samples for 400 times.
+
+In the context of randomization, a good layout means that known independent 
+variables and/or covariates that may affect the dependent variable(s) are
+as uncorrelated as possible with the layout. To evaluate how good a layout is, 
+we need a scoring function, which we pass a scoring function to the
+`optimize_design` function.
 
 This function will assess how well treatment 
 and dose are balanced across the two plates.
@@ -208,15 +224,15 @@ ggplot(
   facet_wrap(~plate)
 ```
 
-## Customizing the plate layout
+# Customizing the plate layout
 
 To properly distinguish between empty and excluded locations one can do the
 following.
 
-* Supply the BatchContainer directly
-* set `add_excluded = TRUE`, set `rename_empty = TRUE`
-* supply a custom color palette
-* excluded wells have NA values and can be colored with `na.value`
+* Supply the BatchContainer directly;
+* set `add_excluded = TRUE` and set `rename_empty = TRUE`;
+* supply a custom color palette;
+* excluded wells have NA values and can be colored with `na.value`.
 
 ```{r, fig.width=6, fig.height=3.5}
 color_palette <- c(
@@ -232,8 +248,8 @@ plot_plate(bc,
   scale_fill_manual(values = color_palette, na.value = "darkgray")
 ```
 
-To remove all empty wells from the plot, hand the pruned sample list.
-to plot_plate rather than the whole BatchContainer.
+To remove all empty wells from the plot, hand the pruned sample list
+to `plot_plate` rather than the whole `BatchContainer` object.
 You can still assign your own colors.
 
 ```{r, fig.width=6, fig.height=3.5}
@@ -248,10 +264,36 @@ Note: removing all empty and excluded wells will lead to omitting
 completely empty rows or columns!
 
 ```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE) |>
-  filter(column != 2),
-plate = plate, column = column, row = row,
-.color = treatment, .alpha = dose
+plot_plate(
+  bc$get_samples(remove_empty_locations = TRUE) |>
+    filter(column != 2),
+  plate = plate, column = column, row = row,
+  .color = treatment, .alpha = dose
 ) +
   scale_fill_viridis_d()
+```
+
+# Summary
+
+To summarize
+
+1. In order to randomize the layout of samples from an experiment, create an 
+instance of `BatchContainer` with `BatchContainer$new()`. 
+2. Use functions `assign_random` and `plot_plate` to assign samples randomly
+and to plot the plate layout. If necessary, you can retrieve the samples from
+the BatchContainer instance `bc` with the method `bc$get_samples()`, or move
+samples with the method `bc$move_samples()`.
+3. The scoring function of `bc` can be set by `bc$scoring_f`. Once it is set,
+we can optimize the design, for instance by shuffling the samples.
+4. Various options are available to further customize the design.
+
+Now you have already the first experience of using _designit_ for randomization.
+It is time to apply the learning in your work. If you need more examples or 
+if you want to understand more details of the package, please explore other
+vignettes of the package as well as check out the documentations.
+
+# Session information
+
+```{r sessionInfo}
+sessionInfo()
 ```
