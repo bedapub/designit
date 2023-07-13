@@ -16,7 +16,7 @@ the function will check if samples in \code{batch_container} are identical to th
 \code{samples} argument.}
 }
 \value{
-Returns \code{BatchContainer}, invisibly.
+Returns a new \code{BatchContainer}.
 }
 \description{
 Distributes samples based on a sample sheet.
@@ -39,7 +39,7 @@ sample_sheet <- tibble::tribble(
   2, "a", 3, 5, "TRT",
 )
 # assign samples from the sample sheet
-assign_from_table(bc, sample_sheet)
+bc <- assign_from_table(bc, sample_sheet)
 
 bc$get_samples(remove_empty_locations = TRUE)
 

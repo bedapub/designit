@@ -27,6 +27,13 @@ bc <- BatchContainer$new(
 
 bc
 }
+\section{Public fields}{
+\if{html}{\out{<div class="r6-fields">}}
+\describe{
+\item{\code{trace}}{Optimization trace, a \code{\link[tibble:tibble]{tibble::tibble()}}}
+}
+\if{html}{\out{</div>}}
+}
 \section{Active bindings}{
 \if{html}{\out{<div class="r6-active-bindings">}}
 \describe{
@@ -71,6 +78,8 @@ Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
 \item \href{#method-BatchContainer-score}{\code{BatchContainer$score()}}
 \item \href{#method-BatchContainer-copy}{\code{BatchContainer$copy()}}
 \item \href{#method-BatchContainer-print}{\code{BatchContainer$print()}}
+\item \href{#method-BatchContainer-scores_table}{\code{BatchContainer$scores_table()}}
+\item \href{#method-BatchContainer-plot_trace}{\code{BatchContainer$plot_trace()}}
 }
 }
 \if{html}{\out{<hr>}}
@@ -200,11 +209,19 @@ The length of the vector should match the number of locations,
 \subsection{Method \code{score()}}{
 Score current sample assignment,
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score()}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score(scoring)}\if{html}{\out{</div>}}
 }
 
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{scoring}}{a function or a names list of scoring functions.
+Each function should return a numeric vector.}
+}
+\if{html}{\out{</div>}}
+}
 \subsection{Returns}{
-Returns a vector of all scoring functions values.
+Returns a named vector of all scoring functions values.
 }
 }
 \if{html}{\out{<hr>}}
@@ -232,16 +249,62 @@ Prints information about \code{BatchContainer}.
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{...}}{not used.
+\item{\code{...}}{not used.}
+}
+\if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BatchContainer-scores_table"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-scores_table}{}}}
+\subsection{Method \code{scores_table()}}{
+Return a table with scores from an optimization.
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$scores_table(index = NULL, include_aggregated = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{optimization index, all by default}
+
+\item{\code{include_aggregated}}{include aggregated scores}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{\link[tibble:tibble]{tibble::tibble()}} with scores
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-BatchContainer-plot_trace"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-plot_trace}{}}}
+\subsection{Method \code{plot_trace()}}{
+Plot trace
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$plot_trace(index = NULL, include_aggregated = FALSE, ...)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{index}}{optimization index, all by default}
+
+\item{\code{include_aggregated}}{include aggregated scores}
+
+\item{\code{...}}{not used.}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
 List of scoring functions.
 Tibble with batch container locations.
 Tibble with sample information and sample ids.
 Sample attributes, a data.table.
 Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
-Validate sample assignment.}
-}
-\if{html}{\out{</div>}}
+Validate sample assignment.
 }
 }
 }
