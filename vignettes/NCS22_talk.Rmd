@@ -138,13 +138,13 @@ bc$get_samples()
 
 ```{r, echo=FALSE}
 bind_rows(head(bc$get_samples(), 3) %>% 
-            mutate(across(, as.character)),
+            mutate(across(everything(), as.character)),
           tibble(batch = "...", 
                  location = " ...", 
                  SubjectID = "...", 
                  Group = "...", Sex = "..."),
           tail(bc$get_samples(), 3) %>% 
-            mutate(across(, as.character))) %>% 
+            mutate(across(everything(), as.character))) %>% 
   gt::gt() %>% gt::tab_options(table.font.size = 11, 
                                data_row.padding = 0.1)
 ```
@@ -198,13 +198,13 @@ cowplot::plot_grid(
 
 ```{r, echo=FALSE}
 bind_rows(head(bc$get_samples(), 3) %>% 
-            mutate(across(, as.character)),
+            mutate(across(everything(), as.character)),
           tibble(batch = "...", 
                  location = " ...", 
                  SubjectID = "...", 
                  Group = "...", Sex = "..."),
           tail(bc$get_samples(), 3) %>% 
-            mutate(across(, as.character))) %>% 
+            mutate(across(everything(), as.character))) %>% 
   gt::gt() %>% gt::tab_options(table.font.size = 11, 
                                data_row.padding = 0.1)
 ```
