@@ -454,12 +454,12 @@ BatchContainer <- R6::R6Class("BatchContainer",
     ),
 
     #' @description
-    #' Return a tibble with scores from an optimization.
+    #' Return a table with scores from an optimization.
     #'
     #' @param index optimization index, all by default
     #' @param include_aggregated include aggregated scores
     #' @return a [tibble::tibble()] with scores
-    scores_tibble = function(index = NULL, include_aggregated = FALSE) {
+    scores_table = function(index = NULL, include_aggregated = FALSE) {
       assertthat::assert_that(
         tibble::is_tibble(self$trace),
         nrow(self$trace) >= 1,
