@@ -513,7 +513,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' @param include_aggregated include aggregated scores
     #' @return a [ggplot2::ggplot()] object
     plot_trace = function(index = NULL, include_aggregated = FALSE, ...) {
-      d <- self$scores(index, include_aggregated)
+      d <- self$scores_table(index, include_aggregated) %>%
+        dplyr::mutate(
+          agg_title = dplyr::if_else(.data$aggregated, "aggregated", "score")
+        )
       p <- ggplot2::ggplot(d) +
         ggplot2::aes(.data$step, .data$value, group = .data$score, color = .data$score) +
         ggplot2::geom_line() +
@@ -523,7 +526,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           ggplot2::facet_wrap(~ optimization_index, scales = "free")
       } else if (include_aggregated && any(d$aggregated)) {
         p <- p +
-          ggplot2::facet_wrap(~ aggregated, scales = "free_y", ncol = 1)
+          ggplot2::facet_wrap(~ agg_title, scales = "free_y", ncol = 1)
       } else {
         p <- p +
           ggplot2::facet_wrap(~ score, scales = "free_y", ncol = 1)
