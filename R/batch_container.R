@@ -442,59 +442,81 @@ BatchContainer <- R6::R6Class("BatchContainer",
     ),
 
     #' @description
-    #' Return a tibble with scores from the last optimization.
+    #' Return a tibble with scores from an optimization.
     #'
-    #' @param include_aggregated shall aggregated scores be included
+    #' @param index optimization index, all by default
+    #' @param include_aggregated include aggregated scores
     #' @return a [tibble::tibble()] with scores
-    last_optimization_tibble = function(include_aggregated = FALSE) {
+    scores_tibble = function(index = NULL, include_aggregated = FALSE) {
       assertthat::assert_that(
         tibble::is_tibble(self$trace),
         nrow(self$trace) >= 1,
         msg = "trace should be available"
       )
       assertthat::assert_that(assertthat::is.flag(include_aggregated))
-      d <- tail(self$trace, 1)$scores[[1]] %>%
-        tidyr::pivot_longer(-.data$step,
+      if (is.null(index)) {
+        index <- self$trace$optimization_index
+      }
+      assertthat::assert_that(
+        rlang::is_integerish(index),
+        msg = "index should be an integer"
+      )
+      d <- self$trace %>%
+        dplyr::filter(.data$optimization_index %in% index) %>%
+        dplyr::select(.data$optimization_index, .data$scores) %>%
+        tidyr::unnest(.data$scores) %>%
+        tidyr::pivot_longer(c(-.data$optimization_index, -.data$step),
                             names_to = "score",
-                            values_to = "value")
-      d$aggregated <- FALSE
+                            values_to = "value") %>%
+        dplyr::mutate(aggregated = FALSE)
       if (include_aggregated) {
-        d_agg <- tail(self$trace, 1)$aggregated_scores[[1]]
-        if (!is.null(d_agg)) {
-          d_agg <- tidyr::pivot_longer(
-            d_agg,
-            -.data$step,
-            names_to = "score",
-            values_to = "value"
-          )
-          d_agg$score <- paste0("agg.", d_agg$score)
-          d_agg$aggregated <- TRUE
-          d <- dplyr::bind_rows(
-            d,
-            d_agg
-          )
+        d_agg <- self$trace %>%
+          dplyr::filter(.data$optimization_index %in% index) %>%
+          dplyr::select(.data$optimization_index, .data$aggregated_scores) %>%
+          tidyr::unnest(.data$aggregated_scores)
+
+        if ("step" %in% colnames(d_agg)) {
+          # if no aggregated scores are provided (aggregated_scores=NULL),
+          # there will be no step column after unnesting
+          d_agg <- d_agg %>%
+            tidyr::pivot_longer(c(-.data$optimization_index, -.data$step),
+                                names_to = "score",
+                                values_to = "value") %>%
+            dplyr::mutate(
+              aggregated = TRUE,
+              score = paste0("agg.", .data$score)
+            )
+            d <- dplyr::bind_rows(
+              d,
+              d_agg
+            )
         }
-      } else {
-        d_agg <- NULL
       }
       d
     },
 
     #' @description
     #' Plot trace
-    plot_trace = function(include_aggregated = FALSE, ...) {
-      d <- self$last_optimization_tibble(include_aggregated)
+    #' @param index optimization index, all by default
+    #' @param include_aggregated include aggregated scores
+    #' @return a [ggplot2::ggplot()] object
+    plot_trace = function(index = NULL, include_aggregated = FALSE, ...) {
+      d <- self$scores(index, include_aggregated)
       p <- ggplot2::ggplot(d) +
         ggplot2::aes(.data$step, .data$value, group = .data$score, color = .data$score) +
         ggplot2::geom_line() +
         ggplot2::geom_point()
-      if (include_aggregated && any(d$aggregated)) {
+      if (length(unique(d$optimization_index)) > 1) {
         p <- p +
-          ggplot2::facet_wrap(~ score, scales = "free_y", ncol = 1)
-      } else {
+          ggplot2::facet_wrap(~ optimization_index, scales = "free")
+      } else if (include_aggregated && any(d$aggregated)) {
         p <- p +
           ggplot2::facet_wrap(~ aggregated, scales = "free_y", ncol = 1)
+      } else {
+        p <- p +
+          ggplot2::facet_wrap(~ score, scales = "free_y", ncol = 1)
       }
+      p
     }
   ),
   private = list(
