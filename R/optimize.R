@@ -215,18 +215,6 @@ optimize_design <- function(batch_container, samples = NULL,
     !is.null(scoring),
     msg = "Scoring should be provided when calling optimize_design()"
   )
-  if (is.function(scoring)) {
-    scoring <- list(scoring)
-  } else {
-    assertthat::assert_that(is.list(scoring), length(scoring) >= 1)
-    assertthat::assert_that(
-      all(purrr::map_lgl(scoring, is.function)),
-      msg = "All elements of scoring should be functions"
-    )
-  }
-  if (is.null(names(scoring))) {
-    names(scoring) <- stringr::str_c("score_", seq_along(scoring))
-  }
 
   # Get assigned samples and locations from the batch container
   samp <- batch_container$get_samples(include_id = TRUE, assignment = TRUE, remove_empty_locations = FALSE)

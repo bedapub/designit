@@ -328,8 +328,8 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' @description
     #' Score current sample assignment,
-    #' @param scoring names list of scoring functions. Each functin should
-    #' return a numeric vector.
+    #' @param scoring a function or a names list of scoring functions.
+    #' Each function should return a numeric vector.
     #' @return Returns a named vector of all scoring functions values.
     score = function(scoring) {
       assertthat::assert_that(
@@ -337,6 +337,18 @@ BatchContainer <- R6::R6Class("BatchContainer",
         !is.null(scoring),
         msg = "Scoring function needs to be provided"
       )
+      if (is.function(scoring)) {
+        scoring <- list(scoring)
+      } else {
+        assertthat::assert_that(is.list(scoring), length(scoring) >= 1)
+        assertthat::assert_that(
+          all(purrr::map_lgl(scoring, is.function)),
+          msg = "All elements of scoring should be functions"
+        )
+      }
+      if (is.null(names(scoring))) {
+        names(scoring) <- stringr::str_c("score_", seq_along(scoring))
+      }
       assertthat::assert_that(is.list(scoring),
         length(scoring) >= 1,
         msg = "Scroring function should be a non-empty list"
