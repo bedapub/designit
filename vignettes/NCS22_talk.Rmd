@@ -57,16 +57,8 @@ set.seed(17) # gives `bad` random assignment
 
 bc <- BatchContainer$new(
   dimensions = list("batch" = 3, "location" = 11),
-)
-
-bc$scoring_f <- list(
-  group = osat_score_generator(batch_vars = "batch", 
-                               feature_vars = "Group"),
-  sex = osat_score_generator(batch_vars = "batch", 
-                             feature_vars = "Sex")
-)
-
-assign_random(bc, subject_data)
+) %>%
+  assign_random(subject_data)
 ```
 
 Gone wrong: Random distribution of 31 grouped subjects into 3 batches 
@@ -119,14 +111,8 @@ set.seed(17) # gives `bad` random assignment
 ```{r}
 bc <- BatchContainer$new(
   dimensions = list("batch" = 3, "location" = 11),
-)
-bc$scoring_f <- list(
-  group = osat_score_generator(batch_vars = "batch", 
-                               feature_vars = "Group"),
-  sex = osat_score_generator(batch_vars = "batch", 
-                             feature_vars = "Sex")
-)
-assign_random(bc, subject_data)
+) %>%
+  assign_random(subject_data)
 ```
 
 
@@ -172,10 +158,20 @@ bind_rows(head(bc$get_samples(), 3) %>%
     * sex (lower priority)
 
 ```{r, warning=FALSE}
-trace <- optimize_design(
+bc <- optimize_design(
   bc,
+  scoring = list(
+    group = osat_score_generator(
+      batch_vars = "batch",
+      feature_vars = "Group"
+    ),
+    sex = osat_score_generator(
+      batch_vars = "batch",
+      feature_vars = "Sex"
+    )
+  ),
   n_shuffle = 1,
-  acceptance_func = 
+  acceptance_func =
     ~ accept_leftmost_improvement(..., tolerance = 0.01),
   max_iter = 150,
   quiet = TRUE
@@ -193,7 +189,7 @@ cowplot::plot_grid(
     bc$get_samples() %>% ggplot(aes(x = batch, fill = Sex)) +
       geom_bar() +
       labs(y = "subject count"),
-    trace$plot(include_aggregated = TRUE)
+    bc$plot_trace(include_aggregated = TRUE)
   ),
   ncol = 3
 )
@@ -243,9 +239,9 @@ set.seed(1) #1 #2
 
 bc <- BatchContainer$new(
   dimensions = list("plate" = 3, "row" = 4, "col" = 6),
-)
-assign_random(bc, dat)
-#assign_in_order(bc, dat)
+) %>%
+  assign_random(dat)
+#  assign_in_order(dat)
 ```
 
 ```{r, fig.width= 5, fig.height=4.5, eval=FALSE}
@@ -276,7 +272,7 @@ cowplot::plot_grid(
 ## Spatial arrangement
 
 ```{r, warning=FALSE, message=FALSE} 
-traces <- optimize_multi_plate_design(
+bc <- optimize_multi_plate_design(
   bc,
   across_plates_variables = c("Group", "Sex"),
   within_plate_variables = c("Group"),
@@ -299,8 +295,8 @@ cowplot::plot_grid(
 )
 ```
 
-```{r fig.width=3, fig.height=3, echo=FALSE}
-purrr::imap(traces, ~ .x$plot(include_aggregated=TRUE) + labs(title = .y))[1:2]
+```{r fig.width=5, fig.height=4, echo=FALSE}
+bc$plot_trace()
 ```
 
 
