@@ -229,8 +229,6 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
     msg = "All columns in 'within_plate_variable' argument have to be found in batch container samples."
   )
 
-  traces <- list()
-
   skip_osat <- is.null(across_plates_variables) || is.null(plate) || dplyr::n_distinct(bc$get_locations()[[plate]]) < 2
 
   if (skip_osat && !quiet) message("\nNo balancing of variables across plates required...")
@@ -239,25 +237,22 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
     scoring_funcs <- purrr::map(across_plates_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
       unlist()
     names(scoring_funcs) <- across_plates_variables
-    bc$scoring_f <- scoring_funcs
 
     if (!quiet) message("\nAssigning samples to plates...")
-    trace1 <- optimize_design(bc,
+    bc <- optimize_design(bc,
+      scoring = scoring_funcs,
       max_iter = max_iter,
       n_shuffle = n_shuffle,
       acceptance_func = accept_leftmost_improvement,
       quiet = TRUE
     )
-    traces <- c(traces, osat_across_plates = trace1)
   }
 
   if (!is.null(within_plate_variables)) {
-    within_traces <- list()
     plate_levels <- unique(bc$get_locations()[[plate]])
     scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x)) %>%
       unlist()
     names(scoring_funcs) <- paste(rep(within_plate_variables, each = length(plate_levels)), names(scoring_funcs))
-    bc$scoring_f <- scoring_funcs
 
 
     if (!quiet) {
@@ -270,7 +265,8 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
     for (curr_plate in plate_levels) {
       if (!quiet && length(plate_levels) > 1) cat(curr_plate, "... ")
 
-      trace2 <- optimize_design(bc,
+      bc <- optimize_design(bc,
+        scoring = scoring_funcs,
         max_iter = max_iter,
         quiet = TRUE,
         shuffle_proposal_func = mk_subgroup_shuffling_function(
@@ -279,16 +275,13 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
         ),
         acceptance_func = accept_leftmost_improvement
       )
-      within_traces <- c(within_traces, trace2)
     }
     if (!quiet) cat("\n")
-    names(within_traces) <- paste0("within_plate_", plate_levels)
-    traces <- c(traces, within_traces)
   }
 
   if (skip_osat && is.null(within_plate_variables) && !quiet) {
     message("\nBoth across plates and within plate optimization skipped ('within_plate_variables' is empty).\nBatch container unchanged.\n")
   }
 
-  invisible(traces)
+  bc
 }

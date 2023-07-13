@@ -123,6 +123,7 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @param batch_container An instance of `BatchContainer`.
 #' @param samples A `data.frame` with sample information.
 #' Should be `NULL` if the `BatchContainer` already has samples in it.
+#' @param scoring Scoring function or a named [list()] of scoring functions.
 #' @param n_shuffle Vector of length 1 or larger, defining how many random sample
 #' swaps should be performed in each iteration. If length(n_shuffle)==1,
 #' this sets no limit to the number of iterations. Otherwise, the optimization
@@ -170,10 +171,14 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' bc <- BatchContainer$new(
 #'   dimensions = c("plate" = 2, "column" = 5, "row" = 6)
 #' )
-#' bc$scoring_f <- osat_score_generator("plate", "Sex")
-#' optimize_design(bc, invivo_study_samples, max_iter = 100)
+#' bc <- optimize_design(bc, invivo_study_samples,
+#'   scoring = osat_score_generator("plate", "Sex"),
+#'   max_iter = 100
+#' )
 #' plot_plate(bc$get_samples(), .col = Sex)
-optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
+optimize_design <- function(batch_container, samples = NULL,
+                            scoring = NULL,
+                            n_shuffle = NULL,
                             shuffle_proposal_func = NULL,
                             acceptance_func = accept_strict_improvement,
                             aggregate_scores_func = identity,
@@ -182,10 +187,19 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
                             sample_attributes_fixed = FALSE,
                             max_iter = 1e4, min_delta = NA, quiet = FALSE) {
   start_time <- Sys.time()
+  cl <- match.call()
+
+  # create a copy, so that we do not modify the BatchContainer
+  batch_container <- batch_container$copy()
+  trace <- tibble::tibble(
+    optimization_index = max(batch_container$trace$optimization_index, 0) + 1,
+    call = list(cl),
+    start_assignment_vec = list(batch_container$assignment)
+  )
 
   # based on https://stat.ethz.ch/pipermail/r-help/2007-September/141717.html
   if (!exists(".Random.seed")) stats::runif(1)
-  save_random_seed <- .Random.seed
+  trace$seed <- list(.Random.seed)
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
@@ -197,11 +211,22 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   }
 
 
-  # Check presence of scoring function and that it's a list of functions
-  assertthat::assert_that(!is.null(batch_container$scoring_f), msg = "no scoring function set for BatchContainer")
-  assertthat::assert_that(is.list(batch_container$scoring_f), msg = "scoring function is expected to be a list")
-  assertthat::assert_that(all(purrr::map_lgl(batch_container$scoring_f, is.function)), msg = "All scoring functions have to be function definitions")
-
+  assertthat::assert_that(
+    !is.null(scoring),
+    msg = "Scoring should be provided when calling optimize_design()"
+  )
+  if (is.function(scoring)) {
+    scoring <- list(scoring)
+  } else {
+    assertthat::assert_that(is.list(scoring), length(scoring) >= 1)
+    assertthat::assert_that(
+      all(purrr::map_lgl(scoring, is.function)),
+      msg = "All elements of scoring should be functions"
+    )
+  }
+  if (is.null(names(scoring))) {
+    names(scoring) <- stringr::str_c("score_", seq_along(scoring))
+  }
 
   # Get assigned samples and locations from the batch container
   samp <- batch_container$get_samples(include_id = TRUE, assignment = TRUE, remove_empty_locations = FALSE)
@@ -257,13 +282,14 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     best_shuffle <- list(src = NULL, dst = NULL, location_assignment = batch_container$assignment, samples_attr = NULL)
   }
 
-  initial_score <- batch_container$score() # Evaluate this just once in order not to break current tests
+  # Evaluate this just once in order not to break current tests
+  initial_score <- batch_container$score(scoring)
   score_dim <- length(initial_score)
 
   # Check score variances (should be all >0)
   if (check_score_variance) {
     bc_copy <- batch_container$copy()
-    score_vars <- random_score_variances(batch_container$copy(), random_perm = 100, sample_attributes_fixed)
+    score_vars <- random_score_variances(batch_container$copy(), scoring = scoring, random_perm = 100, sample_attributes_fixed)
     low_var_scores <- score_vars < 1e-10
     if (!quiet) {
       message(
@@ -298,6 +324,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       )
     }
     autoscale_func <- mk_autoscale_function(batch_container$copy(),
+      scoring = scoring,
       random_perm = autoscaling_permutations,
       use_boxcox = autoscale_useboxcox,
       sample_attributes_fixed
@@ -312,20 +339,23 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   prev_agg <- NULL
 
 
-  trace <- OptimizationTrace$new(
-    max_iter + 1, # + 1 to accommodate initial score
-    length(batch_container$scoring_f),
-    names(batch_container$scoring_f)
+  scores_mat <- matrix(
+    nrow = max_iter + 1, # + 1 to accommodate initial score
+    ncol = length(best_score),
+    dimnames = list(NULL, names(best_score))
   )
 
+  scores_mat[1,] <- best_score
   if (identical(aggregate_scores_func, identity)) {
-    # Do not store aggregated scores if unnecessary
-    trace$set_scores(1, best_score, NULL)
+    aggregated_scores_mat <- NULL
   } else {
-    trace$set_scores(1, best_score, best_agg)
+    aggregated_scores_mat <- matrix(
+      nrow = max_iter + 1, # + 1 to accommodate initial score
+      ncol = length(best_agg),
+      dimnames = list(NULL, names(best_agg))
+    )
+    aggregated_scores_mat[1,] <- best_agg
   }
-  # to do: make work with >1-dim agg, line should read as
-  # trace$set_scores(1, best_score, best_agg)
 
   if (!quiet) report_scores(best_score, best_agg, iteration = 0)
 
@@ -338,7 +368,7 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
       using_attributes <- TRUE
     }
 
-    new_score <- autoscale_func(batch_container$score())
+    new_score <- autoscale_func(batch_container$score(scoring))
     assertthat::assert_that(!any(is.na(new_score)), msg = stringr::str_c("NA apprearing during scoring in iteration ", iteration))
     new_agg <- aggregate_scores_func(new_score)
 
@@ -358,11 +388,9 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
     }
 
     iteration <- iteration + 1
-    if (identical(aggregate_scores_func, identity)) {
-      # Do not store aggregated scores if unnecessary
-      trace$set_scores(iteration, best_score, NULL)
-    } else {
-      trace$set_scores(iteration, best_score, best_agg)
+    scores_mat[iteration,] <- best_score
+    if (!is.null(aggregated_scores_mat)) {
+      aggregated_scores_mat[iteration,] <- best_agg
     }
 
     # Test stopping criteria
@@ -384,8 +412,14 @@ optimize_design <- function(batch_container, samples = NULL, n_shuffle = NULL,
   # In the end, always make sure that final state of bc is the one with the best score
   update_batchcontainer(batch_container, best_shuffle)
 
-  trace$shrink(iteration)
-  trace$seed <- save_random_seed
+  # shrink
+  trace$scores <- shrink_mat(scores_mat, iteration)
+  trace$aggregated_scores <- shrink_mat(aggregated_scores_mat, iteration)
   trace$elapsed <- Sys.time() - start_time
-  trace
+  trace$end_assignment_vec = list(bc$assignment)
+  batch_container$trace <- dplyr::bind_rows(
+    batch_container$trace,
+    trace
+  )
+  batch_container
 }
