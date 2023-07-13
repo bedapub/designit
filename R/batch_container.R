@@ -440,8 +440,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       invisible(self)
     },
 
-    #' @description
-    #' Optimization trace, a [tibble::tibble()]
+    #' @field trace Optimization trace, a [tibble::tibble()]
     trace = tibble::tibble(
       optimization_index = numeric(),
       call = list(),
@@ -511,6 +510,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Plot trace
     #' @param index optimization index, all by default
     #' @param include_aggregated include aggregated scores
+    #' @param ... not used.
     #' @return a [ggplot2::ggplot()] object
     plot_trace = function(index = NULL, include_aggregated = FALSE, ...) {
       d <- self$scores_table(index, include_aggregated) %>%
