@@ -55,8 +55,8 @@ We start by assigning samples randomly.
 set.seed(42)
 bc <- BatchContainer$new(
   dimensions = c("cage" = 11, "position" = 5)
-)
-assign_random(bc, samples)
+) %>%
+  assign_random(samples)
 bc
 ```
 
@@ -96,15 +96,14 @@ and `sex` interactions are considered in the scoring function. We only use 10 it
 shuffling is limited to locations with males and enforces change of cage on every iteration.
 
 ```{r}
-bc$scoring_f <- osat_score_generator(
-  "cage",
-  "sex"
-)
-
 set.seed(10)
 
-res <- optimize_design(
+bc <- optimize_design(
   bc,
+  scoring = osat_score_generator(
+    "cage",
+    "sex"
+  ),
   shuffle_proposal_func = shuffle_with_constraints(
     sex == "M",
     cage != .src$cage
@@ -112,7 +111,7 @@ res <- optimize_design(
   max_iter = 10
 )
 
-plot(res)
+bc$plot_trace()
 ```
 We expect the distribution of males become even, while other variables are not significantly
 affected.
@@ -129,7 +128,7 @@ locations. We also ensure that on every iteration the cage number is changed; we
 `position` dimension does affect actual animal allocation.
 
 ```{r}
-bc$scoring_f <- function(bc) {
+scoring_f <- function(bc) {
   samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
   avg_w <- samples[, mean(weight, na.rm = TRUE)]
   avg_w_per_cage <- samples[!is.na(weight), mean(weight), by = cage]$V1
@@ -141,7 +140,8 @@ bc$scoring_f <- function(bc) {
 }
 
 set.seed(12)
-res <- optimize_design(bc,
+bc <- optimize_design(bc,
+  scoring = scoring_f,
   shuffle_proposal = shuffle_with_constraints(
     sex == "F",
     cage != .src$cage & (is.na(sex) | sex != "M")
@@ -149,8 +149,8 @@ res <- optimize_design(bc,
   n_shuffle = c(rep(10, 20), rep(5, 20), rep(3, 20), rep(1, 140)),
   max_iter = 200
 )
-plot(res)
-bc$score()
+bc$plot_trace()
+scoring_f(bc)
 ```
 
 Now we have a much more even distribution of weights and treatment/control balance.

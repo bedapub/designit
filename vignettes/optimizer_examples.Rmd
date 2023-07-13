@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   
 ```{r setup}
 library(designit)
+library(magrittr)
 ```
   
   
@@ -60,12 +61,9 @@ bc <- BatchContainer$new(
     run = 2, position = 5
   ),
   exclude = tibble::tibble(batch = 4, run = c(1, 2), position = c(5, 5))
-)
-
-# Add samples to container
-assign_in_order(bc, samples = multi_trt_day_samples)
-# Set scoring function
-bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
+) %>%
+  # Add samples to container
+  assign_in_order(samples = multi_trt_day_samples)
 
 bc
 ```
@@ -85,15 +83,15 @@ Optimization finishes after the list of permutations is exhausted.
 ```{r}
 n_shuffle <- rep(c(32, 10, 5, 2, 1), c(20, 40, 40, 50, 50))
 
+scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
 
-bc1 <- bc$copy()
-
-trace1 <- optimize_design(
-  bc1,
+bc1 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   n_shuffle = n_shuffle # will implicitly generate a shuffling function according to the provided schedule
 )
 
-trace1$elapsed
+bc1$trace$elapsed
 ```
 
 ## Optimization trace 
@@ -101,14 +99,27 @@ trace1$elapsed
 Custom plot with some colours:
 
 ```{r, fig.width=5, fig.height= 4}
-ggplot2::qplot(x = seq_along(trace1$scores), y = trace1$scores, color = factor(n_shuffle)[1:length(trace1$scores)], geom = "point") +
-  ggplot2::labs(title = "Score 1 tracing", subtitle = stringr::str_glue("Final score = {bc1$score()}"), x = "Iteration", y = "Score", color = "n_shuffle")
+bc1$scores_table() %>%
+  dplyr::mutate(
+    n_shuffle = c(NA, n_shuffle)
+  ) %>%
+  ggplot2::ggplot(
+    ggplot2::aes(step, value, color = factor(n_shuffle))
+  ) +
+  ggplot2::geom_point() +
+  ggplot2::labs(
+    title = "Score 1 tracing",
+    subtitle = stringr::str_glue("Final score = {bc1$score(scoring_f)}"),
+    x = "Iteration",
+    y = "Score",
+    color = "n_shuffle"
+  )
 ```
 
 Using the internal method...
 
 ```{r, fig.width=5, fig.height= 4}
-trace1$plot()
+bc1$plot_trace()
 ```
 
 We may safely apply the batch container methods get_samples() and score() also
@@ -116,7 +127,7 @@ after using the new optimization code.
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
-bc1$score()
+bc1$score(scoring_f)
 
 bc1$get_samples(assignment = TRUE) %>%
   dplyr::filter(!is.na(Treatment)) %>%
@@ -136,8 +147,9 @@ immediately on the same batch container.
 ```{r}
 n_shuffle <- rep(c(5, 2, 1), c(30, 30, 30))
 
-optimize_design(
+bc1 <- optimize_design(
   bc1,
+  scoring = scoring_f,
   n_shuffle = n_shuffle
 )
 ```
@@ -154,10 +166,9 @@ reaching a specific minimum delta threshold (score improvement from one selected
 solution to the next).
 
 ```{r}
-bc2 <- bc$copy()
-
-optimize_design(
-  bc2,
+bc2 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   n_shuffle = 3, # will implicitly generate a shuffling function that will do 3 swaps at each iteration
   max_iter = 2000,
   min_delta = 0.1
@@ -168,7 +179,7 @@ optimize_design(
 # Optimization with multi-variate scoring function
 
 Instead of passing a single scoring function, a list of multiple scoring
-functions can be assigned to a batch container, each of which to return a scalar
+functions can be passed to the optimizer, each of which to return a scalar
 value on evaluation.
 
 By default, a strict improvement rule is applied for classifying a potential
@@ -182,16 +193,15 @@ The second scoring function used here is by the way rather redundant and just
 serves for illustration.
 
 ```{r}
-bc3 <- bc$copy()
-
-bc3$scoring_f <- list(
+multi_scoring_f <- list(
   osat_score_generator(c("batch"), c("Treatment", "Time")),
   osat_score_generator(c("batch"), c("Treatment"))
 )
 
 
-trace <- optimize_design(
-  bc3,
+bc3 <- optimize_design(
+  bc,
+  scoring = multi_scoring_f,
   n_shuffle = 3,
   max_iter = 200,
   min_delta = 0.1
@@ -216,16 +226,9 @@ We may also want to decrease the delta_min parameter to match the new numerical
 range.
 
 ```{r}
-bc3_as <- bc$copy()
-
-bc3_as$scoring_f <- list(
-  osat_score_generator(c("batch"), c("Treatment", "Time")),
-  osat_score_generator(c("batch"), c("Treatment"))
-)
-
-
-trace <- optimize_design(
-  bc3_as,
+bc3_as <- optimize_design(
+  bc,
+  scoring = multi_scoring_f,
   n_shuffle = 3,
   max_iter = 200,
   min_delta = 0.01,
@@ -245,16 +248,9 @@ simply set the aggregated score to whichever of the individual scores is larger
 
 
 ```{r}
-bc4 <- bc$copy()
-
-bc4$scoring_f <- list(
-  osat_score_generator(c("batch"), c("Treatment", "Time")),
-  osat_score_generator(c("batch"), c("Treatment"))
-)
-
-
-optimize_design(
-  bc4,
+bc4 <- optimize_design(
+  bc,
+  scoring = multi_scoring_f,
   n_shuffle = 3,
   aggregate_scores_func = worst_score,
   max_iter = 200,
@@ -271,15 +267,9 @@ For illustration, we omit the `n_shuffle` parameter here, which will lead by
 default to pairwise sample swaps being done on each iteration.
 
 ```{r, eval = FALSE}
-bc5 <- bc$copy()
-
-bc5$scoring_f <- list(
-  osat_score_generator(c("batch"), c("Treatment", "Time")),
-  osat_score_generator(c("batch"), c("Treatment"))
-)
-
-optimize_design(
-  bc5,
+bc5 <- optimize_design(
+  bc,
+  scoring = multi_scoring_f,
   aggregate_scores_func = sum_scores,
   max_iter = 200,
   autoscale_scores = TRUE,
@@ -295,15 +285,9 @@ Note that we don't use the auto-scaling in this case as the L2-norm based optimi
 not the minimal (negative) value that would be desired in that case.
 
 ```{r, eval = FALSE}
-bc5_2 <- bc$copy()
-
-bc5_2$scoring_f <- list(
-  osat_score_generator(c("batch"), c("Treatment", "Time")),
-  osat_score_generator(c("batch"), c("Treatment"))
-)
-
-optimize_design(
-  bc5_2,
+bc5_2 <- optimize_design(
+  bc,
+  scoring = multi_scoring_f,
   aggregate_scores_func = L2s_norm,
   max_iter = 200,
 )
@@ -322,10 +306,9 @@ across all available positions in the batch container. Note that this is usually
 not a good strategy for converging to a solution.
 
 ```{r}
-bc6 <- bc$copy()
-
-optimize_design(
-  bc6,
+bc6 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   shuffle_proposal_func = complete_random_shuffling,
   max_iter = 200
 )
@@ -349,10 +332,9 @@ to be optimized. Choose an appropriate aggregation function if you happen to
 have multiple scores initially.
 
 ```{r}
-bc7 <- bc$copy()
-
-trace7 <- optimize_design(
-  bc7,
+bc7 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(),
   max_iter = 200
@@ -362,23 +344,22 @@ The trace may show a non strictly monotonic behavior now, reflecting the SA
 protocol at work.
 
 ```{r, fig.width=5, fig.height= 4}
-trace7$plot()
+bc7$plot_trace()
 ```
 
 Better results and quicker convergence may be achieved by playing with the
 starting temperature (T0) and cooling speed (alpha) in a specific case.
 
 ```{r}
-bc8 <- bc$copy()
-
-trace8 <- optimize_design(
-  bc8,
+bc8 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 100, alpha = 2)),
   max_iter = 150
 )
 
-trace8$plot()
+bc8$plot_trace()
 ```
 
 # Full blown example
@@ -387,16 +368,15 @@ The following example puts together all possible options to illustrate the
 flexibility of the optimization.
 
 ```{r}
-bc$scoring_f <- list(
-  osat_score_generator(c("batch"), c("Treatment", "Time")),
-  osat_score_generator(c("batch"), c("Treatment")),
-  osat_score_generator(c("batch"), c("Time"))
-)
-
 n_shuffle <- rep(c(3, 2, 1), c(20, 20, 200))
 
-trace <- optimize_design(
+bc9 <- optimize_design(
   bc,
+  scoring = list(
+    osat_score_generator(c("batch"), c("Treatment", "Time")),
+    osat_score_generator(c("batch"), c("Treatment")),
+    osat_score_generator(c("batch"), c("Time"))
+  ),
   n_shuffle = n_shuffle,
   aggregate_scores_func = sum_scores,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 1)),
@@ -405,9 +385,9 @@ trace <- optimize_design(
   autoscale_scores = T
 )
 
-trace$plot()
+bc9$plot_trace()
 
-bc$get_samples(assignment = TRUE) %>%
+bc9$get_samples(assignment = TRUE) %>%
   dplyr::mutate(batch = factor(batch)) %>%
   ggplot2::ggplot(ggplot2::aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   ggplot2::geom_bar()
