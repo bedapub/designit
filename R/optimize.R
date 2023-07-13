@@ -404,7 +404,7 @@ optimize_design <- function(batch_container, samples = NULL,
   trace$scores <- shrink_mat(scores_mat, iteration)
   trace$aggregated_scores <- shrink_mat(aggregated_scores_mat, iteration)
   trace$elapsed <- Sys.time() - start_time
-  trace$end_assignment_vec = list(bc$assignment)
+  trace$end_assignment_vec = list(batch_container$assignment)
   batch_container$trace <- dplyr::bind_rows(
     batch_container$trace,
     trace
