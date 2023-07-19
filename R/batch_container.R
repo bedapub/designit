@@ -351,7 +351,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
       }
       assertthat::assert_that(is.list(scoring),
         length(scoring) >= 1,
-        msg = "Scroring function should be a non-empty list"
+        msg = "Scoring function should be a non-empty list"
       )
       assertthat::assert_that(!is.null(names(scoring)),
         msg = "scoring should be a named list"
