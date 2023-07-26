@@ -207,7 +207,7 @@ optimize_design <- function(batch_container, samples = NULL,
     )
   } else {
     assertthat::assert_that(nrow(samples) > 0)
-    assign_in_order(batch_container, samples)
+    batch_container <- assign_in_order(batch_container, samples)
   }
 
 
