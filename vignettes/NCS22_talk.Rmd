@@ -4,7 +4,7 @@ author: "Juliane Siebourg-Polster, Iakov Davydov, Guido Steiner, Balazs Banfai"
 output: 
   rmarkdown::html_vignette: 
 vignette: >
-  %\VignetteIndexEntry{NCS Talk}
+  %\VignetteIndexEntry{designit: a flexible engine to generate experiment layouts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 editor_options: 

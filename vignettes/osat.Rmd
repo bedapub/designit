@@ -124,7 +124,7 @@ bc$n_locations
 
 Assign samples and get initial setup.
 ```{r}
-bc$samples <- samples
+bc <- assign_in_order(bc, samples)
 
 starting_assignment <- bc$get_locations() %>%
   left_join(g_setup_start) %>%
@@ -139,22 +139,23 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 
 ## Using designit OSAT score implementation
 ```{r}
-bc$scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
+scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
 
-bc$score()
+bc$score(scoring_f)
 g_setup@metadata$optValue %>% head(1)
 # should be identical
 
 bench::system_time({
   set.seed(123)
-  trace_reference <- optimize_design(bc, max_iter = params$iterations)
+  bc_reference <- optimize_design(bc, scoring = scoring_f, max_iter = params$iterations)
 })
 ```
 
 ```{r}
 # final score
-bc$score()
-plot(trace_reference, main = str_glue("Final score={bc$score()}"))
+bc_reference$score(scoring_f)
+bc_reference$plot_trace() +
+  ggtitle(str_glue("Final score={bc$score(scoring_f)}"))
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
 ```
@@ -163,9 +164,8 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 Instead of relying on `BatchContainer`, here we have a manual optimization process using `data.table`.
 
 ```{r}
-bc$move_samples(location_assignment = starting_assignment)
-
 fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
+  bc <- bc$copy()
   ldf <- data.table::data.table(bc$get_locations())[, c("plates")][, ".sample_id" := bc$assignment]
   fcols <- c(".sample_id", feature_vars)
   smp <- data.table::data.table(bc$samples)[, ..fcols]
@@ -202,27 +202,27 @@ fast_osat_optimize <- function(bc, batch_vars, feature_vars, iterations) {
 
   bc$assignment <- df$.sample_id
 
-  scores
+  list(bc=bc, scores=scores)
 }
 
 bench::system_time({
   set.seed(123)
-  trace <- fast_osat_optimize(bc, "plates", c("SampleType", "Race", "AgeGrp"), iterations = params$iterations)
+  opt_res <- fast_osat_optimize(bc, "plates", c("SampleType", "Race", "AgeGrp"), iterations = params$iterations)
 })
 ```
 
 # Shuffle optimization with burn-in
 ```{r}
-bc$move_samples(location_assignment = starting_assignment)
-
-bc$scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
+scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
 
 burn_in_it <- floor(params$iterations * 0.1)
 burn_in_it
 
 bench::system_time({
   set.seed(123)
-  trace_burn_in <- optimize_design(bc,
+  bc_burn_in <- optimize_design(
+    bc,
+    scoring = scoring_f,
     n_shuffle = c(
       rep(20, burn_in_it),
       rep(
@@ -237,9 +237,9 @@ bench::system_time({
 
 ```{r}
 tibble(
-  i = seq_len(trace_burn_in$n_steps),
-  normal = trace_reference$scores,
-  burnin = trace_burn_in$scores
+  i = bc_burn_in$trace$scores[[1]]$step,
+  normal = bc_reference$trace$scores[[1]]$score_1,
+  burnin = bc_burn_in$trace$scores[[1]]$score_1
 ) %>%
   pivot_longer(-i, names_to = "method", values_to = "score") %>%
   ggplot(aes(i, score, col = method)) +
@@ -249,9 +249,7 @@ tibble(
 
 # Score demonstration
 ```{r}
-bc$score()
-bc$scoring_f <- function(...) rnorm(1)
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r}
@@ -260,13 +258,11 @@ assign_random(bc)
 bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
 
-bc$score()
-
-bc$scoring_f <- list(
+scoring_f <- list(
   fc0 = function(samples) rnorm(1) + 2 * rexp(1),
   fc1 = function(samples) rnorm(1, 100),
   fc2 = function(samples) -7
 )
 
-bc$score()
+bc$score(scoring_f)
 ```

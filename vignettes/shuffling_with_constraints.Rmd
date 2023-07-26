@@ -68,9 +68,9 @@ table(treatments)
 
 bc <- BatchContainer$new(locations_table = data.frame(Treatment = treatments, Position = seq_along(treatments)))
 
-assign_in_order(bc, invivo_study_samples)
+bc <- assign_in_order(bc, invivo_study_samples)
 
-bc$scoring_f <- osat_score_generator(batch_vars = "Treatment", feature_vars = c("Strain", "Sex"))
+scoring_f <- osat_score_generator(batch_vars = "Treatment", feature_vars = c("Strain", "Sex"))
 
 bc
 ```
@@ -100,11 +100,10 @@ defined above at the same time. It can be passed to the optimizer together with 
 such as the scoring or acceptance functions.
 
 ```{r}
-bc2 <- bc$copy()
-
-optimize_design(
-  bc2,
-  shuffle_proposal_func = shuffle_grouped_data(bc2,
+bc2 <- optimize_design(
+  bc,
+  scoring = scoring_f,
+  shuffle_proposal_func = shuffle_grouped_data(bc,
     allocate_var = "Treatment",
     keep_together_vars = c("Strain", "Sex"),
     keep_separate_vars = c("Earmark"),
@@ -238,10 +237,9 @@ the beginning!)
 We can finally use the customized shuffling function in the optimization.
 
 ```{r echo=TRUE}
-bc3 <- bc$copy()
-
-trace <- optimize_design(
-  bc3,
+bc3 <- optimize_design(
+  bc,
+  scoring = scoring_f,
   shuffle_proposal_func = shuffle_proposal,
   max_iter = 300
 )
