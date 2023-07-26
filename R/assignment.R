@@ -158,11 +158,9 @@ assign_from_table <- function(batch_container, samples) {
   if (is.null(batch_container$samples)) {
     batch_container$samples <- only_samples
   } else {
-    assertthat::assert_that(dplyr::all_equal(only_samples,
-      batch_container$get_samples(assignment = FALSE),
-      ignore_col_order = TRUE,
-      ignore_row_order = TRUE,
-      convert = TRUE
+    assertthat::assert_that(all_equal_df(
+      only_samples,
+      batch_container$get_samples(assignment = FALSE)
     ),
     msg = "sample sheet should be compatible with samples inside the batch container"
     )
