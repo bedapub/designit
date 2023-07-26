@@ -69,12 +69,12 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2,
 #' bc <- BatchContainer$new(
 #'   dimensions = c("column" = 6, "row" = 10)
 #' )
-#' assign_random(bc, invivo_study_samples)
-#' bc$scoring_f <- mk_plate_scoring_functions(
+#' bc <- assign_random(bc, invivo_study_samples)
+#' scoring_f <- mk_plate_scoring_functions(
 #'   bc,
 #'   row = "row", column = "column", group = "Sex"
 #' )
-#' optimize_design(bc, max_iter = 100)
+#' bc <- optimize_design(bc, scoring = scoring_f, max_iter = 100)
 #' plot_plate(bc$get_samples(), .col = Sex)
 #'
 mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, column, group, p = 2, penalize_lines = "soft") {
