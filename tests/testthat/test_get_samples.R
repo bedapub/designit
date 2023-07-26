@@ -5,7 +5,7 @@ test_that("$get_samles(as_tibble=TRUE) returns correct columns & expected number
   samp <- data.frame(i = 1:8)
   expect_error(bc$get_samples())
   bc$samples <- samp
-  assign_in_order(bc)
+  bc <- assign_in_order(bc)
   stab <- bc$get_samples()
   expect_true(tibble::is_tibble(stab))
   expect_named(stab, c("row", "column", "i"))
@@ -33,7 +33,7 @@ test_that("$get_samles(as_tibble=FALSE) returns correct columns & expected numbe
   samp <- data.frame(i = 1:8)
   expect_error(bc$get_samples())
   bc$samples <- samp
-  assign_in_order(bc)
+  bc <- assign_in_order(bc)
   stab <- bc$get_samples(as_tibble = FALSE)
   expect_true(data.table::is.data.table(stab))
   expect_named(stab, c("row", "column", "i"))

@@ -10,7 +10,7 @@ test_that("add attributes before assigning samples", {
   expect_equal(bc$get_samples(assignment = FALSE)$attr1, rev(1:8))
 })
 
-assign_in_order(bc)
+bc <- assign_in_order(bc)
 
 test_that("add attributes after assigning samples", {
   bc$samples_attr <- NULL

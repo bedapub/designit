@@ -2,7 +2,7 @@ bc <- BatchContainer$new(
   dimensions = c(row = 3, column = 3)
 )
 samp <- data.frame(i = 1:9)
-assign_in_order(bc, samp)
+bc <- assign_in_order(bc, samp)
 
 test_that("assigning $assignment generates a warning", {
   expect_silent(bc$assignment)
@@ -23,7 +23,7 @@ bc <- BatchContainer$new(
   dimensions = c(row = 3, column = 3)
 )
 samp <- data.frame(i = 1:8)
-assign_in_order(bc, samp)
+bc <- assign_in_order(bc, samp)
 
 test_that("$move_samples() works as expected with src & dst (without $get_samples())", {
   bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
@@ -52,7 +52,7 @@ test_that("$move_samples() does not accept non-integers", {
 })
 
 
-assign_in_order(bc)
+bc <- assign_in_order(bc)
 
 test_that("$move_samples() works as expected with src & dst (after $get_samples())", {
   bc$get_samples()
@@ -82,7 +82,7 @@ bc <- BatchContainer$new(
   dimensions = c(row = 3, column = 3)
 )
 samp <- data.frame(i = 1:8)
-assign_in_order(bc, samp)
+bc <- assign_in_order(bc, samp)
 
 test_that("$move_samples() works as expected with location_assignment (without $get_samples())", {
   a <- as.integer(c(2, 3, NA, 4, 5, 6, 7, 8, 1))

@@ -15,9 +15,9 @@ n_elements_changed <- function(bc) {
   Inf
 }
 
-assign_in_order(bc, samples)
+bc <- assign_in_order(bc, samples)
 
-bc$scoring_f <- n_elements_changed
+scoring_f <- n_elements_changed
 
 set.seed(42)
 
@@ -27,6 +27,7 @@ n_changed <- numeric(0)
 test_that("correct number of shuffles = 1", {
   optimize_design(
     bc,
+    scoring = scoring_f,
     max_iter = 10,
     check_score_variance = F,
     autoscale_scores = F
@@ -38,6 +39,7 @@ n_changed <- numeric(0)
 test_that("correct number of shuffles = 2", {
   optimize_design(
     bc,
+    scoring = scoring_f,
     max_iter = 10,
     n_shuffle = 2,
     check_score_variance = F,
@@ -50,6 +52,7 @@ n_changed <- numeric(0)
 test_that("correct number of shuffles = 5", {
   optimize_design(
     bc,
+    scoring = scoring_f,
     max_iter = 10,
     n_shuffle = 5,
     check_score_variance = FALSE,
@@ -62,6 +65,7 @@ n_changed <- numeric(0)
 test_that("specify too many shuffles", {
   optimize_design(
     bc,
+    scoring = scoring_f,
     max_iter = 10,
     n_shuffle = 40,
     check_score_variance = FALSE,
@@ -74,6 +78,7 @@ n_changed <- numeric(0)
 test_that("complex shuffling schedule", {
   optimize_design(
     bc,
+    scoring = scoring_f,
     max_iter = 10,
     n_shuffle = c(2, 2, 5, 2, 2, 10, 20, 40, 40),
     check_score_variance = F,

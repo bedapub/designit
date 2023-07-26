@@ -2,7 +2,7 @@ bc <- BatchContainer$new(
   dimensions = c(row = 3, column = 3)
 )
 samp <- data.frame(i = 1:8)
-assign_in_order(bc, samp)
+bc <- assign_in_order(bc, samp)
 
 test_that("cannot assign has_samples_attr", {
   bc1 <- bc$copy()
