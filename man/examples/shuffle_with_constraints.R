@@ -21,7 +21,7 @@ scoring_f <- function(samples) {
 # in this example we treat all the positions in the plate as equal.
 # when shuffling we enforce that source location is non-empty,
 # and destination location has a different plate number
-optimize_design(
+bc <- optimize_design(
   bc,
   scoring = scoring_f,
   samples,

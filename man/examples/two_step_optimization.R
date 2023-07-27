@@ -25,7 +25,7 @@ plot_plate(bc,
 scoring_f <- osat_score_generator(
   batch_vars = c("plate"), feature_vars = c("Group")
 )
-optimize_design(
+bc <- optimize_design(
   bc,
   scoring = scoring_f,
   max_iter = 10, # the real number of iterations should be bigger
