@@ -27,7 +27,7 @@ shrink_mat <- function(m, last_iteration) {
     return(m)
   dplyr::bind_cols(
     tibble::tibble(step=seq_len(last_iteration)),
-    as.data.frame(head(m, last_iteration))
+    as.data.frame(utils::head(m, last_iteration))
   ) %>%
     list()
 }
