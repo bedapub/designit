@@ -1,7 +1,7 @@
 ---
 title: "Plate scoring example 2"
 output: html_fragment
-knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+knit: (\(input, ...) rmarkdown::render(input, output_dir = here::here("vignettes/cached")))
 ---
 
 ```{r, include = FALSE}

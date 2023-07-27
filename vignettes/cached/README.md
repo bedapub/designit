@@ -10,7 +10,7 @@
   ---
   title: "Title of vignette child"
   output: html_fragment
-  knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+  knit: (\(input, ...) rmarkdown::render(input, output_dir = here::here("vignettes/cached")))
   ---
   ````
 * knit child to HTML fragment (either in RStudio or with `rmarkdown::render()`)
