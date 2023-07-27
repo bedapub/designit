@@ -67,7 +67,6 @@ Suggests:
     tidyverse,
     printr,
     devtools (>= 2.0.0),
-    gridpattern,
     ggpattern,
     cowplot,
     bestNormalize,
@@ -78,6 +77,3 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 biocViews:
-Remotes:
-    github::trevorld/gridpattern,
-    github::coolbutuseless/ggpattern
