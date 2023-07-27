@@ -35,7 +35,7 @@ example1 <- BatchContainer$new(
 
 # Add samples to container
 # Need unique Sample ID. Can we drop this constraint?
-assign_in_order(example1,
+example1 <- assign_in_order(example1,
   samples = tibble::tibble(
     Group = rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 4),
     ID = 1:16
@@ -43,26 +43,25 @@ assign_in_order(example1,
 )
 
 # The following does not work (an gives a constant score of 144!)
-# example1$scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
+# scoring_f <- osat_score_generator(batch_vars = c("row","col"), feature_vars = c("Group"))
 # First analysis of problem indicates that osat_score generates a full row*col vector of 'ideal scores'
 # which are in fact the same value, implying an identical overall result as each position can be either
 # allocated by 1 sample or 0 samples, the sum of 1's being the sample count.
 # --> don't use osat_score if there's a lack of samples as compared to possible positioning
 
-bc <- example1$copy()
-
 # # Set scoring function
-bc$scoring_f <- list(
+scoring_f <- list(
   Row.Score = osat_score_generator(batch_vars = c("row"), feature_vars = c("Group")),
   Column.Score = osat_score_generator(batch_vars = c("col"), feature_vars = c("Group"))
 )
 ```
 
 ```{r}
-
 set.seed(41)
 
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example1,
+  scoring = scoring_f,
   max_iter = 300, # this is set to shorten vignette run-time based on known random seed, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
@@ -71,7 +70,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,
@@ -85,14 +84,14 @@ This should reliably lead to a nice symmetry-bearing latin square design with
 only a one-dimensional score to look at.
 
 ```{r}
-bc <- example1$copy()
-
-bc$scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
+scoring_f <- mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group")
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example1,
+  scoring = scoring_f,
   max_iter = 1000, # this is set to shorten vignette run-time based on random seed, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
@@ -101,7 +100,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace$elapsed
+bc$trace$elapsed
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,

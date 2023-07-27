@@ -51,7 +51,7 @@ example3 <- BatchContainer$new(
 
 
 # Assign samples randomly to start from a better initial state
-assign_random(example3,
+example3 <- assign_random(example3,
   samples = tibble::tibble(
     Group = rep.int(c("Grp 1", "Grp 2", "Grp3"),
       times = c(69, 30, 69)
@@ -60,14 +60,14 @@ assign_random(example3,
   )
 )
 
-bc <- example3$copy()
-
-bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example3,
+  scoring = scoring_f,
   quiet = TRUE,
   max_iter = 150,
   n_shuffle = 2,
@@ -76,7 +76,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
@@ -87,17 +87,19 @@ plot_plate(bc,
 ```
 
 ```{r}
-bc$scoring_f <- mk_plate_scoring_functions(bc,
+scoring_f <- mk_plate_scoring_functions(bc,
   plate = "plate", row = "row",
   column = "col", group = "Group"
 )
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  bc,
+  scoring = scoring_f,
   max_iter = 300,
   shuffle_proposal_func = mk_subgroup_shuffling_function(
     subgroup_vars = c("plate"),
@@ -110,9 +112,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace$elapsed
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
