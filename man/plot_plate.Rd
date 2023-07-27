@@ -70,7 +70,7 @@ sample_sheet <- tibble::tibble(
 )
 
 # assign samples from the sample sheet
-assign_random(bc, samples = sample_sheet)
+bc <- assign_random(bc, samples = sample_sheet)
 
 plot_plate(bc$get_samples(),
   plate = plate, column = column, row = row,
