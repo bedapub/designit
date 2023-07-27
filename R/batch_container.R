@@ -123,6 +123,7 @@ locations_table_from_dimensions <- function(dimensions, exclude) {
 #' samples can be assigned to locations in that container.
 #'
 #' @export
+#' @import R6
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
     #' @description
