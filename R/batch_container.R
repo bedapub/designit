@@ -349,6 +349,10 @@ BatchContainer <- R6::R6Class("BatchContainer",
       if (is.null(names(scoring))) {
         names(scoring) <- stringr::str_c("score_", seq_along(scoring))
       }
+      assertthat::assert_that(
+        !any(names(scoring) == ""),
+        msg = "scoring cannot be a partially named list"
+      )
       assertthat::assert_that(is.list(scoring),
         length(scoring) >= 1,
         msg = "Scoring function should be a non-empty list"
