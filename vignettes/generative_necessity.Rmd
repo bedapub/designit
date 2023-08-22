@@ -1,5 +1,5 @@
 ---
-title: "On the necessity of experiment design: a generative modelling approach"
+title: "On the benefits of experiment design: a generative modelling approach"
 author: "Jitao david Zhang"
 output: rmarkdown::html_vignette
 vignette: >
@@ -204,4 +204,4 @@ ggplot(bc2$get_samples(),
 
 The simple case study discussed in this vignette is an application of generative models, which means that assuming that we know the mechanism by which the data is generated, we can simulate the data generation process and use it for various purposes. In our cases, we simulated a linear additive model of true effects of compounds and control on cell viability and the plate effect induced by positions in a microtitre plate. Using the model, we demonstrate that (1) plate effect can impact statistical inference by introducing false positive (and in other case, false negative) findings, and (2) a full randomization can guard statistical inference by reducing the effect of plate effect.
 
-While the case study is on the margin of being overly simple, we hope that it demonstrates the advantage of appropriate experiment design and the necessity of statistical techniques such as randomization and blocking when it comes to data analysis in drug discovery and development.
+While the case study is on the margin of being overly simple, we hope that it demonstrates the advantage of appropriate experiment design using tools like \textit{DesignIt}, as well as the necessity of statistical techniques such as randomization and blocking in drug discovery and development.
