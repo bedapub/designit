@@ -125,7 +125,7 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' Should be `NULL` if the `BatchContainer` already has samples in it.
 #' @param scoring Scoring function or a named [list()] of scoring functions.
 #' @param n_shuffle Vector of length 1 or larger, defining how many random sample
-#' swaps should be performed in each iteration. If length(n_shuffle)==1,
+#' swaps should be performed in each iteration. If `length(n_shuffle)==1`,
 #' this sets no limit to the number of iterations. Otherwise, the optimization
 #' stops if the swapping protocol is exhausted.
 #' @param shuffle_proposal_func A user defined function to propose the next shuffling of samples.
