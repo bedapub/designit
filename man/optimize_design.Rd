@@ -31,7 +31,7 @@ Should be \code{NULL} if the \code{BatchContainer} already has samples in it.}
 \item{scoring}{Scoring function or a named \code{\link[=list]{list()}} of scoring functions.}
 
 \item{n_shuffle}{Vector of length 1 or larger, defining how many random sample
-swaps should be performed in each iteration. If length(n_shuffle)==1,
+swaps should be performed in each iteration. If \code{length(n_shuffle)==1},
 this sets no limit to the number of iterations. Otherwise, the optimization
 stops if the swapping protocol is exhausted.}
 
