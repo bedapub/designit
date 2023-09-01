@@ -328,23 +328,67 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
     #' @description
     #' Score current sample assignment,
-    #' @return Returns a vector of all scoring functions values.
-    score = function() {
-      assertthat::assert_that(!is.null(private$scoring_funcs),
-        msg = "Scoring function needs to be assigned"
+    #' @param scoring a function or a names list of scoring functions.
+    #' Each function should return a numeric vector.
+    #' @return Returns a named vector of all scoring functions values.
+    score = function(scoring) {
+      assertthat::assert_that(
+        !missing(scoring),
+        !is.null(scoring),
+        msg = "Scoring function needs to be provided"
       )
-      assertthat::assert_that(is.list(private$scoring_funcs),
-        length(private$scoring_funcs) >= 1,
-        msg = "Scroring function should be a non-empty list"
+      if (is.function(scoring)) {
+        scoring <- list(scoring)
+      } else {
+        assertthat::assert_that(is.list(scoring), length(scoring) >= 1)
+        assertthat::assert_that(
+          all(purrr::map_lgl(scoring, is.function)),
+          msg = "All elements of scoring should be functions"
+        )
+      }
+      if (is.null(names(scoring))) {
+        names(scoring) <- stringr::str_c("score_", seq_along(scoring))
+      }
+      assertthat::assert_that(
+        !any(names(scoring) == ""),
+        msg = "scoring cannot be a partially named list"
       )
-      assertthat::assert_that(!is.null(private$samples_table),
+      assertthat::assert_that(is.list(scoring),
+        length(scoring) >= 1,
+        msg = "Scoring function should be a non-empty list"
+      )
+      assertthat::assert_that(!is.null(names(scoring)),
+        msg = "scoring should be a named list"
+      )
+      assertthat::assert_that(self$has_samples,
         msg = "No samples in the batch container, cannot compute score"
       )
-
-      res <- purrr::map_dbl(private$scoring_funcs, ~ .x(self))
-      assertthat::assert_that(length(res) == length(private$scoring_funcs))
-
-      assertthat::assert_that(is.numeric(res), msg = "Scoring function should return a number")
+      res <- purrr::imap(
+        scoring,
+        \(f, i) {
+          v <- f(self)
+          assertthat::assert_that(
+            is.numeric(v),
+            length(v) >= 1,
+            msg = "scoring function should return a numeric vector of positive length"
+          )
+          if (length(v) > 1) {
+            if (is.null(names(v))) {
+              names(v) <- seq_along(v)
+            }
+            names(v) <- stringr::str_c(i, names(v))
+          } else {
+            names(v) <- i
+          }
+          v
+        }
+      ) |>
+        purrr::flatten_dbl()
+      assertthat::assert_that(length(res) >= length(scoring))
+      assertthat::assert_that(
+        !any(names(res) == "step"),
+        msg = "score name cannot be 'step'"
+      )
 
       return(res)
     },
@@ -368,7 +412,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
         bc$samples_attr <- private$samples_attributes
       }
 
-      bc$scoring_f <- self$scoring_f
+      bc$trace <- self$trace
       bc
     },
 
@@ -398,6 +442,100 @@ BatchContainer <- R6::R6Class("BatchContainer",
         cat()
       cat("\n")
       invisible(self)
+    },
+
+    #' @field trace Optimization trace, a [tibble::tibble()]
+    trace = tibble::tibble(
+      optimization_index = numeric(),
+      call = list(),
+      start_assignment_vec = list(),
+      end_assignment_vec = list(),
+      scores = list(),
+      aggregated_scores = list(),
+      seed = list(),
+      elapsed = as.difftime(character(0))
+    ),
+
+    #' @description
+    #' Return a table with scores from an optimization.
+    #'
+    #' @param index optimization index, all by default
+    #' @param include_aggregated include aggregated scores
+    #' @return a [tibble::tibble()] with scores
+    scores_table = function(index = NULL, include_aggregated = FALSE) {
+      assertthat::assert_that(
+        tibble::is_tibble(self$trace),
+        nrow(self$trace) >= 1,
+        msg = "trace should be available"
+      )
+      assertthat::assert_that(assertthat::is.flag(include_aggregated))
+      if (is.null(index)) {
+        index <- self$trace$optimization_index
+      }
+      assertthat::assert_that(
+        rlang::is_integerish(index),
+        msg = "index should be an integer"
+      )
+      d <- self$trace %>%
+        dplyr::filter(.data$optimization_index %in% index) %>%
+        dplyr::select(.data$optimization_index, .data$scores) %>%
+        tidyr::unnest(.data$scores) %>%
+        tidyr::pivot_longer(c(-.data$optimization_index, -.data$step),
+                            names_to = "score",
+                            values_to = "value") %>%
+        dplyr::mutate(aggregated = FALSE)
+      if (include_aggregated) {
+        d_agg <- self$trace %>%
+          dplyr::filter(.data$optimization_index %in% index) %>%
+          dplyr::select(.data$optimization_index, .data$aggregated_scores) %>%
+          tidyr::unnest(.data$aggregated_scores)
+
+        if ("step" %in% colnames(d_agg)) {
+          # if no aggregated scores are provided (aggregated_scores=NULL),
+          # there will be no step column after unnesting
+          d_agg <- d_agg %>%
+            tidyr::pivot_longer(c(-.data$optimization_index, -.data$step),
+                                names_to = "score",
+                                values_to = "value") %>%
+            dplyr::mutate(
+              aggregated = TRUE,
+              score = paste0("agg.", .data$score)
+            )
+            d <- dplyr::bind_rows(
+              d,
+              d_agg
+            )
+        }
+      }
+      d
+    },
+
+    #' @description
+    #' Plot trace
+    #' @param index optimization index, all by default
+    #' @param include_aggregated include aggregated scores
+    #' @param ... not used.
+    #' @return a [ggplot2::ggplot()] object
+    plot_trace = function(index = NULL, include_aggregated = FALSE, ...) {
+      d <- self$scores_table(index, include_aggregated) %>%
+        dplyr::mutate(
+          agg_title = dplyr::if_else(.data$aggregated, "aggregated", "score")
+        )
+      p <- ggplot2::ggplot(d) +
+        ggplot2::aes(.data$step, .data$value, group = .data$score, color = .data$score) +
+        ggplot2::geom_line() +
+        ggplot2::geom_point()
+      if (length(unique(d$optimization_index)) > 1) {
+        p <- p +
+          ggplot2::facet_wrap(~ optimization_index, scales = "free")
+      } else if (include_aggregated && any(d$aggregated)) {
+        p <- p +
+          ggplot2::facet_wrap(~ agg_title, scales = "free_y", ncol = 1)
+      } else {
+        p <- p +
+          ggplot2::facet_wrap(~ score, scales = "free_y", ncol = 1)
+      }
+      p
     }
   ),
   private = list(
@@ -445,22 +583,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
     #' Upon assignment a single function will be automatically converted to a list
     #' In the later case each function is called.
     scoring_f = function(value) {
-      if (missing(value)) {
-        private$scoring_funcs
-      } else {
-        if (is.null(value)) {
-          private$scoring_funcs <- NULL
-        } else if (is.function(value)) {
-          private$scoring_funcs <- list(value)
-        } else {
-          assertthat::assert_that(is.list(value), length(value) >= 1)
-          assertthat::assert_that(
-            all(purrr::map_lgl(self$scoring_f, is.function)),
-            msg = "All elements of scoring_f should be functions"
-          )
-          private$scoring_funcs <- value
-        }
-      }
+      stop("scoring_f is deprecated, pass it to optimize_design() directly instead")
     },
 
     #' @field has_samples

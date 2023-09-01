@@ -47,14 +47,14 @@ test_that("Test adding samples and then assigning them", {
   bc1_copy <- bc1$copy()
   bc1_copy$samples <- samples
   expect_null(bc1_copy$assignment)
-  assign_in_order(bc1_copy)
+  bc1_copy <- assign_in_order(bc1_copy)
   expect_equal(
     bc1_copy$assignment,
     c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_locations - nrow(samples)))
   )
 
   bc1_copy <- bc1$copy()
-  assign_in_order(bc1_copy, samples)
+  bc1_copy <- assign_in_order(bc1_copy, samples)
   expect_equal(
     bc1_copy$assignment,
     c(seq_len(nrow(samples)), rep(NA_integer_, bc1_copy$n_locations - nrow(samples)))
@@ -66,7 +66,7 @@ test_that("Test assigning samples randomly", {
   bc3_copy <- bc3_excl$copy()
   expect_null(bc3_copy$assignment)
   expect_false(any(!is.na(bc3_copy$assignment)))
-  assign_random(bc3_copy, samples)
+  bc3_copy <- assign_random(bc3_copy, samples)
   expect_true(any(!is.na(bc3_copy$assignment)))
 })
 

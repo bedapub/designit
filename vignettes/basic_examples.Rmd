@@ -102,7 +102,7 @@ bc$get_locations() %>% head()
 Use random assignment function to place samples to plate locations
 
 ```{r}
-assign_random(bc, samples)
+bc <- assign_random(bc, samples)
 
 bc$get_samples()
 bc$get_samples(remove_empty_locations = TRUE)
@@ -128,7 +128,9 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE),
 To move individual samples or manually assigning all locations we can use the 
 `batchContainer$move_samples()` method
 
-To swap two or more samples use
+To swap two or more samples use:
+
+**Warning**: This will change your BatchContainer in-place.
 
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
@@ -140,6 +142,9 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE),
 ```
 
 To assign all samples in one go, use the option `location_assignment`.
+
+**Warning**: This will change your BatchContainer in-place.
+
 The example below orders samples by ID and adds the empty locations afterwards
 ```{r, fig.width=6, fig.height=3.5}
 bc$move_samples(
@@ -155,29 +160,23 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE, include_id = TRUE),
 )
 ```
 
-## Scoring a layout
-
-To evaluate how good a layout is, we need a scoring function. 
-This we also assign to the batch container.
-
-This function will assess how well treatment 
-and dose are balanced across the two plates.
-
-```{r}
-bc$scoring_f <- osat_score_generator(
-  batch_vars = "plate",
-  feature_vars = c("treatment", "dose")
-)
-```
-
 ## Run an optimization
 
 The optimization procedure is invoked with e.g. `optimize_design`.
 Here we use a simple shuffling schedule: 
 swap 10 samples for 100 times, then swap 2 samples for 400 times.
 
+To evaluate how good a layout is, we need a scoring function. 
+
+This function will assess how well treatment 
+and dose are balanced across the two plates.
+
 ```{r}
-trace <- optimize_design(bc,
+bc <- optimize_design(bc,
+  scoring = osat_score_generator(
+    batch_vars = "plate",
+    feature_vars = c("treatment", "dose")
+  ),
   # shuffling schedule
   n_shuffle = c(rep(10, 200), rep(2, 400))
 )
@@ -186,7 +185,7 @@ trace <- optimize_design(bc,
 Development of the score can be viewed with
 
 ```{r, fig.width=3.5, fig.height=3}
-trace$plot()
+bc$plot_trace()
 ```
 
 The layout after plate batching looks the following

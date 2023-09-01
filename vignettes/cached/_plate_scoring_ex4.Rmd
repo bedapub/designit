@@ -1,7 +1,7 @@
 ---
 title: "Plate scoring example 4"
 output: html_fragment
-knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+knit: (\(input, ...) rmarkdown::render(input, output_dir = here::here("vignettes/cached")))
 ---  
   
 ```{r, include = FALSE}
@@ -38,31 +38,31 @@ example4 <- BatchContainer$new(
 
 
 # Assign samples randomly to start from lower score (avoid Inf values even since plate 3 will miss 2 groups initially :)
-assign_in_order(example4, samples = tibble::tibble(
+example4 <- assign_in_order(example4, samples = tibble::tibble(
   Group = rep.int(c("Treatment 1", "Treatment 2"), times = c(10, 10)),
   Sex = c(rep(c("M", "F", "F", "M"), times = 4), "M", NA, NA, "F"), ID = 1:20
 ))
 
-bc <- example4$copy()
-
 cowplot::plot_grid(
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
-  plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex"),
+  plot_plate(example4, plate = plate, row = row, column = col, .color = Group, title = "Initial layout by Group"),
+  plot_plate(example4, plate = plate, row = row, column = col, .color = Sex, title = "Initial layout by Sex"),
   ncol = 2
 )
 
 
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
-  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+scoring_f <- c(
+  Group = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Sex")
 )
 
-bc$score()
+example4$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example4,
+  scoring = scoring_f,
   max_iter = 750,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
@@ -74,9 +74,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-trace$elapsed
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
@@ -90,7 +90,9 @@ reference!
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  bc,
+  scoring = scoring_f,
   max_iter = 500,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 1)),
@@ -103,7 +105,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-bc$score()
+bc$score(scoring_f)
 
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
@@ -118,17 +120,17 @@ default acceptance function. We are strictly prioritizing the leftmost score in
 addition to reflect relevance for the design.
 
 ```{r}
-bc <- example4$copy()
-
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
-  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+scoring_f <- c(
+  Group = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Sex")
 )
 
-bc$score()
+example4$score(scoring_f)
 
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example4,
+  scoring = scoring_f,
   max_iter = 5000,
   n_shuffle = 1,
   acceptance_func = accept_leftmost_improvement,
@@ -138,7 +140,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-bc$score()
+bc$score(scoring_f)
 
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
@@ -151,17 +153,16 @@ Using a tolerance value to accept slightly worse solutions in the leftmost
 relevant score if overcompensated by other scores:
 
 ```{r}
-bc <- example4$copy()
-
-
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
-  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+scoring_f <- c(
+  Group = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Sex")
 )
 
 
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example4,
+  scoring = scoring_f,
   max_iter = 5000,
   n_shuffle = 1,
   acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
@@ -169,12 +170,10 @@ trace <- optimize_design(bc,
   quiet = TRUE
 )
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-bc$score()
-
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),
   plot_plate(bc, plate = plate, row = row, column = col, .color = Sex, title = "Final layout by Sex"),
@@ -188,17 +187,17 @@ $\kappa^p$, $0 < \kappa < 1$ We choose a $\kappa$ of 0.5, i.e. the second
 score's improvement counts half of that of the first one.
 
 ```{r}
-bc <- example4$copy()
-
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group"),
-  Sex = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Sex")
+scoring_f <- c(
+  Group = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Group"),
+  Sex = mk_plate_scoring_functions(example4, row = "row", column = "col", group = "Sex")
 )
 
-bc$score()
+bc$score(scoring_f)
 
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example4,
+  scoring = scoring_f,
   max_iter = 1000,
   n_shuffle = 1,
   acceptance_func = mk_exponentially_weighted_acceptance_func(kappa = 0.5, simulated_annealing = T),
@@ -208,7 +207,7 @@ trace <- optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-bc$score()
+bc$score(scoring_f)
 
 cowplot::plot_grid(
   plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = "Final layout by Group"),

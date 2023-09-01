@@ -7,6 +7,7 @@
 optimize_design(
   batch_container,
   samples = NULL,
+  scoring = NULL,
   n_shuffle = NULL,
   shuffle_proposal_func = NULL,
   acceptance_func = accept_strict_improvement,
@@ -27,8 +28,10 @@ optimize_design(
 \item{samples}{A \code{data.frame} with sample information.
 Should be \code{NULL} if the \code{BatchContainer} already has samples in it.}
 
+\item{scoring}{Scoring function or a named \code{\link[=list]{list()}} of scoring functions.}
+
 \item{n_shuffle}{Vector of length 1 or larger, defining how many random sample
-swaps should be performed in each iteration. If length(n_shuffle)==1,
+swaps should be performed in each iteration. If \code{length(n_shuffle)==1},
 this sets no limit to the number of iterations. Otherwise, the optimization
 stops if the swapping protocol is exhausted.}
 
@@ -87,7 +90,9 @@ data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("plate" = 2, "column" = 5, "row" = 6)
 )
-bc$scoring_f <- osat_score_generator("plate", "Sex")
-optimize_design(bc, invivo_study_samples, max_iter = 100)
+bc <- optimize_design(bc, invivo_study_samples,
+  scoring = osat_score_generator("plate", "Sex"),
+  max_iter = 100
+)
 plot_plate(bc$get_samples(), .col = Sex)
 }

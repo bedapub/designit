@@ -1,7 +1,7 @@
 ---
 title: "Plate scoring example 5"
 output: html_fragment
-knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+knit: (\(input, ...) rmarkdown::render(input, output_dir = here::here("vignettes/cached")))
 ---  
 
 ```{r, include = FALSE}
@@ -33,25 +33,25 @@ example5 <- BatchContainer$new(
 )
 
 # Assign samples randomly to start from lower score (avoid `Inf` values when doing the 'hard' penalization)
-assign_random(example5, samples = tibble::tibble(
+example5 <- assign_random(example5, samples = tibble::tibble(
   Group = rep.int(paste("Group", 1:5), times = c(8, 8, 8, 8, 64)),
   ID = 1:96
 ))
 
 penalize_lines <- "hard"
 
-bc <- example5$copy()
-
-bc$scoring_f <- c(
-  Group = mk_plate_scoring_functions(bc, row = "row", column = "col", group = "Group", p = 2, penalize_lines = penalize_lines)
+scoring_f <- c(
+  Group = mk_plate_scoring_functions(example5, row = "row", column = "col", group = "Group", p = 2, penalize_lines = penalize_lines)
 )
 
-bc$score()
+example5$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example5,
+  scoring = scoring_f,
   max_iter = 5000,
   n_shuffle = 1,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 500, alpha = 0.1)),
@@ -60,9 +60,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r, fig.width=7, fig.height=3.5}
-trace$elapsed
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 
 plot_plate(bc, plate = plate, row = row, column = col, .color = Group, title = stringr::str_c("Line penalization: ", penalize_lines))
 ```

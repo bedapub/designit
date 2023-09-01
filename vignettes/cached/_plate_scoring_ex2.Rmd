@@ -1,7 +1,7 @@
 ---
 title: "Plate scoring example 2"
 output: html_fragment
-knit: (\(input, ...) rmarkdown::render(input, output_dir = "vignettes/cached"))
+knit: (\(input, ...) rmarkdown::render(input, output_dir = here::here("vignettes/cached")))
 ---
 
 ```{r, include = FALSE}
@@ -40,28 +40,28 @@ example2 <- BatchContainer$new(
 )
 
 # Add samples to container
-assign_in_order(example2, samples = tibble::tibble(
+example2 <- assign_in_order(example2, samples = tibble::tibble(
   Group = c(rep(c("Grp 1", "Grp 2", "Grp 3", "Grp 4"), each = 8)),
   ID = 1:32
 ))
 
-bc <- example2$copy()
-
-bc$scoring_f <- c(mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group"),
+scoring_f <- c(mk_plate_scoring_functions(example2, plate = "plate", row = "row", column = "col", group = "Group"),
   osat_plate = osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 )
 
-plot_plate(bc,
+plot_plate(example2,
   plate = plate, row = row, column = col, .color = Group,
   title = "Ex2: Initial sample arrangement"
 )
 
-bc$score()
+example2$score(scoring_f)
 ```
 
 ```{r}
 set.seed(41)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example2,
+  scoring = scoring_f,
   n_shuffle = c(rep(10, 10), rep(3, 90), rep(2, 100), rep(1, 1400)),
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
   aggregate_scores_func = worst_score,
@@ -70,9 +70,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace$elapsed
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,
@@ -92,33 +92,34 @@ permutation function which takes the plate structure into account and only
 shuffles samples around within one plate.
 
 ```{r}
-# Setting up the batch container
-
-bc <- example2$copy()
-
-bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 
 set.seed(42)
-optimize_design(bc,
+bc <- optimize_design(
+  example2,
+  scoring = scoring_f,
   quiet = TRUE,
   max_iter = 200, # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5)),
 )
+bc$trace$elapsed
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,
   title = "Ex2: 'Plate wise' design\nStep 1: after allocating samples to plates"
 )
 
-bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
+scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  bc,
+  scoring = scoring_f,
   max_iter = 400,
   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate")),
   acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 1000, alpha = 0.5)),
@@ -128,9 +129,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,
@@ -153,16 +154,14 @@ happen first within plate 1, then within plate 2, so that the two scores can be
 optimized in succeeding runs.
 
 ```{r}
-# Setting up the batch container
-
-bc <- example2$copy()
-
-bc$scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
+scoring_f <- osat_score_generator(batch_vars = c("plate"), feature_vars = c("Group"))
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  example2,
+  scoring = scoring_f,
   quiet = TRUE,
   max_iter = 150, # this is set to shorten vignette run-time, normally we don't know.
   n_shuffle = 2,
@@ -171,21 +170,23 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,
   title = "Ex2: 'Serial plate' design\nStep 1: after allocating samples to plates"
 )
 
-bc$scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
+scoring_f <- mk_plate_scoring_functions(bc, plate = "plate", row = "row", column = "col", group = "Group")
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  bc,
+  scoring = scoring_f,
   max_iter = 150,
   quiet = TRUE,
   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(1)),
@@ -195,14 +196,16 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 ```
 
 ```{r}
 set.seed(42)
-trace <- optimize_design(bc,
+bc <- optimize_design(
+  bc,
+  scoring = scoring_f,
   max_iter = 550,
   quiet = TRUE,
   shuffle_proposal_func = mk_subgroup_shuffling_function(subgroup_vars = c("plate"), restrain_on_subgroup_levels = c(2)),
@@ -212,9 +215,9 @@ trace <- optimize_design(bc,
 ```
 
 ```{r}
-trace
+bc$trace$elapsed
 
-bc$score()
+bc$score(scoring_f)
 
 plot_plate(bc,
   plate = plate, row = row, column = col, .color = Group,

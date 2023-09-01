@@ -10,7 +10,7 @@ test_that("add attributes before assigning samples", {
   expect_equal(bc$get_samples(assignment = FALSE)$attr1, rev(1:8))
 })
 
-assign_in_order(bc)
+bc <- assign_in_order(bc)
 
 test_that("add attributes after assigning samples", {
   bc$samples_attr <- NULL
@@ -23,7 +23,7 @@ test_that("add attributes after assigning samples", {
 
 test_that("shuffling samples keeps attributes order", {
   set.seed(42)
-  assign_random(bc)
+  bc <- assign_random(bc)
   bc$get_samples(include_id = TRUE, as_tibble = FALSE)
   bc$samples_attr <- data.frame(attr1 = rev(1:8))
   expect_equal(bc$get_samples(assignment = FALSE)$attr1, rev(1:8))

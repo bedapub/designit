@@ -54,13 +54,8 @@ bc <- BatchContainer$new(
   )
 )
 
-# Add samples to container
-bc$samples <- multi_trt_day_samples
 # Initial random assignment
-assign_in_order(bc)
-# Set scoring function
-bc$scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
-
+bc <- assign_in_order(bc, multi_trt_day_samples)
 bc
 ```
 
@@ -73,10 +68,10 @@ n_iterations <- length(n_shuffle)
 
 set.seed(42) # should we have conventions for this?
 
-# initial score
-# bc$score()
-trace <- optimize_design(
+scoring_f <- osat_score_generator(c("batch"), c("Treatment", "Time"))
+bc <- optimize_design(
   bc,
+  scoring = scoring_f,
   n_shuffle = n_shuffle,
   max_iter = n_iterations
 ) # default is 10000
@@ -89,8 +84,10 @@ I practice you will have to run for a much higher number of iterations.
 
 ```{r, fig.width=5, fig.height= 4}
 qplot(
-  x = 1:trace$n_steps, y = trace$scores, color = factor(c(32, n_shuffle)),
-  main = str_glue("Final score={bc$score()}"), geom = "point"
+  x = bc$trace$scores[[1]]$step,
+  y = bc$trace$scores[[1]]$score_1,
+  color = factor(c(32, n_shuffle)),
+  main = str_glue("Final score={bc$score(scoring_f)}"), geom = "point"
 )
 ```
 
@@ -105,18 +102,16 @@ bc$get_samples(assignment = TRUE) %>%
 # Repeat but use shuffle with contraints 
 
 ```{r, fig.width=6, fig.height= 4}
-
 # copy batch container for second optimization
-bc2 <- bc$copy()
-# Initial random assignment
-assign_in_order(bc2)
+bc2 <- assign_in_order(bc)
 
 n_iterations <- 200
 
 set.seed(42) # should we have conventions for this?
 
-trace2 <- optimize_design(
+bc2 <- optimize_design(
   bc2,
+  scoring = scoring_f,
   shuffle_proposal = shuffle_with_constraints(
     src = TRUE,
     # batch needs to change for shuffle to be accepted
@@ -126,8 +121,9 @@ trace2 <- optimize_design(
 )
 
 qplot(
-  x = 1:trace$n_steps, y = trace2$scores, # color = factor(n_shuffle),
-  main = str_glue("Final score={bc2$score()}"), geom = "point"
+  x = bc2$trace$scores[[1]]$step,
+  y = bc2$trace$scores[[1]]$score_1,
+  main = str_glue("Final score={bc2$score(scoring_f)}"), geom = "point"
 )
 
 bc2$get_samples(assignment = TRUE) %>%
@@ -147,16 +143,17 @@ For this we keep the optimized `batch` and now only optimize `run` with constrai
 ```{r}
 n_iterations <- 100
 
-# assign new optimization function
-bc$scoring_f <- osat_score_generator(c("run"), c("Treatment", "Time"))
+# new optimization function
+scoring_f <- osat_score_generator(c("run"), c("Treatment", "Time"))
 # like this the optimization score is wrong because it tries to optimize across Batches.
 # Possible ways to go:
 # - we'd need something like c("batch", batch/run") for optimize by batch and run within batch.
 # - or we add "batch/run" to the constraints somehow.
-bc$score()
+bc$score(scoring_f)
 
-trace_run <- optimize_design(
+bc <- optimize_design(
   bc,
+  scoring = scoring_f,
   shuffle_proposal = shuffle_with_constraints(
     src = TRUE,
     # batch remains the same and run needs to change
@@ -168,8 +165,10 @@ trace_run <- optimize_design(
 
 ```{r, fig.width=6, fig.height= 4}
 qplot(
-  x = 1:trace_run$n_steps, y = trace_run$scores, color = factor(n_iterations),
-  main = str_glue("Final score={bc$score()}"), geom = "point"
+  x = bc$trace$scores[[1]]$step,
+  y = bc$trace$scores[[1]]$score_1,
+  color = factor(n_iterations),
+  main = str_glue("Final score={bc$score(scoring_f)}"), geom = "point"
 )
 ```
 
@@ -178,7 +177,6 @@ qplot(
 This is not giving the expected mix of treatments across runs.
 
 ```{r, fig.width=6, fig.height= 4}
-
 bc$get_samples() %>%
   mutate(run = factor(run)) %>%
   ggplot(aes(x = run, fill = Treatment, alpha = factor(Time))) +
