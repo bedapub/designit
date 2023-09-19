@@ -40,17 +40,17 @@ sample_sheet4 <- rbind(
 test_that("assign samples from sample sheet", {
   bc <- bc1$copy()
   expect_null(bc$samples)
-  assign_from_table(bc, sample_sheet1)
+  bc <- assign_from_table(bc, sample_sheet1)
   expect_equal(nrow(sample_sheet1), nrow(bc$samples))
 
   bc <- bc1$copy()
   expect_null(bc$samples)
-  assign_from_table(bc, sample_sheet2)
+  bc <- assign_from_table(bc, sample_sheet2)
   expect_equal(nrow(sample_sheet2), nrow(bc$samples))
 
   bc <- bc2$copy()
   expect_null(bc$samples)
-  assign_from_table(bc, sample_sheet2)
+  bc <- assign_from_table(bc, sample_sheet2)
   expect_equal(nrow(sample_sheet2), nrow(bc$samples))
 })
 
@@ -58,20 +58,20 @@ test_that("assign samples from sample sheet works when samples are added/assigne
   bc <- bc1$copy()
   expect_null(bc$samples)
   bc$samples <- subset(sample_sheet1, select = sampleID)
-  assign_from_table(bc, sample_sheet1)
+  bc <- assign_from_table(bc, sample_sheet1)
 
   bc <- bc2$copy()
   expect_null(bc$samples)
-  assign_from_table(bc, sample_sheet2)
-  assign_random(bc)
-  assign_from_table(bc, sample_sheet2)
+  bc <- assign_from_table(bc, sample_sheet2)
+  bc <- assign_random(bc)
+  bc <- assign_from_table(bc, sample_sheet2)
 })
 
 
 test_that("assign samples from sample sheet works only when samples match what's in the container", {
   bc <- bc1$copy()
   expect_null(bc$samples)
-  assign_from_table(bc, sample_sheet1)
+  bc <- assign_from_table(bc, sample_sheet1)
   expect_error(assign_from_table(bc, sample_sheet2))
 })
 

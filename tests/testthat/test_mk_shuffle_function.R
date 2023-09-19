@@ -6,7 +6,7 @@ samples <- data.frame(
   sampleId = seq_len(bc$n_locations)
 )
 
-assign_in_order(bc, samples)
+bc <- assign_in_order(bc, samples)
 
 test_that("mk_swapping_function returns an error if iteration number is too large", {
   f <- mk_swapping_function(c(1, 2, 3))

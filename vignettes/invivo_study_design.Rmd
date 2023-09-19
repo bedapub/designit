@@ -215,7 +215,7 @@ InVivo_assignTreatments <- function(animal_list, treatments,
     exclude = exclude_table
   )
 
-  assign_in_order(bc_treatment, ani_bclevels)
+  bc_treatment <- assign_in_order(bc_treatment, ani_bclevels)
 
   if (!quiet_process) message("Constructing scoring functions:")
 
@@ -275,20 +275,20 @@ InVivo_assignTreatments <- function(animal_list, treatments,
   }
 
   assertthat::assert_that(length(scoring_functions) > 0, msg = "No variables for scoring found or all have only one level. Nothing to do.")
-  bc_treatment$scoring_f <- scoring_functions
-  bc_treatment$score()
+  bc_treatment$score(scoring_functions)
 
-  trace <- optimize_design(
+  bc_treatment <- optimize_design(
     bc_treatment,
+    scoring = scoring_functions,
     n_shuffle = n_shuffle,
     acceptance_func = ~ accept_leftmost_improvement(..., tolerance = 0.1),
     quiet = quiet_optimize
   )
 
   # Check if user given constraints (if provided) could be satisfied
-  if ("trt_constraints" %in% names(bc_treatment$score())) {
-    if (bc_treatment$score()[["trt_constraints"]] > 0) {
-      message("CAUTION: User defined constraints could not be fully met (remaining score ", bc_treatment$score()[["trt_constraints"]], ")")
+  if ("trt_constraints" %in% names(bc_treatment$score(scoring_functions))) {
+    if (bc_treatment$score(scoring_functions)[["trt_constraints"]] > 0) {
+      message("CAUTION: User defined constraints could not be fully met (remaining score ", bc_treatment$score(scoring_functions)[["trt_constraints"]], ")")
     } else {
       if (!quiet_process) message("Success. User provided constraints could be fully met.")
     }
@@ -325,7 +325,7 @@ Invivo_assignCages <- function(design_trt,
   bc_cage <- BatchContainer$new(
     dimensions = c("Dummy" = 1, ID = nrow(design_trt))
   )
-  assign_in_order(bc_cage, design_trt)
+  bc_cage <- assign_in_order(bc_cage, design_trt)
 
   shuffle_proposal <- shuffle_grouped_data(bc_cage,
     allocate_var = "Dummy",
@@ -372,15 +372,14 @@ Invivo_assignCages <- function(design_trt,
     scoring_functions <- c(scoring_functions, sf)
   }
 
-  if (length(scoring_functions) > 0) {
-    bc_cage$scoring_f <- scoring_functions
-  } else {
+  if (length(scoring_functions) == 0) {
     if (!quiet_process) message("     ... just a dummy score as there are no user provided balancing variables")
-    bc_cage$scoring_f <- osat_score_generator(batch_vars = "Dummy", feature_vars = c("Treatment"))
+    scoring_functions <- osat_score_generator(batch_vars = "Dummy", feature_vars = c("Treatment"))
   }
 
-  trace <- optimize_design(
+  bc_cage <- optimize_design(
     bc_cage,
+    scoring = scoring_functions,
     shuffle_proposal_func = shuffle_proposal,
     acceptance_func = accept_leftmost_improvement,
     max_iter = maxiter,
@@ -436,7 +435,7 @@ Invivo_arrangeCages <- function(design_cage,
     dimensions = c(Rack = nr_racks, CageRow = n_cage_x, CageCol = n_cage_y)
   )
 
-  assign_random(bc_rack, design_rack)
+  bc_rack <- assign_random(bc_rack, design_rack)
 
   # Firstly, distribute variables across racks if necessary
   if (nr_racks > 1) {
@@ -447,16 +446,18 @@ Invivo_arrangeCages <- function(design_cage,
       )
     }
 
-    bc_rack$scoring_f <- list(across_rack = osat_score_generator(batch_vars = c("Rack"), feature_vars = distribute_cagerack_vars))
+    scoring_functions <- list(across_rack = osat_score_generator(batch_vars = c("Rack"), feature_vars = distribute_cagerack_vars))
 
-    optimize_design(bc_rack,
+    bc_rack <- optimize_design(
+      bc_rack,
+      scoring = scoring_functions,
       quiet = quiet_optimize,
       min_score = 0, max_iter = 1e3,
       n_shuffle = 2,
       acceptance_func = mk_simanneal_acceptance_func(mk_simanneal_temp_func(T0 = 10000, alpha = 0.5))
     )
 
-    if (!quiet_process) message("   ... final score: ", bc_rack$score())
+    if (!quiet_process) message("   ... final score: ", bc_rack$score(scoring_f))
   }
 
   if (!quiet_process) {
@@ -475,13 +476,12 @@ Invivo_arrangeCages <- function(design_cage,
   }
   names(scoring_functions) <- stringr::str_c(names(scoring_functions), rep(distribute_cagerack_vars, each = nr_racks), sep = "_")
 
-  bc_rack$scoring_f <- scoring_functions
-
   for (i in 1:nr_racks) {
     if (!quiet_process) message("   ... Rack ", i)
 
-    trace <- optimize_design(
+    bc_rack <- optimize_design(
       bc_rack,
+      scoring = scoring_functions,
       shuffle_proposal_func = mk_subgroup_shuffling_function(
         subgroup_vars = "Rack",
         restrain_on_subgroup_levels = c(i),
@@ -495,7 +495,7 @@ Invivo_arrangeCages <- function(design_cage,
     )
   }
 
-  if (!quiet_process) message("   ... final scores: ", paste(names(bc_rack$score()), round(bc_rack$score(), 2), sep = ": ", collapse = ", "))
+  if (!quiet_process) message("   ... final scores: ", paste(names(bc_rack$score(scoring_functions)), round(bc_rack$score(scoring_functions), 2), sep = ": ", collapse = ", "))
 
   # Translate Rack numbers to some text output and assign CageNr
   design_rack <- bc_rack$get_samples() %>%

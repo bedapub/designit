@@ -4,16 +4,16 @@
 #' @param samples data.frame with samples.
 #' @param batch_container Instance of BatchContainer class
 #'
-#' @return Returns `BatchContainer`, invisibly.
+#' @return Returns a new `BatchContainer`.
 #' @example man/examples/assignment.R
 assign_random <- function(batch_container, samples = NULL) {
-  assign_in_order(batch_container, samples)
+  batch_container <- assign_in_order(batch_container, samples)
 
   batch_container$move_samples(
     location_assignment = sample(batch_container$assignment)
   )
 
-  invisible(batch_container)
+  batch_container
 }
 
 #' Distributes samples in order.
@@ -25,9 +25,10 @@ assign_random <- function(batch_container, samples = NULL) {
 #' @param samples data.frame with samples.
 #' @param batch_container Instance of BatchContainer class
 #'
-#' @return Returns `BatchContainer`, invisibly.
+#' @return Returns a new `BatchContainer`.
 #' @example man/examples/assignment.R
 assign_in_order <- function(batch_container, samples = NULL) {
+  batch_container <- batch_container$copy()
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
       msg = "batch-container is empty and no samples provided"
@@ -46,7 +47,7 @@ assign_in_order <- function(batch_container, samples = NULL) {
     rep(NA_integer_, n_locations - n_samples)
   ))
 
-  invisible(batch_container)
+  batch_container
 }
 
 #' Shuffling proposal function with constraints.
@@ -113,7 +114,7 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #' the function will check if samples in `batch_container` are identical to the ones in the
 #' `samples` argument.
 #'
-#' @return Returns `BatchContainer`, invisibly.
+#' @return Returns a new `BatchContainer`.
 #'
 #' @examples
 #' bc <- BatchContainer$new(
@@ -133,11 +134,12 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #'   2, "a", 3, 5, "TRT",
 #' )
 #' # assign samples from the sample sheet
-#' assign_from_table(bc, sample_sheet)
+#' bc <- assign_from_table(bc, sample_sheet)
 #'
 #' bc$get_samples(remove_empty_locations = TRUE)
 #'
 assign_from_table <- function(batch_container, samples) {
+  batch_container <- batch_container$copy()
   # sample sheet has all the batch variable
   assertthat::assert_that(is.data.frame(samples) && nrow(samples) > 0,
     msg = "samples should be non-empty data.frame"
@@ -156,11 +158,9 @@ assign_from_table <- function(batch_container, samples) {
   if (is.null(batch_container$samples)) {
     batch_container$samples <- only_samples
   } else {
-    assertthat::assert_that(dplyr::all_equal(only_samples,
-      batch_container$get_samples(assignment = FALSE),
-      ignore_col_order = TRUE,
-      ignore_row_order = TRUE,
-      convert = TRUE
+    assertthat::assert_that(all_equal_df(
+      only_samples,
+      batch_container$get_samples(assignment = FALSE)
     ),
     msg = "sample sheet should be compatible with samples inside the batch container"
     )
@@ -177,5 +177,5 @@ assign_from_table <- function(batch_container, samples) {
 
   batch_container$move_samples(location_assignment = samples_with_id$.sample_id)
 
-  invisible(batch_container)
+  batch_container
 }

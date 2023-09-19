@@ -31,7 +31,7 @@ test_that(
       sample_id = 1:9
     )
     bc <- batch_container_from_table(tab, c("row", "column"))
-    expect_true(dplyr::all_equal(bc$get_samples(), tab))
+    expect_true(all_equal_df(bc$get_samples(), tab))
   }
 )
 
@@ -44,7 +44,7 @@ test_that(
       sample_id = c(1, 2, 3, NA, 5, 6, 7, NA, 9)
     )
     bc <- batch_container_from_table(tab, c("row", "column"))
-    expect_true(dplyr::all_equal(bc$get_samples(), tab))
+    expect_true(all_equal_df(bc$get_samples(), tab))
   }
 )
 
@@ -61,7 +61,7 @@ test_that(
     expect_warning({
       bc <- batch_container_from_table(tab, c("row", "column"))
     })
-    expect_true(dplyr::all_equal(bc$get_samples(), tab))
+    expect_true(all_equal_df(bc$get_samples(), tab))
   }
 )
 

@@ -69,7 +69,7 @@ bc <- BatchContainer$new(
 
 # assign samples randomly
 set.seed(17)
-assign_random(bc, subject_data)
+bc <- assign_random(bc, subject_data)
 
 bc$get_samples() %>%
   ggplot() +
@@ -85,7 +85,7 @@ Random assignmet of samples to batches produced an uneven distribution.
 
 ``` r
 # set scoring functions
-bc$scoring_f <- list(
+scoring_f <- list(
   # first priority, groups are evenly distributed
   group = osat_score_generator(batch_vars = "batch", 
                                feature_vars = "Group"),
@@ -94,7 +94,9 @@ bc$scoring_f <- list(
                              feature_vars = "Sex")
 )
 
-trace <- optimize_design(bc, max_iter = 150, quiet = TRUE)
+bc <- optimize_design(
+  bc, scoring = scoring_f, max_iter = 150, quiet = TRUE
+)
 
 bc$get_samples() %>%
   ggplot() +
@@ -107,7 +109,7 @@ bc$get_samples() %>%
 ``` r
 
 # show optimization trace
-plot(trace)
+bc$plot_trace()
 ```
 
 ![](man/figures/README-optimized_assignment-2.png)<!-- -->

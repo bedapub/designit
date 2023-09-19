@@ -42,12 +42,12 @@ data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("column" = 6, "row" = 10)
 )
-assign_random(bc, invivo_study_samples)
-bc$scoring_f <- mk_plate_scoring_functions(
+bc <- assign_random(bc, invivo_study_samples)
+scoring_f <- mk_plate_scoring_functions(
   bc,
   row = "row", column = "column", group = "Sex"
 )
-optimize_design(bc, max_iter = 100)
+bc <- optimize_design(bc, scoring = scoring_f, max_iter = 100)
 plot_plate(bc$get_samples(), .col = Sex)
 
 }

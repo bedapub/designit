@@ -40,7 +40,7 @@ bc <- BatchContainer$new(
   dimensions = c("plate" = 5, "position" = 25)
 )
 
-bc$scoring_f <- function(samples) {
+scoring_f <- function(samples) {
   osat_score(
     samples,
     "plate",
@@ -51,8 +51,9 @@ bc$scoring_f <- function(samples) {
 # in this example we treat all the positions in the plate as equal.
 # when shuffling we enforce that source location is non-empty,
 # and destination location has a different plate number
-optimize_design(
+bc <- optimize_design(
   bc,
+  scoring = scoring_f,
   samples,
   shuffle_proposal = shuffle_with_constraints(
     # source is non-empty location

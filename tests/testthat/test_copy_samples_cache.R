@@ -3,7 +3,7 @@ test_that("$copy() does not preserve samples table cache", {
     dimensions = c(row = 3, column = 3)
   )
   samp <- data.frame(i = 1:9)
-  assign_in_order(bc, samp)
+  bc <- assign_in_order(bc, samp)
   # creates cache
   bc$get_samples()
   bc_clone <- bc$copy()
@@ -18,14 +18,14 @@ test_that("Cloning preservs dimensions, samples, scores & assignment", {
     exclude = data.frame(row = 3, column = 1:3)
   )
   samp <- data.frame(i = 1:6)
-  assign_in_order(bc, samp)
-  bc$scoring_f <- function(...) 42L
+  bc <- assign_in_order(bc, samp)
+  scoring_f <- function(...) 42L
   bc_clone <- bc$copy()
 
   expect_equal(bc$samples, bc_clone$samples)
   expect_equal(bc$get_locations(), bc_clone$get_locations())
   expect_equal(bc$n_locations, bc_clone$n_locations)
-  expect_equal(bc$score(), bc_clone$score())
+  expect_equal(bc$score(scoring_f), bc_clone$score(scoring_f))
   expect_equal(bc$n_dimensions, bc_clone$n_dimensions)
   expect_equal(bc$dimension_names, bc_clone$dimension_names)
   expect_equal(bc$get_samples(include_id = TRUE), bc_clone$get_samples(include_id = TRUE))

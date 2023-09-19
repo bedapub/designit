@@ -12,7 +12,7 @@ assign_in_order(batch_container, samples = NULL)
 \item{samples}{data.frame with samples.}
 }
 \value{
-Returns \code{BatchContainer}, invisibly.
+Returns a new \code{BatchContainer}.
 }
 \description{
 First sample is assigned to the first location, second
@@ -27,10 +27,10 @@ bc
 
 set.seed(42)
 # assigns samples randomly
-assign_random(bc, samples)
+bc <- assign_random(bc, samples)
 bc$get_samples()
 
 # assigns samples in order
-assign_in_order(bc)
+bc <- assign_in_order(bc)
 bc$get_samples()
 }

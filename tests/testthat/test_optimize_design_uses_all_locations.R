@@ -6,9 +6,7 @@ samples <- data.frame(
   sampleId = seq_len(bc$n_locations - 5)
 )
 
-assign_in_order(bc, samples)
-
-bc$scoring_f <- function(...) rnorm(1)
+bc <- assign_in_order(bc, samples)
 
 set.seed(42)
 
@@ -17,9 +15,9 @@ test_that("empty locations are used by optimize_design", {
   assignments <- purrr::map_dfr(
     seq_len(20),
     function(...) {
-      bc1 <- bc$copy()
-      optimize_design(
-        bc1,
+      bc1 <- optimize_design(
+        bc,
+        scoring = function(...) rnorm(1),
         max_iter = 5
       )
       bc1$get_samples()

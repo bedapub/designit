@@ -4,10 +4,18 @@
 \alias{sample_random_scores}
 \title{Sample scores from a number of completely random sample permutations}
 \usage{
-sample_random_scores(batch_container, random_perm, sample_attributes_fixed)
+sample_random_scores(
+  batch_container,
+  scoring,
+  random_perm,
+  sample_attributes_fixed
+)
 }
 \arguments{
 \item{batch_container}{An instance of \link{BatchContainer}.}
+
+\item{scoring}{A named \code{\link[=list]{list()}} of scoring function. Each function should
+return a vector of non-zero length.}
 
 \item{random_perm}{Number of random sample permutations to be done.}
 

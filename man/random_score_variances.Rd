@@ -4,10 +4,18 @@
 \alias{random_score_variances}
 \title{Estimate the variance of individual scores by a series of completely random sample permutations}
 \usage{
-random_score_variances(batch_container, random_perm, sample_attributes_fixed)
+random_score_variances(
+  batch_container,
+  scoring,
+  random_perm,
+  sample_attributes_fixed
+)
 }
 \arguments{
 \item{batch_container}{An instance of \code{BatchContainer}.}
+
+\item{scoring}{A named \code{\link[=list]{list()}} of scoring function. Each function should
+return a vector of non-zero length.}
 
 \item{random_perm}{Number of random sample permutations to be done.}
 

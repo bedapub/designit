@@ -6,6 +6,7 @@
 \usage{
 mk_autoscale_function(
   batch_container,
+  scoring,
   random_perm,
   use_boxcox = TRUE,
   sample_attributes_fixed = FALSE
@@ -13,6 +14,9 @@ mk_autoscale_function(
 }
 \arguments{
 \item{batch_container}{An instance of \link{BatchContainer}.}
+
+\item{scoring}{A named \code{\link[=list]{list()}} of scoring function. Each function should
+return a vector of non-zero length.}
 
 \item{random_perm}{Number of random sample permutations for the estimation of the scaling params.}
 
