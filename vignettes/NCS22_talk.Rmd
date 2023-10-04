@@ -33,16 +33,18 @@ It uses a subset of the `longitudinal_subject_samples` dataset.
 ```{r get_data, include = TRUE}
 data("longitudinal_subject_samples")
 
-dat <- longitudinal_subject_samples %>% 
-  filter(Group %in% 1:5, Week %in% c(1,4)) %>% 
+dat <- longitudinal_subject_samples %>%
+  filter(Group %in% 1:5, Week %in% c(1, 4)) %>%
   select(SampleID, SubjectID, Group, Sex, Week)
 
-# for simplicity: remove two subjects that don't have both visits  
-dat <- dat %>% 
-  filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID)) 
+# for simplicity: remove two subjects that don't have both visits
+dat <- dat %>%
+  filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID))
 
 
-subject_data <- dat %>% select(SubjectID, Group, Sex) %>% unique()
+subject_data <- dat %>%
+  select(SubjectID, Group, Sex) %>%
+  unique()
 ```
 
 ## Batch effects matter
@@ -120,7 +122,7 @@ turns out unbalanced:
 
 ```{r, fig.width= 3, fig.height=3, echo = FALSE}
 bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
-  geom_bar() + 
+  geom_bar() +
   labs(y = "subject count")
 ```
 
@@ -191,16 +193,23 @@ bc$get_samples()
 ```
 
 ```{r, echo=FALSE}
-bind_rows(head(bc$get_samples(), 3) %>% 
-            mutate(across(everything(), as.character)),
-          tibble(batch = "...", 
-                 location = " ...", 
-                 SubjectID = "...", 
-                 Group = "...", Sex = "..."),
-          tail(bc$get_samples(), 3) %>% 
-            mutate(across(everything(), as.character))) %>% 
-  gt::gt() %>% gt::tab_options(table.font.size = 11, 
-                               data_row.padding = 0.1)
+bind_rows(
+  head(bc$get_samples(), 3) %>%
+    mutate(across(everything(), as.character)),
+  tibble(
+    batch = "...",
+    location = " ...",
+    SubjectID = "...",
+    Group = "...", Sex = "..."
+  ),
+  tail(bc$get_samples(), 3) %>%
+    mutate(across(everything(), as.character))
+) %>%
+  gt::gt() %>%
+  gt::tab_options(
+    table.font.size = 11,
+    data_row.padding = 0.1
+  )
 ```
 
 
@@ -251,16 +260,23 @@ cowplot::plot_grid(
 
 
 ```{r, echo=FALSE}
-bind_rows(head(bc$get_samples(), 3) %>% 
-            mutate(across(everything(), as.character)),
-          tibble(batch = "...", 
-                 location = " ...", 
-                 SubjectID = "...", 
-                 Group = "...", Sex = "..."),
-          tail(bc$get_samples(), 3) %>% 
-            mutate(across(everything(), as.character))) %>% 
-  gt::gt() %>% gt::tab_options(table.font.size = 11, 
-                               data_row.padding = 0.1)
+bind_rows(
+  head(bc$get_samples(), 3) %>%
+    mutate(across(everything(), as.character)),
+  tibble(
+    batch = "...",
+    location = " ...",
+    SubjectID = "...",
+    Group = "...", Sex = "..."
+  ),
+  tail(bc$get_samples(), 3) %>%
+    mutate(across(everything(), as.character))
+) %>%
+  gt::gt() %>%
+  gt::tab_options(
+    table.font.size = 11,
+    data_row.padding = 0.1
+  )
 ```
 
 
@@ -289,29 +305,37 @@ of interest evenly across the plate and adjust for the effect computationally.
     * sex (lower priority)
 
 ```{r}
-set.seed(1) #1 #2
+set.seed(1) # 1 #2
 
 bc <- BatchContainer$new(
   dimensions = list("plate" = 3, "row" = 4, "col" = 6)
 ) %>%
   assign_random(dat)
-#  assign_in_order(dat)
+# assign_in_order(dat)
 ```
 
 ```{r, fig.width= 5, fig.height=4.5, eval=FALSE}
-plot_plate(bc, plate = plate, row = row, column = col,
-           .color = Group, title = "Initial layout by Group")
-plot_plate(bc, plate = plate, row = row, column = col, 
-           .color = Sex, title = "Initial layout by Sex")
+plot_plate(bc,
+  plate = plate, row = row, column = col,
+  .color = Group, title = "Initial layout by Group"
+)
+plot_plate(bc,
+  plate = plate, row = row, column = col,
+  .color = Sex, title = "Initial layout by Sex"
+)
 ```
 
 ```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(bc, plate = plate, row = row, column = col, 
-               .color = Group, title = "Initial layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, 
-               .color = Sex, title = "Initial layout by Sex")
+    plot_plate(bc1,
+      plate = plate, row = row, column = col,
+      .color = Group, title = "Initial layout by Group"
+    ),
+    plot_plate(bc1,
+      plate = plate, row = row, column = col,
+      .color = Sex, title = "Initial layout by Sex"
+    )
   ),
   nrow = 2
 )
@@ -332,7 +356,7 @@ bc <- optimize_multi_plate_design(
   within_plate_variables = c("Group"),
   plate = "plate", row = "row", column = "col",
   n_shuffle = 2,
-  max_iter = 500 #2000
+  max_iter = 500 # 2000
 )
 ```
 
@@ -340,10 +364,14 @@ bc <- optimize_multi_plate_design(
 ```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(bc, plate = plate, row = row, column = col, 
-               .color = Group, title = "Initial layout by Group"),
-    plot_plate(bc, plate = plate, row = row, column = col, 
-               .color = Sex, title = "Initial layout by Sex")
+    plot_plate(bc,
+      plate = plate, row = row, column = col,
+      .color = Group, title = "Initial layout by Group"
+    ),
+    plot_plate(bc,
+      plate = plate, row = row, column = col,
+      .color = Sex, title = "Initial layout by Sex"
+    )
   ),
   nrow = 2
 )
@@ -395,12 +423,13 @@ see vignette `invivo_study_design` for the full story.
 
 ```{r, fig.width=4.0, fig.hight = 5.0, echo = FALSE}
 layout <- crossing(row = 1:9, column = 1:12) %>%
-  mutate(Questions = "no") 
-layout$Questions[c(16, 17, 18, 19, 20, 21, 
-                  27, 28, 33, 34, 
-                  45, 46, 
-                  55, 56, 66, 67, 90, 91)] <- "yes"
+  mutate(Questions = "no")
+layout$Questions[c(
+  16, 17, 18, 19, 20, 21,
+  27, 28, 33, 34,
+  45, 46,
+  55, 56, 66, 67, 90, 91
+)] <- "yes"
 
 plot_plate(layout, .color = Questions, title = "Thank you")
-
 ```
