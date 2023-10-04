@@ -305,13 +305,12 @@ of interest evenly across the plate and adjust for the effect computationally.
     * sex (lower priority)
 
 ```{r}
-set.seed(1) # 1 #2
+set.seed(1)
 
 bc <- BatchContainer$new(
   dimensions = list("plate" = 3, "row" = 4, "col" = 6)
 ) %>%
-  assign_random(dat)
-# assign_in_order(dat)
+  assign_in_order(dat)
 ```
 
 ```{r, fig.width= 5, fig.height=4.5, eval=FALSE}
@@ -328,11 +327,11 @@ plot_plate(bc,
 ```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(bc1,
+    plot_plate(bc,
       plate = plate, row = row, column = col,
       .color = Group, title = "Initial layout by Group"
     ),
-    plot_plate(bc1,
+    plot_plate(bc,
       plate = plate, row = row, column = col,
       .color = Sex, title = "Initial layout by Sex"
     )
@@ -341,13 +340,82 @@ cowplot::plot_grid(
 )
 ```
 
-**2-step optimization** `multi_plate_layout()`
+## 2-step optimization
 
-* Across plate optimization using osat score as before
-* Within plate optimization using distance based sample scoring function
+### Across plate optimization using osat score as before
+```{r, warning=FALSE}
+bc1 <- optimize_design(
+  bc,
+  scoring = list(
+    group = osat_score_generator(
+      batch_vars = "plate",
+      feature_vars = "Group"
+    ),
+    sex = osat_score_generator(
+      batch_vars = "plate",
+      feature_vars = "Sex"
+    )
+  ),
+  n_shuffle = 1,
+  acceptance_func =
+    ~ accept_leftmost_improvement(..., tolerance = 0.01),
+  max_iter = 150,
+  quiet = TRUE
+)
+```
+
+```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc1,
+      plate = plate, row = row, column = col,
+      .color = Group, title = "Layout after the first step, Group"
+    ),
+    plot_plate(bc1,
+      plate = plate, row = row, column = col,
+      .color = Sex, title = "Layout after the first step, Sex"
+    )
+  ),
+  nrow = 2
+)
+```
+
+### Within plate optimization using distance based sample scoring function
+```{r, warning=FALSE}
+bc2 <- optimize_design(
+  bc1,
+  scoring = mk_plate_scoring_functions(
+    bc1,
+    plate = "plate", row = "row", column = "col",
+    group = "Group"
+  ),
+  shuffle_proposal_func = shuffle_with_constraints(dst = plate == .src$plate),
+  max_iter = 150,
+  quiet = TRUE
+)
+```
+
+```{r, fig.width= 5, fig.height=4.5, echo=FALSE}
+cowplot::plot_grid(
+  plotlist = list(
+    plot_plate(bc2,
+      plate = plate, row = row, column = col,
+      .color = Group, title = "Layout after the second step, Group"
+    ),
+    plot_plate(bc2,
+      plate = plate, row = row, column = col,
+      .color = Sex, title = "Layout after the second step, Sex"
+    )
+  ),
+  nrow = 2
+)
+```
 
 
-## Spatial arrangement
+## 2-step optimization `multi_plate_layout()`
+
+We are performing the same optimization as before, but using the
+`multi_plate_layout()` function to combine the two steps.
 
 ```{r, warning=FALSE, message=FALSE} 
 bc <- optimize_multi_plate_design(
@@ -366,11 +434,11 @@ cowplot::plot_grid(
   plotlist = list(
     plot_plate(bc,
       plate = plate, row = row, column = col,
-      .color = Group, title = "Initial layout by Group"
+      .color = Group, title = "After optimization, Group"
     ),
     plot_plate(bc,
       plate = plate, row = row, column = col,
-      .color = Sex, title = "Initial layout by Sex"
+      .color = Sex, title = "After optimization, Sex"
     )
   ),
   nrow = 2
