@@ -56,7 +56,7 @@ subject_data <- dat %>% select(SubjectID, Group, Sex) %>% unique()
 set.seed(17) # gives `bad` random assignment
 
 bc <- BatchContainer$new(
-  dimensions = list("batch" = 3, "location" = 11),
+  dimensions = list("batch" = 3, "location" = 11)
 ) %>%
   assign_random(subject_data)
 ```
@@ -110,7 +110,7 @@ set.seed(17) # gives `bad` random assignment
 ```
 ```{r}
 bc <- BatchContainer$new(
-  dimensions = list("batch" = 3, "location" = 11),
+  dimensions = list("batch" = 3, "location" = 11)
 ) %>%
   assign_random(subject_data)
 ```
@@ -238,7 +238,7 @@ of interest evenly across the plate and adjust for the effect computationally.
 set.seed(1) #1 #2
 
 bc <- BatchContainer$new(
-  dimensions = list("plate" = 3, "row" = 4, "col" = 6),
+  dimensions = list("plate" = 3, "row" = 4, "col" = 6)
 ) %>%
   assign_random(dat)
 #  assign_in_order(dat)
