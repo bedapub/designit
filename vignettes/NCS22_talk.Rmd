@@ -33,17 +33,18 @@ It uses a subset of the `longitudinal_subject_samples` dataset.
 ```{r get_data, include = TRUE}
 data("longitudinal_subject_samples")
 
-dat <- longitudinal_subject_samples %>%
-  filter(Group %in% 1:5, Week %in% c(1, 4)) %>%
+dat <- longitudinal_subject_samples |>
+  filter(Group %in% 1:5, Week %in% c(1, 4)) |>
   select(SampleID, SubjectID, Group, Sex, Week)
 
 # for simplicity: remove two subjects that don't have both visits
-dat <- dat %>%
-  filter(SubjectID %in% (dat %>% count(SubjectID) %>% filter(n == 2) %>% .$SubjectID))
+dat <- dat |>
+  filter(SubjectID %in%
+    (dat |> count(SubjectID) |> filter(n == 2) |> pull(SubjectID)))
 
 
-subject_data <- dat %>%
-  select(SubjectID, Group, Sex) %>%
+subject_data <- dat |>
+  select(SubjectID, Group, Sex) |>
   unique()
 ```
 
@@ -85,7 +86,7 @@ p1 <- plate_effect_example |>
   viridis::scale_fill_viridis() +
   ggtitle("Readout")
 
-p1 <- plate_effect_example |>
+p2 <- plate_effect_example |>
   filter(treatment == "control") |>
   mutate(column = as.numeric(column)) |>
   ggplot() +
@@ -113,7 +114,7 @@ set.seed(17) # gives `bad` random assignment
 
 bc <- BatchContainer$new(
   dimensions = list("batch" = 3, "location" = 11)
-) %>%
+) |>
   assign_random(subject_data)
 ```
 
@@ -121,7 +122,8 @@ Gone wrong: Random distribution of 31 grouped subjects into 3 batches
 turns out unbalanced: 
 
 ```{r, fig.width= 3, fig.height=3, echo = FALSE}
-bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+bc$get_samples() |>
+  ggplot(aes(x = batch, fill = Group)) +
   geom_bar() +
   labs(y = "subject count")
 ```
@@ -167,7 +169,7 @@ set.seed(17) # gives `bad` random assignment
 ```{r}
 bc <- BatchContainer$new(
   dimensions = list("batch" = 3, "location" = 11)
-) %>%
+) |>
   assign_random(subject_data)
 ```
 
@@ -177,10 +179,12 @@ bc <- BatchContainer$new(
 ```{r, fig.width= 5.5, fig.height=3, echo = FALSE}
 cowplot::plot_grid(
   plotlist = list(
-    bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+    bc$get_samples() |>
+      ggplot(aes(x = batch, fill = Group)) +
       geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = batch, fill = Sex)) +
+    bc$get_samples() |>
+      ggplot(aes(x = batch, fill = Sex)) +
       geom_bar() +
       labs(y = "subject count")
   ),
@@ -194,7 +198,7 @@ bc$get_samples()
 
 ```{r, echo=FALSE}
 bind_rows(
-  head(bc$get_samples(), 3) %>%
+  head(bc$get_samples(), 3) |>
     mutate(across(everything(), as.character)),
   tibble(
     batch = "...",
@@ -202,10 +206,10 @@ bind_rows(
     SubjectID = "...",
     Group = "...", Sex = "..."
   ),
-  tail(bc$get_samples(), 3) %>%
+  tail(bc$get_samples(), 3) |>
     mutate(across(everything(), as.character))
-) %>%
-  gt::gt() %>%
+) |>
+  gt::gt() |>
   gt::tab_options(
     table.font.size = 11,
     data_row.padding = 0.1
@@ -246,10 +250,12 @@ bc <- optimize_design(
 ```{r, fig.width= 8, fig.height=3, echo = FALSE}
 cowplot::plot_grid(
   plotlist = list(
-    bc$get_samples() %>% ggplot(aes(x = batch, fill = Group)) +
+    bc$get_samples() |>
+      ggplot(aes(x = batch, fill = Group)) +
       geom_bar() +
       labs(y = "subject count"),
-    bc$get_samples() %>% ggplot(aes(x = batch, fill = Sex)) +
+    bc$get_samples() |>
+      ggplot(aes(x = batch, fill = Sex)) +
       geom_bar() +
       labs(y = "subject count"),
     bc$plot_trace(include_aggregated = TRUE)
@@ -261,7 +267,7 @@ cowplot::plot_grid(
 
 ```{r, echo=FALSE}
 bind_rows(
-  head(bc$get_samples(), 3) %>%
+  head(bc$get_samples(), 3) |>
     mutate(across(everything(), as.character)),
   tibble(
     batch = "...",
@@ -269,10 +275,10 @@ bind_rows(
     SubjectID = "...",
     Group = "...", Sex = "..."
   ),
-  tail(bc$get_samples(), 3) %>%
+  tail(bc$get_samples(), 3) |>
     mutate(across(everything(), as.character))
-) %>%
-  gt::gt() %>%
+) |>
+  gt::gt() |>
   gt::tab_options(
     table.font.size = 11,
     data_row.padding = 0.1
@@ -305,11 +311,11 @@ of interest evenly across the plate and adjust for the effect computationally.
     * sex (lower priority)
 
 ```{r}
-set.seed(1)
+set.seed(4)
 
 bc <- BatchContainer$new(
   dimensions = list("plate" = 3, "row" = 4, "col" = 6)
-) %>%
+) |>
   assign_in_order(dat)
 ```
 
@@ -490,7 +496,7 @@ see vignette `invivo_study_design` for the full story.
 
 
 ```{r, fig.width=4.0, fig.hight = 5.0, echo = FALSE}
-layout <- crossing(row = 1:9, column = 1:12) %>%
+layout <- crossing(row = 1:9, column = 1:12) |>
   mutate(Questions = "no")
 layout$Questions[c(
   16, 17, 18, 19, 20, 21,
