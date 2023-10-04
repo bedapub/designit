@@ -26,7 +26,7 @@ library(tidyverse)
 
 # Introduction
 
-Examples in this vignette are used in a talk at NCS22.
+Examples in this vignette are used were used in our presentation.
 
 It uses a subset of the `longitudinal_subject_samples` dataset.
 
