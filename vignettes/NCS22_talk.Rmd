@@ -45,6 +45,60 @@ dat <- dat %>%
 subject_data <- dat %>% select(SubjectID, Group, Sex) %>% unique()
 ```
 
+## Batch effects matter
+Here's an example of plate effect. Here both top and bottom rows of the
+plate are used as controls. 
+
+This is the experiment design:
+
+```{r, fig.width= 4, fig.height=3, echo = FALSE}
+data("plate_effect_example")
+plate_effect_example |>
+  ggplot() +
+  aes(x = column, y = row, fill = treatment, alpha = log_conc) +
+  geom_tile() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_y_discrete(limits = rev) +
+  scale_fill_brewer(palette = "Set1") +
+  # make transparency more visible
+  scale_alpha_continuous(range = c(0.2, 1)) +
+  ggtitle("Design")
+```
+
+These are the readouts:
+
+```{r, fig.width= 4, fig.height=5, echo = FALSE}
+p1 <- plate_effect_example |>
+  ggplot() +
+  aes(x = column, y = row, fill = readout) +
+  geom_tile() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  ) +
+  scale_y_discrete(limits = rev) +
+  viridis::scale_fill_viridis() +
+  ggtitle("Readout")
+
+p1 <- plate_effect_example |>
+  filter(treatment == "control") |>
+  mutate(column = as.numeric(column)) |>
+  ggplot() +
+  aes(x = column, y = readout, color = row) +
+  geom_point() +
+  geom_line() +
+  scale_color_brewer(palette = "Set1") +
+  ggtitle("Control")
+
+cowplot::plot_grid(p1, p2, nrow = 2)
+```
+
+Due to the plate effect, the control rows are affected differently. It is
+virtually impossible to normalize readouts in a meaningful way.
+
 ## Go fully random? 
 
 * Could it be sufficient to randomly distribute samples across batches?
