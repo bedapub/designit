@@ -83,6 +83,7 @@ p1 <- plate_effect_example |>
     panel.grid.minor = element_blank()
   ) +
   scale_y_discrete(limits = rev) +
+  scale_fill_viridis_c() +
   ggtitle("Readout")
 
 p2 <- plate_effect_example |>
