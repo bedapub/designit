@@ -1,4 +1,3 @@
-
 #' Unbalanced treatment and time sample list
 #'
 #' A sample list with 4 columns SampleName, Well, Time and Treatment
@@ -86,3 +85,26 @@
 #' \item{Sex}{Female (F) or Male (M) - a constraint which kind of animal may receive the respective treatment}
 #' }
 "invivo_study_treatments"
+
+#' Example dataset with a plate effect
+#'
+#' Here top and bottom row were both used as controls (in dilutions). The top
+#' row however was affected differently than the bottom one. This makes
+#' normalization virtually impossible.
+#'
+#' @docType data
+#' @keywords datasets
+#' @name plate_effect_example
+#' @usage data(plate_effect_example)
+#' @author Balazs Banfai
+#'
+#' @format An object of class \code{"tibble"}
+#' \describe{
+#' \item{row}{Plate row}
+#' \item{column}{Plate column}
+#' \item{conc}{Sample concentration}
+#' \item{log_conc}{Logarithm of sample concentration}
+#' \item{treatment}{Sample treatment}
+#' \item{readout}{Readout from experiment}
+#' }
+"plate_effect_example"
