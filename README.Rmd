@@ -35,6 +35,10 @@ devtools::install_github("BEDApub/designit")
 
 ## Usage
 
+### R in Pharma presentation
+<iframe width="560" height="315" src="https://www.youtube.com/embed/mvPmSQJVy8o?si=N9TvgqNxuRoCV0HF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+### Batch container
 The main class used is `BatchContainer`, which holds the dimensions for sample allocation.
 After creating such a container, a list of samples can be allocated in it using a given assignment function.
 
