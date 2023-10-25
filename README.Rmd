@@ -36,7 +36,7 @@ devtools::install_github("BEDApub/designit")
 ## Usage
 
 ### R in Pharma presentation
-<iframe width="560" height="315" src="https://www.youtube.com/embed/mvPmSQJVy8o?si=N9TvgqNxuRoCV0HF" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[![Designit: a flexible engine to generate experiment layouts, R in Pharma presentation](https://img.youtube.com/vi/mvPmSQJVy8o/0.jpg)](http://www.youtube.com/watch?v=mvPmSQJVy8o "Designit: a flexible engine to generate experiment layouts")
 
 ### Batch container
 The main class used is `BatchContainer`, which holds the dimensions for sample allocation.
