@@ -250,8 +250,10 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
 
   if (!is.null(within_plate_variables)) {
     plate_levels <- unique(bc$get_locations()[[plate]])
-    scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x))
-    names(scoring_funcs) <- within_plate_variables
+    scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x)) %>%
+      unlist()
+    names(scoring_funcs) <- paste(rep(within_plate_variables, each = length(plate_levels)), names(scoring_funcs))
+
 
     if (!quiet) {
       message(
@@ -264,7 +266,7 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
       if (!quiet && length(plate_levels) > 1) cat(curr_plate, "... ")
 
       bc <- optimize_design(bc,
-        scoring = scoring_funcs %>% purrr::map(curr_plate) %>% rlang::set_names(paste(names(.), " Plate_", curr_plate)),
+        scoring = scoring_funcs,
         max_iter = max_iter,
         quiet = TRUE,
         shuffle_proposal_func = mk_subgroup_shuffling_function(
