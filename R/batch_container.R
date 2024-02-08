@@ -122,6 +122,7 @@ locations_table_from_dimensions <- function(dimensions, exclude) {
 #' A typical workflow starts with creating a `BatchContainer`. Then
 #' samples can be assigned to locations in that container.
 #'
+#' @rawNamespace import(R6, except=getNamespaceExports("R6"))
 #' @export
 BatchContainer <- R6::R6Class("BatchContainer",
   public = list(
