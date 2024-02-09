@@ -3,22 +3,10 @@
 \docType{data}
 \name{.datatable.aware}
 \alias{.datatable.aware}
-\title{This undocumented (?) flag allows us to use \verb{:=}
-without getting an error.}
-\format{
-An object of class \code{logical} of length 1.
-}
-\usage{
-.datatable.aware
-}
+\title{Show that the package is designed to rely on data.table functionality}
 \description{
-This undocumented (?) flag allows us to use \verb{:=}
-without getting an error.
-}
-\examples{
-\dontrun{
-dt <- data.table::data.table(a = 1, b = 2)
-dt[, a := NULL]
-}
+See \code{\link[data.table:assign]{data.table::let()}} and
+\href{https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html}{\code{vignette("datatable-importing", "data.table")}}
+section "data.table in Imports but nothing imported".
 }
 \keyword{internal}
