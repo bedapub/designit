@@ -72,8 +72,8 @@ assign_in_order <- function(batch_container, samples = NULL) {
 #'
 #' @example man/examples/shuffle_with_constraints.R
 shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
-  src <- enquo(src)
-  dst <- enquo(dst)
+  src <- rlang::enquo(src)
+  dst <- rlang::enquo(dst)
   function(bc, i) {
     dt <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
     src_ind <- which(rep_len(TRUE, nrow(dt)) & rlang::eval_tidy(src, dt))
