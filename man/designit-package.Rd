@@ -29,6 +29,7 @@ Authors:
 
 Other contributors:
 \itemize{
+  \item Konrad Rudolph \email{konrad.rudolph@roche.com} (\href{https://orcid.org/0000-0002-9866-7051}{ORCID}) [contributor]
   \item F. Hoffman-La Roche [copyright holder, funder]
 }
 
