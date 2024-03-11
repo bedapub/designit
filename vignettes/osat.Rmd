@@ -18,6 +18,9 @@ knitr::opts_chunk$set(
 )
 ```
 
+In this vignette, we demonstrate how to use the OSAT score
+([Yan et al. (2012)](https://doi.org/10.1186/1471-2164-13-689)).
+
 ```{r setup}
 library(designit)
 library(tidyverse)
