@@ -6,7 +6,7 @@
 \title{Show that the package is designed to rely on data.table functionality}
 \description{
 See \code{\link[data.table:assign]{data.table::let()}} and
-\href{https://cran.r-project.org/web/packages/data.table/vignettes/datatable-importing.html}{\code{vignette("datatable-importing", "data.table")}}
+\code{vignette("datatable-importing", "data.table")}
 section "data.table in Imports but nothing imported".
 }
 \keyword{internal}
