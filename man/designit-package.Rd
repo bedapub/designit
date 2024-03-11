@@ -6,7 +6,7 @@
 \alias{designit-package}
 \title{designit: Blocking and Randomization for Experimental Design}
 \description{
-Reducing batch effect by intellegently assigning samples to batches. Batch-effect have a strong influence in data analysis, especially when samples-to-batches assignent is coinciding with contrast groups. By defining your batch container and a scoring function reflecting the contrasts, you can assign samples in such a way that the potential batch-effect has minimal effect on the comparison of interest.
+Reducing batch effect by intelligently assigning samples to batches. Batch-effect have a strong influence in data analysis, especially when samples-to-batches assignment is coinciding with contrast groups. By defining your batch container and a scoring function reflecting the contrasts, you can assign samples in such a way that the potential batch-effect has minimal effect on the comparison of interest.
 }
 \seealso{
 Useful links:

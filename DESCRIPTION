@@ -29,9 +29,9 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0422-7977")),
     person(given = "F. Hoffman-La Roche", role = c("cph", "fnd")))
 Description:
-    Reducing batch effect by intellegently assigning samples to batches.
+    Reducing batch effect by intelligently assigning samples to batches.
     Batch-effect have a strong influence in data analysis, especially when
-    samples-to-batches assignent is coinciding with contrast groups.
+    samples-to-batches assignment is coinciding with contrast groups.
     By defining your batch container and a scoring function reflecting
     the contrasts, you can assign samples in such a way that the potential
     batch-effect has minimal effect on the comparison of interest.
