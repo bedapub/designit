@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(designit)
 library(dplyr)
-library(forcats)
 library(assertthat)
 library(stringr)
 library(tidyr)

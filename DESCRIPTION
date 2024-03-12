@@ -55,7 +55,6 @@ Imports:
     ineq,
     data.table,
     glue,
-    forcats,
     checkmate,
     stats
 Suggests: 

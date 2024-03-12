@@ -20,7 +20,6 @@ knitr::opts_chunk$set(
 ```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(designit)
 library(dplyr)
-library(forcats)
 library(assertthat)
 library(stringr)
 library(tidyr)
@@ -158,7 +157,7 @@ InVivo_assignTreatments <- function(animal_list, treatments,
 
   # Make sure we have defined factor levels for categorical variables
   treatments_sortedfac <- dplyr::mutate(treatments, across(where(is_character), as.factor)) # here we want alphabetic sort order!
-  treatments <- dplyr::mutate(treatments, across(where(is_character), forcats::as_factor)) # Keep orig sort order in treatment object!
+  treatments <- dplyr::mutate(treatments, across(where(is_character), function(v) factor(v, levels = unique(v)))) # Keep orig sort order in treatment object!
 
   # Create a CageGroup variable if not yet provided in animal list or overridden by specific argument
   if (!is.null(form_cages_by) && length(form_cages_by) > 0) {
