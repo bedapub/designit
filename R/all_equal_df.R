@@ -25,9 +25,9 @@ all_equal_df <- function(df1, df2) {
   df2 <- df2[colnames(df1)]
 
   # convert factors to characters
-  df1 <- df1 |>
+  df1 <- df1 %>%
     dplyr::mutate(dplyr::across(dplyr::where(is.factor), as.character))
-  df2 <- df2 |>
+  df2 <- df2 %>%
     dplyr::mutate(dplyr::across(dplyr::where(is.factor), as.character))
 
   # order by all columns

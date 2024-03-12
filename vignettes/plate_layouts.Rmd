@@ -131,7 +131,7 @@ We can look at the trace objects for each internal `optimize_design` run,
 returned from the wrapper function.
 
 ```{r fig.width=6, fig.height=3}
-bc$scores_table() |>
+bc$scores_table() %>%
   ggplot(aes(step, value, color = score)) +
   geom_line() +
   geom_point() +
@@ -328,7 +328,7 @@ cowplot::plot_grid(
 ```
 
 ```{r fig.width=5.5, fig.height=2}
-bc$scores_table() |>
+bc$scores_table() %>%
   ggplot(aes(step, value, color = score)) +
   geom_line() +
   geom_point() +
@@ -556,7 +556,7 @@ cowplot::plot_grid(
 
 
 ```{r fig.width=6, fig.height=4}
-bc$scores_table() |>
+bc$scores_table() %>%
   ggplot(aes(step, value, color = score)) +
   geom_line() +
   geom_point() +
