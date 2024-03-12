@@ -383,7 +383,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
           }
           v
         }
-      ) |>
+      ) %>%
         purrr::flatten_dbl()
       assertthat::assert_that(length(res) >= length(scoring))
       assertthat::assert_that(
