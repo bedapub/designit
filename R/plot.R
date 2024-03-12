@@ -100,11 +100,11 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   Pattern <- NULL
 
   if (add_excluded) {
-    assertthat::assert_that(checkmate::test_r6(.tbl, "BatchContainer"))
+    assertthat::assert_that(R6::is.R6(.tbl) && inherits(.tbl, "BatchContainer"))
     excluded <- .tbl$exclude
   }
 
-  if (checkmate::test_r6(.tbl, "BatchContainer")) {
+  if (R6::is.R6(.tbl) && inherits(.tbl, "BatchContainer")) {
     .tbl <- .tbl$get_samples()
   } else {
     assertthat::assert_that(is.data.frame(.tbl))
