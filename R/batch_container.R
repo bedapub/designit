@@ -101,7 +101,9 @@ locations_table_from_dimensions <- function(dimensions, exclude) {
     for (dim_name in names(dimensions)) {
       assertthat::assert_that(
         all(exclude[[dim_name]] %in% dimensions[[dim_name]]$values),
-        msg = stringr::str_glue("Some values are outside range in dimension '{dim_name}'")
+        msg = paste0(
+          "Some values are outside range in dimension '", dim_name, "'"
+        )
       )
     }
 
@@ -427,15 +429,16 @@ BatchContainer <- R6::R6Class("BatchContainer",
         } else {
           assigned_info <- "assigned"
         }
-        sample_info <- stringr::str_glue(
-          " and {nrow(private$samples_table)} samples ({assigned_info})"
+        sample_info <- paste0(
+          " and ", nrow(private$samples_table), " samples ",
+          "(", assigned_info, ")"
         )
       } else {
         sample_info <- ""
       }
-      cat(stringr::str_glue(
-        "Batch container with {self$n_locations} locations{sample_info}.\n",
-        .trim = FALSE
+      cat(paste0(
+        "Batch container with ", self$n_locations, " locations",
+        sample_info, "\n"
       ))
       cat("  Dimensions: ")
       self$dimension_names %>%

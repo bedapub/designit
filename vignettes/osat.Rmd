@@ -158,7 +158,7 @@ bench::system_time({
 # final score
 bc_reference$score(scoring_f)
 bc_reference$plot_trace() +
-  ggtitle(str_glue("Final score={bc$score(scoring_f)}"))
+  ggtitle(paste0("Final score=", bc$score(scoring_f)))
 bc$get_samples(remove_empty_locations = TRUE) %>%
   plot_batch()
 ```
