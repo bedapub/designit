@@ -157,7 +157,7 @@ bc2 <- BatchContainer$new(
                     col = list(values=sprintf("%02d", 1:12)))
 )
 
-assign_in_order(bc2, rand_dat)
+bc2 <- assign_in_order(bc2, rand_dat)
 head(bc2$get_samples()) %>% gt::gt()
 ```
 
