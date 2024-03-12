@@ -109,7 +109,7 @@ bc1$scores_table() %>%
   ggplot2::geom_point() +
   ggplot2::labs(
     title = "Score 1 tracing",
-    subtitle = paste("Final score =", bc1$score(scoring_f)),
+    subtitle = stringr::str_glue("Final score = {bc1$score(scoring_f)}"),
     x = "Iteration",
     y = "Score",
     color = "n_shuffle"

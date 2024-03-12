@@ -58,7 +58,7 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
   special_col_names <- c(".n_batch", ".batch_freq", ".n_samples")
   special_col_names_str <- stringr::str_c(special_col_names, collapse = ", ")
   assertthat::assert_that(length(intersect(special_col_names, colnames(df))) == 0,
-    msg = paste("special names", special_col_names_str, "cannot be used as column names")
+    msg = glue::glue("special names ({special_col_names_str}) cannot be used as column names")
   )
   if (is.null(expected_dt)) {
     batch_df <- df[, .(.n_batch = .N), by = batch_vars]
@@ -91,7 +91,7 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
       sort()
     expected_colnames_str <- stringr::str_c(expected_colnames, collapse = ", ")
     assertthat::assert_that(all(sort(colnames(expected_dt)) == expected_colnames),
-      msg = paste("expecting column names in expected_dt:", expected_colnames_str)
+      msg = glue::glue("expecting column names in expected_dt: {expected_colnames_str}")
     )
   }
   sample_count_df <- na.omit(df[, .N, by = c(feature_vars, batch_vars)])
