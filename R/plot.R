@@ -125,7 +125,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     } else {
       assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
       .tbl <- .tbl %>%
-        dplyr::mutate(Pattern = forcats::as_factor({{ .pattern }}))
+        dplyr::mutate(Pattern = as.factor({{ .pattern }}))
     }
   }
   # If there is no plate,
@@ -153,9 +153,9 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
 
   .tbl <- .tbl %>%
     dplyr::mutate(
-      plate = forcats::as_factor({{ plate }}),
-      column = forcats::as_factor({{ column }}),
-      row = forcats::as_factor({{ row }})
+      plate = as.factor({{ plate }}),
+      column = as.factor({{ column }}),
+      row = as.factor({{ row }})
     )
 
   # make plot
