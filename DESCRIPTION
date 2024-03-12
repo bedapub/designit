@@ -39,9 +39,8 @@ License: MIT + file LICENSE
 URL: https://bedapub.github.io/designit/, https://github.com/BEDApub/designit/
 BugReports: https://github.com/BEDApub/designit/issues
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Imports: 
-    magrittr,
     rlang (>= 0.4.0),
     dplyr (>= 1.0.0),
     purrr,

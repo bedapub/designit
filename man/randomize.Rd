@@ -63,9 +63,9 @@ samples <- data.frame(
 )
 
 # generate initial sample table (2 animals per group with 3 replicates)
-samples <- dplyr::bind_rows(samples \%>\% dplyr::mutate(animals = 1), samples) \%>\%
+samples <- dplyr::bind_rows(samples |> dplyr::mutate(animals = 1), samples) |>
   dplyr::rename(animal = animals)
-samples <- dplyr::bind_rows(list(samples, samples, samples)) \%>\%
+samples <- dplyr::bind_rows(list(samples, samples, samples)) |>
   dplyr::mutate(
     replicate = rep(1:3, each = 10),
     SampleID = paste0(Treatment, "_", animal, "_", replicate),
@@ -105,7 +105,7 @@ result <- randomize(design, report, layout_dim, balance,
   distribute = sample(1:(prod(layout_dim)))
 )
 
-final_design <- result$design \%>\%
+final_design <- result$design |>
   dplyr::mutate(Column = Column + 1) # first column empty
 
 # plot

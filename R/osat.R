@@ -88,8 +88,8 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
     data.table::setkeyv(expected_dt, c(batch_vars, feature_vars))
   } else {
     assertthat::assert_that(is.data.frame(expected_dt) && nrow(expected_dt) > 0)
-    expected_colnames <- c(feature_vars, batch_vars) %>%
-      c(".n_expected") %>%
+    expected_colnames <- c(feature_vars, batch_vars) |>
+      c(".n_expected") |>
       sort()
     expected_colnames_str <- stringr::str_c(expected_colnames, collapse = ", ")
     assertthat::assert_that(all(sort(colnames(expected_dt)) == expected_colnames),
