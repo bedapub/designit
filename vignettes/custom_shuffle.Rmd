@@ -38,12 +38,12 @@ samples <- tibble(
   group = sample(c("treatment", "control"), params$n_samples, replace = TRUE),
   weight = runif(params$n_samples, 20, 30)
 )
-samples %>%
+samples |>
   head()
 ```
 
 ```{r}
-samples %>%
+samples |>
   count(sex)
 ```
 We create a `BatchContainer` with 11 cages and 5 positions per cage. Note that positions do not
@@ -55,7 +55,7 @@ We start by assigning samples randomly.
 set.seed(42)
 bc <- BatchContainer$new(
   dimensions = c("cage" = 11, "position" = 5)
-) %>%
+) |>
   assign_random(samples)
 bc
 ```
@@ -63,15 +63,15 @@ bc
 Functions to plot number of males per cage, weights per cage and treatment/control ratios.
 ```{r}
 males_per_cage <- function(bc) {
-  bc$get_samples() %>%
-    filter(sex == "M") %>%
-    count(cage) %>%
+  bc$get_samples() |>
+    filter(sex == "M") |>
+    count(cage) |>
     ggplot(aes(cage, n)) +
     geom_col()
 }
 
 weight_d <- function(bc) {
-  bc$get_samples() %>%
+  bc$get_samples() |>
     ggplot(aes(factor(cage), weight)) +
     geom_violin() +
     geom_point() +
@@ -79,7 +79,7 @@ weight_d <- function(bc) {
 }
 
 group_d <- function(bc) {
-  bc$get_samples(remove_empty_locations = TRUE) %>%
+  bc$get_samples(remove_empty_locations = TRUE) |>
     ggplot(aes(factor(cage), fill = group)) +
     geom_bar(position = "fill")
 }

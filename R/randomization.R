@@ -95,19 +95,19 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
       if (tests[[ti]] != "meanDiff") {
         # get the penalty for each dimension group
         # factor von balace variables
-        penalty <- layout %>%
-          dplyr::group_by(!!rlang::sym(group)) %>%
+        penalty <- layout |>
+          dplyr::group_by(!!rlang::sym(group)) |>
           dplyr::summarize_at(.vars = dplyr::vars(balance), testFun)
-        score <- penalty %>%
+        score <- penalty |>
           dplyr::summarize(score = sum((!!rlang::sym(balance))^2, na.rm = TRUE))
         score <- sum(score * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       } else {
         # loop over balance variables
-        means <- layout %>%
+        means <- layout |>
           dplyr::summarize_at(.vars = dplyr::vars(balance), .funs = mean)
         # uselevel <- ifelse(length(groups)>1, group[2])
-        diff <- means %>% dplyr::summarize(.vars = dplyr::vars(balance), meanDiff)
+        diff <- means |> dplyr::summarize(.vars = dplyr::vars(balance), meanDiff)
         score <- sum(diff * bal_weights) # multiply score for each balance factor by its weight and sum
         tscore <- tscore + score
       }
@@ -153,9 +153,9 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #' )
 #'
 #' # generate initial sample table (2 animals per group with 3 replicates)
-#' samples <- dplyr::bind_rows(samples %>% dplyr::mutate(animals = 1), samples) %>%
+#' samples <- dplyr::bind_rows(samples |> dplyr::mutate(animals = 1), samples) |>
 #'   dplyr::rename(animal = animals)
-#' samples <- dplyr::bind_rows(list(samples, samples, samples)) %>%
+#' samples <- dplyr::bind_rows(list(samples, samples, samples)) |>
 #'   dplyr::mutate(
 #'     replicate = rep(1:3, each = 10),
 #'     SampleID = paste0(Treatment, "_", animal, "_", replicate),
@@ -195,7 +195,7 @@ getScore <- function(layout, balance, sc_groups, sc_tests,
 #'   distribute = sample(1:(prod(layout_dim)))
 #' )
 #'
-#' final_design <- result$design %>%
+#' final_design <- result$design |>
 #'   dplyr::mutate(Column = Column + 1) # first column empty
 #'
 #' # plot
@@ -240,7 +240,7 @@ randomize <- function(design, report, layout_dim, balance,
   ndim <- length(layout_dim) # number of experiment dimensions
   grid <- expand.grid(sapply(layout_dim, function(x) {
     seq(1, x)
-  }, simplify = F)) %>% # TODO: maybe lapply?
+  }, simplify = F)) |> # TODO: maybe lapply?
 
     as.data.frame()
 
@@ -248,7 +248,7 @@ randomize <- function(design, report, layout_dim, balance,
   fixed <- rep(FALSE, nloc)
 
   # make factors
-  design <- design %>%
+  design <- design |>
     dplyr::mutate_at(.vars = dplyr::vars(balance), factor)
 
   # Adding empty samples
@@ -388,7 +388,7 @@ randomize <- function(design, report, layout_dim, balance,
   if (length(fixedPos) > 0) {
     if (length(convert) > 0) {
       # reconvert factors to letters # TODO: This version still needs testing
-      mfac <- mfac %>%
+      mfac <- mfac |>
         dplyr::mutate_at(.vars = dplyr::vars(convert), .funs = function(x) {
           factor(x, levels = 1:max(x, na.rm = TRUE), labels = LETTERS[1:max(x, na.rm = TRUE)])
         })

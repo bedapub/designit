@@ -35,7 +35,7 @@ Loading samples. We add two dummy columns to demonstrate how to choose batch col
 osat_data_path <- system.file("extdata", package = "OSAT")
 samples <- read_tsv(file.path(osat_data_path, "samples.txt"),
   col_types = cols(SampleType = col_factor(), Race = col_factor(), AgeGrp = col_factor())
-) %>%
+) |>
   mutate(dummy_var1 = rnorm(n()), dummy_var2 = str_c(SampleType, Race, sep = " "))
 ```
 
@@ -59,17 +59,17 @@ Saving starting point of optimization
 ```{r}
 set.seed(1234)
 
-g_setup_start <- OSAT::create.optimized.setup(sample = gs, container = gc, nSim = 1) %>%
+g_setup_start <- OSAT::create.optimized.setup(sample = gs, container = gc, nSim = 1) |>
   OSAT::get.experiment.setup()
 ```
 
 
 Visualize various batch factors. OSAT score is optimized only for `plates` in this case.
 ```{r}
-OSAT::get.experiment.setup(g_setup) %>%
-  select(AgeGrp, plates, chipRows, chipColumns, chips, rows, columns, wells) %>%
-  pivot_longer(-AgeGrp) %>%
-  count(AgeGrp, value, name) %>%
+OSAT::get.experiment.setup(g_setup) |>
+  select(AgeGrp, plates, chipRows, chipColumns, chips, rows, columns, wells) |>
+  pivot_longer(-AgeGrp) |>
+  count(AgeGrp, value, name) |>
   ggplot(aes(AgeGrp, n, fill = factor(value))) +
   geom_col(position = "dodge") +
   facet_wrap(~name, scales = "free_y")
@@ -78,10 +78,10 @@ OSAT::get.experiment.setup(g_setup) %>%
 ## Visualize for plates
 ```{r}
 plot_batch <- function(df) {
-  df %>%
-    select(plates, SampleType, Race, AgeGrp) %>%
-    pivot_longer(c(SampleType, Race, AgeGrp), names_to = "variable", values_to = "level") %>%
-    count(plates, variable, level) %>%
+  df |>
+    select(plates, SampleType, Race, AgeGrp) |>
+    pivot_longer(c(SampleType, Race, AgeGrp), names_to = "variable", values_to = "level") |>
+    count(plates, variable, level) |>
     ggplot(aes(level, n, fill = factor(plates))) +
     geom_col(position = "dodge") +
     facet_wrap(~variable, scales = "free", ncol = 1)
@@ -90,12 +90,12 @@ plot_batch <- function(df) {
 
 Before the optimization.
 ```{r}
-g_setup_start %>% plot_batch()
+g_setup_start |> plot_batch()
 ```
 
 After the optimization.
 ```{r}
-OSAT::get.experiment.setup(g_setup) %>%
+OSAT::get.experiment.setup(g_setup) |>
   plot_batch()
 ```
 
@@ -103,14 +103,14 @@ OSAT::get.experiment.setup(g_setup) %>%
 # Compare scores with various implementations
 Compare OSAT score generated using designit.
 ```{r}
-OSAT::getLayout(gc) %>%
-  left_join(OSAT::get.experiment.setup(g_setup)) %>%
-  data.table::data.table() %>%
-  osat_score("plates", c("SampleType", "Race", "AgeGrp")) %>%
+OSAT::getLayout(gc) |>
+  left_join(OSAT::get.experiment.setup(g_setup)) |>
+  data.table::data.table() |>
+  osat_score("plates", c("SampleType", "Race", "AgeGrp")) |>
   .$score
 
 # score using OSAT
-g_setup@metadata$optValue %>% tail(1)
+g_setup@metadata$optValue |> tail(1)
 ```
 
 
@@ -129,14 +129,14 @@ Assign samples and get initial setup.
 ```{r}
 bc <- assign_in_order(bc, samples)
 
-starting_assignment <- bc$get_locations() %>%
-  left_join(g_setup_start) %>%
-  pull(ID) %>%
+starting_assignment <- bc$get_locations() |>
+  left_join(g_setup_start) |>
+  pull(ID) |>
   as.integer()
 
 bc$move_samples(location_assignment = starting_assignment)
 
-bc$get_samples(remove_empty_locations = TRUE) %>%
+bc$get_samples(remove_empty_locations = TRUE) |>
   plot_batch()
 ```
 
@@ -145,7 +145,7 @@ bc$get_samples(remove_empty_locations = TRUE) %>%
 scoring_f <- osat_score_generator("plates", c("SampleType", "Race", "AgeGrp"))
 
 bc$score(scoring_f)
-g_setup@metadata$optValue %>% head(1)
+g_setup@metadata$optValue |> head(1)
 # should be identical
 
 bench::system_time({
@@ -159,7 +159,7 @@ bench::system_time({
 bc_reference$score(scoring_f)
 bc_reference$plot_trace() +
   ggtitle(str_glue("Final score={bc$score(scoring_f)}"))
-bc$get_samples(remove_empty_locations = TRUE) %>%
+bc$get_samples(remove_empty_locations = TRUE) |>
   plot_batch()
 ```
 
@@ -243,8 +243,8 @@ tibble(
   i = bc_burn_in$trace$scores[[1]]$step,
   normal = bc_reference$trace$scores[[1]]$score_1,
   burnin = bc_burn_in$trace$scores[[1]]$score_1
-) %>%
-  pivot_longer(-i, names_to = "method", values_to = "score") %>%
+) |>
+  pivot_longer(-i, names_to = "method", values_to = "score") |>
   ggplot(aes(i, score, col = method)) +
   geom_line()
 ```

@@ -11,8 +11,8 @@
 plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
   # generate vars
   vars <- rlang::enquos(...)
-  combinations <- .tbl %>%
-    dplyr::mutate(combinations = interaction(!!!vars, lex.order = T)) %>%
+  combinations <- .tbl |>
+    dplyr::mutate(combinations = interaction(!!!vars, lex.order = T)) |>
     dplyr::pull(combinations)
   g <- ggplot2::ggplot(.tbl) +
     ggplot2::aes(
@@ -22,9 +22,9 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
     ggplot2::geom_histogram(stat = "count") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90))
   if (!rlang::quo_is_null(rlang::enquo(.alpha))) {
-    alpha_levels <- .tbl %>%
-      dplyr::pull({{ .alpha }}) %>%
-      unique() %>%
+    alpha_levels <- .tbl |>
+      dplyr::pull({{ .alpha }}) |>
+      unique() |>
       length()
     alpha_range <- c(1 / min(5, alpha_levels), 1)
     g <- g +
@@ -124,7 +124,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
       warning("Please install ggpattern to use patterns in the plot")
     } else {
       assertthat::assert_that(assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(.pattern))))
-      .tbl <- .tbl %>%
+      .tbl <- .tbl |>
         dplyr::mutate(Pattern = as.factor({{ .pattern }}))
     }
   }
@@ -133,11 +133,11 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     !assertthat::has_name(.tbl, rlang::as_name(rlang::enquo(plate)))) {
     # check if row + column is unique
     assertthat::assert_that(
-      (.tbl %>% dplyr::count({{ column }}, {{ row }}) %>% nrow()) == nrow(.tbl),
+      (.tbl |> dplyr::count({{ column }}, {{ row }}) |> nrow()) == nrow(.tbl),
       msg = "Non-unique row + column combination found. Please provide a plate variable."
     )
     # make a fake plate variable
-    .tbl <- .tbl %>%
+    .tbl <- .tbl |>
       dplyr::mutate(plate = 1)
     plate <- rlang::sym("plate")
   }
@@ -151,7 +151,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
     .tbl <- dplyr::bind_rows(.tbl, excluded)
   }
 
-  .tbl <- .tbl %>%
+  .tbl <- .tbl |>
     dplyr::mutate(
       plate = as.factor({{ plate }}),
       column = as.factor({{ column }}),
@@ -169,7 +169,7 @@ plot_plate <- function(.tbl, plate = plate, row = row, column = column,
   # scale alpha
   .alpha <- rlang::enquo(.alpha)
   if (!rlang::quo_is_null(.alpha)) {
-    alpha_var <- .tbl %>%
+    alpha_var <- .tbl |>
       dplyr::pull(!!.alpha)
     alpha_levels <- unique(alpha_var)
     if (is.numeric(alpha_var) && length(alpha_levels > 7)) {

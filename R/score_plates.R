@@ -20,8 +20,8 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2,
   )
 
   # Set up distance matrix without any penalty
-  m <- matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) %>%
-    stats::dist(method = dist, p = p) %>%
+  m <- matrix(c(rep(1:plate_y, plate_x), rep(1:plate_x, each = plate_y)), ncol = 2) |>
+    stats::dist(method = dist, p = p) |>
     as.matrix()
 
   if (penalize_lines != "none") {
@@ -186,7 +186,7 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
     samp <- dplyr::group_by(samp, dplyr::across(dplyr::all_of(plate)))
     plate_names <- dplyr::pull(dplyr::group_keys(samp), 1)
 
-    score_funcs <- purrr::map(plate_names, ~ plate_scoring_func(samp, plate = plate, plate_name = .x, row = row, column = column, group = group)) %>%
+    score_funcs <- purrr::map(plate_names, ~ plate_scoring_func(samp, plate = plate, plate_name = .x, row = row, column = column, group = group)) |>
       stats::setNames(nm = paste("Plate", plate_names))
   }
 
@@ -234,7 +234,7 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
   if (skip_osat && !quiet) message("\nNo balancing of variables across plates required...")
 
   if (!skip_osat) {
-    scoring_funcs <- purrr::map(across_plates_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) %>%
+    scoring_funcs <- purrr::map(across_plates_variables, ~ osat_score_generator(batch_vars = plate, feature_vars = .x)) |>
       unlist()
     names(scoring_funcs) <- across_plates_variables
 
@@ -250,7 +250,7 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
 
   if (!is.null(within_plate_variables)) {
     plate_levels <- unique(bc$get_locations()[[plate]])
-    scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x)) %>%
+    scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x)) |>
       unlist()
     names(scoring_funcs) <- paste(rep(within_plate_variables, each = length(plate_levels)), names(scoring_funcs))
 

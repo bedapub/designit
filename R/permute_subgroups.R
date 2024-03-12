@@ -108,8 +108,8 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
 
   # Determine sizes of the subgroups and store in list; name elements by levels of the involved grouping variables
   subgroup_sizes <- purrr::map(dplyr::group_size(grouped_samples), ~ best_group_sizes(.x, n_min, n_max, n_ideal, prefer_big_groups))
-  names(subgroup_sizes) <- dplyr::group_keys(grouped_samples) %>%
-    tidyr::unite(col = "keys", sep = "/") %>%
+  names(subgroup_sizes) <- dplyr::group_keys(grouped_samples) |>
+    tidyr::unite(col = "keys", sep = "/") |>
     dplyr::pull(1)
 
   assertthat::assert_that(!strict || (min(unlist(subgroup_sizes)) >= n_min && max(unlist(subgroup_sizes)) <= n_max),
@@ -294,7 +294,7 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
 
   # Index vector to assign group allocation to sample dataframe in its original order.
   # Split up according to group structure to allow easy permutation on the subgroup level
-  sample_vec <- order(dplyr::group_indices(subgroup_object$Grouped_Samples)) %>%
+  sample_vec <- order(dplyr::group_indices(subgroup_object$Grouped_Samples)) |>
     split(f = group_vec)
 
   # Order of the allocation variable in the batch container may be arbitrary and not strictly sorted;
@@ -330,7 +330,7 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
 
     # Create a random permutation within (!) all the groups
     # This means that only 'equivalent' items are swapped around and get assigned to new subgroups every time
-    rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
+    rand_index <- purrr::map(sample_vec, my_sample) |> unlist(use.names = F)
 
     # Check if keep_separate_vars constraints are fulfilled within the randomized subgroups
     # Otherwise, create new permutations and increment number of tolerated violations every 1000 unsuccessful attempts
@@ -350,7 +350,7 @@ shuffle_with_subgroup_formation <- function(subgroup_object, subgroup_allocation
             "Increasing number of tolerated violations to ", sep_fails_tolerance
           )
         }
-        rand_index <- purrr::map(sample_vec, my_sample) %>% unlist(use.names = F)
+        rand_index <- purrr::map(sample_vec, my_sample) |> unlist(use.names = F)
       }
     }
 

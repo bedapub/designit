@@ -152,7 +152,7 @@ assign_from_table <- function(batch_container, samples) {
   )
   location_columns <- batch_container$dimension_names
   sample_columns <- setdiff(colnames(samples), batch_container$dimension_names)
-  only_samples <- samples[sample_columns] %>%
+  only_samples <- samples[sample_columns] |>
     # remove all-NA rows, i.e. unassigned locations
     dplyr::filter(!dplyr::if_all(dplyr::everything(), is.na))
   if (is.null(batch_container$samples)) {
@@ -171,8 +171,8 @@ assign_from_table <- function(batch_container, samples) {
   )) == 0,
   msg = "sample sheed has locations not available in the batch container"
   )
-  samples_with_id <- batch_container$get_locations() %>%
-    dplyr::left_join(samples, by = location_columns) %>%
+  samples_with_id <- batch_container$get_locations() |>
+    dplyr::left_join(samples, by = location_columns) |>
     dplyr::left_join(batch_container$samples, by = sample_columns)
 
   batch_container$move_samples(location_assignment = samples_with_id$.sample_id)

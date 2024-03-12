@@ -31,8 +31,8 @@ Samples are grouped by Treatment and Collection time with the following group
 sizes:
   
 ```{r}
-multi_trt_day_samples %>%
-  dplyr::count(Time, Treatment) %>%
+multi_trt_day_samples |>
+  dplyr::count(Time, Treatment) |>
   gt::gt()
 ```
 
@@ -61,7 +61,7 @@ bc <- BatchContainer$new(
     run = 2, position = 5
   ),
   exclude = tibble::tibble(batch = 4, run = c(1, 2), position = c(5, 5))
-) %>%
+) |>
   # Add samples to container
   assign_in_order(samples = multi_trt_day_samples)
 
@@ -99,10 +99,10 @@ bc1$trace$elapsed
 Custom plot with some colours:
 
 ```{r, fig.width=5, fig.height= 4}
-bc1$scores_table() %>%
+bc1$scores_table() |>
   dplyr::mutate(
     n_shuffle = c(NA, n_shuffle)
-  ) %>%
+  ) |>
   ggplot2::ggplot(
     ggplot2::aes(step, value, color = factor(n_shuffle))
   ) +
@@ -129,9 +129,9 @@ after using the new optimization code.
 ```{r, fig.width=6, fig.height=5}
 bc1$score(scoring_f)
 
-bc1$get_samples(assignment = TRUE) %>%
-  dplyr::filter(!is.na(Treatment)) %>%
-  dplyr::mutate(anno = stringr::str_c(Time, " hr")) %>%
+bc1$get_samples(assignment = TRUE) |>
+  dplyr::filter(!is.na(Treatment)) |>
+  dplyr::mutate(anno = stringr::str_c(Time, " hr")) |>
   ggplot2::ggplot(ggplot2::aes(x = batch, y = interaction(position, run), fill = Treatment)) +
   ggplot2::geom_tile(color = "white") +
   ggplot2::geom_hline(yintercept = 5.5, size = 1) +
@@ -387,8 +387,8 @@ bc9 <- optimize_design(
 
 bc9$plot_trace()
 
-bc9$get_samples(assignment = TRUE) %>%
-  dplyr::mutate(batch = factor(batch)) %>%
+bc9$get_samples(assignment = TRUE) |>
+  dplyr::mutate(batch = factor(batch)) |>
   ggplot2::ggplot(ggplot2::aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   ggplot2::geom_bar()
 ```

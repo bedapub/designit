@@ -39,7 +39,7 @@ DoE_multipleLevelCols <- function(df, na.rm = FALSE) {
 }
 
 DoE_numericalCols <- function(df, na.rm = FALSE) {
-  dplyr::select(df, where(is.numeric)) %>%
+  dplyr::select(df, where(is.numeric)) |>
     colnames()
 }
 ```
@@ -102,10 +102,10 @@ bc_homogenicity_violations <- function(container_var, feature_var, weight = 1, t
 
   function(bc) {
     samples <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
-    viol <- table(samples[[container_var]], samples[[feature_var]]) %>%
+    viol <- table(samples[[container_var]], samples[[feature_var]]) |>
       apply(1, function(a) {
         sum(a > 0) - 1
-      }) %>%
+      }) |>
       sum()
     weight * viol
   }
@@ -167,7 +167,7 @@ InVivo_assignTreatments <- function(animal_list, treatments,
   # Do we have batch container columns that are multi-value and have to align with identically named sample columns?
   # In this case, make those columns factors, check that numbers match and thus a solution is possible at all
   # Append '_bc' to the common variables in the batch container to allow both sets of variables in the same container
-  bc_columns <- intersect(colnames(treatments), colnames(animal_list)) %>% intersect(DoE_multipleLevelCols(treatments))
+  bc_columns <- intersect(colnames(treatments), colnames(animal_list)) |> intersect(DoE_multipleLevelCols(treatments))
 
   ani_fac <- dplyr::mutate(animal_list, across(all_of(bc_columns), as.factor)) # here we want alphabetic sort order!
 
@@ -179,8 +179,8 @@ InVivo_assignTreatments <- function(animal_list, treatments,
       )
     }
 
-    ani_counts <- dplyr::count(as_tibble(ani_fac), across(all_of(bc_columns))) %>% dplyr::arrange(across(all_of(bc_columns)))
-    treat_counts <- dplyr::count(as_tibble(treatments_sortedfac), across(all_of(bc_columns))) %>% dplyr::arrange(across(all_of(bc_columns)))
+    ani_counts <- dplyr::count(as_tibble(ani_fac), across(all_of(bc_columns))) |> dplyr::arrange(across(all_of(bc_columns)))
+    treat_counts <- dplyr::count(as_tibble(treatments_sortedfac), across(all_of(bc_columns))) |> dplyr::arrange(across(all_of(bc_columns)))
     assertthat::assert_that(identical(ani_counts, treat_counts), msg = "Levels of common variables don't match between animal list and treatment list")
     if (!quiet_process) message("   ... Yes!")
     for (i in seq_along(bc_columns)) { # add bc_ prefix to constraint variables to allow both variable sets in batch container
@@ -198,10 +198,10 @@ InVivo_assignTreatments <- function(animal_list, treatments,
 
   dimension_vector <- c(setNames(as.integer(n_lev), nm = colnames(n_lev)), Position = positions)
 
-  exclude_table <- tidyr::expand_grid(dplyr::select(all_fac_combs, -c("n")), Position = 1:positions) %>%
-    dplyr::left_join(all_fac_combs, by = setdiff(colnames(all_fac_combs), "n")) %>%
-    dplyr::filter(Position > n) %>%
-    dplyr::select(-c("n")) %>%
+  exclude_table <- tidyr::expand_grid(dplyr::select(all_fac_combs, -c("n")), Position = 1:positions) |>
+    dplyr::left_join(all_fac_combs, by = setdiff(colnames(all_fac_combs), "n")) |>
+    dplyr::filter(Position > n) |>
+    dplyr::select(-c("n")) |>
     dplyr::mutate(across(everything(), as.integer))
 
 
@@ -250,18 +250,18 @@ InVivo_assignTreatments <- function(animal_list, treatments,
     ))
   }
 
-  trt_vars_cat <- intersect(balance_treatment_vars, colnames(bc_data)) %>%
-    setdiff(bc_columns) %>%
-    intersect(DoE_multipleLevelCols(bc_data)) %>%
+  trt_vars_cat <- intersect(balance_treatment_vars, colnames(bc_data)) |>
+    setdiff(bc_columns) |>
+    intersect(DoE_multipleLevelCols(bc_data)) |>
     setdiff(DoE_numericalCols(bc_data))
   if (length(trt_vars_cat) > 0) {
     if (!quiet_process) message("     ... OSAT for categorical variables balanced across treatment (", stringr::str_c(trt_vars_cat, collapse = ", "), ")")
     scoring_functions <- c(scoring_functions, balanced_categorical = osat_score_generator(batch_vars = "Treatment", feature_vars = trt_vars_cat))
   }
 
-  trt_vars_num <- intersect(balance_treatment_vars, colnames(bc_data)) %>%
-    setdiff(bc_columns) %>%
-    intersect(DoE_multipleLevelCols(bc_data)) %>%
+  trt_vars_num <- intersect(balance_treatment_vars, colnames(bc_data)) |>
+    setdiff(bc_columns) |>
+    intersect(DoE_multipleLevelCols(bc_data)) |>
     intersect(DoE_numericalCols(bc_data))
   if (length(trt_vars_num) > 0) {
     if (!quiet_process) message("     ... ANOVA -logP for numerical variables balanced across treatment (", stringr::str_c(trt_vars_num, collapse = ", "), ")")
@@ -301,7 +301,7 @@ InVivo_assignTreatments <- function(animal_list, treatments,
     design_trt[[bc_columns[i]]] <- levels(treatments_sortedfac[[stringr::str_c(bc_columns[i], "_bc")]])[design_trt[[bc_columns[i]]]]
   }
 
-  dplyr::select(design_trt, -all_of(ends_with("_bc"))) %>%
+  dplyr::select(design_trt, -all_of(ends_with("_bc"))) |>
     dplyr::select(-any_of(c("Position")))
 }
 
@@ -350,16 +350,16 @@ Invivo_assignCages <- function(design_trt,
   scoring_functions <- list()
   bc_data <- bc_cage$get_samples()
 
-  trt_vars_cat <- intersect(balance_cage_vars, colnames(bc_data)) %>%
-    intersect(DoE_multipleLevelCols(bc_data)) %>%
+  trt_vars_cat <- intersect(balance_cage_vars, colnames(bc_data)) |>
+    intersect(DoE_multipleLevelCols(bc_data)) |>
     setdiff(DoE_numericalCols(bc_data))
   if (length(trt_vars_cat) > 0) {
     if (!quiet_process) message("     ... OSAT for categorical variables balanced across cages (", stringr::str_c(trt_vars_cat, collapse = ", "), ")")
     scoring_functions <- c(scoring_functions, balanced_categorical = osat_score_generator(batch_vars = "Cage", feature_vars = trt_vars_cat))
   }
 
-  trt_vars_num <- intersect(balance_cage_vars, colnames(bc_data)) %>%
-    intersect(DoE_multipleLevelCols(bc_data)) %>%
+  trt_vars_num <- intersect(balance_cage_vars, colnames(bc_data)) |>
+    intersect(DoE_multipleLevelCols(bc_data)) |>
     intersect(DoE_numericalCols(bc_data))
   if (length(trt_vars_num) > 0) {
     if (!quiet_process) message("     ... ANOVA -logP for numerical variables balanced across cages (", stringr::str_c(trt_vars_num, collapse = ", "), ")")
@@ -386,7 +386,7 @@ Invivo_assignCages <- function(design_trt,
     quiet = quiet_optimize
   )
 
-  bc_cage$get_samples() %>%
+  bc_cage$get_samples() |>
     dplyr::select(-any_of(c("Dummy", "ID", "alloc_var_level", "group", "subgroup")))
 }
 
@@ -427,7 +427,7 @@ Invivo_arrangeCages <- function(design_cage,
 
   if (!quiet_process) message("Setting up batch container.")
 
-  design_rack <- dplyr::select(design_cage, all_of(c("Cage", distribute_cagerack_vars))) %>% dplyr::distinct()
+  design_rack <- dplyr::select(design_cage, all_of(c("Cage", distribute_cagerack_vars))) |> dplyr::distinct()
   assertthat::assert_that(!any(duplicated(design_rack[["Cage"]])), msg = "'Distribute rack' variables are not homogeneous within cages")
 
   bc_rack <- BatchContainer$new(
@@ -497,9 +497,9 @@ Invivo_arrangeCages <- function(design_cage,
   if (!quiet_process) message("   ... final scores: ", paste(names(bc_rack$score(scoring_functions)), round(bc_rack$score(scoring_functions), 2), sep = ": ", collapse = ", "))
 
   # Translate Rack numbers to some text output and assign CageNr
-  design_rack <- bc_rack$get_samples() %>%
-    dplyr::filter(!is.na(Cage)) %>% # strip empty locations in rack
-    dplyr::arrange(Rack, CageRow, CageCol) %>%
+  design_rack <- bc_rack$get_samples() |>
+    dplyr::filter(!is.na(Cage)) |> # strip empty locations in rack
+    dplyr::arrange(Rack, CageRow, CageCol) |>
     dplyr::mutate(
       CageNr = 1:nr_cages,
       Rack = stringr::str_c("Rack ", Rack)
@@ -531,7 +531,7 @@ Invivo_plotByRack <- function(design, colorBy = "Treatment", showAnimals = FALSE
 
   for (rack in unique(design$Rack)) {
     design_f <- dplyr::filter(design, Rack == rack)
-    design_u <- dplyr::select(design_f, all_of(c("CageNr", "CageRow", "CageCol", colorBy))) %>% dplyr::distinct()
+    design_u <- dplyr::select(design_f, all_of(c("CageNr", "CageRow", "CageCol", colorBy))) |> dplyr::distinct()
 
     p <- ggplot2::ggplot(design_f, aes(x = NA, y = NA)) +
       facet_grid(CageRow ~ CageCol) +
@@ -546,7 +546,7 @@ Invivo_plotByRack <- function(design, colorBy = "Treatment", showAnimals = FALSE
       )
 
     if (showAnimals) {
-      cage_list <- dplyr::group_by(design_f, across(all_of(c("CageNr", "CageRow", "CageCol")))) %>%
+      cage_list <- dplyr::group_by(design_f, across(all_of(c("CageNr", "CageRow", "CageCol")))) |>
         dplyr::summarize(Animals = paste_animals(!!as.symbol(animalLabel), Earmark), .groups = "drop")
       p <- p + geom_text(data = cage_list, aes(label = Animals), size = 3) +
         theme(legend.position = "none") +
@@ -604,8 +604,8 @@ data("invivo_study_treatments")
 ```{r echo=TRUE}
 str(invivo_study_samples)
 
-invivo_study_samples %>%
-  dplyr::count(Strain, Sex, BirthDate) %>%
+invivo_study_samples |>
+  dplyr::count(Strain, Sex, BirthDate) |>
   gt::gt()
 ```
 
@@ -619,8 +619,8 @@ information are available for all animals. The litter is nested within the
 strain and all individuals within one litter naturally share one birth date.
 
 ```{r echo=TRUE}
-invivo_study_samples %>%
-  dplyr::count(Strain, Litter, BirthDate) %>%
+invivo_study_samples |>
+  dplyr::count(Strain, Litter, BirthDate) |>
   gt::gt()
 ```
 
@@ -629,8 +629,8 @@ invivo_study_samples %>%
 ```{r echo=TRUE}
 str(invivo_study_treatments)
 
-invivo_study_treatments %>%
-  dplyr::count(Treatment, Strain, Sex) %>%
+invivo_study_treatments |>
+  dplyr::count(Treatment, Strain, Sex) |>
   gt::gt()
 ```
 
@@ -682,8 +682,8 @@ invivo_study_samples <- dplyr::mutate(invivo_study_samples,
   Litter_combine_females = ifelse(Sex == "F", "female_all", Litter)
 )
 
-invivo_study_samples %>%
-  dplyr::count(Strain, Litter_combine_females, BirthDate, AgeGroup) %>%
+invivo_study_samples |>
+  dplyr::count(Strain, Litter_combine_females, BirthDate, AgeGroup) |>
   gt::gt()
 ```
 

@@ -257,7 +257,7 @@ optimize_design <- function(batch_container, samples = NULL,
   iteration <- 1
   using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
 
-  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+  shuffle_params <- shuffle_proposal_func(batch_container, iteration) |>
     extract_shuffle_params(attributes_expected = FALSE)
 
   # Always perform first shuffling before scoring the bc; works also if attributes are added at this stage
@@ -392,7 +392,7 @@ optimize_design <- function(batch_container, samples = NULL,
 
     if (iteration <= max_iter) {
       # only call shuffle_proposal_func in case we have more iterations
-      shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+      shuffle_params <- shuffle_proposal_func(batch_container, iteration) |>
         extract_shuffle_params(attributes_expected = using_attributes)
     }
   }
