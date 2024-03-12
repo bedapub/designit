@@ -87,7 +87,7 @@ qplot(
   x = bc$trace$scores[[1]]$step,
   y = bc$trace$scores[[1]]$score_1,
   color = factor(c(32, n_shuffle)),
-  main = str_glue("Final score={bc$score(scoring_f)}"), geom = "point"
+  main = paste0("Final score=", bc$score(scoring_f)), geom = "point"
 )
 ```
 
@@ -123,7 +123,7 @@ bc2 <- optimize_design(
 qplot(
   x = bc2$trace$scores[[1]]$step,
   y = bc2$trace$scores[[1]]$score_1,
-  main = str_glue("Final score={bc2$score(scoring_f)}"), geom = "point"
+  main = paste0("Final score=", bc2$score(scoring_f)), geom = "point"
 )
 
 bc2$get_samples(assignment = TRUE) %>%
@@ -168,7 +168,7 @@ qplot(
   x = bc$trace$scores[[1]]$step,
   y = bc$trace$scores[[1]]$score_1,
   color = factor(n_iterations),
-  main = str_glue("Final score={bc$score(scoring_f)}"), geom = "point"
+  main = paste0("Final score=", bc$score(scoring_f)), geom = "point"
 )
 ```
 

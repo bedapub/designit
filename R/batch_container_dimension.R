@@ -98,7 +98,7 @@ BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
     #' E.g., "mydim<size=10>".
     short_info = function(value) {
       if (missing(value)) {
-        stringr::str_glue("{self$name}<size={self$size}>")
+        paste0(self$name, "<size=", self$size, ">")
       } else {
         stop("short_info is a read-only field")
       }
