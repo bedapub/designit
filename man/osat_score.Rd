@@ -28,7 +28,9 @@ a list with two attributes: \verb{$score} (numeric score value), \verb{$expected
 (expected counts \code{data.table} for reuse)
 }
 \description{
-Compute OSAT score for sample assignment.
+The OSAT score is intended to ensure even distribution of samples across
+batches and is closely related to the chi-square test contingency table
+(Yan et al. (2012) \doi{10.1186/1471-2164-13-689}).
 }
 \examples{
 sample_assignment <- tibble::tribble(

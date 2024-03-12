@@ -1,5 +1,9 @@
 #' Compute OSAT score for sample assignment.
 #'
+#' The OSAT score is intended to ensure even distribution of samples across
+#' batches and is closely related to the chi-square test contingency table
+#' (Yan et al. (2012) \doi{10.1186/1471-2164-13-689}).
+#'
 #' @param bc [BatchContainer] with samples
 #' or [`data.table`][data.table::data.table]/[data.frame] where every row is a location
 #' in a container and a sample in this location.

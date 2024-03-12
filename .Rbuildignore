@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^designit\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
@@ -19,3 +21,5 @@
 
 # vignette cache
 ^vignettes/cached/.*\.Rmd$
+# large vignette excluded on CRAN
+^vignettes/plate_scoring_examples.Rmd$
