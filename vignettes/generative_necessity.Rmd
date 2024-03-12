@@ -66,7 +66,7 @@ bc <- BatchContainer$new(
                     col = list(values=sprintf("%02d", 1:12)))
 )
 
-assign_in_order(bc, dat)
+bc <- assign_in_order(bc, dat)
 
 head(bc$get_samples()) %>% gt::gt()
 ```
