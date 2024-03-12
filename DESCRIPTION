@@ -54,6 +54,7 @@ Imports:
     R6,
     ineq,
     data.table,
+    glue,
     stats
 Suggests: 
     testthat,
