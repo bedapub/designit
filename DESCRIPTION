@@ -48,7 +48,6 @@ Imports:
     ggplot2,
     scales,
     tibble,
-    tidyselect,
     tidyr,
     assertthat,
     stringr,

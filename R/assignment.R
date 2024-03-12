@@ -154,7 +154,7 @@ assign_from_table <- function(batch_container, samples) {
   sample_columns <- setdiff(colnames(samples), batch_container$dimension_names)
   only_samples <- samples[sample_columns] %>%
     # remove all-NA rows, i.e. unassigned locations
-    dplyr::filter(!dplyr::if_all(tidyselect::everything(), is.na))
+    dplyr::filter(!dplyr::if_all(dplyr::everything(), is.na))
   if (is.null(batch_container$samples)) {
     batch_container$samples <- only_samples
   } else {

@@ -104,7 +104,7 @@ form_homogeneous_subgroups <- function(batch_container, allocate_var, keep_toget
   }
 
   # Group sample list by relevant variables
-  grouped_samples <- dplyr::group_by(samples, dplyr::across(tidyselect::all_of(use_vars)))
+  grouped_samples <- dplyr::group_by(samples, dplyr::across(dplyr::all_of(use_vars)))
 
   # Determine sizes of the subgroups and store in list; name elements by levels of the involved grouping variables
   subgroup_sizes <- purrr::map(dplyr::group_size(grouped_samples), ~ best_group_sizes(.x, n_min, n_max, n_ideal, prefer_big_groups))
