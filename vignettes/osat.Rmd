@@ -107,7 +107,7 @@ OSAT::getLayout(gc) |>
   left_join(OSAT::get.experiment.setup(g_setup)) |>
   data.table::data.table() |>
   osat_score("plates", c("SampleType", "Race", "AgeGrp")) |>
-  .$score
+  pull(score)
 
 # score using OSAT
 g_setup@metadata$optValue |> tail(1)

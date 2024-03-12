@@ -265,7 +265,7 @@ dat <- dat |>
   bind_rows(data.frame(
     SubjectID = "empty",
     SampleID = paste("empty", 1:(3 * 24 - nrow(dat))),
-    batch = rep(1:3, 24 - (dat |> count(batch) |> .$n))
+    batch = rep(1:3, 24 - (dat |> count(batch) |> pull(n)))
   ))
 
 bc <- BatchContainer$new(
@@ -470,7 +470,7 @@ samples_with_plate <- samples_with_plate |>
   bind_rows(data.frame(
     SubjectID = "empty",
     SampleID = paste("empty", 1:(3 * 80 - nrow(samples_with_plate))),
-    plate = rep(1:3, 80 - (samples_with_plate |> count(plate) |> .$n)) |>
+    plate = rep(1:3, 80 - (samples_with_plate |> count(plate) |> pull(n))) |>
       as.character()
   ))
 
