@@ -41,7 +41,8 @@ Description:
     defining a batch container and a scoring function that reflects the
     contrasts, this package allows users to assign samples in a way that
     minimizes the potential impact of batch effects on the comparison of
-    interest.
+    interest. Among other functionality, we provide an implementation for OSAT
+    score by Yan et al. (2012, <doi:10.1186/1471-2164-13-689>).
 License: MIT + file LICENSE
 URL: https://bedapub.github.io/designit/, https://github.com/BEDApub/designit/
 BugReports: https://github.com/BEDApub/designit/issues
