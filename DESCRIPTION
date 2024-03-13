@@ -58,7 +58,6 @@ Imports:
     assertthat,
     stringr,
     R6,
-    ineq,
     data.table,
     stats
 Suggests: 
