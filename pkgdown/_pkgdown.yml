@@ -16,4 +16,4 @@ template:
   assets: pkgdown/assets
 
 development:
-  mode: unreleased
+  mode: auto
