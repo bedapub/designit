@@ -8,7 +8,8 @@ samples <- data.frame(
 
 # This is a helper class which provides a scoring function and conunts
 # internally the number of elements shuffled at each iteration.
-NElementsChanged <- R6::R6Class("NElementsChanged",
+NElementsChanged <- R6::R6Class(
+  "NElementsChanged",
   list(
     scoring_f = function(bc) {
       df <- bc$get_samples(include_id = TRUE, as_tibble = FALSE)
@@ -29,8 +30,8 @@ set.seed(42)
 
 start_state <- ifelse(is.na(bc$assignment), -1, bc$assignment)
 
-n_changed <- NElementsChanged$new()
 test_that("correct number of shuffles = 1", {
+  n_changed <- NElementsChanged$new()
   optimize_design(
     bc,
     scoring = n_changed$scoring_f,
@@ -41,8 +42,8 @@ test_that("correct number of shuffles = 1", {
   expect_equal(n_changed$n, c(0, rep(2, 10)))
 })
 
-n_changed <- NElementsChanged$new()
 test_that("correct number of shuffles = 2", {
+  n_changed <- NElementsChanged$new()
   optimize_design(
     bc,
     scoring = n_changed$scoring_f,
@@ -54,8 +55,8 @@ test_that("correct number of shuffles = 2", {
   expect_equal(n_changed$n, c(0, rep(4, 10)))
 })
 
-n_changed <- NElementsChanged$new()
 test_that("correct number of shuffles = 5", {
+  n_changed <- NElementsChanged$new()
   optimize_design(
     bc,
     scoring = n_changed$scoring_f,
@@ -67,8 +68,8 @@ test_that("correct number of shuffles = 5", {
   expect_equal(n_changed$n, c(0, rep(10, 10)))
 })
 
-n_changed <- NElementsChanged$new()
 test_that("specify too many shuffles", {
+  n_changed <- NElementsChanged$new()
   optimize_design(
     bc,
     scoring = n_changed$scoring_f,
@@ -80,8 +81,8 @@ test_that("specify too many shuffles", {
   expect_equal(n_changed$n, c(0, rep(20, 10)))
 })
 
-n_changed <- NElementsChanged$new()
 test_that("complex shuffling schedule", {
+  n_changed <- NElementsChanged$new()
   optimize_design(
     bc,
     scoring = n_changed$scoring_f,
