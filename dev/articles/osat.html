@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -123,15 +123,17 @@
 
     
     
+<p>In this vignette, we demonstrate how to use the OSAT score (<a href="https://doi.org/10.1186/1471-2164-13-689" class="external-link">Yan et
+al. (2012)</a>).</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.4</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.4.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.1     </span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.5.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.2     </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -147,7 +149,7 @@ choose batch columns of interest.</p>
 <code class="sourceCode R"><span><span class="va">osat_data_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, package <span class="op">=</span> <span class="st">"OSAT"</span><span class="op">)</span></span>
 <span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_tsv</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">osat_data_path</span>, <span class="st">"samples.txt"</span><span class="op">)</span>,</span>
 <span>  col_types <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/cols.html" class="external-link">cols</a></span><span class="op">(</span>SampleType <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/parse_factor.html" class="external-link">col_factor</a></span><span class="op">(</span><span class="op">)</span>, Race <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/parse_factor.html" class="external-link">col_factor</a></span><span class="op">(</span><span class="op">)</span>, AgeGrp <span class="op">=</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/parse_factor.html" class="external-link">col_factor</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>dummy_var1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, dummy_var2 <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">SampleType</span>, <span class="va">Race</span>, sep <span class="op">=</span> <span class="st">" "</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="running-osat-optimization">Running OSAT optimization<a class="anchor" aria-label="anchor" href="#running-osat-optimization"></a>
@@ -166,7 +168,7 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Warning in OSAT::create.optimized.setup(sample = gs, container = gc, nSim =</span></span>
 <span><span class="co">#&gt; params$iterations): Using default optimization method: optimal.shuffle</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   1.21s   1.21s</span></span>
+<span><span class="co">#&gt;   919ms   919ms</span></span>
 <span></span>
 <span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/QC.html" class="external-link">QC</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -183,17 +185,17 @@ choose batch columns of interest.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">g_setup_start</span> <span class="op">&lt;-</span> <span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/create.optimized.setup.html" class="external-link">create.optimized.setup</a></span><span class="op">(</span>sample <span class="op">=</span> <span class="va">gs</span>, container <span class="op">=</span> <span class="va">gc</span>, nSim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">g_setup_start</span> <span class="op">&lt;-</span> <span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/create.optimized.setup.html" class="external-link">create.optimized.setup</a></span><span class="op">(</span>sample <span class="op">=</span> <span class="va">gs</span>, container <span class="op">=</span> <span class="va">gc</span>, nSim <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in OSAT::create.optimized.setup(sample = gs, container = gc, nSim = 1):</span></span>
 <span><span class="co">#&gt; Using default optimization method: optimal.shuffle</span></span></code></pre></div>
 <p>Visualize various batch factors. OSAT score is optimized only for
 <code>plates</code> in this case.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">plates</span>, <span class="va">chipRows</span>, <span class="va">chipColumns</span>, <span class="va">chips</span>, <span class="va">rows</span>, <span class="va">columns</span>, <span class="va">wells</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">AgeGrp</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">value</span>, <span class="va">name</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">plates</span>, <span class="va">chipRows</span>, <span class="va">chipColumns</span>, <span class="va">chips</span>, <span class="va">rows</span>, <span class="va">columns</span>, <span class="va">wells</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">AgeGrp</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">value</span>, <span class="va">name</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">n</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
@@ -203,21 +205,21 @@ choose batch columns of interest.</p>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot_batch</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">df</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">plates</span>, <span class="va">SampleType</span>, <span class="va">Race</span>, <span class="va">AgeGrp</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">SampleType</span>, <span class="va">Race</span>, <span class="va">AgeGrp</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"variable"</span>, values_to <span class="op">=</span> <span class="st">"level"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">plates</span>, <span class="va">variable</span>, <span class="va">level</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="va">df</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">plates</span>, <span class="va">SampleType</span>, <span class="va">Race</span>, <span class="va">AgeGrp</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">SampleType</span>, <span class="va">Race</span>, <span class="va">AgeGrp</span><span class="op">)</span>, names_to <span class="op">=</span> <span class="st">"variable"</span>, values_to <span class="op">=</span> <span class="st">"level"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">plates</span>, <span class="va">variable</span>, <span class="va">level</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">level</span>, <span class="va">n</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">plates</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">variable</span>, scales <span class="op">=</span> <span class="st">"free"</span>, ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>Before the optimization.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">g_setup_start</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">g_setup_start</span> <span class="op">|&gt;</span> <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-7-1.png" width="576"></p>
 <p>After the optimization.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 </div>
@@ -227,19 +229,19 @@ choose batch columns of interest.</p>
 </h2>
 <p>Compare OSAT score generated using designit.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/gArray-class.html" class="external-link">getLayout</a></span><span class="op">(</span><span class="va">gc</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/osat_score.html">osat_score</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="va">.</span><span class="op">$</span><span class="va">score</span></span>
+<code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/gArray-class.html" class="external-link">getLayout</a></span><span class="op">(</span><span class="va">gc</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/osat_score.html">osat_score</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/with.html" class="external-link">with</a></span><span class="op">(</span><span class="va">score</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(plates, chipRows, chipColumns, chips, rows, columns,</span></span>
 <span><span class="co">#&gt; wells)`</span></span>
-<span><span class="co">#&gt; Warning in osat_score(., "plates", c("SampleType", "Race", "AgeGrp")): NAs in</span></span>
-<span><span class="co">#&gt; features / batch columns; they will be excluded from scoring</span></span>
+<span><span class="co">#&gt; Warning in osat_score(data.table::data.table(left_join(OSAT::getLayout(gc), :</span></span>
+<span><span class="co">#&gt; NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; [1] 34.85714</span></span>
 <span></span>
 <span><span class="co"># score using OSAT</span></span>
-<span><span class="va">g_setup</span><span class="op">@</span><span class="va">metadata</span><span class="op">$</span><span class="va">optValue</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="va">g_setup</span><span class="op">@</span><span class="va">metadata</span><span class="op">$</span><span class="va">optValue</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 34.85714</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -258,36 +260,37 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; [1] 672</span></span></code></pre></div>
 <p>Assign samples and get initial setup.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="va">samples</span></span>
+<code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">samples</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">starting_assignment</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">get_locations</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">g_setup_start</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">starting_assignment</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">get_locations</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="va">g_setup_start</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">ID</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Joining with `by = join_by(plates, chips, rows, columns)`</span></span>
 <span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">move_samples</span><span class="op">(</span>location_assignment <span class="op">=</span> <span class="va">starting_assignment</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-11-1.png" width="576"></p>
 <div class="section level3">
 <h3 id="using-designit-osat-score-implementation">Using designit OSAT score implementation<a class="anchor" aria-label="anchor" href="#using-designit-osat-score-implementation"></a>
 </h3>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
-<span><span class="co">#&gt; [1] 360.8571</span></span>
-<span><span class="va">g_setup</span><span class="op">@</span><span class="va">metadata</span><span class="op">$</span><span class="va">optValue</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  score_1 </span></span>
+<span><span class="co">#&gt; 360.8571</span></span>
+<span><span class="va">g_setup</span><span class="op">@</span><span class="va">metadata</span><span class="op">$</span><span class="va">optValue</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 360.8571</span></span>
 <span><span class="co"># should be identical</span></span>
 <span></span>
 <span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="http://bench.r-lib.org/reference/bench_time.html" class="external-link">system_time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span>  <span class="va">trace_reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">bc</span>, max_iter <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">iterations</span><span class="op">)</span></span>
+<span>  <span class="va">bc_reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">bc</span>, scoring <span class="op">=</span> <span class="va">scoring_f</span>, max_iter <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">iterations</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
 <span><span class="co">#&gt; ... (6749.04) - OK</span></span>
@@ -362,15 +365,17 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 786</span></span>
 <span><span class="co">#&gt; Achieved score: 30.857 at iteration 960</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   10.2s   10.2s</span></span></code></pre></div>
+<span><span class="co">#&gt;  16.08s   8.38s</span></span></code></pre></div>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># final score</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 30.85714</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">trace_reference</span>, main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score()}"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bc_reference</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  score_1 </span></span>
+<span><span class="co">#&gt; 30.85714</span></span>
+<span><span class="va">bc_reference</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score(scoring_f)}"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-13-1.png" width="576"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-13-2.png" width="576"></p>
 </div>
@@ -380,12 +385,11 @@ choose batch columns of interest.</p>
 <p>Instead of relying on <code>BatchContainer</code>, here we have a
 manual optimization process using <code>data.table</code>.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">move_samples</span><span class="op">(</span>location_assignment <span class="op">=</span> <span class="va">starting_assignment</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fast_osat_optimize</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span>, <span class="va">batch_vars</span>, <span class="va">feature_vars</span>, <span class="va">iterations</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">ldf</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="fu">get_locations</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plates"</span><span class="op">)</span><span class="op">]</span><span class="op">[</span>, <span class="st">".sample_id"</span> <span class="op">:=</span> <span class="va">bc</span><span class="op">$</span><span class="va">assignment</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">fast_osat_optimize</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span>, <span class="va">batch_vars</span>, <span class="va">feature_vars</span>, <span class="va">iterations</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">bc</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
+<span>  <span class="va">ldf</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="fu">get_locations</span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plates"</span><span class="op">)</span><span class="op">]</span><span class="op">[</span>, <span class="st">".sample_id"</span> <span class="op">:=</span> <span class="va">bc</span><span class="op">$</span><span class="va">assignment</span><span class="op">]</span></span>
 <span>  <span class="va">fcols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".sample_id"</span>, <span class="va">feature_vars</span><span class="op">)</span></span>
-<span>  <span class="va">smp</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="va">samples</span><span class="op">)</span><span class="op">[</span>, <span class="va">..fcols</span><span class="op">]</span></span>
+<span>  <span class="va">smp</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="va">samples</span><span class="op">)</span><span class="op">[</span>, <span class="va">..fcols</span><span class="op">]</span></span>
 <span>  <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">smp</span><span class="op">[</span><span class="va">ldf</span>, on <span class="op">=</span> <span class="st">".sample_id"</span><span class="op">]</span></span>
 <span></span>
 <span>  <span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score.html">osat_score</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">batch_vars</span>, <span class="va">feature_vars</span><span class="op">)</span></span>
@@ -419,28 +423,26 @@ manual optimization process using <code>data.table</code>.</p>
 <span></span>
 <span>  <span class="va">bc</span><span class="op">$</span><span class="va">assignment</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">$</span><span class="va">.sample_id</span></span>
 <span></span>
-<span>  <span class="va">scores</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>bc<span class="op">=</span><span class="va">bc</span>, scores<span class="op">=</span><span class="va">scores</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="http://bench.r-lib.org/reference/bench_time.html" class="external-link">system_time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span>  <span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu">fast_osat_optimize</span><span class="op">(</span><span class="va">bc</span>, <span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span>, iterations <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">iterations</span><span class="op">)</span></span>
+<span>  <span class="va">opt_res</span> <span class="op">&lt;-</span> <span class="fu">fast_osat_optimize</span><span class="op">(</span><span class="va">bc</span>, <span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span>, iterations <span class="op">=</span> <span class="va">params</span><span class="op">$</span><span class="va">iterations</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in osat_score(df, batch_vars, feature_vars): NAs in features / batch</span></span>
 <span><span class="co">#&gt; columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Warning in (function (assignment) : this field might become read-only in the</span></span>
 <span><span class="co">#&gt; future, please use $move_samples() instead</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   7.41s   7.41s</span></span></code></pre></div>
+<span><span class="co">#&gt;  10.56s   5.39s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="shuffle-optimization-with-burn-in">Shuffle optimization with burn-in<a class="anchor" aria-label="anchor" href="#shuffle-optimization-with-burn-in"></a>
 </h2>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">move_samples</span><span class="op">(</span>location_assignment <span class="op">=</span> <span class="va">starting_assignment</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plates"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"SampleType"</span>, <span class="st">"Race"</span>, <span class="st">"AgeGrp"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">burn_in_it</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">floor</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">iterations</span> <span class="op">*</span> <span class="fl">0.1</span><span class="op">)</span></span>
 <span><span class="va">burn_in_it</span></span>
@@ -448,7 +450,9 @@ manual optimization process using <code>data.table</code>.</p>
 <span></span>
 <span><span class="fu">bench</span><span class="fu">::</span><span class="fu"><a href="http://bench.r-lib.org/reference/bench_time.html" class="external-link">system_time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span>  <span class="va">trace_burn_in</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">bc</span>,</span>
+<span>  <span class="va">bc_burn_in</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>    <span class="va">bc</span>,</span>
+<span>    scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>    n_shuffle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">20</span>, <span class="va">burn_in_it</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span></span>
@@ -522,14 +526,14 @@ manual optimization process using <code>data.table</code>.</p>
 <span><span class="co">#&gt; Achieved score: 34.857 at iteration 807</span></span>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 827</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   10.2s   10.2s</span></span></code></pre></div>
+<span><span class="co">#&gt;  16.78s   8.86s</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>  i <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">trace_burn_in</span><span class="op">$</span><span class="va">n_steps</span><span class="op">)</span>,</span>
-<span>  normal <span class="op">=</span> <span class="va">trace_reference</span><span class="op">$</span><span class="va">scores</span>,</span>
-<span>  burnin <span class="op">=</span> <span class="va">trace_burn_in</span><span class="op">$</span><span class="va">scores</span></span>
-<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">i</span>, names_to <span class="op">=</span> <span class="st">"method"</span>, values_to <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  i <span class="op">=</span> <span class="va">bc_burn_in</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
+<span>  normal <span class="op">=</span> <span class="va">bc_reference</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span>,</span>
+<span>  burnin <span class="op">=</span> <span class="va">bc_burn_in</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">i</span>, names_to <span class="op">=</span> <span class="st">"method"</span>, values_to <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">i</span>, <span class="va">score</span>, col <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-16-1.png" width="576"></p>
@@ -538,57 +542,56 @@ manual optimization process using <code>data.table</code>.</p>
 <h2 id="score-demonstration">Score demonstration<a class="anchor" aria-label="anchor" href="#score-demonstration"></a>
 </h2>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 32.85714</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -1.349697</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  score_1 </span></span>
+<span><span class="co">#&gt; 360.8571</span></span></code></pre></div>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Batch container with 672 locations and 576 samples (assigned).</span></span>
+<span><span class="co">#&gt;   Dimensions: plates, chips, rows, columns</span></span>
 <span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 672 × 10</span></span></span>
-<span><span class="co">#&gt;    plates chips  rows columns    ID SampleType Race     AgeGrp   dummy…¹ dummy…²</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1     1     1       1   444 Control    European (50,60]  -<span style="color: #BB0000;">1.49</span>   Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      1     1     1       2   486 Control    European (40,50]  -<span style="color: #BB0000;">0.344</span>  Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      1     1     2       1   318 Control    European (0,30]   -<span style="color: #BB0000;">0.337</span>  Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      1     1     2       2   107 Case       Hispanic (40,50]   0.520  Case H…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      1     1     3       1   432 Control    European (30,40]   0.044<span style="text-decoration: underline;">3</span> Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      1     1     3       2   366 Control    European (0,30]   -<span style="color: #BB0000;">1.18</span>   Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      1     1     4       1   172 Case       European (30,40]   0.329  Case E…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      1     1     4       2   248 Case       European (60,100] -<span style="color: #BB0000;">0.861</span>  Case E…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      1     1     5       1   443 Control    European (60,100] -<span style="color: #BB0000;">0.098</span><span style="color: #BB0000; text-decoration: underline;">0</span> Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      1     1     5       2    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>      <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 662 more rows, and abbreviated variable names ¹​dummy_var1, ²​dummy_var2</span></span></span>
+<span><span class="co">#&gt;    plates chips  rows columns    ID SampleType Race     AgeGrp   dummy_var1</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1     1     1       1   563 Control    Hispanic (30,40]     -<span style="color: #BB0000;">1.43</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      1     1     1       2   488 Control    European (30,40]      0.060<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      1     1     2       1   215 Case       European (50,60]     -<span style="color: #BB0000;">0.930</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      1     1     2       2   268 Case       Hispanic (40,50]      0.698 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      1     1     3       1   165 Case       European (60,100]    -<span style="color: #BB0000;">0.981</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      1     1     3       2    86 Case       Hispanic (60,100]    -<span style="color: #BB0000;">0.471</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      1     1     4       1   264 Case       European (60,100]     0.504 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      1     1     4       2   451 Control    European (30,40]     -<span style="color: #BB0000;">0.097</span><span style="color: #BB0000; text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      1     1     5       1   250 Case       Hispanic (60,100]     0.926 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      1     1     5       2    <span style="color: #BB0000;">NA</span> <span style="color: #BB0000;">NA</span>         <span style="color: #BB0000;">NA</span>       <span style="color: #BB0000;">NA</span>          <span style="color: #BB0000;">NA</span>     </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 662 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: dummy_var2 &lt;chr&gt;</span></span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 576 × 10</span></span></span>
-<span><span class="co">#&gt;    plates chips  rows columns    ID SampleType Race     AgeGrp   dummy…¹ dummy…²</span></span>
-<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1     1     1       1   444 Control    European (50,60]  -<span style="color: #BB0000;">1.49</span>   Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      1     1     1       2   486 Control    European (40,50]  -<span style="color: #BB0000;">0.344</span>  Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      1     1     2       1   318 Control    European (0,30]   -<span style="color: #BB0000;">0.337</span>  Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      1     1     2       2   107 Case       Hispanic (40,50]   0.520  Case H…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      1     1     3       1   432 Control    European (30,40]   0.044<span style="text-decoration: underline;">3</span> Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      1     1     3       2   366 Control    European (0,30]   -<span style="color: #BB0000;">1.18</span>   Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      1     1     4       1   172 Case       European (30,40]   0.329  Case E…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      1     1     4       2   248 Case       European (60,100] -<span style="color: #BB0000;">0.861</span>  Case E…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      1     1     5       1   443 Control    European (60,100] -<span style="color: #BB0000;">0.098</span><span style="color: #BB0000; text-decoration: underline;">0</span> Contro…</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      1     1     6       1   272 Case       European (30,40]   1.28   Case E…</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 566 more rows, and abbreviated variable names ¹​dummy_var1, ²​dummy_var2</span></span></span>
+<span><span class="co">#&gt;    plates chips  rows columns    ID SampleType Race     AgeGrp   dummy_var1</span></span>
+<span><span class="co">#&gt;     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>      1     1     1       1   563 Control    Hispanic (30,40]     -<span style="color: #BB0000;">1.43</span>  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>      1     1     1       2   488 Control    European (30,40]      0.060<span style="text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>      1     1     2       1   215 Case       European (50,60]     -<span style="color: #BB0000;">0.930</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>      1     1     2       2   268 Case       Hispanic (40,50]      0.698 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>      1     1     3       1   165 Case       European (60,100]    -<span style="color: #BB0000;">0.981</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>      1     1     3       2    86 Case       Hispanic (60,100]    -<span style="color: #BB0000;">0.471</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>      1     1     4       1   264 Case       European (60,100]     0.504 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>      1     1     4       2   451 Control    European (30,40]     -<span style="color: #BB0000;">0.097</span><span style="color: #BB0000; text-decoration: underline;">8</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>      1     1     5       1   250 Case       Hispanic (60,100]     0.926 </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>      1     1     6       1   191 Case       Hispanic (60,100]    -<span style="color: #BB0000;">0.131</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 566 more rows</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 1 more variable: dummy_var2 &lt;chr&gt;</span></span></span>
 <span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] -1.645012</span></span>
-<span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  fc0 <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="op">+</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Exponential.html" class="external-link">rexp</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>,</span>
 <span>  fc1 <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">100</span><span class="op">)</span>,</span>
 <span>  fc2 <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="va">samples</span><span class="op">)</span> <span class="op">-</span><span class="fl">7</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       fc0       fc1       fc2 </span></span>
-<span><span class="co">#&gt;  1.843001 99.649906 -7.000000</span></span></code></pre></div>
+<span><span class="co">#&gt;   3.64428 100.78084  -7.00000</span></span></code></pre></div>
 </div>
   </div>
 

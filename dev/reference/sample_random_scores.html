@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -90,13 +90,23 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_random_scores</span><span class="op">(</span><span class="va">batch_container</span>, <span class="va">random_perm</span>, <span class="va">sample_attributes_fixed</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">sample_random_scores</span><span class="op">(</span></span>
+<span>  <span class="va">batch_container</span>,</span>
+<span>  <span class="va">scoring</span>,</span>
+<span>  <span class="va">random_perm</span>,</span>
+<span>  <span class="va">sample_attributes_fixed</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>batch_container</dt>
 <dd><p>An instance of <a href="BatchContainer.html">BatchContainer</a>.</p></dd>
+
+
+<dt>scoring</dt>
+<dd><p>A named <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of scoring function. Each function should
+return a vector of non-zero length.</p></dd>
 
 
 <dt>random_perm</dt>

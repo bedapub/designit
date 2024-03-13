@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -127,11 +127,11 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.4</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.4.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.1     </span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.5.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.2     </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -144,17 +144,29 @@
 <p>Samples are grouped by Treatment and Collection time with the
 following group sizes:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="ubjxfrcaeg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+<div id="yiwxhmyetz" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#yiwxhmyetz table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#ubjxfrcaeg .gt_table {
+#yiwxhmyetz thead, #yiwxhmyetz tbody, #yiwxhmyetz tfoot, #yiwxhmyetz tr, #yiwxhmyetz td, #yiwxhmyetz th {
+  border-style: none;
+}
+
+#yiwxhmyetz p {
+  margin: 0;
+  padding: 0;
+}
+
+#yiwxhmyetz .gt_table {
   display: table;
   border-collapse: collapse;
+  line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
@@ -177,24 +189,12 @@ following group sizes:</p>
   border-left-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#ubjxfrcaeg .gt_caption {
+#yiwxhmyetz .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#ubjxfrcaeg .gt_title {
+#yiwxhmyetz .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -206,25 +206,37 @@ following group sizes:</p>
   border-bottom-width: 0;
 }
 
-#ubjxfrcaeg .gt_subtitle {
+#yiwxhmyetz .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
+  padding-top: 3px;
+  padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
 
-#ubjxfrcaeg .gt_bottom_border {
+#yiwxhmyetz .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#yiwxhmyetz .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_col_headings {
+#yiwxhmyetz .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -239,7 +251,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_col_heading {
+#yiwxhmyetz .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -259,7 +271,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#ubjxfrcaeg .gt_column_spanner_outer {
+#yiwxhmyetz .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -271,15 +283,15 @@ following group sizes:</p>
   padding-right: 4px;
 }
 
-#ubjxfrcaeg .gt_column_spanner_outer:first-child {
+#yiwxhmyetz .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#ubjxfrcaeg .gt_column_spanner_outer:last-child {
+#yiwxhmyetz .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#ubjxfrcaeg .gt_column_spanner {
+#yiwxhmyetz .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -291,7 +303,11 @@ following group sizes:</p>
   width: 100%;
 }
 
-#ubjxfrcaeg .gt_group_heading {
+#yiwxhmyetz .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#yiwxhmyetz .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -317,7 +333,7 @@ following group sizes:</p>
   text-align: left;
 }
 
-#ubjxfrcaeg .gt_empty_group_heading {
+#yiwxhmyetz .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -332,15 +348,15 @@ following group sizes:</p>
   vertical-align: middle;
 }
 
-#ubjxfrcaeg .gt_from_md > :first-child {
+#yiwxhmyetz .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#ubjxfrcaeg .gt_from_md > :last-child {
+#yiwxhmyetz .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#ubjxfrcaeg .gt_row {
+#yiwxhmyetz .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -359,7 +375,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#ubjxfrcaeg .gt_stub {
+#yiwxhmyetz .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -372,7 +388,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#ubjxfrcaeg .gt_stub_row_group {
+#yiwxhmyetz .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -386,11 +402,15 @@ following group sizes:</p>
   vertical-align: top;
 }
 
-#ubjxfrcaeg .gt_row_group_first td {
+#yiwxhmyetz .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#ubjxfrcaeg .gt_summary_row {
+#yiwxhmyetz .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#yiwxhmyetz .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -400,16 +420,16 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#ubjxfrcaeg .gt_first_summary_row {
+#yiwxhmyetz .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_first_summary_row.thick {
+#yiwxhmyetz .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#ubjxfrcaeg .gt_last_summary_row {
+#yiwxhmyetz .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -419,7 +439,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_grand_summary_row {
+#yiwxhmyetz .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -429,7 +449,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#ubjxfrcaeg .gt_first_grand_summary_row {
+#yiwxhmyetz .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -439,11 +459,21 @@ following group sizes:</p>
   border-top-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_striped {
+#yiwxhmyetz .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#yiwxhmyetz .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#ubjxfrcaeg .gt_table_body {
+#yiwxhmyetz .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -452,7 +482,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_footnotes {
+#yiwxhmyetz .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -466,30 +496,8 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#ubjxfrcaeg .gt_footnote {
+#yiwxhmyetz .gt_footnote {
   margin: 0px;
-  font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#ubjxfrcaeg .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#ubjxfrcaeg .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -497,69 +505,90 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#ubjxfrcaeg .gt_left {
+#yiwxhmyetz .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#yiwxhmyetz .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#yiwxhmyetz .gt_left {
   text-align: left;
 }
 
-#ubjxfrcaeg .gt_center {
+#yiwxhmyetz .gt_center {
   text-align: center;
 }
 
-#ubjxfrcaeg .gt_right {
+#yiwxhmyetz .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#ubjxfrcaeg .gt_font_normal {
+#yiwxhmyetz .gt_font_normal {
   font-weight: normal;
 }
 
-#ubjxfrcaeg .gt_font_bold {
+#yiwxhmyetz .gt_font_bold {
   font-weight: bold;
 }
 
-#ubjxfrcaeg .gt_font_italic {
+#yiwxhmyetz .gt_font_italic {
   font-style: italic;
 }
 
-#ubjxfrcaeg .gt_super {
+#yiwxhmyetz .gt_super {
   font-size: 65%;
 }
 
-#ubjxfrcaeg .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
+#yiwxhmyetz .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
+  position: initial;
 }
 
-#ubjxfrcaeg .gt_asterisk {
+#yiwxhmyetz .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#ubjxfrcaeg .gt_indent_1 {
+#yiwxhmyetz .gt_indent_1 {
   text-indent: 5px;
 }
 
-#ubjxfrcaeg .gt_indent_2 {
+#yiwxhmyetz .gt_indent_2 {
   text-indent: 10px;
 }
 
-#ubjxfrcaeg .gt_indent_3 {
+#yiwxhmyetz .gt_indent_3 {
   text-indent: 15px;
 }
 
-#ubjxfrcaeg .gt_indent_4 {
+#yiwxhmyetz .gt_indent_4 {
   text-indent: 20px;
 }
 
-#ubjxfrcaeg .gt_indent_5 {
+#yiwxhmyetz .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
-<table class="table gt_table">
-<thead class="gt_col_headings"><tr>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings">
 <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Time">Time</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Treatment">Treatment</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="n">n</th>
@@ -636,13 +665,8 @@ following group sizes:</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Add samples to container</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="va">multi_trt_day_samples</span></span>
 <span><span class="co"># Initial random assignment</span></span>
-<span><span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
-<span><span class="co"># Set scoring function</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
+<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">multi_trt_day_samples</span><span class="op">)</span></span>
 <span><span class="va">bc</span></span>
 <span><span class="co">#&gt; Batch container with 32 locations and 32 samples (assigned).</span></span>
 <span><span class="co">#&gt;   Dimensions: batch, run, position</span></span></code></pre></div>
@@ -655,10 +679,10 @@ done using osat scoring on sample <code>Treatment</code> and
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span> <span class="co"># should we have conventions for this?</span></span>
 <span></span>
-<span><span class="co"># initial score</span></span>
-<span><span class="co"># bc$score()</span></span>
-<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="va">n_shuffle</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="va">n_iterations</span></span>
 <span><span class="op">)</span> <span class="co"># default is 10000</span></span>
@@ -681,8 +705,10 @@ of iterations.</p>
 </h3>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html" class="external-link">qplot</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">trace</span><span class="op">$</span><span class="va">n_steps</span>, y <span class="op">=</span> <span class="va">trace</span><span class="op">$</span><span class="va">scores</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">32</span>, <span class="va">n_shuffle</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score()}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
+<span>  x <span class="op">=</span> <span class="va">bc</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">bc</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span>,</span>
+<span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">32</span>, <span class="va">n_shuffle</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score(scoring_f)}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: `qplot()` was deprecated in ggplot2 3.4.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
@@ -694,8 +720,8 @@ of iterations.</p>
 <h3 id="final-batch-layout">Final batch layout<a class="anchor" aria-label="anchor" href="#final-batch-layout"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
@@ -706,18 +732,16 @@ of iterations.</p>
 <h2 id="repeat-but-use-shuffle-with-contraints">Repeat but use shuffle with contraints<a class="anchor" aria-label="anchor" href="#repeat-but-use-shuffle-with-contraints"></a>
 </h2>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># copy batch container for second optimization</span></span>
-<span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co"># Initial random assignment</span></span>
-<span><span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># copy batch container for second optimization</span></span>
+<span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">n_iterations</span> <span class="op">&lt;-</span> <span class="fl">200</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span> <span class="co"># should we have conventions for this?</span></span>
 <span></span>
-<span><span class="va">trace2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc2</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  shuffle_proposal <span class="op">=</span> <span class="fu"><a href="../reference/shuffle_with_constraints.html">shuffle_with_constraints</a></span><span class="op">(</span></span>
 <span>    src <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    <span class="co"># batch needs to change for shuffle to be accepted</span></span>
@@ -750,14 +774,15 @@ of iterations.</p>
 <span><span class="co">#&gt; Achieved score: 3 at iteration 180</span></span>
 <span></span>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html" class="external-link">qplot</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">trace</span><span class="op">$</span><span class="va">n_steps</span>, y <span class="op">=</span> <span class="va">trace2</span><span class="op">$</span><span class="va">scores</span>, <span class="co"># color = factor(n_shuffle),</span></span>
-<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc2$score()}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
+<span>  x <span class="op">=</span> <span class="va">bc2</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">bc2</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span>,</span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc2$score(scoring_f)}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">bc2</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc2</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
@@ -775,17 +800,19 @@ and now only optimize <code>run</code> with constraint.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_iterations</span> <span class="op">&lt;-</span> <span class="fl">100</span></span>
 <span></span>
-<span><span class="co"># assign new optimization function</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"run"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># new optimization function</span></span>
+<span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"run"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co"># like this the optimization score is wrong because it tries to optimize across Batches.</span></span>
 <span><span class="co"># Possible ways to go:</span></span>
 <span><span class="co"># - we'd need something like c("batch", batch/run") for optimize by batch and run within batch.</span></span>
 <span><span class="co"># - or we add "batch/run" to the constraints somehow.</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 16</span></span>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
+<span><span class="co">#&gt; score_1 </span></span>
+<span><span class="co">#&gt;      16</span></span>
 <span></span>
-<span><span class="va">trace_run</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  shuffle_proposal <span class="op">=</span> <span class="fu"><a href="../reference/shuffle_with_constraints.html">shuffle_with_constraints</a></span><span class="op">(</span></span>
 <span>    src <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>    <span class="co"># batch remains the same and run needs to change</span></span>
@@ -803,8 +830,10 @@ and now only optimize <code>run</code> with constraint.</p>
 <span><span class="co">#&gt; Achieved score: 2 at iteration 16</span></span></code></pre></div>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html" class="external-link">qplot</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="va">trace_run</span><span class="op">$</span><span class="va">n_steps</span>, y <span class="op">=</span> <span class="va">trace_run</span><span class="op">$</span><span class="va">scores</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_iterations</span><span class="op">)</span>,</span>
-<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score()}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
+<span>  x <span class="op">=</span> <span class="va">bc</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">bc</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span>,</span>
+<span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_iterations</span><span class="op">)</span>,</span>
+<span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score(scoring_f)}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-10-1.png" width="576"></p>
 <div class="section level3">
@@ -812,9 +841,8 @@ and now only optimize <code>run</code> with constraint.</p>
 </h3>
 <p>This is not giving the expected mix of treatments across runs.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">run</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">batch</span><span class="op">)</span></span>

@@ -18,7 +18,7 @@ sample is assigned to the second location, etc."><meta property="og:image" conte
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -109,7 +109,7 @@ sample is assigned to the second location, etc.</p>
     <h2>Value</h2>
     
 
-<p>Returns <code>BatchContainer</code>, invisibly.</p>
+<p>Returns a new <code>BatchContainer</code>.</p>
     </div>
 
     <div id="ref-examples">
@@ -128,7 +128,7 @@ sample is assigned to the second location, etc.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># assigns samples randomly</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">samples</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">samples</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     row column sampId sampName</span>
@@ -141,7 +141,7 @@ sample is assigned to the second location, etc.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span>     3      2      3 c       </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># assigns samples in order</span></span></span>
-<span class="r-in"><span><span class="fu">assign_in_order</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu">assign_in_order</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     row column sampId sampName</span>

@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -133,17 +133,29 @@
 <p>Samples are grouped by Treatment and Collection time with the
 following group sizes:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="cwbhcfrvkl" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+<div id="blyktgeaab" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#blyktgeaab table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#cwbhcfrvkl .gt_table {
+#blyktgeaab thead, #blyktgeaab tbody, #blyktgeaab tfoot, #blyktgeaab tr, #blyktgeaab td, #blyktgeaab th {
+  border-style: none;
+}
+
+#blyktgeaab p {
+  margin: 0;
+  padding: 0;
+}
+
+#blyktgeaab .gt_table {
   display: table;
   border-collapse: collapse;
+  line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
@@ -166,24 +178,12 @@ following group sizes:</p>
   border-left-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
-}
-
-#cwbhcfrvkl .gt_caption {
+#blyktgeaab .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#cwbhcfrvkl .gt_title {
+#blyktgeaab .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -195,25 +195,37 @@ following group sizes:</p>
   border-bottom-width: 0;
 }
 
-#cwbhcfrvkl .gt_subtitle {
+#blyktgeaab .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
+  padding-top: 3px;
+  padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
 }
 
-#cwbhcfrvkl .gt_bottom_border {
+#blyktgeaab .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#blyktgeaab .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_col_headings {
+#blyktgeaab .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -228,7 +240,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_col_heading {
+#blyktgeaab .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -248,7 +260,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#cwbhcfrvkl .gt_column_spanner_outer {
+#blyktgeaab .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -260,15 +272,15 @@ following group sizes:</p>
   padding-right: 4px;
 }
 
-#cwbhcfrvkl .gt_column_spanner_outer:first-child {
+#blyktgeaab .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#cwbhcfrvkl .gt_column_spanner_outer:last-child {
+#blyktgeaab .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#cwbhcfrvkl .gt_column_spanner {
+#blyktgeaab .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -280,7 +292,11 @@ following group sizes:</p>
   width: 100%;
 }
 
-#cwbhcfrvkl .gt_group_heading {
+#blyktgeaab .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#blyktgeaab .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -306,7 +322,7 @@ following group sizes:</p>
   text-align: left;
 }
 
-#cwbhcfrvkl .gt_empty_group_heading {
+#blyktgeaab .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -321,15 +337,15 @@ following group sizes:</p>
   vertical-align: middle;
 }
 
-#cwbhcfrvkl .gt_from_md > :first-child {
+#blyktgeaab .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#cwbhcfrvkl .gt_from_md > :last-child {
+#blyktgeaab .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#cwbhcfrvkl .gt_row {
+#blyktgeaab .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -348,7 +364,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#cwbhcfrvkl .gt_stub {
+#blyktgeaab .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -361,7 +377,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#cwbhcfrvkl .gt_stub_row_group {
+#blyktgeaab .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -375,11 +391,15 @@ following group sizes:</p>
   vertical-align: top;
 }
 
-#cwbhcfrvkl .gt_row_group_first td {
+#blyktgeaab .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#cwbhcfrvkl .gt_summary_row {
+#blyktgeaab .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#blyktgeaab .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -389,16 +409,16 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#cwbhcfrvkl .gt_first_summary_row {
+#blyktgeaab .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_first_summary_row.thick {
+#blyktgeaab .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#cwbhcfrvkl .gt_last_summary_row {
+#blyktgeaab .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -408,7 +428,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_grand_summary_row {
+#blyktgeaab .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -418,7 +438,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#cwbhcfrvkl .gt_first_grand_summary_row {
+#blyktgeaab .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -428,11 +448,21 @@ following group sizes:</p>
   border-top-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_striped {
+#blyktgeaab .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#blyktgeaab .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#cwbhcfrvkl .gt_table_body {
+#blyktgeaab .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -441,7 +471,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_footnotes {
+#blyktgeaab .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -455,30 +485,8 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#cwbhcfrvkl .gt_footnote {
+#blyktgeaab .gt_footnote {
   margin: 0px;
-  font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
-  padding-left: 5px;
-  padding-right: 5px;
-}
-
-#cwbhcfrvkl .gt_sourcenotes {
-  color: #333333;
-  background-color: #FFFFFF;
-  border-bottom-style: none;
-  border-bottom-width: 2px;
-  border-bottom-color: #D3D3D3;
-  border-left-style: none;
-  border-left-width: 2px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 2px;
-  border-right-color: #D3D3D3;
-}
-
-#cwbhcfrvkl .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -486,69 +494,90 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#cwbhcfrvkl .gt_left {
+#blyktgeaab .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#blyktgeaab .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#blyktgeaab .gt_left {
   text-align: left;
 }
 
-#cwbhcfrvkl .gt_center {
+#blyktgeaab .gt_center {
   text-align: center;
 }
 
-#cwbhcfrvkl .gt_right {
+#blyktgeaab .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#cwbhcfrvkl .gt_font_normal {
+#blyktgeaab .gt_font_normal {
   font-weight: normal;
 }
 
-#cwbhcfrvkl .gt_font_bold {
+#blyktgeaab .gt_font_bold {
   font-weight: bold;
 }
 
-#cwbhcfrvkl .gt_font_italic {
+#blyktgeaab .gt_font_italic {
   font-style: italic;
 }
 
-#cwbhcfrvkl .gt_super {
+#blyktgeaab .gt_super {
   font-size: 65%;
 }
 
-#cwbhcfrvkl .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
+#blyktgeaab .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
+  position: initial;
 }
 
-#cwbhcfrvkl .gt_asterisk {
+#blyktgeaab .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#cwbhcfrvkl .gt_indent_1 {
+#blyktgeaab .gt_indent_1 {
   text-indent: 5px;
 }
 
-#cwbhcfrvkl .gt_indent_2 {
+#blyktgeaab .gt_indent_2 {
   text-indent: 10px;
 }
 
-#cwbhcfrvkl .gt_indent_3 {
+#blyktgeaab .gt_indent_3 {
   text-indent: 15px;
 }
 
-#cwbhcfrvkl .gt_indent_4 {
+#blyktgeaab .gt_indent_4 {
   text-indent: 20px;
 }
 
-#cwbhcfrvkl .gt_indent_5 {
+#blyktgeaab .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
-<table class="table gt_table">
-<thead class="gt_col_headings"><tr>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings">
 <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="Time">Time</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Treatment">Treatment</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="n">n</th>
@@ -629,12 +658,9 @@ container positions.</p>
 <span>    run <span class="op">=</span> <span class="fl">2</span>, position <span class="op">=</span> <span class="fl">5</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fl">4</span>, run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Add samples to container</span></span>
-<span><span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">bc</span>, samples <span class="op">=</span> <span class="va">multi_trt_day_samples</span><span class="op">)</span></span>
-<span><span class="co"># Set scoring function</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="co"># Add samples to container</span></span>
+<span>  <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="va">multi_trt_day_samples</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bc</span></span>
 <span><span class="co">#&gt; Batch container with 38 locations and 32 samples (assigned).</span></span>
@@ -656,47 +682,58 @@ exhausted.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_shuffle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">32</span>, <span class="fl">10</span>, <span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">40</span>, <span class="fl">40</span>, <span class="fl">50</span>, <span class="fl">50</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
+<span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">bc1</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trace1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc1</span>,</span>
+<span><span class="va">bc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="va">n_shuffle</span> <span class="co"># will implicitly generate a shuffling function according to the provided schedule</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Re-defined number of swaps to 19 in swapping function.</span></span>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (25.046) - OK</span></span>
+<span><span class="co">#&gt; ... (24.414) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 20.925 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 20.399 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 18.82 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 18.294 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 17.346 at iteration 13</span></span>
-<span><span class="co">#&gt; Achieved score: 12.82 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 10.925 at iteration 22</span></span>
-<span><span class="co">#&gt; Achieved score: 6.82 at iteration 49</span></span>
-<span><span class="co">#&gt; Achieved score: 4.82 at iteration 85</span></span>
-<span><span class="co">#&gt; Achieved score: 4.504 at iteration 174</span></span>
+<span><span class="co">#&gt; Achieved score: 23.03 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 20.188 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 18.715 at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: 14.609 at iteration 14</span></span>
+<span><span class="co">#&gt; Achieved score: 14.399 at iteration 26</span></span>
+<span><span class="co">#&gt; Achieved score: 12.82 at iteration 38</span></span>
+<span><span class="co">#&gt; Achieved score: 12.399 at iteration 70</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 84</span></span>
+<span><span class="co">#&gt; Achieved score: 10.188 at iteration 102</span></span>
+<span><span class="co">#&gt; Achieved score: 8.188 at iteration 123</span></span>
+<span><span class="co">#&gt; Achieved score: 6.188 at iteration 157</span></span>
+<span><span class="co">#&gt; Achieved score: 6.083 at iteration 183</span></span>
 <span></span>
-<span><span class="va">trace1</span><span class="op">$</span><span class="va">elapsed</span></span>
-<span><span class="co">#&gt; Time difference of 2.559221 secs</span></span></code></pre></div>
+<span><span class="va">bc1</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">elapsed</span></span>
+<span><span class="co">#&gt; Time difference of 2.159714 secs</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="optimization-trace">Optimization trace<a class="anchor" aria-label="anchor" href="#optimization-trace"></a>
 </h3>
 <p>Custom plot with some colours:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/qplot.html" class="external-link">qplot</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">trace1</span><span class="op">$</span><span class="va">scores</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">trace1</span><span class="op">$</span><span class="va">scores</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_shuffle</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">trace1</span><span class="op">$</span><span class="va">scores</span><span class="op">)</span><span class="op">]</span>, geom <span class="op">=</span> <span class="st">"point"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Score 1 tracing"</span>, subtitle <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score = {bc1$score()}"</span><span class="op">)</span>, x <span class="op">=</span> <span class="st">"Iteration"</span>, y <span class="op">=</span> <span class="st">"Score"</span>, color <span class="op">=</span> <span class="st">"n_shuffle"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: `qplot()` was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">scores_table</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    n_shuffle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">n_shuffle</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
+<span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">step</span>, <span class="va">value</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_shuffle</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Score 1 tracing"</span>,</span>
+<span>    subtitle <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score = {bc1$score(scoring_f)}"</span><span class="op">)</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Iteration"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Score"</span>,</span>
+<span>    color <span class="op">=</span> <span class="st">"n_shuffle"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-6-1.png" width="480"></p>
 <p>Using the internal method…</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trace1</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-7-1.png" width="480"></p>
 <p>We may safely apply the batch container methods get_samples() and
 score() also after using the new optimization code.</p>
@@ -705,12 +742,13 @@ score() also after using the new optimization code.</p>
 <h3 id="final-batch-layout">Final batch layout<a class="anchor" aria-label="anchor" href="#final-batch-layout"></a>
 </h3>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 4.504155</span></span>
+<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  score_1 </span></span>
+<span><span class="co">#&gt; 6.083102</span></span>
 <span></span>
-<span><span class="va">bc1</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>anno <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">Time</span>, <span class="st">" hr"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc1</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>anno <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">Time</span>, <span class="st">" hr"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html" class="external-link">interaction</a></span><span class="op">(</span><span class="va">position</span>, <span class="va">run</span><span class="op">)</span>, fill <span class="op">=</span> <span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">5.5</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
@@ -731,17 +769,14 @@ be done immediately on the same batch container.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_shuffle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">30</span>, <span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">bc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc1</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="va">n_shuffle</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (24.63) - OK</span></span>
-<span><span class="co">#&gt; Initial score: 4.504</span></span>
-<span><span class="co">#&gt; Achieved score: 2.609 at iteration 88</span></span>
-<span><span class="co">#&gt; Optimization trace (91 score values, elapsed 1.469071 secs).</span></span>
-<span><span class="co">#&gt;   Starting score: 4.504</span></span>
-<span><span class="co">#&gt;   Final score   : 2.609</span></span></code></pre></div>
+<span><span class="co">#&gt; ... (25.905) - OK</span></span>
+<span><span class="co">#&gt; Initial score: 6.083</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -756,43 +791,38 @@ number of times. Thus, iteration has to be stopped by either the
 max_iter criterion or by reaching a specific minimum delta threshold
 (score improvement from one selected solution to the next).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc2</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">3</span>, <span class="co"># will implicitly generate a shuffling function that will do 3 swaps at each iteration</span></span>
 <span>  max_iter <span class="op">=</span> <span class="fl">2000</span>,</span>
 <span>  min_delta <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (29.544) - OK</span></span>
+<span><span class="co">#&gt; ... (28.585) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 67.662 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 54.083 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 38.083 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 36.504 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 34.715 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 30.715 at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: 28.715 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 26.715 at iteration 8</span></span>
-<span><span class="co">#&gt; Achieved score: 22.715 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 14.294 at iteration 11</span></span>
-<span><span class="co">#&gt; Achieved score: 12.294 at iteration 27</span></span>
-<span><span class="co">#&gt; Achieved score: 12.083 at iteration 29</span></span>
-<span><span class="co">#&gt; Achieved score: 8.188 at iteration 66</span></span>
-<span><span class="co">#&gt; Achieved score: 6.188 at iteration 109</span></span>
-<span><span class="co">#&gt; Achieved score: 4.188 at iteration 146</span></span>
-<span><span class="co">#&gt; Achieved score: 2.609 at iteration 334</span></span>
-<span><span class="co">#&gt; Achieved score: 2.294 at iteration 621</span></span>
-<span><span class="co">#&gt; Optimization trace (2001 score values, elapsed 16.78205 secs).</span></span>
-<span><span class="co">#&gt;   Starting score: 73.03</span></span>
-<span><span class="co">#&gt;   Final score   : 2.294</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 45.03 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 41.03 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 29.452 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 25.452 at iteration 5</span></span>
+<span><span class="co">#&gt; Achieved score: 17.767 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 11.767 at iteration 10</span></span>
+<span><span class="co">#&gt; Achieved score: 11.452 at iteration 14</span></span>
+<span><span class="co">#&gt; Achieved score: 10.188 at iteration 24</span></span>
+<span><span class="co">#&gt; Achieved score: 10.083 at iteration 34</span></span>
+<span><span class="co">#&gt; Achieved score: 8.083 at iteration 38</span></span>
+<span><span class="co">#&gt; Achieved score: 7.978 at iteration 58</span></span>
+<span><span class="co">#&gt; Achieved score: 7.662 at iteration 61</span></span>
+<span><span class="co">#&gt; Achieved score: 6.083 at iteration 74</span></span>
+<span><span class="co">#&gt; Achieved score: 4.504 at iteration 129</span></span>
+<span><span class="co">#&gt; Achieved score: 2.925 at iteration 151</span></span>
+<span><span class="co">#&gt; Achieved score: 2.609 at iteration 678</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="optimization-with-multi-variate-scoring-function">Optimization with multi-variate scoring function<a class="anchor" aria-label="anchor" href="#optimization-with-multi-variate-scoring-function"></a>
 </h2>
 <p>Instead of passing a single scoring function, a list of multiple
-scoring functions can be assigned to a batch container, each of which to
+scoring functions can be passed to the optimizer, each of which to
 return a scalar value on evaluation.</p>
 <p>By default, a strict improvement rule is applied for classifying a
 potential solution as “better”: each of the individual scores has to be
@@ -803,16 +833,15 @@ scores or defining the acceptance criterion. See later examples.</p>
 <p>The second scoring function used here is by the way rather redundant
 and just serves for illustration.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc3</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc3</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">multi_scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc3</span>,</span>
+<span><span class="va">bc3</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">multi_scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  min_delta <span class="op">=</span> <span class="fl">0.1</span></span>
@@ -823,21 +852,19 @@ and just serves for illustration.</p>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (27.086, 53.151) - OK</span></span>
+<span><span class="co">#&gt; ... (22.815, 50.754) - OK</span></span>
 <span><span class="co">#&gt; Initial score: c(73.03, 44.803)</span></span>
-<span><span class="co">#&gt; Achieved score: c(51.452, 39.645) at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: c(35.452, 29.645) at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: c(29.662, 25.751) at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: c(25.662, 21.751) at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: c(23.978, 14.382) at iteration 16</span></span>
-<span><span class="co">#&gt; Achieved score: c(14.399, 9.119) at iteration 20</span></span>
-<span><span class="co">#&gt; Achieved score: c(12.504, 7.33) at iteration 22</span></span>
-<span><span class="co">#&gt; Achieved score: c(10.504, 7.33) at iteration 31</span></span>
-<span><span class="co">#&gt; Achieved score: c(10.504, 5.751) at iteration 45</span></span>
-<span><span class="co">#&gt; Achieved score: c(6.504, 5.751) at iteration 66</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.925, 4.593) at iteration 136</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.925, 4.593) at iteration 179</span></span>
-<span><span class="co">#&gt; Reached min delta in 179 iterations.</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: c(57.03, 42.803) at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: c(46.925, 26.593) at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: c(24.925, 16.698) at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: c(23.346, 13.54) at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: c(21.346, 13.54) at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: c(17.346, 7.54) at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: c(13.346, 5.54) at iteration 35</span></span>
+<span><span class="co">#&gt; Achieved score: c(11.662, 4.172) at iteration 80</span></span>
+<span><span class="co">#&gt; Achieved score: c(10.083, 3.014) at iteration 127</span></span>
+<span><span class="co">#&gt; Achieved score: c(8.083, 3.014) at iteration 141</span></span>
+<span><span class="co">#&gt; Achieved score: c(6.188, 3.014) at iteration 158</span></span></code></pre></div>
 <p>Note that the first score tends to yield higher values than the
 second one. This could be a problem when trying to select a solution
 based on an aggregated, overall score. We repeat the same optimization
@@ -855,43 +882,30 @@ values centered around zero, thus that the optimized scores are likely
 to be negative. We may also want to decrease the delta_min parameter to
 match the new numerical range.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc3_as</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc3_as</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc3_as</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc3_as</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">multi_scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  min_delta <span class="op">=</span> <span class="fl">0.01</span>,</span>
 <span>  autoscale_scores <span class="op">=</span> <span class="cn">T</span>,</span>
 <span>  autoscaling_permutations <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
-<span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
-<span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (33.045, 64.702) - OK</span></span>
+<span><span class="co">#&gt; ... (22.204, 62.438) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 2-dim. score vector. (200 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(5.727, 2.888)</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.589, 1.885) at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.74, 1.253) at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.948, 0.953) at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.026, 0.296) at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.029, -0.621) at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.022, -1.418) at iteration 14</span></span>
-<span><span class="co">#&gt; Achieved score: c(-3.505, -2.281) at iteration 28</span></span>
-<span><span class="co">#&gt; Achieved score: c(-3.505, -2.307) at iteration 40</span></span>
-<span><span class="co">#&gt; Achieved score: c(-4.252, -2.598) at iteration 56</span></span>
-<span><span class="co">#&gt; Achieved score: c(-5.705, -2.8) at iteration 76</span></span>
-<span><span class="co">#&gt; Achieved score: c(-7.415, -2.8) at iteration 92</span></span></code></pre></div>
+<span><span class="co">#&gt; Initial score: c(4.631, 2.646)</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.498, 1.618) at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.731, -1.4) at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.273, -2.177) at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.997, -2.749) at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.763, -3.14) at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.236, -3.839) at iteration 26</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.147, -3.839) at iteration 40</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.701, -3.839) at iteration 42</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.203, -4.476) at iteration 123</span></span>
+<span><span class="co">#&gt; Achieved score: c(-4.03, -4.689) at iteration 129</span></span></code></pre></div>
 <p>Having directly comparable scores, it may be reasonable now to use a
 function that somehow aggregates the scores to decide on the best
 iteration (instead of looking at the scores individually).</p>
@@ -899,70 +913,47 @@ iteration (instead of looking at the scores individually).</p>
 This will simply set the aggregated score to whichever of the individual
 scores is larger (i.e. ‘worse’ in terms of the optimization).</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc4</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc4</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc4</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">multi_scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  aggregate_scores_func <span class="op">=</span> <span class="va">worst_score</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  autoscale_scores <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  autoscaling_permutations <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
-<span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
-<span></span>
-<span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
-<span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (23.096, 45.492) - OK</span></span>
+<span><span class="co">#&gt; ... (31.128, 62.318) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 2-dim. score vector. (200 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(7.044, 2.491)</span></span>
-<span><span class="co">#&gt;    Aggregated: 7.044</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.972, 0.497) at iteration 1</span></span>
-<span><span class="co">#&gt;    Aggregated: 3.972</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.958, 0.952) at iteration 2</span></span>
-<span><span class="co">#&gt;    Aggregated: 3.958</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.999, -0.642) at iteration 3</span></span>
-<span><span class="co">#&gt;    Aggregated: 1.999</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.752, -1.588) at iteration 4</span></span>
-<span><span class="co">#&gt;    Aggregated: 1.752</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.17, -1.421) at iteration 6</span></span>
-<span><span class="co">#&gt;    Aggregated: 1.17</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.265, -3.156) at iteration 7</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.265</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.64, -1.87) at iteration 8</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.64</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.516, -1.029) at iteration 11</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.029</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.492, -1.398) at iteration 14</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.398</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.882, -1.79) at iteration 48</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.79</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.349, -2.18) at iteration 50</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.18</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.376, -2.995) at iteration 58</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.376</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.403, -3.917) at iteration 67</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.403</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.403, -3.917) at iteration 83</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.403</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.431, -4.029) at iteration 132</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.431</span></span>
-<span><span class="co">#&gt; Achieved score: c(-3.093, -2.697) at iteration 143</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.697</span></span>
-<span><span class="co">#&gt; Achieved score: c(-3.676, -3.417) at iteration 151</span></span>
-<span><span class="co">#&gt;    Aggregated: -3.417</span></span>
-<span><span class="co">#&gt; Optimization trace (201 score values, elapsed 6.154244 secs).</span></span>
-<span><span class="co">#&gt;   Starting score: 7.044,2.491</span></span>
-<span><span class="co">#&gt;   Final score   : -3.676,-3.417</span></span></code></pre></div>
+<span><span class="co">#&gt; Initial score: c(5.241, 2.876)</span></span>
+<span><span class="co">#&gt;    Aggregated: 5.241</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.868, 1.925) at iteration 1</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.868</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.377, 1.807) at iteration 2</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.377</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.917, -1.044) at iteration 3</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.917</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.691, -0.9) at iteration 6</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.691</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.139, -0.445) at iteration 7</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.139</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.391, -0.76) at iteration 10</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.76</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.332, -1.369) at iteration 11</span></span>
+<span><span class="co">#&gt;    Aggregated: -1.369</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.804, -2.224) at iteration 16</span></span>
+<span><span class="co">#&gt;    Aggregated: -1.804</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.332, -2.224) at iteration 26</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.224</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.273, -2.734) at iteration 36</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.273</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.361, -2.83) at iteration 46</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.361</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.836, -3.223) at iteration 90</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.836</span></span>
+<span><span class="co">#&gt; Achieved score: c(-3.376, -2.965) at iteration 117</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.965</span></span></code></pre></div>
 <p>Another - more interesting - option would be to aggregate the two
 scores by taking their sum. This way both scores will influence the
 optimization at every step.</p>
@@ -970,15 +961,9 @@ optimization at every step.</p>
 which will lead by default to pairwise sample swaps being done on each
 iteration.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc5</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc5</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc5</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc5</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">multi_scoring_f</span>,</span>
 <span>  aggregate_scores_func <span class="op">=</span> <span class="va">sum_scores</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span>  autoscale_scores <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -992,15 +977,9 @@ meaningful distance vectors or normalized n-tuples.</p>
 based optimization would force both normalized scores towards zero, not
 the minimal (negative) value that would be desired in that case.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc5_2</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">bc5_2</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc5_2</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc5_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">multi_scoring_f</span>,</span>
 <span>  aggregate_scores_func <span class="op">=</span> <span class="va">L2s_norm</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span>,</span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -1018,26 +997,26 @@ shuffles across all available positions in the batch container. Note
 that this is usually not a good strategy for converging to a
 solution.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc6</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc6</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc6</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  shuffle_proposal_func <span class="op">=</span> <span class="va">complete_random_shuffling</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (31.558) - OK</span></span>
+<span><span class="co">#&gt; ... (23.768) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 32.925 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 19.241 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 15.978 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 12.925 at iteration 24</span></span>
-<span><span class="co">#&gt; Achieved score: 12.82 at iteration 25</span></span>
-<span><span class="co">#&gt; Achieved score: 10.399 at iteration 34</span></span>
-<span><span class="co">#&gt; Achieved score: 8.82 at iteration 87</span></span>
-<span><span class="co">#&gt; Optimization trace (201 score values, elapsed 1.999838 secs).</span></span>
-<span><span class="co">#&gt;   Starting score: 73.03</span></span>
-<span><span class="co">#&gt;   Final score   : 8.82</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 28.715 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 26.715 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 24.294 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 22.925 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 18.925 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 16.82 at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 15</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 17</span></span>
+<span><span class="co">#&gt; Achieved score: 14.083 at iteration 41</span></span>
+<span><span class="co">#&gt; Achieved score: 10.925 at iteration 62</span></span>
+<span><span class="co">#&gt; Achieved score: 10.715 at iteration 98</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="using-simulated-annealing-sa-for-optimization">Using simulated annealing (SA) for optimization<a class="anchor" aria-label="anchor" href="#using-simulated-annealing-sa-for-optimization"></a>
@@ -1056,112 +1035,122 @@ step, like allowing just 1 sample swap per iteration.</p>
 value score to be optimized. Choose an appropriate aggregation function
 if you happen to have multiple scores initially.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc7</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trace7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc7</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc7</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  acceptance_func <span class="op">=</span> <span class="fu"><a href="../reference/mk_simanneal_acceptance_func.html">mk_simanneal_acceptance_func</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (26.224) - OK</span></span>
+<span><span class="co">#&gt; ... (18.733) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 67.452 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 67.452 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 67.452 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 67.452 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 67.452 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 65.452 at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: 55.452 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 49.873 at iteration 8</span></span>
-<span><span class="co">#&gt; Achieved score: 43.873 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 43.873 at iteration 10</span></span>
-<span><span class="co">#&gt; Achieved score: 43.873 at iteration 11</span></span>
-<span><span class="co">#&gt; Achieved score: 41.873 at iteration 14</span></span>
-<span><span class="co">#&gt; Achieved score: 37.767 at iteration 15</span></span>
-<span><span class="co">#&gt; Achieved score: 35.767 at iteration 16</span></span>
-<span><span class="co">#&gt; Achieved score: 35.767 at iteration 17</span></span>
-<span><span class="co">#&gt; Achieved score: 35.767 at iteration 18</span></span>
-<span><span class="co">#&gt; Achieved score: 31.767 at iteration 19</span></span>
-<span><span class="co">#&gt; Achieved score: 28.083 at iteration 20</span></span>
-<span><span class="co">#&gt; Achieved score: 26.188 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 26.188 at iteration 23</span></span>
-<span><span class="co">#&gt; Achieved score: 24.188 at iteration 24</span></span>
-<span><span class="co">#&gt; Achieved score: 22.188 at iteration 25</span></span>
-<span><span class="co">#&gt; Achieved score: 24.188 at iteration 26</span></span>
-<span><span class="co">#&gt; Achieved score: 24.083 at iteration 27</span></span>
-<span><span class="co">#&gt; Achieved score: 24.083 at iteration 28</span></span>
-<span><span class="co">#&gt; Achieved score: 20.083 at iteration 29</span></span>
-<span><span class="co">#&gt; Achieved score: 18.083 at iteration 30</span></span>
-<span><span class="co">#&gt; Achieved score: 18.083 at iteration 31</span></span>
-<span><span class="co">#&gt; Achieved score: 18.083 at iteration 33</span></span>
-<span><span class="co">#&gt; Achieved score: 16.083 at iteration 38</span></span>
-<span><span class="co">#&gt; Achieved score: 16.083 at iteration 40</span></span>
-<span><span class="co">#&gt; Achieved score: 16.083 at iteration 49</span></span>
-<span><span class="co">#&gt; Achieved score: 14.083 at iteration 51</span></span>
-<span><span class="co">#&gt; Achieved score: 14.083 at iteration 52</span></span>
-<span><span class="co">#&gt; Achieved score: 14.399 at iteration 54</span></span>
-<span><span class="co">#&gt; Achieved score: 14.399 at iteration 61</span></span>
-<span><span class="co">#&gt; Achieved score: 14.399 at iteration 62</span></span>
-<span><span class="co">#&gt; Achieved score: 12.399 at iteration 63</span></span>
-<span><span class="co">#&gt; Achieved score: 12.399 at iteration 64</span></span>
-<span><span class="co">#&gt; Achieved score: 12.399 at iteration 68</span></span>
-<span><span class="co">#&gt; Achieved score: 12.399 at iteration 69</span></span>
-<span><span class="co">#&gt; Achieved score: 12.399 at iteration 74</span></span>
-<span><span class="co">#&gt; Achieved score: 10.82 at iteration 80</span></span>
-<span><span class="co">#&gt; Achieved score: 10.82 at iteration 82</span></span>
-<span><span class="co">#&gt; Achieved score: 8.82 at iteration 86</span></span>
-<span><span class="co">#&gt; Achieved score: 8.82 at iteration 109</span></span>
+<span><span class="co">#&gt; Achieved score: 69.03 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 59.03 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 57.03 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 47.03 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 47.03 at iteration 5</span></span>
+<span><span class="co">#&gt; Achieved score: 45.452 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 39.452 at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: 37.767 at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: 37.767 at iteration 9</span></span>
+<span><span class="co">#&gt; Achieved score: 32.188 at iteration 11</span></span>
+<span><span class="co">#&gt; Achieved score: 28.188 at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: 28.188 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 28.188 at iteration 15</span></span>
+<span><span class="co">#&gt; Achieved score: 28.188 at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: 24.188 at iteration 17</span></span>
+<span><span class="co">#&gt; Achieved score: 24.188 at iteration 18</span></span>
+<span><span class="co">#&gt; Achieved score: 20.188 at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: 20.188 at iteration 22</span></span>
+<span><span class="co">#&gt; Achieved score: 18.188 at iteration 23</span></span>
+<span><span class="co">#&gt; Achieved score: 16.609 at iteration 24</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 25</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 30</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 31</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 32</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 33</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 34</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 36</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 38</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 39</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 40</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 42</span></span>
+<span><span class="co">#&gt; Achieved score: 14.504 at iteration 46</span></span>
+<span><span class="co">#&gt; Achieved score: 12.504 at iteration 47</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 48</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 49</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 51</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 52</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 54</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 59</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 60</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 67</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 70</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 71</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 72</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 75</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 77</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 94</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 100</span></span>
+<span><span class="co">#&gt; Achieved score: 6.82 at iteration 108</span></span>
+<span><span class="co">#&gt; Achieved score: 6.82 at iteration 110</span></span>
 <span><span class="co">#&gt; Achieved score: 6.82 at iteration 122</span></span>
-<span><span class="co">#&gt; Achieved score: 4.82 at iteration 124</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 4.82 at iteration 148</span></span>
+<span><span class="co">#&gt; Achieved score: 2.925 at iteration 178</span></span></code></pre></div>
 <p>The trace may show a non strictly monotonic behavior now, reflecting
 the SA protocol at work.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trace7</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">bc7</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-18-1.png" width="480"></p>
 <p>Better results and quicker convergence may be achieved by playing
 with the starting temperature (T0) and cooling speed (alpha) in a
 specific case.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc8</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">copy</span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trace8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
-<span>  <span class="va">bc8</span>,</span>
+<code class="sourceCode R"><span><span class="va">bc8</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  acceptance_func <span class="op">=</span> <span class="fu"><a href="../reference/mk_simanneal_acceptance_func.html">mk_simanneal_acceptance_func</a></span><span class="op">(</span><span class="fu"><a href="../reference/mk_simanneal_temp_func.html">mk_simanneal_temp_func</a></span><span class="op">(</span>T0 <span class="op">=</span> <span class="fl">100</span>, alpha <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">150</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (34.519) - OK</span></span>
+<span><span class="co">#&gt; ... (28.097) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
 <span><span class="co">#&gt; Achieved score: 73.03 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 69.03 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 61.03 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 61.03 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 55.03 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 49.03 at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: 49.03 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 43.03 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 33.03 at iteration 10</span></span>
-<span><span class="co">#&gt; Achieved score: 23.03 at iteration 11</span></span>
-<span><span class="co">#&gt; Achieved score: 23.03 at iteration 12</span></span>
-<span><span class="co">#&gt; Achieved score: 23.03 at iteration 14</span></span>
-<span><span class="co">#&gt; Achieved score: 21.03 at iteration 15</span></span>
-<span><span class="co">#&gt; Achieved score: 21.03 at iteration 17</span></span>
-<span><span class="co">#&gt; Achieved score: 19.03 at iteration 18</span></span>
-<span><span class="co">#&gt; Achieved score: 17.03 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 17.03 at iteration 28</span></span>
-<span><span class="co">#&gt; Achieved score: 17.03 at iteration 35</span></span>
-<span><span class="co">#&gt; Achieved score: 13.03 at iteration 37</span></span>
-<span><span class="co">#&gt; Achieved score: 11.03 at iteration 42</span></span>
-<span><span class="co">#&gt; Achieved score: 10.925 at iteration 45</span></span>
-<span><span class="co">#&gt; Achieved score: 9.346 at iteration 60</span></span>
-<span><span class="co">#&gt; Achieved score: 7.346 at iteration 62</span></span>
-<span><span class="co">#&gt; Achieved score: 5.452 at iteration 86</span></span>
-<span><span class="co">#&gt; Achieved score: 3.873 at iteration 140</span></span>
+<span><span class="co">#&gt; Achieved score: 67.03 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 64.925 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 64.925 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 52.925 at iteration 5</span></span>
+<span><span class="co">#&gt; Achieved score: 52.925 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 52.925 at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: 52.925 at iteration 9</span></span>
+<span><span class="co">#&gt; Achieved score: 50.925 at iteration 10</span></span>
+<span><span class="co">#&gt; Achieved score: 48.925 at iteration 11</span></span>
+<span><span class="co">#&gt; Achieved score: 49.346 at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: 41.346 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 39.346 at iteration 15</span></span>
+<span><span class="co">#&gt; Achieved score: 39.346 at iteration 17</span></span>
+<span><span class="co">#&gt; Achieved score: 39.346 at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: 39.346 at iteration 21</span></span>
+<span><span class="co">#&gt; Achieved score: 39.346 at iteration 22</span></span>
+<span><span class="co">#&gt; Achieved score: 35.346 at iteration 23</span></span>
+<span><span class="co">#&gt; Achieved score: 33.346 at iteration 25</span></span>
+<span><span class="co">#&gt; Achieved score: 25.346 at iteration 29</span></span>
+<span><span class="co">#&gt; Achieved score: 25.241 at iteration 30</span></span>
+<span><span class="co">#&gt; Achieved score: 23.662 at iteration 31</span></span>
+<span><span class="co">#&gt; Achieved score: 21.662 at iteration 34</span></span>
+<span><span class="co">#&gt; Achieved score: 17.662 at iteration 40</span></span>
+<span><span class="co">#&gt; Achieved score: 15.662 at iteration 43</span></span>
+<span><span class="co">#&gt; Achieved score: 12.083 at iteration 45</span></span>
+<span><span class="co">#&gt; Achieved score: 11.978 at iteration 63</span></span>
+<span><span class="co">#&gt; Achieved score: 9.978 at iteration 65</span></span>
+<span><span class="co">#&gt; Achieved score: 9.557 at iteration 74</span></span>
+<span><span class="co">#&gt; Achieved score: 7.978 at iteration 97</span></span>
+<span><span class="co">#&gt; Achieved score: 6.399 at iteration 139</span></span>
+<span><span class="co">#&gt; Achieved score: 4.504 at iteration 145</span></span>
 <span></span>
-<span><span class="va">trace8</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bc8</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
 </div>
 <div class="section level2">
@@ -1170,16 +1159,15 @@ specific case.</p>
 <p>The following example puts together all possible options to
 illustrate the flexibility of the optimization.</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">n_shuffle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">n_shuffle</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">200</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">bc9</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span>, <span class="st">"Time"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Treatment"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"batch"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Time"</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="va">n_shuffle</span>,</span>
 <span>  aggregate_scores_func <span class="op">=</span> <span class="va">sum_scores</span>,</span>
 <span>  acceptance_func <span class="op">=</span> <span class="fu"><a href="../reference/mk_simanneal_acceptance_func.html">mk_simanneal_acceptance_func</a></span><span class="op">(</span><span class="fu"><a href="../reference/mk_simanneal_temp_func.html">mk_simanneal_temp_func</a></span><span class="op">(</span>T0 <span class="op">=</span> <span class="fl">500</span>, alpha <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -1196,31 +1184,51 @@ illustrate the flexibility of the optimization.</p>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 3-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (24.506, 52.938, 67.784) - OK</span></span>
+<span><span class="co">#&gt; ... (24.627, 69.642, 140.314) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 3-dim. score vector. (100 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(5.079, 2.547, 3.612)</span></span>
-<span><span class="co">#&gt;    Aggregated: 11.238</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.084, 2.547, 2.882) at iteration 1</span></span>
-<span><span class="co">#&gt;    Aggregated: 9.513</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.143, 1.774, 2.721) at iteration 2</span></span>
-<span><span class="co">#&gt;    Aggregated: 7.638</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.081, 0.995, 2.004) at iteration 3</span></span>
-<span><span class="co">#&gt;    Aggregated: 5.08</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.17, 1.726, 1.54) at iteration 4</span></span>
-<span><span class="co">#&gt;    Aggregated: 5.437</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.376, 1.541, -0.098) at iteration 5</span></span>
-<span><span class="co">#&gt;    Aggregated: 2.818</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.376, 1.541, -0.098) at iteration 6</span></span>
-<span><span class="co">#&gt;    Aggregated: 2.818</span></span>
-<span><span class="co">#&gt; Reached min delta in 6 iterations.</span></span>
+<span><span class="co">#&gt; Initial score: c(7.87, 4.222, 4.38)</span></span>
+<span><span class="co">#&gt;    Aggregated: 16.472</span></span>
+<span><span class="co">#&gt; Achieved score: c(5.642, 2.514, 3.88) at iteration 1</span></span>
+<span><span class="co">#&gt;    Aggregated: 12.037</span></span>
+<span><span class="co">#&gt; Achieved score: c(4.182, 3.089, 2.695) at iteration 2</span></span>
+<span><span class="co">#&gt;    Aggregated: 9.967</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.528, 0.725, 0.922) at iteration 3</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.175</span></span>
+<span><span class="co">#&gt; Achieved score: c(2.243, 0.762, 0.922) at iteration 4</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.926</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.769, -1.025, -0.52) at iteration 5</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.777</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.047, -1.778, -0.52) at iteration 7</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.345</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.806, -2.397, -0.896) at iteration 8</span></span>
+<span><span class="co">#&gt;    Aggregated: -5.1</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.231, -1.879, -1.396) at iteration 9</span></span>
+<span><span class="co">#&gt;    Aggregated: -4.507</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.295, -1.477, -1.396) at iteration 10</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.168</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.204, -0.947, 0.443) at iteration 11</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.708</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.196, -0.966, -1.554) at iteration 12</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.325</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.593, -1.677, -1.03) at iteration 13</span></span>
+<span><span class="co">#&gt;    Aggregated: -4.299</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.11, -2.064, -1.03) at iteration 14</span></span>
+<span><span class="co">#&gt;    Aggregated: -5.203</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.593, -0.165, -0.391) at iteration 19</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.149</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.11, -0.908, -0.33) at iteration 21</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.349</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.11, -0.908, -0.33) at iteration 23</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.349</span></span>
+<span><span class="co">#&gt; Reached min delta in 23 iterations.</span></span>
 <span></span>
-<span><span class="va">trace</span><span class="op">$</span><span class="fu">plot</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bc9</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc9</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>

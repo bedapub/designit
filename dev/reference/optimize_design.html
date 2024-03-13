@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -93,6 +93,7 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">optimize_design</span><span class="op">(</span></span>
 <span>  <span class="va">batch_container</span>,</span>
 <span>  samples <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  shuffle_proposal_func <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  acceptance_func <span class="op">=</span> <span class="va">accept_strict_improvement</span>,</span>
@@ -119,9 +120,13 @@
 Should be <code>NULL</code> if the <code>BatchContainer</code> already has samples in it.</p></dd>
 
 
+<dt>scoring</dt>
+<dd><p>Scoring function or a named <code><a href="https://rdrr.io/r/base/list.html" class="external-link">list()</a></code> of scoring functions.</p></dd>
+
+
 <dt>n_shuffle</dt>
 <dd><p>Vector of length 1 or larger, defining how many random sample
-swaps should be performed in each iteration. If length(n_shuffle)==1,
+swaps should be performed in each iteration. If <code>length(n_shuffle)==1</code>,
 this sets no limit to the number of iterations. Otherwise, the optimization
 stops if the swapping protocol is exhausted.</p></dd>
 
@@ -205,8 +210,10 @@ from current best and previously best solution) drops below min_delta.</p></dd>
 <span class="r-in"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plate"</span> <span class="op">=</span> <span class="fl">2</span>, <span class="st">"column"</span> <span class="op">=</span> <span class="fl">5</span>, <span class="st">"row"</span> <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plate"</span>, <span class="st">"Sex"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">optimize_design</span><span class="op">(</span><span class="va">bc</span>, <span class="va">invivo_study_samples</span>, max_iter <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu">optimize_design</span><span class="op">(</span><span class="va">bc</span>, <span class="va">invivo_study_samples</span>,</span></span>
+<span class="r-in"><span>  scoring <span class="op">=</span> <span class="fu"><a href="osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plate"</span>, <span class="st">"Sex"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  max_iter <span class="op">=</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>NAs in features / batch columns; they will be excluded from scoring</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Checking variances of 1-dim. score vector.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ... (141.154) - OK</span>
@@ -218,9 +225,6 @@ from current best and previously best solution) drops below min_delta.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 12.5 at iteration 15</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 2.5 at iteration 16</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 0.5 at iteration 31</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Optimization trace (101 score values, elapsed 1.236129 secs).</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Starting score: 182.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Final score   : 0.5</span>
 <span class="r-in"><span><span class="fu"><a href="plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span>, .col <span class="op">=</span> <span class="va">Sex</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="optimize_design-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

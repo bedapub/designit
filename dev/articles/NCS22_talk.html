@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -129,22 +129,38 @@ Siebourg-Polster, Iakov Davydov, Guido Steiner, Balazs Banfai</h4>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>Examples in this vignette are used in a talk at NCS22.</p>
+<p>Examples in this vignette are used were used in our presentation.</p>
 <p>It uses a subset of the <code>longitudinal_subject_samples</code>
 dataset.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"longitudinal_subject_samples"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">longitudinal_subject_samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="va">Week</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">longitudinal_subject_samples</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Group</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">5</span>, <span class="va">Week</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">SampleID</span>, <span class="va">SubjectID</span>, <span class="va">Group</span>, <span class="va">Sex</span>, <span class="va">Week</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># for simplicity: remove two subjects that don't have both visits  </span></span>
-<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">dat</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">SubjectID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="op">(</span><span class="va">dat</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">SubjectID</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="va">.</span><span class="op">$</span><span class="va">SubjectID</span><span class="op">)</span><span class="op">)</span> </span>
+<span><span class="co"># for simplicity: remove two subjects that don't have both visits</span></span>
+<span><span class="va">dat</span> <span class="op">&lt;-</span> <span class="va">dat</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">SubjectID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span></span>
+<span>    <span class="op">(</span><span class="va">dat</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">SubjectID</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">n</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">SubjectID</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">subject_data</span> <span class="op">&lt;-</span> <span class="va">dat</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">SubjectID</span>, <span class="va">Group</span>, <span class="va">Sex</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">subject_data</span> <span class="op">&lt;-</span> <span class="va">dat</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">SubjectID</span>, <span class="va">Group</span>, <span class="va">Sex</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="batch-effects-matter">Batch effects matter<a class="anchor" aria-label="anchor" href="#batch-effects-matter"></a>
+</h3>
+<p>Here’s an example of plate effect. Here both top and bottom rows of
+the plate are used as controls.</p>
+<p>This is the experiment design:</p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-2-1.png" width="384"></p>
+<p>These are the readouts:</p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-3-1.png" width="384"></p>
+<p>Due to the plate effect, the control rows are affected differently.
+It is virtually impossible to normalize readouts in a meaningful
+way.</p>
+</div>
 <div class="section level3">
 <h3 id="go-fully-random">Go fully random?<a class="anchor" aria-label="anchor" href="#go-fully-random"></a>
 </h3>
@@ -161,7 +177,7 @@ layout</li>
 </ul>
 <p>Gone wrong: Random distribution of 31 grouped subjects into 3 batches
 turns out unbalanced:</p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-3-1.png" width="288"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-5-1.png" width="288"></p>
 <p>“<strong>Block</strong> what you can and <strong>randomize</strong>
 what you cannot.” (G. Box, 1978)</p>
 </div>
@@ -220,32 +236,33 @@ constrained layouts.</p>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"batch"</span> <span class="op">=</span> <span class="fl">3</span>, <span class="st">"location"</span> <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>,</span>
-<span><span class="op">)</span></span>
-<span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  group <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span>batch_vars <span class="op">=</span> <span class="st">"batch"</span>, </span>
-<span>                               feature_vars <span class="op">=</span> <span class="st">"Group"</span><span class="op">)</span>,</span>
-<span>  sex <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span>batch_vars <span class="op">=</span> <span class="st">"batch"</span>, </span>
-<span>                             feature_vars <span class="op">=</span> <span class="st">"Sex"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">subject_data</span><span class="op">)</span></span></code></pre></div>
+<span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"batch"</span> <span class="op">=</span> <span class="fl">3</span>, <span class="st">"location"</span> <span class="op">=</span> <span class="fl">11</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">subject_data</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Batch composition before optimization</strong></p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-6-1.png" width="528"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-8-1.png" width="528"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; Warning: There was 1 warning in `mutate()`.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> In argument: `across(, as.character)`.</span></span>
-<span><span class="co">#&gt; Caused by warning:</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Using `across()` without supplying `.cols` was deprecated in dplyr 1.1.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please supply `.cols` instead.</span></span></code></pre>
 <div id="dezuqsvkwv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+<style>#dezuqsvkwv table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#dezuqsvkwv thead, #dezuqsvkwv tbody, #dezuqsvkwv tfoot, #dezuqsvkwv tr, #dezuqsvkwv td, #dezuqsvkwv th {
+  border-style: none;
+}
+
+#dezuqsvkwv p {
+  margin: 0;
+  padding: 0;
 }
 
 #dezuqsvkwv .gt_table {
   display: table;
   border-collapse: collapse;
+  line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
@@ -266,18 +283,6 @@ constrained layouts.</p>
   border-left-style: none;
   border-left-width: 2px;
   border-left-color: #D3D3D3;
-}
-
-#dezuqsvkwv .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
 }
 
 #dezuqsvkwv .gt_caption {
@@ -301,12 +306,24 @@ constrained layouts.</p>
   color: #333333;
   font-size: 85%;
   font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
+  padding-top: 3px;
+  padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
+}
+
+#dezuqsvkwv .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
 }
 
 #dezuqsvkwv .gt_bottom_border {
@@ -380,6 +397,10 @@ constrained layouts.</p>
   overflow-x: hidden;
   display: inline-block;
   width: 100%;
+}
+
+#dezuqsvkwv .gt_spanner_row {
+  border-bottom-style: hidden;
 }
 
 #dezuqsvkwv .gt_group_heading {
@@ -481,6 +502,10 @@ constrained layouts.</p>
   border-top-width: 2px;
 }
 
+#dezuqsvkwv .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
 #dezuqsvkwv .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
@@ -530,6 +555,16 @@ constrained layouts.</p>
   border-top-color: #D3D3D3;
 }
 
+#dezuqsvkwv .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
 #dezuqsvkwv .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
@@ -560,8 +595,8 @@ constrained layouts.</p>
 #dezuqsvkwv .gt_footnote {
   margin: 0px;
   font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
@@ -618,10 +653,9 @@ constrained layouts.</p>
 }
 
 #dezuqsvkwv .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
+  position: initial;
 }
 
 #dezuqsvkwv .gt_asterisk {
@@ -649,8 +683,8 @@ constrained layouts.</p>
   text-indent: 25px;
 }
 </style>
-<table class="table gt_table">
-<thead class="gt_col_headings"><tr>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings">
 <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="batch">batch</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="location">location</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="SubjectID">SubjectID</th>
@@ -723,25 +757,47 @@ constrained layouts.</p>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">trace</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    group <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
+<span>      batch_vars <span class="op">=</span> <span class="st">"batch"</span>,</span>
+<span>      feature_vars <span class="op">=</span> <span class="st">"Group"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    sex <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
+<span>      batch_vars <span class="op">=</span> <span class="st">"batch"</span>,</span>
+<span>      feature_vars <span class="op">=</span> <span class="st">"Sex"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  acceptance_func <span class="op">=</span> </span>
+<span>  acceptance_func <span class="op">=</span></span>
 <span>    <span class="op">~</span> <span class="fu"><a href="../reference/accept_leftmost_improvement.html">accept_leftmost_improvement</a></span><span class="op">(</span><span class="va">...</span>, tolerance <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>,</span>
 <span>  max_iter <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><strong>Batch composition after optimization</strong></p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-10-1.png" width="768"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-12-1.png" width="768"></p>
 <div id="wbihlbdwyr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>html {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', 'Fira Sans', 'Droid Sans', Arial, sans-serif;
+<style>#wbihlbdwyr table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#wbihlbdwyr thead, #wbihlbdwyr tbody, #wbihlbdwyr tfoot, #wbihlbdwyr tr, #wbihlbdwyr td, #wbihlbdwyr th {
+  border-style: none;
+}
+
+#wbihlbdwyr p {
+  margin: 0;
+  padding: 0;
 }
 
 #wbihlbdwyr .gt_table {
   display: table;
   border-collapse: collapse;
+  line-height: normal;
   margin-left: auto;
   margin-right: auto;
   color: #333333;
@@ -762,18 +818,6 @@ constrained layouts.</p>
   border-left-style: none;
   border-left-width: 2px;
   border-left-color: #D3D3D3;
-}
-
-#wbihlbdwyr .gt_heading {
-  background-color: #FFFFFF;
-  text-align: center;
-  border-bottom-color: #FFFFFF;
-  border-left-style: none;
-  border-left-width: 1px;
-  border-left-color: #D3D3D3;
-  border-right-style: none;
-  border-right-width: 1px;
-  border-right-color: #D3D3D3;
 }
 
 #wbihlbdwyr .gt_caption {
@@ -797,12 +841,24 @@ constrained layouts.</p>
   color: #333333;
   font-size: 85%;
   font-weight: initial;
-  padding-top: 0;
-  padding-bottom: 6px;
+  padding-top: 3px;
+  padding-bottom: 5px;
   padding-left: 5px;
   padding-right: 5px;
   border-top-color: #FFFFFF;
   border-top-width: 0;
+}
+
+#wbihlbdwyr .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
 }
 
 #wbihlbdwyr .gt_bottom_border {
@@ -876,6 +932,10 @@ constrained layouts.</p>
   overflow-x: hidden;
   display: inline-block;
   width: 100%;
+}
+
+#wbihlbdwyr .gt_spanner_row {
+  border-bottom-style: hidden;
 }
 
 #wbihlbdwyr .gt_group_heading {
@@ -977,6 +1037,10 @@ constrained layouts.</p>
   border-top-width: 2px;
 }
 
+#wbihlbdwyr .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
 #wbihlbdwyr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
@@ -1026,6 +1090,16 @@ constrained layouts.</p>
   border-top-color: #D3D3D3;
 }
 
+#wbihlbdwyr .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
 #wbihlbdwyr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
@@ -1056,8 +1130,8 @@ constrained layouts.</p>
 #wbihlbdwyr .gt_footnote {
   margin: 0px;
   font-size: 90%;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding-top: 4px;
+  padding-bottom: 4px;
   padding-left: 5px;
   padding-right: 5px;
 }
@@ -1114,10 +1188,9 @@ constrained layouts.</p>
 }
 
 #wbihlbdwyr .gt_footnote_marks {
-  font-style: italic;
-  font-weight: normal;
   font-size: 75%;
   vertical-align: 0.4em;
+  position: initial;
 }
 
 #wbihlbdwyr .gt_asterisk {
@@ -1145,8 +1218,8 @@ constrained layouts.</p>
   text-indent: 25px;
 }
 </style>
-<table class="table gt_table">
-<thead class="gt_col_headings"><tr>
+<table class="table gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+<thead><tr class="gt_col_headings">
 <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="batch">batch</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="location">location</th>
       <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="SubjectID">SubjectID</th>
@@ -1238,47 +1311,91 @@ effect computationally.</p>
 </ul>
 </li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span> <span class="co">#1 #2</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
-<span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"plate"</span> <span class="op">=</span> <span class="fl">3</span>, <span class="st">"row"</span> <span class="op">=</span> <span class="fl">4</span>, <span class="st">"col"</span> <span class="op">=</span> <span class="fl">6</span><span class="op">)</span>,</span>
+<span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"plate"</span> <span class="op">=</span> <span class="fl">3</span>, <span class="st">"row"</span> <span class="op">=</span> <span class="fl">4</span>, <span class="st">"col"</span> <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span><span class="va">dat</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span>,</span>
+<span>  plate <span class="op">=</span> <span class="va">plate</span>, row <span class="op">=</span> <span class="va">row</span>, column <span class="op">=</span> <span class="va">col</span>,</span>
+<span>  .color <span class="op">=</span> <span class="va">Group</span>, title <span class="op">=</span> <span class="st">"Initial layout by Group"</span></span>
 <span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">dat</span><span class="op">)</span></span>
-<span><span class="co">#assign_in_order(bc, dat)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span>, plate <span class="op">=</span> <span class="va">plate</span>, row <span class="op">=</span> <span class="va">row</span>, column <span class="op">=</span> <span class="va">col</span>,</span>
-<span>           .color <span class="op">=</span> <span class="va">Group</span>, title <span class="op">=</span> <span class="st">"Initial layout by Group"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span>, plate <span class="op">=</span> <span class="va">plate</span>, row <span class="op">=</span> <span class="va">row</span>, column <span class="op">=</span> <span class="va">col</span>, </span>
-<span>           .color <span class="op">=</span> <span class="va">Sex</span>, title <span class="op">=</span> <span class="st">"Initial layout by Sex"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-14-1.png" width="480"></p>
-<p><strong>2-step optimization</strong>
-<code>multi_plate_layout()</code></p>
-<ul>
-<li>Across plate optimization using osat score as before</li>
-<li>Within plate optimization using distance based sample scoring
-function</li>
-</ul>
+<span><span class="fu"><a href="../reference/plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span>,</span>
+<span>  plate <span class="op">=</span> <span class="va">plate</span>, row <span class="op">=</span> <span class="va">row</span>, column <span class="op">=</span> <span class="va">col</span>,</span>
+<span>  .color <span class="op">=</span> <span class="va">Sex</span>, title <span class="op">=</span> <span class="st">"Initial layout by Sex"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-16-1.png" width="480"></p>
 </div>
 <div class="section level3">
-<h3 id="spatial-arrangement">Spatial arrangement<a class="anchor" aria-label="anchor" href="#spatial-arrangement"></a>
+<h3 id="step-optimization">2-step optimization<a class="anchor" aria-label="anchor" href="#step-optimization"></a>
 </h3>
+<div class="section level4">
+<h4 id="across-plate-optimization-using-osat-score-as-before">Across plate optimization using osat score as before<a class="anchor" aria-label="anchor" href="#across-plate-optimization-using-osat-score-as-before"></a>
+</h4>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bc1</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    group <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
+<span>      batch_vars <span class="op">=</span> <span class="st">"plate"</span>,</span>
+<span>      feature_vars <span class="op">=</span> <span class="st">"Group"</span></span>
+<span>    <span class="op">)</span>,</span>
+<span>    sex <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
+<span>      batch_vars <span class="op">=</span> <span class="st">"plate"</span>,</span>
+<span>      feature_vars <span class="op">=</span> <span class="st">"Sex"</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  n_shuffle <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  acceptance_func <span class="op">=</span></span>
+<span>    <span class="op">~</span> <span class="fu"><a href="../reference/accept_leftmost_improvement.html">accept_leftmost_improvement</a></span><span class="op">(</span><span class="va">...</span>, tolerance <span class="op">=</span> <span class="fl">0.01</span><span class="op">)</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-18-1.png" width="480"></p>
+</div>
+<div class="section level4">
+<h4 id="within-plate-optimization-using-distance-based-sample-scoring-function">Within plate optimization using distance based sample scoring
+function<a class="anchor" aria-label="anchor" href="#within-plate-optimization-using-distance-based-sample-scoring-function"></a>
+</h4>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">traces</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_multi_plate_design.html">optimize_multi_plate_design</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">bc2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span>  <span class="va">bc1</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="../reference/mk_plate_scoring_functions.html">mk_plate_scoring_functions</a></span><span class="op">(</span></span>
+<span>    <span class="va">bc1</span>,</span>
+<span>    plate <span class="op">=</span> <span class="st">"plate"</span>, row <span class="op">=</span> <span class="st">"row"</span>, column <span class="op">=</span> <span class="st">"col"</span>,</span>
+<span>    group <span class="op">=</span> <span class="st">"Group"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  shuffle_proposal_func <span class="op">=</span> <span class="fu"><a href="../reference/shuffle_with_constraints.html">shuffle_with_constraints</a></span><span class="op">(</span>dst <span class="op">=</span> <span class="va">plate</span> <span class="op">==</span> <span class="va">.src</span><span class="op">$</span><span class="va">plate</span><span class="op">)</span>,</span>
+<span>  max_iter <span class="op">=</span> <span class="fl">150</span>,</span>
+<span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-20-1.png" width="480"></p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="step-optimization-multi_plate_layout">2-step optimization <code>multi_plate_layout()</code><a class="anchor" aria-label="anchor" href="#step-optimization-multi_plate_layout"></a>
+</h3>
+<p>We are performing the same optimization as before, but using the
+<code>multi_plate_layout()</code> function to combine the two steps.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_multi_plate_design.html">optimize_multi_plate_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
 <span>  across_plates_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Group"</span>, <span class="st">"Sex"</span><span class="op">)</span>,</span>
 <span>  within_plate_variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Group"</span><span class="op">)</span>,</span>
 <span>  plate <span class="op">=</span> <span class="st">"plate"</span>, row <span class="op">=</span> <span class="st">"row"</span>, column <span class="op">=</span> <span class="st">"col"</span>,</span>
 <span>  n_shuffle <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>  max_iter <span class="op">=</span> <span class="fl">500</span> <span class="co">#2000</span></span>
+<span>  max_iter <span class="op">=</span> <span class="fl">500</span> <span class="co"># 2000</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; 1 ... 2 ... 3 ...</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-16-1.png" width="480"></p>
-<pre><code><span><span class="co">#&gt; $osat_across_plates</span></span></code></pre>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-17-1.png" width="288"></p>
-<pre><code><span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; $within_plate_1</span></span></code></pre>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-17-2.png" width="288"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-22-1.png" width="480"></p>
+<pre><code><span><span class="co">#&gt; Warning: Removed 4509 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_line()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 4509 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-23-1.png" width="480"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1328,7 +1445,7 @@ plates.</li>
 <li>Fabian Birzele</li>
 <li>PMDA group for feedback?</li>
 </ul>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-18-1.png" width="384"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-24-1.png" width="384"></p>
 </div>
   </div>
 

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -95,6 +95,14 @@
     <p>A typical workflow starts with creating a <code>BatchContainer</code>. Then
 samples can be assigned to locations in that container.</p>
     </div>
+    <div id="public-fields">
+    <h2>Public fields</h2>
+    <p></p><div class="r6-fields"><dl><dt><code>trace</code></dt>
+<dd><p>Optimization trace, a <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble()</a></code></p></dd>
+
+
+</dl><p></p></div>
+    </div>
     <div id="active-bindings">
     <h2>Active bindings</h2>
     <p></p><div class="r6-active-bindings"><dl><dt><code>scoring_f</code></dt>
@@ -158,6 +166,8 @@ When assigning data.frame should not have column named .sample_id column.</p></d
 <li><p><a href="#method-BatchContainer-score"><code>BatchContainer$score()</code></a></p></li>
 <li><p><a href="#method-BatchContainer-copy"><code>BatchContainer$copy()</code></a></p></li>
 <li><p><a href="#method-BatchContainer-print"><code>BatchContainer$print()</code></a></p></li>
+<li><p><a href="#method-BatchContainer-scores_table"><code>BatchContainer$scores_table()</code></a></p></li>
+<li><p><a href="#method-BatchContainer-plot_trace"><code>BatchContainer$plot_trace()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-BatchContainer-new"></a><div class="section">
 <h3 id="method-new-">Method <code><a href="https://rdrr.io/r/methods/new.html" class="external-link">new()</a></code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
 <p>Create a new BatchContainer object.</p><div class="section">
@@ -233,8 +243,8 @@ from the result tibble.</p></dd>
 
 <dt><code>as_tibble</code></dt>
 <dd><p>Return <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></code>.
-If <code>FALSE</code> returns <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code>. This should have
-lower overhead, as internally there is a cached <code><a href="https://Rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code>.</p></dd>
+If <code>FALSE</code> returns <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code>. This should have
+lower overhead, as internally there is a cached <code><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></code>.</p></dd>
 
 
 </dl><p></p></div>
@@ -291,12 +301,21 @@ The length of the vector should match the number of locations,
 <h3 id="method-score-">Method <code>score()</code><a class="anchor" aria-label="anchor" href="#method-score-"></a></h3>
 <p>Score current sample assignment,</p><div class="section">
 <h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
-<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BatchContainer</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span></code></pre></div><p></p></div>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BatchContainer</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>scoring</code></dt>
+<dd><p>a function or a names list of scoring functions.
+Each function should return a numeric vector.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
 <h4 id="returns-3">Returns<a class="anchor" aria-label="anchor" href="#returns-3"></a></h4>
-<p>Returns a vector of all scoring functions values.</p>
+<p>Returns a named vector of all scoring functions values.</p>
 </div>
 
 </div><p></p><hr><a id="method-BatchContainer-copy"></a><div class="section">
@@ -319,19 +338,71 @@ The length of the vector should match the number of locations,
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>...</code></dt>
-<dd><p>not used.
+<dd><p>not used.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+
+</div><p></p><hr><a id="method-BatchContainer-scores_table"></a><div class="section">
+<h3 id="method-scores-table-">Method <code>scores_table()</code><a class="anchor" aria-label="anchor" href="#method-scores-table-"></a></h3>
+<p>Return a table with scores from an optimization.</p><div class="section">
+<h4 id="usage-7">Usage<a class="anchor" aria-label="anchor" href="#usage-7"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BatchContainer</span><span class="op">$</span><span class="fu">scores_table</span><span class="op">(</span>index <span class="op">=</span> <span class="cn">NULL</span>, include_aggregated <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-5">Arguments<a class="anchor" aria-label="anchor" href="#arguments-5"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>index</code></dt>
+<dd><p>optimization index, all by default</p></dd>
+
+
+<dt><code>include_aggregated</code></dt>
+<dd><p>include aggregated scores</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-5">Returns<a class="anchor" aria-label="anchor" href="#returns-5"></a></h4>
+<p>a <code><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble::tibble()</a></code> with scores</p>
+</div>
+
+</div><p></p><hr><a id="method-BatchContainer-plot_trace"></a><div class="section">
+<h3 id="method-plot-trace-">Method <code>plot_trace()</code><a class="anchor" aria-label="anchor" href="#method-plot-trace-"></a></h3>
+<p>Plot trace</p><div class="section">
+<h4 id="usage-8">Usage<a class="anchor" aria-label="anchor" href="#usage-8"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">BatchContainer</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span>index <span class="op">=</span> <span class="cn">NULL</span>, include_aggregated <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-6">Arguments<a class="anchor" aria-label="anchor" href="#arguments-6"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>index</code></dt>
+<dd><p>optimization index, all by default</p></dd>
+
+
+<dt><code>include_aggregated</code></dt>
+<dd><p>include aggregated scores</p></dd>
+
+
+<dt><code>...</code></dt>
+<dd><p>not used.</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-6">Returns<a class="anchor" aria-label="anchor" href="#returns-6"></a></h4>
+<p>a <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot2::ggplot()</a></code> object
 List of scoring functions.
 Tibble with batch container locations.
 Tibble with sample information and sample ids.
 Sample attributes, a data.table.
 Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
-Validate sample assignment.</p></dd>
-
-
-</dl><p></p></div>
+Validate sample assignment.</p>
 </div>
 
 </div>

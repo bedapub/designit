@@ -20,7 +20,7 @@ If length(n_swaps)&amp;gt;1 and called without argument, the returned function m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -117,9 +117,9 @@ If <code>length(n_swaps)&gt;1</code> and called without argument, the returned f
 <span class="r-in"><span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span></span>
 <span class="r-in"><span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"plate"</span> <span class="op">=</span> <span class="fl">2</span>, <span class="st">"column"</span> <span class="op">=</span> <span class="fl">5</span>, <span class="st">"row"</span> <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plate"</span>, <span class="st">"Sex"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span><span class="st">"plate"</span>, <span class="st">"Sex"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="optimize_design.html">optimize_design</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">bc</span>, <span class="va">invivo_study_samples</span>,</span></span>
+<span class="r-in"><span>  <span class="va">bc</span>, scoring <span class="op">=</span> <span class="va">scoring_f</span>, <span class="va">invivo_study_samples</span>,</span></span>
 <span class="r-in"><span>  max_iter <span class="op">=</span> <span class="fl">100</span>,</span></span>
 <span class="r-in"><span>  shuffle_proposal_func <span class="op">=</span> <span class="fu">mk_swapping_function</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
@@ -134,9 +134,8 @@ If <code>length(n_swaps)&gt;1</code> and called without argument, the returned f
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 12.5 at iteration 24</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 2.5 at iteration 26</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Achieved score: 0.5 at iteration 36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Optimization trace (101 score values, elapsed 1.230023 secs).</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Starting score: 182.5</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Final score   : 0.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Batch container with 60 locations and 59 samples (assigned).</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Dimensions: plate, column, row</span>
 </code></pre></div>
     </div>
   </div>

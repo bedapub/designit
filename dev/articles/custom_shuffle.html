@@ -41,7 +41,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.0.9000</span>
+        <span class="version label label-danger" data-toggle="tooltip" data-placement="bottom" title="In-development version">0.4.1.9000</span>
       </span>
     </div>
 
@@ -127,11 +127,11 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Attaching core tidyverse packages</span> ──────────────────────── tidyverse 2.0.0 ──</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.4</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.4.1     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.2     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.1     </span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">dplyr    </span> 1.1.4     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">readr    </span> 2.1.5</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">forcats  </span> 1.0.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">stringr  </span> 1.5.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">ggplot2  </span> 3.5.0     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tibble   </span> 3.2.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">lubridate</span> 1.9.3     <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">tidyr    </span> 1.3.1</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> <span style="color: #0000BB;">purrr    </span> 1.0.2     </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Conflicts</span> ────────────────────────────────────────── tidyverse_conflicts() ──</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">filter()</span> masks <span style="color: #0000BB;">stats</span>::filter()</span></span>
 <span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> <span style="color: #0000BB;">dplyr</span>::<span style="color: #00BB00;">lag()</span>    masks <span style="color: #0000BB;">stats</span>::lag()</span></span>
@@ -152,7 +152,7 @@ cage</li>
 <span>  group <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"treatment"</span>, <span class="st">"control"</span><span class="op">)</span>, <span class="va">params</span><span class="op">$</span><span class="va">n_samples</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  weight <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">n_samples</span>, <span class="fl">20</span>, <span class="fl">30</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
-<span><span class="va">samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">samples</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 4</span></span></span>
 <span><span class="co">#&gt;      id sex   group     weight</span></span>
@@ -164,7 +164,7 @@ cage</li>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 F     treatment   24.3</span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span>     6 F     treatment   21.5</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">samples</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">#&gt;   sex       n</span></span>
@@ -179,8 +179,8 @@ limit the number of animals per cage.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cage"</span> <span class="op">=</span> <span class="fl">11</span>, <span class="st">"position"</span> <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">bc</span>, <span class="va">samples</span><span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">samples</span><span class="op">)</span></span>
 <span><span class="va">bc</span></span>
 <span><span class="co">#&gt; Batch container with 55 locations and 50 samples (assigned).</span></span>
 <span><span class="co">#&gt;   Dimensions: cage, position</span></span></code></pre></div>
@@ -188,15 +188,15 @@ limit the number of animals per cage.</p>
 treatment/control ratios.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">males_per_cage</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"M"</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">cage</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">sex</span> <span class="op">==</span> <span class="st">"M"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">cage</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">cage</span>, <span class="va">n</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">weight_d</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cage</span><span class="op">)</span>, <span class="va">weight</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_violin.html" class="external-link">geom_violin</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -204,7 +204,7 @@ treatment/control ratios.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">group_d</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cage</span><span class="op">)</span>, fill <span class="op">=</span> <span class="va">group</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"fill"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
@@ -213,10 +213,12 @@ treatment/control ratios.</p>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-6-1.png" width="576"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_ydensity()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values (`stat_summary()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_summary()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-6-2.png" width="576"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
@@ -227,15 +229,14 @@ interactions are considered in the scoring function. We only use 10
 iterations, since shuffling is limited to locations with males and
 enforces change of cage on every iteration.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
-<span>  <span class="st">"cage"</span>,</span>
-<span>  <span class="st">"sex"</span></span>
-<span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
+<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span></span>
 <span>  <span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="fu"><a href="../reference/osat_score_generator.html">osat_score_generator</a></span><span class="op">(</span></span>
+<span>    <span class="st">"cage"</span>,</span>
+<span>    <span class="st">"sex"</span></span>
+<span>  <span class="op">)</span>,</span>
 <span>  shuffle_proposal_func <span class="op">=</span> <span class="fu"><a href="../reference/shuffle_with_constraints.html">shuffle_with_constraints</a></span><span class="op">(</span></span>
 <span>    <span class="va">sex</span> <span class="op">==</span> <span class="st">"M"</span>,</span>
 <span>    <span class="va">cage</span> <span class="op">!=</span> <span class="va">.src</span><span class="op">$</span><span class="va">cage</span></span>
@@ -250,7 +251,7 @@ enforces change of cage on every iteration.</p>
 <span><span class="co">#&gt; Achieved score: 11.818 at iteration 1</span></span>
 <span><span class="co">#&gt; Achieved score: 9.818 at iteration 10</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-7-1.png" width="576">
 We expect the distribution of males become even, while other variables
 are not significantly affected.</p>
@@ -259,10 +260,12 @@ are not significantly affected.</p>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_ydensity()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values (`stat_summary()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_summary()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-2.png" width="576"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
@@ -274,7 +277,7 @@ also ensure that on every iteration the cage number is changed; we do
 this because <code>position</code> dimension does affect actual animal
 allocation.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span> <span class="op">{</span></span>
+<code class="sourceCode R"><span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">samples</span> <span class="op">&lt;-</span> <span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>include_id <span class="op">=</span> <span class="cn">TRUE</span>, as_tibble <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span>  <span class="va">avg_w</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">weight</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span></span>
 <span>  <span class="va">avg_w_per_cage</span> <span class="op">&lt;-</span> <span class="va">samples</span><span class="op">[</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">weight</span><span class="op">)</span>, by <span class="op">=</span> <span class="va">cage</span><span class="op">]</span><span class="op">$</span><span class="va">V1</span></span>
@@ -286,7 +289,8 @@ allocation.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">12</span><span class="op">)</span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">bc</span>,</span>
+<span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/optimize_design.html">optimize_design</a></span><span class="op">(</span><span class="va">bc</span>,</span>
+<span>  scoring <span class="op">=</span> <span class="va">scoring_f</span>,</span>
 <span>  shuffle_proposal <span class="op">=</span> <span class="fu"><a href="../reference/shuffle_with_constraints.html">shuffle_with_constraints</a></span><span class="op">(</span></span>
 <span>    <span class="va">sex</span> <span class="op">==</span> <span class="st">"F"</span>,</span>
 <span>    <span class="va">cage</span> <span class="op">!=</span> <span class="va">.src</span><span class="op">$</span><span class="va">cage</span> <span class="op">&amp;</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">sex</span><span class="op">)</span> <span class="op">|</span> <span class="va">sex</span> <span class="op">!=</span> <span class="st">"M"</span><span class="op">)</span></span>
@@ -323,10 +327,10 @@ allocation.</p>
 <span><span class="co">#&gt; Achieved score: 0.241 at iteration 184</span></span>
 <span><span class="co">#&gt; Achieved score: 0.241 at iteration 191</span></span>
 <span><span class="co">#&gt; Achieved score: 0.237 at iteration 196</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-9-1.png" width="576"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu">scoring_f</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.2370109</span></span></code></pre></div>
 <p>Now we have a much more even distribution of weights and
 treatment/control balance.</p>
@@ -335,10 +339,12 @@ treatment/control balance.</p>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-1.png" width="576"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
 <span><span class="co">#&gt; (`stat_ydensity()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite values (`stat_summary()`).</span></span>
-<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values (`geom_point()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
+<span><span class="co">#&gt; (`stat_summary()`).</span></span>
+<span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-2.png" width="576"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
