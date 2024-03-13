@@ -77,10 +77,12 @@ plot_plate(bc$get_samples(),
   .color = Treatment, .alpha = Timepoint
 )
 
+\donttest{
 plot_plate(bc$get_samples(),
   plate = plate, column = column, row = row,
   .color = Treatment, .pattern = Timepoint
 )
+}
 }
 \author{
 siebourj
