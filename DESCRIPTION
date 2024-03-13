@@ -34,15 +34,15 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0422-7977")),
     person(given = "F. Hoffman-La Roche", role = c("cph", "fnd")))
 Description:
-    This package provides a method for intelligently assigning samples to
-    batches in order to reduce batch effects. Batch effects can have a
-    significant impact on data analysis, especially when the assignment of
-    samples to batches coincides with the contrast groups being studied. By
-    defining a batch container and a scoring function that reflects the
-    contrasts, this package allows users to assign samples in a way that
-    minimizes the potential impact of batch effects on the comparison of
-    interest. Among other functionality, we provide an implementation for OSAT
-    score by Yan et al. (2012, <doi:10.1186/1471-2164-13-689>).
+    Intelligently assign samples to batches in order to reduce batch effects.
+    Batch effects can have a significant impact on data analysis, especially
+    when the assignment of samples to batches coincides with the contrast
+    groups being studied. By defining a batch container and a scoring function
+    that reflects the contrasts, this package allows users to assign samples in
+    a way that minimizes the potential impact of batch effects on the
+    comparison of interest. Among other functionality, we provide an
+    implementation for OSAT score by Yan et al. (2012,
+    <doi:10.1186/1471-2164-13-689>).
 License: MIT + file LICENSE
 URL: https://bedapub.github.io/designit/, https://github.com/BEDApub/designit/
 BugReports: https://github.com/BEDApub/designit/issues
