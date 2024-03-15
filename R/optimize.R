@@ -197,9 +197,16 @@ optimize_design <- function(batch_container, samples = NULL,
     start_assignment_vec = list(batch_container$assignment)
   )
 
-  # based on https://stat.ethz.ch/pipermail/r-help/2007-September/141717.html
-  if (!exists(".Random.seed")) stats::runif(1)
+  # saving the current random seed for reproducibility
+  if (!exists(".Random.seed", .GlobalEnv)) {
+    # sets the default random number generator and initialized
+    # .Random.seed in the global environment.
+    # this doesn't affect the way random seed would have been set in
+    # downstream functions such as `sample()`
+    do.call(RNGkind, as.list(RNGkind()))
+  }
   trace$seed <- list(.Random.seed)
+  trace$rng_kind <- list(RNGkind())
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
