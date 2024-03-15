@@ -199,10 +199,10 @@ optimize_design <- function(batch_container, samples = NULL,
 
   # saving the current random seed for reproducibility
   if (!exists(".Random.seed", .GlobalEnv)) {
-    # sets the default random number generator and initialized
+    # Sets the default random number generator and initializes
     # .Random.seed in the global environment.
-    # this doesn't affect the way random seed would have been set in
-    # downstream functions such as `sample()`
+    # This doesn't affect the way random seed would have been set in
+    # downstream functions such as `sample()`.
     do.call(RNGkind, as.list(RNGkind()))
   }
   trace$seed <- list(.Random.seed)
