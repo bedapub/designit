@@ -1,6 +1,6 @@
 # designit (development version)
 
-* remove magrittr, glue, checkmate, forcats, and tidyselect dependencies
+* remove magrittr, glue, checkmate, forcats, ineq, and tidyselect dependencies
 * minimum R version 4.1.0 (for the native pipe and lambda functions)
 * remove several unexported functions
 * BatchContainer trace saves the random seed as well as RNG kind
