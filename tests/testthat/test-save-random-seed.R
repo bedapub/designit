@@ -11,7 +11,13 @@ scoring_f <- function(...) rnorm(1)
 
 test_that("random seed is saved when no seed is set", {
   # unset random seed
-  rm(.Random.seed, envir = .GlobalEnv)
+  if (exists(".Random.seed")) {
+    random_seed <- .Random.seed
+    on.exit(.GlobalEnv$.Random.seed <- random_seed)
+    rm(.Random.seed, envir = .GlobalEnv)
+    testthat::expect_false(exists(".Random.seed"))
+  }
+  
   bc_opt <- optimize_design(
     bc,
     scoring = scoring_f,

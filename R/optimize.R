@@ -203,7 +203,7 @@ optimize_design <- function(batch_container, samples = NULL,
     # .Random.seed in the global environment.
     # This doesn't affect the way random seed would have been set in
     # downstream functions such as `sample()`.
-    do.call(RNGkind, as.list(RNGkind()))
+    set.seed(NULL)
   }
   trace$seed <- list(.Random.seed)
   trace$rng_kind <- list(RNGkind())
