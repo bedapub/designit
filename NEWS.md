@@ -1,3 +1,5 @@
+# designit (development version)
+
 # designit 0.5.0
 
 * remove magrittr, glue, checkmate, forcats, ineq, and tidyselect dependencies
