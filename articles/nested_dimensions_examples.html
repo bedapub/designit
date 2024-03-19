@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
       </span>
     </div>
 
@@ -143,26 +143,26 @@
 <p>Samples are grouped by Treatment and Collection time with the
 following group sizes:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="knvbsahuac" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#knvbsahuac table {
+<div id="pmqzkpvkho" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#pmqzkpvkho table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#knvbsahuac thead, #knvbsahuac tbody, #knvbsahuac tfoot, #knvbsahuac tr, #knvbsahuac td, #knvbsahuac th {
+#pmqzkpvkho thead, #pmqzkpvkho tbody, #pmqzkpvkho tfoot, #pmqzkpvkho tr, #pmqzkpvkho td, #pmqzkpvkho th {
   border-style: none;
 }
 
-#knvbsahuac p {
+#pmqzkpvkho p {
   margin: 0;
   padding: 0;
 }
 
-#knvbsahuac .gt_table {
+#pmqzkpvkho .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -188,12 +188,12 @@ following group sizes:</p>
   border-left-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_caption {
+#pmqzkpvkho .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#knvbsahuac .gt_title {
+#pmqzkpvkho .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -205,7 +205,7 @@ following group sizes:</p>
   border-bottom-width: 0;
 }
 
-#knvbsahuac .gt_subtitle {
+#pmqzkpvkho .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -217,7 +217,7 @@ following group sizes:</p>
   border-top-width: 0;
 }
 
-#knvbsahuac .gt_heading {
+#pmqzkpvkho .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -229,13 +229,13 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_bottom_border {
+#pmqzkpvkho .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_col_headings {
+#pmqzkpvkho .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -250,7 +250,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_col_heading {
+#pmqzkpvkho .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -270,7 +270,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#knvbsahuac .gt_column_spanner_outer {
+#pmqzkpvkho .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -282,15 +282,15 @@ following group sizes:</p>
   padding-right: 4px;
 }
 
-#knvbsahuac .gt_column_spanner_outer:first-child {
+#pmqzkpvkho .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#knvbsahuac .gt_column_spanner_outer:last-child {
+#pmqzkpvkho .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#knvbsahuac .gt_column_spanner {
+#pmqzkpvkho .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -302,11 +302,11 @@ following group sizes:</p>
   width: 100%;
 }
 
-#knvbsahuac .gt_spanner_row {
+#pmqzkpvkho .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#knvbsahuac .gt_group_heading {
+#pmqzkpvkho .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -332,7 +332,7 @@ following group sizes:</p>
   text-align: left;
 }
 
-#knvbsahuac .gt_empty_group_heading {
+#pmqzkpvkho .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -347,15 +347,15 @@ following group sizes:</p>
   vertical-align: middle;
 }
 
-#knvbsahuac .gt_from_md > :first-child {
+#pmqzkpvkho .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#knvbsahuac .gt_from_md > :last-child {
+#pmqzkpvkho .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#knvbsahuac .gt_row {
+#pmqzkpvkho .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -374,7 +374,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#knvbsahuac .gt_stub {
+#pmqzkpvkho .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -387,7 +387,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#knvbsahuac .gt_stub_row_group {
+#pmqzkpvkho .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -401,15 +401,15 @@ following group sizes:</p>
   vertical-align: top;
 }
 
-#knvbsahuac .gt_row_group_first td {
+#pmqzkpvkho .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#knvbsahuac .gt_row_group_first th {
+#pmqzkpvkho .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#knvbsahuac .gt_summary_row {
+#pmqzkpvkho .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -419,16 +419,16 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#knvbsahuac .gt_first_summary_row {
+#pmqzkpvkho .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_first_summary_row.thick {
+#pmqzkpvkho .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#knvbsahuac .gt_last_summary_row {
+#pmqzkpvkho .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -438,7 +438,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_grand_summary_row {
+#pmqzkpvkho .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -448,7 +448,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#knvbsahuac .gt_first_grand_summary_row {
+#pmqzkpvkho .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -458,7 +458,7 @@ following group sizes:</p>
   border-top-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_last_grand_summary_row_top {
+#pmqzkpvkho .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -468,11 +468,11 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_striped {
+#pmqzkpvkho .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#knvbsahuac .gt_table_body {
+#pmqzkpvkho .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -481,7 +481,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_footnotes {
+#pmqzkpvkho .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -495,7 +495,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_footnote {
+#pmqzkpvkho .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -504,7 +504,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#knvbsahuac .gt_sourcenotes {
+#pmqzkpvkho .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -518,7 +518,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#knvbsahuac .gt_sourcenote {
+#pmqzkpvkho .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -526,63 +526,63 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#knvbsahuac .gt_left {
+#pmqzkpvkho .gt_left {
   text-align: left;
 }
 
-#knvbsahuac .gt_center {
+#pmqzkpvkho .gt_center {
   text-align: center;
 }
 
-#knvbsahuac .gt_right {
+#pmqzkpvkho .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#knvbsahuac .gt_font_normal {
+#pmqzkpvkho .gt_font_normal {
   font-weight: normal;
 }
 
-#knvbsahuac .gt_font_bold {
+#pmqzkpvkho .gt_font_bold {
   font-weight: bold;
 }
 
-#knvbsahuac .gt_font_italic {
+#pmqzkpvkho .gt_font_italic {
   font-style: italic;
 }
 
-#knvbsahuac .gt_super {
+#pmqzkpvkho .gt_super {
   font-size: 65%;
 }
 
-#knvbsahuac .gt_footnote_marks {
+#pmqzkpvkho .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#knvbsahuac .gt_asterisk {
+#pmqzkpvkho .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#knvbsahuac .gt_indent_1 {
+#pmqzkpvkho .gt_indent_1 {
   text-indent: 5px;
 }
 
-#knvbsahuac .gt_indent_2 {
+#pmqzkpvkho .gt_indent_2 {
   text-indent: 10px;
 }
 
-#knvbsahuac .gt_indent_3 {
+#pmqzkpvkho .gt_indent_3 {
   text-indent: 15px;
 }
 
-#knvbsahuac .gt_indent_4 {
+#pmqzkpvkho .gt_indent_4 {
   text-indent: 20px;
 }
 
-#knvbsahuac .gt_indent_5 {
+#pmqzkpvkho .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -719,8 +719,8 @@ of iterations.</p>
 <h3 id="final-batch-layout">Final batch layout<a class="anchor" aria-label="anchor" href="#final-batch-layout"></a>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
@@ -780,8 +780,8 @@ of iterations.</p>
 <p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-8-1.png" width="576"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">bc2</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc2</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
@@ -840,8 +840,8 @@ and now only optimize <code>run</code> with constraint.</p>
 </h3>
 <p>This is not giving the expected mix of treatments across runs.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">run</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">run</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">batch</span><span class="op">)</span></span>
@@ -863,7 +863,7 @@ and now only optimize <code>run</code> with constraint.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Balazs Banfai.</p>
+<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Jitao David Zhang, Balazs Banfai.</p>
 </div>
 
 <div class="pkgdown">

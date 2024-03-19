@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">designit</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.5.0</span>
       </span>
     </div>
 
@@ -123,8 +123,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://magrittr.tidyverse.org" class="external-link">magrittr</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="sample-annotation-overview">Sample annotation overview<a class="anchor" aria-label="anchor" href="#sample-annotation-overview"></a>
 </h2>
@@ -133,26 +132,26 @@
 <p>Samples are grouped by Treatment and Collection time with the
 following group sizes:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">multi_trt_day_samples</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">Time</span>, <span class="va">Treatment</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gt</span><span class="fu">::</span><span class="fu"><a href="https://gt.rstudio.com/reference/gt.html" class="external-link">gt</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div id="iiobfydctu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#iiobfydctu table {
+<div id="cgaaiygvza" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cgaaiygvza table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#iiobfydctu thead, #iiobfydctu tbody, #iiobfydctu tfoot, #iiobfydctu tr, #iiobfydctu td, #iiobfydctu th {
+#cgaaiygvza thead, #cgaaiygvza tbody, #cgaaiygvza tfoot, #cgaaiygvza tr, #cgaaiygvza td, #cgaaiygvza th {
   border-style: none;
 }
 
-#iiobfydctu p {
+#cgaaiygvza p {
   margin: 0;
   padding: 0;
 }
 
-#iiobfydctu .gt_table {
+#cgaaiygvza .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -178,12 +177,12 @@ following group sizes:</p>
   border-left-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_caption {
+#cgaaiygvza .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#iiobfydctu .gt_title {
+#cgaaiygvza .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -195,7 +194,7 @@ following group sizes:</p>
   border-bottom-width: 0;
 }
 
-#iiobfydctu .gt_subtitle {
+#cgaaiygvza .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -207,7 +206,7 @@ following group sizes:</p>
   border-top-width: 0;
 }
 
-#iiobfydctu .gt_heading {
+#cgaaiygvza .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -219,13 +218,13 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_bottom_border {
+#cgaaiygvza .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_col_headings {
+#cgaaiygvza .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -240,7 +239,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_col_heading {
+#cgaaiygvza .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -260,7 +259,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#iiobfydctu .gt_column_spanner_outer {
+#cgaaiygvza .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -272,15 +271,15 @@ following group sizes:</p>
   padding-right: 4px;
 }
 
-#iiobfydctu .gt_column_spanner_outer:first-child {
+#cgaaiygvza .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#iiobfydctu .gt_column_spanner_outer:last-child {
+#cgaaiygvza .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#iiobfydctu .gt_column_spanner {
+#cgaaiygvza .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -292,11 +291,11 @@ following group sizes:</p>
   width: 100%;
 }
 
-#iiobfydctu .gt_spanner_row {
+#cgaaiygvza .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#iiobfydctu .gt_group_heading {
+#cgaaiygvza .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -322,7 +321,7 @@ following group sizes:</p>
   text-align: left;
 }
 
-#iiobfydctu .gt_empty_group_heading {
+#cgaaiygvza .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -337,15 +336,15 @@ following group sizes:</p>
   vertical-align: middle;
 }
 
-#iiobfydctu .gt_from_md > :first-child {
+#cgaaiygvza .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#iiobfydctu .gt_from_md > :last-child {
+#cgaaiygvza .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#iiobfydctu .gt_row {
+#cgaaiygvza .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -364,7 +363,7 @@ following group sizes:</p>
   overflow-x: hidden;
 }
 
-#iiobfydctu .gt_stub {
+#cgaaiygvza .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -377,7 +376,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#iiobfydctu .gt_stub_row_group {
+#cgaaiygvza .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -391,15 +390,15 @@ following group sizes:</p>
   vertical-align: top;
 }
 
-#iiobfydctu .gt_row_group_first td {
+#cgaaiygvza .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#iiobfydctu .gt_row_group_first th {
+#cgaaiygvza .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#iiobfydctu .gt_summary_row {
+#cgaaiygvza .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -409,16 +408,16 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#iiobfydctu .gt_first_summary_row {
+#cgaaiygvza .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_first_summary_row.thick {
+#cgaaiygvza .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#iiobfydctu .gt_last_summary_row {
+#cgaaiygvza .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -428,7 +427,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_grand_summary_row {
+#cgaaiygvza .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -438,7 +437,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#iiobfydctu .gt_first_grand_summary_row {
+#cgaaiygvza .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -448,7 +447,7 @@ following group sizes:</p>
   border-top-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_last_grand_summary_row_top {
+#cgaaiygvza .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -458,11 +457,11 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_striped {
+#cgaaiygvza .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#iiobfydctu .gt_table_body {
+#cgaaiygvza .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -471,7 +470,7 @@ following group sizes:</p>
   border-bottom-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_footnotes {
+#cgaaiygvza .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -485,7 +484,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_footnote {
+#cgaaiygvza .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -494,7 +493,7 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#iiobfydctu .gt_sourcenotes {
+#cgaaiygvza .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -508,7 +507,7 @@ following group sizes:</p>
   border-right-color: #D3D3D3;
 }
 
-#iiobfydctu .gt_sourcenote {
+#cgaaiygvza .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -516,63 +515,63 @@ following group sizes:</p>
   padding-right: 5px;
 }
 
-#iiobfydctu .gt_left {
+#cgaaiygvza .gt_left {
   text-align: left;
 }
 
-#iiobfydctu .gt_center {
+#cgaaiygvza .gt_center {
   text-align: center;
 }
 
-#iiobfydctu .gt_right {
+#cgaaiygvza .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#iiobfydctu .gt_font_normal {
+#cgaaiygvza .gt_font_normal {
   font-weight: normal;
 }
 
-#iiobfydctu .gt_font_bold {
+#cgaaiygvza .gt_font_bold {
   font-weight: bold;
 }
 
-#iiobfydctu .gt_font_italic {
+#cgaaiygvza .gt_font_italic {
   font-style: italic;
 }
 
-#iiobfydctu .gt_super {
+#cgaaiygvza .gt_super {
   font-size: 65%;
 }
 
-#iiobfydctu .gt_footnote_marks {
+#cgaaiygvza .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#iiobfydctu .gt_asterisk {
+#cgaaiygvza .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#iiobfydctu .gt_indent_1 {
+#cgaaiygvza .gt_indent_1 {
   text-indent: 5px;
 }
 
-#iiobfydctu .gt_indent_2 {
+#cgaaiygvza .gt_indent_2 {
   text-indent: 10px;
 }
 
-#iiobfydctu .gt_indent_3 {
+#cgaaiygvza .gt_indent_3 {
   text-indent: 15px;
 }
 
-#iiobfydctu .gt_indent_4 {
+#cgaaiygvza .gt_indent_4 {
   text-indent: 20px;
 }
 
-#iiobfydctu .gt_indent_5 {
+#cgaaiygvza .gt_indent_5 {
   text-indent: 25px;
 }
 </style>
@@ -658,7 +657,7 @@ container positions.</p>
 <span>    run <span class="op">=</span> <span class="fl">2</span>, position <span class="op">=</span> <span class="fl">5</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  exclude <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fl">4</span>, run <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, position <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">5</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># Add samples to container</span></span>
 <span>  <span class="fu"><a href="../reference/assign_in_order.html">assign_in_order</a></span><span class="op">(</span>samples <span class="op">=</span> <span class="va">multi_trt_day_samples</span><span class="op">)</span></span>
 <span></span>
@@ -693,30 +692,29 @@ exhausted.</p>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (25.909) - OK</span></span>
+<span><span class="co">#&gt; ... (29.908) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 23.452 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 23.136 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 19.136 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 16.399 at iteration 10</span></span>
-<span><span class="co">#&gt; Achieved score: 13.662 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 10.188 at iteration 44</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 87</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 117</span></span>
-<span><span class="co">#&gt; Achieved score: 8.083 at iteration 130</span></span>
-<span><span class="co">#&gt; Achieved score: 6.083 at iteration 136</span></span>
+<span><span class="co">#&gt; Achieved score: 19.241 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 18.82 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 17.03 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 13.241 at iteration 9</span></span>
+<span><span class="co">#&gt; Achieved score: 12.399 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: 8.715 at iteration 126</span></span>
+<span><span class="co">#&gt; Achieved score: 8.399 at iteration 136</span></span>
+<span><span class="co">#&gt; Achieved score: 6.399 at iteration 172</span></span>
 <span></span>
 <span><span class="va">bc1</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">elapsed</span></span>
-<span><span class="co">#&gt; Time difference of 0.891397 secs</span></span></code></pre></div>
+<span><span class="co">#&gt; Time difference of 2.066754 secs</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="optimization-trace">Optimization trace<a class="anchor" aria-label="anchor" href="#optimization-trace"></a>
 </h3>
 <p>Custom plot with some colours:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">scores_table</span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">scores_table</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    n_shuffle <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="va">n_shuffle</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span></span>
 <span>    <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">step</span>, <span class="va">value</span>, color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_shuffle</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
@@ -742,11 +740,11 @@ score() also after using the new optimization code.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  score_1 </span></span>
-<span><span class="co">#&gt; 6.083102</span></span>
+<span><span class="co">#&gt; 6.398892</span></span>
 <span></span>
-<span><span class="va">bc1</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>anno <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">Time</span>, <span class="st">" hr"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc1</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>anno <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_c.html" class="external-link">str_c</a></span><span class="op">(</span><span class="va">Time</span>, <span class="st">" hr"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interaction.html" class="external-link">interaction</a></span><span class="op">(</span><span class="va">position</span>, <span class="va">run</span><span class="op">)</span>, fill <span class="op">=</span> <span class="va">Treatment</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_tile</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_hline</a></span><span class="op">(</span>yintercept <span class="op">=</span> <span class="fl">5.5</span>, size <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">+</span></span>
@@ -773,8 +771,9 @@ be done immediately on the same batch container.</p>
 <span>  n_shuffle <span class="op">=</span> <span class="va">n_shuffle</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (27.236) - OK</span></span>
-<span><span class="co">#&gt; Initial score: 6.083</span></span></code></pre></div>
+<span><span class="co">#&gt; ... (32.844) - OK</span></span>
+<span><span class="co">#&gt; Initial score: 6.399</span></span>
+<span><span class="co">#&gt; Achieved score: 4.504 at iteration 73</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -797,22 +796,31 @@ max_iter criterion or by reaching a specific minimum delta threshold
 <span>  min_delta <span class="op">=</span> <span class="fl">0.1</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (32.811) - OK</span></span>
+<span><span class="co">#&gt; ... (28.981) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 57.767 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 49.767 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 35.767 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 30.188 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 20.188 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 16.188 at iteration 8</span></span>
-<span><span class="co">#&gt; Achieved score: 9.978 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 8.083 at iteration 38</span></span>
-<span><span class="co">#&gt; Achieved score: 6.399 at iteration 43</span></span>
-<span><span class="co">#&gt; Achieved score: 4.504 at iteration 104</span></span>
-<span><span class="co">#&gt; Achieved score: 4.188 at iteration 235</span></span>
-<span><span class="co">#&gt; Achieved score: 3.873 at iteration 738</span></span>
-<span><span class="co">#&gt; Achieved score: 3.873 at iteration 965</span></span>
-<span><span class="co">#&gt; Reached min delta in 965 iterations.</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 53.452 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 37.452 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 25.452 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 21.452 at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: 19.452 at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: 19.346 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 15.346 at iteration 14</span></span>
+<span><span class="co">#&gt; Achieved score: 13.767 at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: 13.662 at iteration 23</span></span>
+<span><span class="co">#&gt; Achieved score: 13.557 at iteration 34</span></span>
+<span><span class="co">#&gt; Achieved score: 11.978 at iteration 46</span></span>
+<span><span class="co">#&gt; Achieved score: 10.399 at iteration 47</span></span>
+<span><span class="co">#&gt; Achieved score: 10.083 at iteration 71</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 94</span></span>
+<span><span class="co">#&gt; Achieved score: 6.715 at iteration 124</span></span>
+<span><span class="co">#&gt; Achieved score: 6.609 at iteration 127</span></span>
+<span><span class="co">#&gt; Achieved score: 6.504 at iteration 200</span></span>
+<span><span class="co">#&gt; Achieved score: 6.083 at iteration 306</span></span>
+<span><span class="co">#&gt; Achieved score: 4.504 at iteration 402</span></span>
+<span><span class="co">#&gt; Achieved score: 2.925 at iteration 459</span></span>
+<span><span class="co">#&gt; Achieved score: 2.609 at iteration 729</span></span>
+<span><span class="co">#&gt; Achieved score: 2.294 at iteration 1955</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="optimization-with-multi-variate-scoring-function">Optimization with multi-variate scoring function<a class="anchor" aria-label="anchor" href="#optimization-with-multi-variate-scoring-function"></a>
@@ -848,21 +856,17 @@ and just serves for illustration.</p>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (26.175, 64.376) - OK</span></span>
+<span><span class="co">#&gt; ... (27.872, 52.29) - OK</span></span>
 <span><span class="co">#&gt; Initial score: c(73.03, 44.803)</span></span>
-<span><span class="co">#&gt; Achieved score: c(57.03, 32.803) at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: c(46.925, 28.593) at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: c(45.346, 27.33) at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: c(33.346, 23.33) at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: c(33.346, 21.33) at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: c(29.346, 21.33) at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: c(19.767, 14.066) at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: c(14.083, 10.488) at iteration 13</span></span>
-<span><span class="co">#&gt; Achieved score: c(12.504, 9.224) at iteration 22</span></span>
-<span><span class="co">#&gt; Achieved score: c(8.399, 9.224) at iteration 50</span></span>
-<span><span class="co">#&gt; Achieved score: c(8.083, 8.909) at iteration 66</span></span>
-<span><span class="co">#&gt; Achieved score: c(6.083, 4.909) at iteration 99</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.609, 1.856) at iteration 150</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: c(57.452, 29.645) at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: c(43.452, 29.54) at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: c(29.452, 17.54) at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: c(21.452, 13.54) at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: c(17.452, 7.54) at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: c(16.294, 7.224) at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: c(8.294, 7.224) at iteration 52</span></span>
+<span><span class="co">#&gt; Achieved score: c(8.188, 7.119) at iteration 86</span></span>
+<span><span class="co">#&gt; Achieved score: c(8.083, 7.014) at iteration 164</span></span></code></pre></div>
 <p>Note that the first score tends to yield higher values than the
 second one. This could be a problem when trying to select a solution
 based on an aggregated, overall score. We repeat the same optimization
@@ -890,24 +894,18 @@ match the new numerical range.</p>
 <span>  autoscaling_permutations <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (24.866, 47.009) - OK</span></span>
+<span><span class="co">#&gt; ... (27.312, 53.647) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 2-dim. score vector. (200 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(6.232, 2.641)</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.724, 1.231) at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.903, -0.295) at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.865, -1.311) at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.967, -1.311) at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.024, -1.548) at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.348, -1.548) at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.368, -1.593) at iteration 12</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.614, -1.78) at iteration 19</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.915, -2.475) at iteration 20</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.347, -2.475) at iteration 39</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.813, -2.475) at iteration 69</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.982, -3.353) at iteration 92</span></span>
-<span><span class="co">#&gt; Achieved score: c(-3.638, -3.353) at iteration 135</span></span>
-<span><span class="co">#&gt; Achieved score: c(-4.601, -3.664) at iteration 147</span></span></code></pre></div>
+<span><span class="co">#&gt; Initial score: c(5.937, 2.763)</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.364, 1.643) at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: c(2.669, 1.643) at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.318, 0.511) at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.009, -0.012) at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.032, -1.131) at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.293, -1.792) at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.645, -2.816) at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.189, -2.816) at iteration 114</span></span></code></pre></div>
 <p>Having directly comparable scores, it may be reasonable now to use a
 function that somehow aggregates the scores to decide on the best
 iteration (instead of looking at the scores individually).</p>
@@ -925,45 +923,35 @@ scores is larger (i.e. ‘worse’ in terms of the optimization).</p>
 <span>  autoscaling_permutations <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 2-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (24.094, 59.118) - OK</span></span>
+<span><span class="co">#&gt; ... (27.052, 71.47) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 2-dim. score vector. (200 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(6.38, 2.259)</span></span>
-<span><span class="co">#&gt;    Aggregated: 6.38</span></span>
-<span><span class="co">#&gt; Achieved score: c(5.005, 2.005) at iteration 1</span></span>
-<span><span class="co">#&gt;    Aggregated: 5.005</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.13, 1.727) at iteration 2</span></span>
-<span><span class="co">#&gt;    Aggregated: 4.13</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.699, 1.283) at iteration 3</span></span>
-<span><span class="co">#&gt;    Aggregated: 3.699</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.688, 1.75) at iteration 4</span></span>
-<span><span class="co">#&gt;    Aggregated: 2.688</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.529, 1.594) at iteration 5</span></span>
-<span><span class="co">#&gt;    Aggregated: 1.594</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.889, 1.1) at iteration 7</span></span>
-<span><span class="co">#&gt;    Aggregated: 1.1</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.986, 0.517) at iteration 8</span></span>
-<span><span class="co">#&gt;    Aggregated: 0.517</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.917, 0.082) at iteration 11</span></span>
-<span><span class="co">#&gt;    Aggregated: 0.082</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.641, -0.548) at iteration 16</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.548</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.149, -1.192) at iteration 18</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.149</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.149, -1.635) at iteration 19</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.635</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.149, -2.077) at iteration 31</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.077</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.234, -2.298) at iteration 57</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.234</span></span>
-<span><span class="co">#&gt; Achieved score: c(-2.803, -2.298) at iteration 59</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.298</span></span>
-<span><span class="co">#&gt; Achieved score: c(-4.062, -2.891) at iteration 111</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.891</span></span>
-<span><span class="co">#&gt; Achieved score: c(-4.104, -2.933) at iteration 127</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.933</span></span>
-<span><span class="co">#&gt; Achieved score: c(-4.785, -3.457) at iteration 192</span></span>
-<span><span class="co">#&gt;    Aggregated: -3.457</span></span></code></pre></div>
+<span><span class="co">#&gt; Initial score: c(5.158, 2.297)</span></span>
+<span><span class="co">#&gt;    Aggregated: 5.158</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.478, 1.846) at iteration 1</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.478</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.596, 0.385) at iteration 2</span></span>
+<span><span class="co">#&gt;    Aggregated: 1.596</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.082, 0.826) at iteration 3</span></span>
+<span><span class="co">#&gt;    Aggregated: 1.082</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.475, 0.612) at iteration 4</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.612</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.143, 0.002) at iteration 5</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.002</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.854, -0.792) at iteration 7</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.792</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.326, -1.942) at iteration 10</span></span>
+<span><span class="co">#&gt;    Aggregated: -1.942</span></span>
+<span><span class="co">#&gt; Achieved score: c(-2.204, -2.233) at iteration 19</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.204</span></span>
+<span><span class="co">#&gt; Achieved score: c(-3.372, -2.563) at iteration 126</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.563</span></span>
+<span><span class="co">#&gt; Achieved score: c(-3.333, -3.106) at iteration 127</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.106</span></span>
+<span><span class="co">#&gt; Achieved score: c(-3.333, -4.037) at iteration 179</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.333</span></span>
+<span><span class="co">#&gt; Achieved score: c(-4.117, -4.037) at iteration 195</span></span>
+<span><span class="co">#&gt;    Aggregated: -4.037</span></span></code></pre></div>
 <p>Another - more interesting - option would be to aggregate the two
 scores by taking their sum. This way both scores will influence the
 optimization at every step.</p>
@@ -1014,14 +1002,15 @@ solution.</p>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (29.765) - OK</span></span>
+<span><span class="co">#&gt; ... (28.187) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 18.294 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 16.188 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 15.03 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 14.925 at iteration 15</span></span>
-<span><span class="co">#&gt; Achieved score: 12.083 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 8.925 at iteration 101</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 20.715 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 18.82 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 15.346 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 13.241 at iteration 14</span></span>
+<span><span class="co">#&gt; Achieved score: 12.82 at iteration 47</span></span>
+<span><span class="co">#&gt; Achieved score: 10.82 at iteration 73</span></span>
+<span><span class="co">#&gt; Achieved score: 8.82 at iteration 99</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="using-simulated-annealing-sa-for-optimization">Using simulated annealing (SA) for optimization<a class="anchor" aria-label="anchor" href="#using-simulated-annealing-sa-for-optimization"></a>
@@ -1048,70 +1037,64 @@ if you happen to have multiple scores initially.</p>
 <span>  max_iter <span class="op">=</span> <span class="fl">200</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (30.893) - OK</span></span>
+<span><span class="co">#&gt; ... (30.919) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 71.346 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 71.346 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 67.662 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 61.767 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 65.873 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 55.873 at iteration 6</span></span>
-<span><span class="co">#&gt; Achieved score: 55.873 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 51.873 at iteration 8</span></span>
-<span><span class="co">#&gt; Achieved score: 45.873 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 41.452 at iteration 10</span></span>
-<span><span class="co">#&gt; Achieved score: 41.452 at iteration 11</span></span>
-<span><span class="co">#&gt; Achieved score: 41.452 at iteration 12</span></span>
-<span><span class="co">#&gt; Achieved score: 33.452 at iteration 13</span></span>
-<span><span class="co">#&gt; Achieved score: 29.452 at iteration 15</span></span>
-<span><span class="co">#&gt; Achieved score: 29.452 at iteration 16</span></span>
-<span><span class="co">#&gt; Achieved score: 31.452 at iteration 17</span></span>
-<span><span class="co">#&gt; Achieved score: 31.452 at iteration 18</span></span>
-<span><span class="co">#&gt; Achieved score: 29.452 at iteration 19</span></span>
-<span><span class="co">#&gt; Achieved score: 25.452 at iteration 20</span></span>
-<span><span class="co">#&gt; Achieved score: 25.452 at iteration 22</span></span>
-<span><span class="co">#&gt; Achieved score: 25.452 at iteration 23</span></span>
-<span><span class="co">#&gt; Achieved score: 21.452 at iteration 24</span></span>
-<span><span class="co">#&gt; Achieved score: 19.767 at iteration 26</span></span>
-<span><span class="co">#&gt; Achieved score: 19.767 at iteration 27</span></span>
-<span><span class="co">#&gt; Achieved score: 19.767 at iteration 28</span></span>
-<span><span class="co">#&gt; Achieved score: 19.767 at iteration 29</span></span>
-<span><span class="co">#&gt; Achieved score: 17.767 at iteration 30</span></span>
-<span><span class="co">#&gt; Achieved score: 18.188 at iteration 31</span></span>
-<span><span class="co">#&gt; Achieved score: 16.188 at iteration 32</span></span>
-<span><span class="co">#&gt; Achieved score: 14.188 at iteration 33</span></span>
-<span><span class="co">#&gt; Achieved score: 14.083 at iteration 34</span></span>
-<span><span class="co">#&gt; Achieved score: 12.083 at iteration 35</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 36</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 37</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 38</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 39</span></span>
-<span><span class="co">#&gt; Achieved score: 10.083 at iteration 40</span></span>
-<span><span class="co">#&gt; Achieved score: 10.188 at iteration 41</span></span>
-<span><span class="co">#&gt; Achieved score: 10.188 at iteration 43</span></span>
-<span><span class="co">#&gt; Achieved score: 10.188 at iteration 49</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 51</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 53</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 57</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 61</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 67</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 69</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 72</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 75</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 77</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 85</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 86</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 87</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 88</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 102</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 103</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 106</span></span>
-<span><span class="co">#&gt; Achieved score: 8.399 at iteration 107</span></span>
-<span><span class="co">#&gt; Achieved score: 7.978 at iteration 114</span></span>
-<span><span class="co">#&gt; Achieved score: 6.399 at iteration 120</span></span>
-<span><span class="co">#&gt; Achieved score: 6.399 at iteration 127</span></span>
-<span><span class="co">#&gt; Achieved score: 4.82 at iteration 174</span></span>
-<span><span class="co">#&gt; Achieved score: 3.241 at iteration 178</span></span></code></pre></div>
+<span><span class="co">#&gt; Achieved score: 65.03 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 65.03 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 5</span></span>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 59.452 at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: 55.452 at iteration 8</span></span>
+<span><span class="co">#&gt; Achieved score: 55.452 at iteration 9</span></span>
+<span><span class="co">#&gt; Achieved score: 51.452 at iteration 10</span></span>
+<span><span class="co">#&gt; Achieved score: 51.873 at iteration 11</span></span>
+<span><span class="co">#&gt; Achieved score: 52.188 at iteration 12</span></span>
+<span><span class="co">#&gt; Achieved score: 52.188 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 46.188 at iteration 15</span></span>
+<span><span class="co">#&gt; Achieved score: 42.188 at iteration 16</span></span>
+<span><span class="co">#&gt; Achieved score: 40.083 at iteration 17</span></span>
+<span><span class="co">#&gt; Achieved score: 40.083 at iteration 18</span></span>
+<span><span class="co">#&gt; Achieved score: 38.188 at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: 34.188 at iteration 20</span></span>
+<span><span class="co">#&gt; Achieved score: 30.504 at iteration 21</span></span>
+<span><span class="co">#&gt; Achieved score: 30.504 at iteration 22</span></span>
+<span><span class="co">#&gt; Achieved score: 30.504 at iteration 23</span></span>
+<span><span class="co">#&gt; Achieved score: 30.504 at iteration 24</span></span>
+<span><span class="co">#&gt; Achieved score: 30.504 at iteration 25</span></span>
+<span><span class="co">#&gt; Achieved score: 28.504 at iteration 26</span></span>
+<span><span class="co">#&gt; Achieved score: 22.504 at iteration 27</span></span>
+<span><span class="co">#&gt; Achieved score: 18.504 at iteration 28</span></span>
+<span><span class="co">#&gt; Achieved score: 18.504 at iteration 29</span></span>
+<span><span class="co">#&gt; Achieved score: 18.504 at iteration 30</span></span>
+<span><span class="co">#&gt; Achieved score: 18.504 at iteration 31</span></span>
+<span><span class="co">#&gt; Achieved score: 18.504 at iteration 33</span></span>
+<span><span class="co">#&gt; Achieved score: 16.504 at iteration 35</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 36</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 38</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 39</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 40</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 41</span></span>
+<span><span class="co">#&gt; Achieved score: 16.399 at iteration 42</span></span>
+<span><span class="co">#&gt; Achieved score: 14.399 at iteration 44</span></span>
+<span><span class="co">#&gt; Achieved score: 14.399 at iteration 45</span></span>
+<span><span class="co">#&gt; Achieved score: 12.82 at iteration 48</span></span>
+<span><span class="co">#&gt; Achieved score: 12.82 at iteration 49</span></span>
+<span><span class="co">#&gt; Achieved score: 12.82 at iteration 56</span></span>
+<span><span class="co">#&gt; Achieved score: 10.925 at iteration 60</span></span>
+<span><span class="co">#&gt; Achieved score: 10.925 at iteration 61</span></span>
+<span><span class="co">#&gt; Achieved score: 8.925 at iteration 64</span></span>
+<span><span class="co">#&gt; Achieved score: 8.925 at iteration 89</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 93</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 95</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 96</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 99</span></span>
+<span><span class="co">#&gt; Achieved score: 8.504 at iteration 112</span></span>
+<span><span class="co">#&gt; Achieved score: 8.188 at iteration 119</span></span>
+<span><span class="co">#&gt; Achieved score: 8.083 at iteration 144</span></span>
+<span><span class="co">#&gt; Achieved score: 8.083 at iteration 145</span></span>
+<span><span class="co">#&gt; Achieved score: 7.978 at iteration 174</span></span></code></pre></div>
 <p>The trace may show a non strictly monotonic behavior now, reflecting
 the SA protocol at work.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
@@ -1129,29 +1112,31 @@ specific case.</p>
 <span>  max_iter <span class="op">=</span> <span class="fl">150</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Checking variances of 1-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (21.955) - OK</span></span>
+<span><span class="co">#&gt; ... (41.437) - OK</span></span>
 <span><span class="co">#&gt; Initial score: 73.03</span></span>
-<span><span class="co">#&gt; Achieved score: 69.03 at iteration 1</span></span>
-<span><span class="co">#&gt; Achieved score: 59.03 at iteration 2</span></span>
-<span><span class="co">#&gt; Achieved score: 53.452 at iteration 3</span></span>
-<span><span class="co">#&gt; Achieved score: 45.452 at iteration 4</span></span>
-<span><span class="co">#&gt; Achieved score: 45.452 at iteration 5</span></span>
-<span><span class="co">#&gt; Achieved score: 45.452 at iteration 7</span></span>
-<span><span class="co">#&gt; Achieved score: 45.452 at iteration 8</span></span>
-<span><span class="co">#&gt; Achieved score: 41.452 at iteration 9</span></span>
-<span><span class="co">#&gt; Achieved score: 35.873 at iteration 10</span></span>
-<span><span class="co">#&gt; Achieved score: 35.873 at iteration 11</span></span>
-<span><span class="co">#&gt; Achieved score: 33.767 at iteration 12</span></span>
-<span><span class="co">#&gt; Achieved score: 27.767 at iteration 13</span></span>
-<span><span class="co">#&gt; Achieved score: 25.767 at iteration 14</span></span>
-<span><span class="co">#&gt; Achieved score: 21.767 at iteration 15</span></span>
-<span><span class="co">#&gt; Achieved score: 20.083 at iteration 21</span></span>
-<span><span class="co">#&gt; Achieved score: 16.083 at iteration 25</span></span>
-<span><span class="co">#&gt; Achieved score: 14.083 at iteration 30</span></span>
-<span><span class="co">#&gt; Achieved score: 12.504 at iteration 39</span></span>
-<span><span class="co">#&gt; Achieved score: 8.504 at iteration 42</span></span>
-<span><span class="co">#&gt; Achieved score: 6.504 at iteration 62</span></span>
-<span><span class="co">#&gt; Achieved score: 4.504 at iteration 116</span></span>
+<span><span class="co">#&gt; Achieved score: 66.925 at iteration 1</span></span>
+<span><span class="co">#&gt; Achieved score: 56.925 at iteration 2</span></span>
+<span><span class="co">#&gt; Achieved score: 54.925 at iteration 3</span></span>
+<span><span class="co">#&gt; Achieved score: 46.925 at iteration 4</span></span>
+<span><span class="co">#&gt; Achieved score: 48.925 at iteration 5</span></span>
+<span><span class="co">#&gt; Achieved score: 40.925 at iteration 6</span></span>
+<span><span class="co">#&gt; Achieved score: 32.925 at iteration 7</span></span>
+<span><span class="co">#&gt; Achieved score: 30.925 at iteration 9</span></span>
+<span><span class="co">#&gt; Achieved score: 30.925 at iteration 10</span></span>
+<span><span class="co">#&gt; Achieved score: 30.925 at iteration 11</span></span>
+<span><span class="co">#&gt; Achieved score: 26.925 at iteration 13</span></span>
+<span><span class="co">#&gt; Achieved score: 18.925 at iteration 18</span></span>
+<span><span class="co">#&gt; Achieved score: 16.925 at iteration 19</span></span>
+<span><span class="co">#&gt; Achieved score: 16.925 at iteration 20</span></span>
+<span><span class="co">#&gt; Achieved score: 16.925 at iteration 22</span></span>
+<span><span class="co">#&gt; Achieved score: 16.925 at iteration 23</span></span>
+<span><span class="co">#&gt; Achieved score: 16.925 at iteration 24</span></span>
+<span><span class="co">#&gt; Achieved score: 14.925 at iteration 26</span></span>
+<span><span class="co">#&gt; Achieved score: 14.925 at iteration 43</span></span>
+<span><span class="co">#&gt; Achieved score: 13.03 at iteration 57</span></span>
+<span><span class="co">#&gt; Achieved score: 11.346 at iteration 61</span></span>
+<span><span class="co">#&gt; Achieved score: 9.346 at iteration 79</span></span>
+<span><span class="co">#&gt; Achieved score: 7.662 at iteration 96</span></span>
 <span></span>
 <span><span class="va">bc8</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-19-1.png" width="700"></p>
@@ -1187,61 +1172,57 @@ illustrate the flexibility of the optimization.</p>
 <span><span class="co">#&gt; Warning in osat_score(bc, batch_vars = batch_vars, feature_vars = feature_vars,</span></span>
 <span><span class="co">#&gt; : NAs in features / batch columns; they will be excluded from scoring</span></span>
 <span><span class="co">#&gt; Checking variances of 3-dim. score vector.</span></span>
-<span><span class="co">#&gt; ... (31.751, 74.52, 97.769) - OK</span></span>
+<span><span class="co">#&gt; ... (32.721, 70.614, 105.045) - OK</span></span>
 <span><span class="co">#&gt; Creating autoscaling function for 3-dim. score vector. (100 random permutations)</span></span>
 <span><span class="co">#&gt; ... Performing boxcox lambda estimation.</span></span>
-<span><span class="co">#&gt; Initial score: c(5.011, 2.287, 4.641)</span></span>
-<span><span class="co">#&gt;    Aggregated: 11.939</span></span>
-<span><span class="co">#&gt; Achieved score: c(4.055, 1.288, 4.294) at iteration 1</span></span>
-<span><span class="co">#&gt;    Aggregated: 9.637</span></span>
-<span><span class="co">#&gt; Achieved score: c(3.087, 0.785, 3.121) at iteration 2</span></span>
-<span><span class="co">#&gt;    Aggregated: 6.993</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.868, 0.346, 1.673) at iteration 3</span></span>
-<span><span class="co">#&gt;    Aggregated: 3.887</span></span>
-<span><span class="co">#&gt; Achieved score: c(2.513, 0.785, 1.673) at iteration 4</span></span>
-<span><span class="co">#&gt;    Aggregated: 4.971</span></span>
-<span><span class="co">#&gt; Achieved score: c(1.868, 0.785, 2.154) at iteration 5</span></span>
-<span><span class="co">#&gt;    Aggregated: 4.807</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.857, 1.196, 0.917) at iteration 6</span></span>
-<span><span class="co">#&gt;    Aggregated: 2.969</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.348, -0.011, 0.248) at iteration 7</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.112</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.141, 0.245, -1.098) at iteration 8</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.994</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.368, 0.18, -1.015) at iteration 9</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.203</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.368, 0.14, -0.326) at iteration 10</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.553</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.665, -0.025, -1.036) at iteration 12</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.726</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.498, -0.878, -0.194) at iteration 14</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.57</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.05, -0.917, -0.144) at iteration 15</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.111</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.071, -1.336, 0.122) at iteration 16</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.143</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.273, 0.003, -0.62) at iteration 18</span></span>
-<span><span class="co">#&gt;    Aggregated: -0.89</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.273, 0.003, -1.486) at iteration 19</span></span>
-<span><span class="co">#&gt;    Aggregated: -1.755</span></span>
-<span><span class="co">#&gt; Achieved score: c(0.071, -0.277, -2.153) at iteration 22</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.359</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.645, -1.336, -0.686) at iteration 24</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.666</span></span>
-<span><span class="co">#&gt; Achieved score: c(-0.665, -0.976, -0.686) at iteration 28</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.326</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.073, -0.976, -0.686) at iteration 29</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.734</span></span>
-<span><span class="co">#&gt; Achieved score: c(-1.073, -0.976, -0.686) at iteration 32</span></span>
-<span><span class="co">#&gt;    Aggregated: -2.734</span></span>
-<span><span class="co">#&gt; Reached min delta in 32 iterations.</span></span>
+<span><span class="co">#&gt; Initial score: c(9.253, 3.275, 5.019)</span></span>
+<span><span class="co">#&gt;    Aggregated: 17.547</span></span>
+<span><span class="co">#&gt; Achieved score: c(6.898, 2.618, 3.304) at iteration 1</span></span>
+<span><span class="co">#&gt;    Aggregated: 12.819</span></span>
+<span><span class="co">#&gt; Achieved score: c(6.609, 2.427, 2.847) at iteration 2</span></span>
+<span><span class="co">#&gt;    Aggregated: 11.883</span></span>
+<span><span class="co">#&gt; Achieved score: c(4.878, 2.258, 2.43) at iteration 3</span></span>
+<span><span class="co">#&gt;    Aggregated: 9.566</span></span>
+<span><span class="co">#&gt; Achieved score: c(3.415, 2.7, 2.004) at iteration 4</span></span>
+<span><span class="co">#&gt;    Aggregated: 8.119</span></span>
+<span><span class="co">#&gt; Achieved score: c(1.23, 1.387, 0.578) at iteration 5</span></span>
+<span><span class="co">#&gt;    Aggregated: 3.195</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.369, -0.875, 0.578) at iteration 6</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.666</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.818, -0.277, 0.376) at iteration 7</span></span>
+<span><span class="co">#&gt;    Aggregated: 0.917</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.018, 0.019, -0.698) at iteration 8</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.661</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.665, 0.004, -0.31) at iteration 9</span></span>
+<span><span class="co">#&gt;    Aggregated: -1.971</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.697, 0.125, -0.325) at iteration 11</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.897</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.304, 0.93, -0.717) at iteration 13</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.091</span></span>
+<span><span class="co">#&gt; Achieved score: c(-0.326, -0.503, 0.568) at iteration 14</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.262</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.103, -0.487, -0.106) at iteration 15</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.489</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.167, -0.754, -0.12) at iteration 16</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.707</span></span>
+<span><span class="co">#&gt; Achieved score: c(0.568, -0.422, -0.404) at iteration 18</span></span>
+<span><span class="co">#&gt;    Aggregated: -0.258</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.074, -0.422, -0.736) at iteration 19</span></span>
+<span><span class="co">#&gt;    Aggregated: -2.231</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.504, -0.422, -1.664) at iteration 22</span></span>
+<span><span class="co">#&gt;    Aggregated: -3.59</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.944, -0.422, -1.664) at iteration 25</span></span>
+<span><span class="co">#&gt;    Aggregated: -4.03</span></span>
+<span><span class="co">#&gt; Achieved score: c(-1.944, -0.422, -1.664) at iteration 27</span></span>
+<span><span class="co">#&gt;    Aggregated: -4.03</span></span>
+<span><span class="co">#&gt; Reached min delta in 27 iterations.</span></span>
 <span></span>
 <span><span class="va">bc9</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="optimizer_examples_files/figure-html/unnamed-chunk-20-1.png" width="700"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">bc9</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="va">bc9</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>batch <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">batch</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
@@ -1261,7 +1242,7 @@ illustrate the flexibility of the optimization.</p>
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Balazs Banfai.</p>
+<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Jitao David Zhang, Balazs Banfai.</p>
 </div>
 
 <div class="pkgdown">
