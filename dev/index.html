@@ -19,12 +19,15 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Blocking and Randomization for Experimental Design">
 <meta property="og:description" content="
-    Reducing batch effect by intelligently assigning samples to batches.
-    Batch-effect have a strong influence in data analysis, especially when
-    samples-to-batches assignment is coinciding with contrast groups.
-    By defining your batch container and a scoring function reflecting
-    the contrasts, you can assign samples in such a way that the potential
-    batch-effect has minimal effect on the comparison of interest.">
+    Intelligently assign samples to batches in order to reduce batch effects.
+    Batch effects can have a significant impact on data analysis, especially
+    when the assignment of samples to batches coincides with the contrast
+    groups being studied. By defining a batch container and a scoring function
+    that reflects the contrasts, this package allows users to assign samples in
+    a way that minimizes the potential impact of batch effects on the
+    comparison of interest. Among other functionality, we provide an
+    implementation for OSAT score by Yan et al. (2012,
+    &lt;doi:10.1186/1471-2164-13-689&gt;).">
 <meta property="og:image" content="https://bedapub.github.io/designit/logo.svg">
 <meta name="robots" content="noindex">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -277,6 +280,7 @@
 <li>Iakov I. Davydov <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0000-0003-3510-3926" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Juliane Siebourg-Polster <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0002-1759-3223" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Guido Steiner <br><small class="roles"> Author, copyright holder </small>  </li>
+<li>Jitao David Zhang <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0002-3085-0909" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Balazs Banfai <br><small class="roles"> Author, copyright holder </small> <a href="https://orcid.org/0000-0003-0422-7977" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>
 <a href="https://www.roche.com" class="external-link">F. Hoffman-La Roche</a> <br><small class="roles"> Copyright holder, funder </small>  </li>
@@ -298,7 +302,7 @@
 
       <footer><div class="copyright">
   <p></p>
-<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Balazs Banfai.</p>
+<p>Developed by Iakov I. Davydov, Juliane Siebourg-Polster, Guido Steiner, Jitao David Zhang, Balazs Banfai.</p>
 </div>
 
 <div class="pkgdown">

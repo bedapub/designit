@@ -94,9 +94,6 @@
     <loc>https://bedapub.github.io/designit/reference/complete_random_shuffling.html</loc>
   </url>
   <url>
-    <loc>https://bedapub.github.io/designit/reference/countGini.html</loc>
-  </url>
-  <url>
     <loc>https://bedapub.github.io/designit/reference/designit-package.html</loc>
   </url>
   <url>
@@ -121,9 +118,6 @@
     <loc>https://bedapub.github.io/designit/reference/generate_terms.html</loc>
   </url>
   <url>
-    <loc>https://bedapub.github.io/designit/reference/getScore.html</loc>
-  </url>
-  <url>
     <loc>https://bedapub.github.io/designit/reference/get_order.html</loc>
   </url>
   <url>
@@ -136,9 +130,6 @@
     <loc>https://bedapub.github.io/designit/reference/invivo_study_treatments.html</loc>
   </url>
   <url>
-    <loc>https://bedapub.github.io/designit/reference/kruskal.html</loc>
-  </url>
-  <url>
     <loc>https://bedapub.github.io/designit/reference/locations_table_from_dimensions.html</loc>
   </url>
   <url>
@@ -146,9 +137,6 @@
   </url>
   <url>
     <loc>https://bedapub.github.io/designit/reference/make_colnames.html</loc>
-  </url>
-  <url>
-    <loc>https://bedapub.github.io/designit/reference/meanDiff.html</loc>
   </url>
   <url>
     <loc>https://bedapub.github.io/designit/reference/mk_autoscale_function.html</loc>
@@ -181,9 +169,6 @@
     <loc>https://bedapub.github.io/designit/reference/multi_trt_day_samples.html</loc>
   </url>
   <url>
-    <loc>https://bedapub.github.io/designit/reference/neighbors.html</loc>
-  </url>
-  <url>
     <loc>https://bedapub.github.io/designit/reference/optimize_design.html</loc>
   </url>
   <url>
@@ -206,9 +191,6 @@
   </url>
   <url>
     <loc>https://bedapub.github.io/designit/reference/random_score_variances.html</loc>
-  </url>
-  <url>
-    <loc>https://bedapub.github.io/designit/reference/randomize.html</loc>
   </url>
   <url>
     <loc>https://bedapub.github.io/designit/reference/report_scores.html</loc>
