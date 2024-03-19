@@ -11,8 +11,8 @@ scoring_f <- function(...) rnorm(1)
 
 test_that("random seed is saved when no seed is set", {
   # unset random seed
-  if (exists(".Random.seed")) {
-    random_seed <- .Random.seed
+  if (exists(".Random.seed", envir = .GlobalEnv)) {
+    random_seed <- .GlobalEnv$.Random.seed
     on.exit(.GlobalEnv$.Random.seed <- random_seed)
     rm(.Random.seed, envir = .GlobalEnv)
     testthat::expect_false(exists(".Random.seed"))
