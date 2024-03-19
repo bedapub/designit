@@ -1,4 +1,4 @@
-# designit (development version)
+# designit 0.5.0
 
 * remove magrittr, glue, checkmate, forcats, ineq, and tidyselect dependencies
 * minimum R version 4.1.0 (for the native pipe and lambda functions)
