@@ -15,6 +15,12 @@ experimental designs.
 
 ## Installation
 
+Install the released version of rlang from CRAN:
+
+``` r
+install.packages("designit")
+```
+
 You can install the development version from GitHub with:
 
 ``` r
@@ -25,9 +31,13 @@ devtools::install_github("BEDApub/designit")
 ## Usage
 
 ### R in Pharma presentation
-[![Designit: a flexible engine to generate experiment layouts, R in Pharma presentation](https://img.youtube.com/vi/mvPmSQJVy8o/0.jpg)](https://www.youtube.com/watch?v=mvPmSQJVy8o "Designit: a flexible engine to generate experiment layouts")
+
+[![Designit: a flexible engine to generate experiment layouts, R in
+Pharma
+presentation](https://img.youtube.com/vi/mvPmSQJVy8o/0.jpg)](https://www.youtube.com/watch?v=mvPmSQJVy8o "Designit: a flexible engine to generate experiment layouts")
 
 ### Batch container
+
 The main class used is `BatchContainer`, which holds the dimensions for
 sample allocation. After creating such a container, a list of samples
 can be allocated in it using a given assignment function.
@@ -111,7 +121,6 @@ bc$get_samples() %>%
 ![](man/figures/README-optimized_assignment-1.png)<!-- -->
 
 ``` r
-
 # show optimization trace
 bc$plot_trace()
 ```
