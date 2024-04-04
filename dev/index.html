@@ -131,8 +131,11 @@
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version from GitHub with:</p>
+<p>Install the released version of rlang from CRAN:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"designit"</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version from GitHub with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"BEDApub/designit"</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -152,7 +155,7 @@
 <div class="section level3">
 <h3 id="creating-a-table-with-sample-information">Creating a table with sample information<a class="anchor" aria-label="anchor" href="#creating-a-table-with-sample-information"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bedapub.github.io/designit/">designit</a></span><span class="op">)</span></span>
 <span></span>
@@ -183,7 +186,7 @@
 <div class="section level3">
 <h3 id="creating-a-batchcontainer-and-assigning-samples">Creating a <code>BatchContainer</code> and assigning samples<a class="anchor" aria-label="anchor" href="#creating-a-batchcontainer-and-assigning-samples"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># a batch container with 3 batches and 11 locations per batch</span></span>
 <span><span class="va">bc</span> <span class="op">&lt;-</span> <span class="va"><a href="reference/BatchContainer.html">BatchContainer</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span></span>
 <span>  dimensions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"batch"</span> <span class="op">=</span> <span class="fl">3</span>, <span class="st">"location"</span> <span class="op">=</span> <span class="fl">11</span><span class="op">)</span>,</span>
@@ -203,7 +206,7 @@
 <div class="section level3">
 <h3 id="optimizing-the-assignemnt">Optimizing the assignemnt<a class="anchor" aria-label="anchor" href="#optimizing-the-assignemnt"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># set scoring functions</span></span>
 <span><span class="va">scoring_f</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  <span class="co"># first priority, groups are evenly distributed</span></span>
@@ -223,9 +226,8 @@
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Group</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-optimized_assignment-1.png"><!-- --></p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># show optimization trace</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># show optimization trace</span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-optimized_assignment-2.png"><!-- --></p>
 </div>
@@ -247,6 +249,7 @@
     <div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=designit" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/BEDApub/designit" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/BEDApub/designit/issues" class="external-link">Report a bug</a></li>
 </ul>
