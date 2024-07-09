@@ -250,7 +250,9 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
 
   if (!is.null(within_plate_variables)) {
     plate_levels <- unique(bc$get_locations()[[plate]])
-    scoring_funcs <- purrr::map(within_plate_variables, ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x)) |>
+    scoring_funcs <- purrr::map(within_plate_variables,
+                                ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x,
+                                                             p = 1, penalize_lines = "none")) |>
       unlist()
     names(scoring_funcs) <- paste(rep(within_plate_variables, each = length(plate_levels)), names(scoring_funcs))
 
