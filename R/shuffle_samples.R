@@ -138,9 +138,9 @@ mk_swapping_function <- function(n_swaps = 1) {
   swapping_functions <- NULL
   if (length(unique(n_swaps)) < 1000) {
     # When number of unique values is small, pre-generate a swapping function for each n_swaps.
-    swapping_functions <- n_swaps %>%
-      unique() %>%
-      purrr::set_names() %>%
+    swapping_functions <- n_swaps |>
+      unique() |>
+      purrr::set_names() |>
       purrr::map(mk_constant_swapping_function)
   }
 
@@ -219,7 +219,7 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
           " possible permutations. Consider a different solution."
         )
       )
-      valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) %>% dplyr::filter(src < dst)
+      valid_permutations <<- tidyr::crossing(src = valid_indices, dst = valid_indices) |> dplyr::filter(src < dst)
     } else { # we swap samples across subgroups
       bc_loc <- dplyr::group_by(bc_loc, dplyr::across(dplyr::all_of(subgroup_vars)))
       grp_ind <- dplyr::group_indices(bc_loc)
@@ -232,8 +232,8 @@ mk_subgroup_shuffling_function <- function(subgroup_vars,
         )
       )
       assertthat::assert_that(length(subgroup_sizes) > 1, msg = "Subgroup shuffling is pointless if there's only one subgroup involved")
-      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) %>%
-        purrr::map(~ tidyr::crossing(src = .x, dst = .x) %>% dplyr::filter(src < dst)) %>%
+      valid_permutations <<- purrr::map(seq_along(subgroup_sizes), ~ which(grp_ind == .x)) |>
+        purrr::map(~ tidyr::crossing(src = .x, dst = .x) |> dplyr::filter(src < dst)) |>
         dplyr::bind_rows()
     }
 

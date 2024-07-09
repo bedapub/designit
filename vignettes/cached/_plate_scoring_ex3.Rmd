@@ -44,8 +44,8 @@ example3 <- BatchContainer$new(
     row = 8, col = 12
   ),
   exclude = dplyr::bind_rows(
-    tidyr::crossing(plate = 2, row = 1:8, col = 1:12) %>% dplyr::filter(row > 6 | col > 8),
-    tidyr::crossing(plate = 3, row = 1:8, col = 1:12) %>% dplyr::filter(row > 4 | col > 6)
+    tidyr::crossing(plate = 2, row = 1:8, col = 1:12) |> dplyr::filter(row > 6 | col > 8),
+    tidyr::crossing(plate = 3, row = 1:8, col = 1:12) |> dplyr::filter(row > 4 | col > 6)
   )
 )
 

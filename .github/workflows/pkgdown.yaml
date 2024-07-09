@@ -70,7 +70,4 @@ jobs:
         with:
           branch: gh-pages
           folder: docs
-          clean: true
-          clean-exclude: |
-            dev/
-          single-commit: true
+          clean: false

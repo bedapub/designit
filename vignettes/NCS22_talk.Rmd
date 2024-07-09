@@ -33,7 +33,7 @@ It uses a subset of the `longitudinal_subject_samples` dataset.
 ```{r get_data, include = TRUE}
 data("longitudinal_subject_samples")
 
-dat <- longitudinal_subject_samples |>
+dat <- longitudinal_subject_samples |> 
   filter(Group %in% 1:5, Week %in% c(1, 4)) |>
   select(SampleID, SubjectID, Group, Sex, Week)
 

@@ -26,6 +26,12 @@ The goal of designit is to generate optimal sample allocations for experimental 
 
 ## Installation
 
+Install the released version of rlang from CRAN:
+
+```{r echo=TRUE, eval=FALSE}
+install.packages("designit")
+```
+
 You can install the development version from GitHub with:
 
 ```{r echo=TRUE, eval=FALSE}

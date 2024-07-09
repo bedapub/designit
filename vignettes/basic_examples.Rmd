@@ -55,15 +55,15 @@ animals <- bind_rows(replicate(n_animals, conditions, simplify = FALSE),
 )
 samples <- bind_rows(replicate(n_reps, animals, simplify = FALSE),
   .id = "replicate"
-) %>%
+) |>
   mutate(
     SampleID = paste0(treatment, "_", animal, "_", replicate),
     AnimalID = paste0(treatment, "_", animal)
-  ) %>%
+  ) |>
   mutate(dose = factor(dose))
 
-samples %>%
-  head(10) %>%
+samples |>
+  head(10) |>
   gt::gt()
 ```
 ## Plate layout requirements
@@ -94,7 +94,7 @@ bc
 
 bc$n_locations
 bc$exclude
-bc$get_locations() %>% head()
+bc$get_locations() |> head()
 ```
 
 ## Moving samples
@@ -248,7 +248,7 @@ Note: removing all empty and excluded wells will lead to omitting
 completely empty rows or columns!
 
 ```{r, fig.width=6, fig.height=3.5}
-plot_plate(bc$get_samples(remove_empty_locations = TRUE) %>%
+plot_plate(bc$get_samples(remove_empty_locations = TRUE) |>
   filter(column != 2),
 plate = plate, column = column, row = row,
 .color = treatment, .alpha = dose

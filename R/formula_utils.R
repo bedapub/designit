@@ -10,7 +10,7 @@
 #' @examples
 generate_terms <- function(.tbl, ...) {
   if (!tibble::is_tibble(.tbl)) .tbl <- tibble::as_tibble(.tbl)
-  .tbl <- dplyr::select(.tbl, tidyselect::everything(), ...)
+  .tbl <- dplyr::select(.tbl, dplyr::everything(), ...)
   n <- nrow(.tbl)
   m <- ncol(.tbl)
   form <- paste("~ 1 + .")

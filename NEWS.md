@@ -1,3 +1,13 @@
+# designit (development version)
+
+# designit 0.5.0
+
+* remove magrittr, glue, checkmate, forcats, ineq, and tidyselect dependencies
+* minimum R version 4.1.0 (for the native pipe and lambda functions)
+* remove several unexported functions
+* BatchContainer trace saves the random seed as well as RNG kind
+* preparing for CRAN resumbission
+
 # designit 0.4.1
 
 * mainly github action changes

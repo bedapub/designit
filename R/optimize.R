@@ -197,9 +197,16 @@ optimize_design <- function(batch_container, samples = NULL,
     start_assignment_vec = list(batch_container$assignment)
   )
 
-  # based on https://stat.ethz.ch/pipermail/r-help/2007-September/141717.html
-  if (!exists(".Random.seed")) stats::runif(1)
+  # saving the current random seed for reproducibility
+  if (!exists(".Random.seed", .GlobalEnv)) {
+    # Sets the default random number generator and initializes
+    # .Random.seed in the global environment.
+    # This doesn't affect the way random seed would have been set in
+    # downstream functions such as `sample()`.
+    set.seed(NULL)
+  }
   trace$seed <- list(.Random.seed)
+  trace$rng_kind <- list(RNGkind())
 
   if (is.null(samples)) {
     assertthat::assert_that(batch_container$has_samples,
@@ -257,7 +264,7 @@ optimize_design <- function(batch_container, samples = NULL,
   iteration <- 1
   using_attributes <- FALSE # keeps track if attributes had been used in 1st iteration, since they must be provided consistently
 
-  shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+  shuffle_params <- shuffle_proposal_func(batch_container, iteration) |>
     extract_shuffle_params(attributes_expected = FALSE)
 
   # Always perform first shuffling before scoring the bc; works also if attributes are added at this stage
@@ -392,7 +399,7 @@ optimize_design <- function(batch_container, samples = NULL,
 
     if (iteration <= max_iter) {
       # only call shuffle_proposal_func in case we have more iterations
-      shuffle_params <- shuffle_proposal_func(batch_container, iteration) %>%
+      shuffle_params <- shuffle_proposal_func(batch_container, iteration) |>
         extract_shuffle_params(attributes_expected = using_attributes)
     }
   }

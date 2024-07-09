@@ -50,8 +50,8 @@ invivo_study_samples <- dplyr::mutate(invivo_study_samples,
 )
 str(invivo_study_samples)
 
-invivo_study_samples %>%
-  dplyr::count(Strain, Sex, Litter_combine_females) %>%
+invivo_study_samples |>
+  dplyr::count(Strain, Sex, Litter_combine_females) |>
   gt::gt()
 ```
 
@@ -138,8 +138,8 @@ exception of tolerating one violation of earmark-uniqueness within a cage.
 The following cages (homogeneous in strain, sex and treatment) have been generated in the process:
 
 ```{r echo=TRUE}
-design %>%
-  dplyr::count(Cage, Strain, Sex, Treatment) %>%
+design |>
+  dplyr::count(Cage, Strain, Sex, Treatment) |>
   gt::gt()
 ```
 
@@ -247,7 +247,7 @@ bc3 <- optimize_design(
 design <- bc3$get_samples()
 
 # Obeying all constraints does not lead to a very balanced sample allocation:
-dplyr::count(design, Treatment, Strain) %>% gt::gt()
+dplyr::count(design, Treatment, Strain) |> gt::gt()
 
-dplyr::count(design, Treatment, Sex) %>% gt::gt()
+dplyr::count(design, Treatment, Sex) |> gt::gt()
 ```

@@ -2,7 +2,7 @@ samples <- data.frame(i = 1:384, x = rnorm(384))
 
 bc <- BatchContainer$new(
   dimensions = c(row = 16, column = 24)
-) |>
+) %>%
   assign_in_order(samples)
 
 

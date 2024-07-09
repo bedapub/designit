@@ -1,6 +1,6 @@
 Package: designit
 Title: Blocking and Randomization for Experimental Design
-Version: 0.4.1
+Version: 0.5.0.9000
 Authors@R: c(
     person(given = c(first = "Iakov", middle = "I."),
            family = "Davydov",
@@ -22,6 +22,11 @@ Authors@R: c(
            role = "ctb",
            email = "konrad.rudolph@roche.com",
            comment = c(ORCID = "0000-0002-9866-7051")),
+    person(given = "Jitao David",
+           family = "Zhang",
+           role = c("aut", "cph"),
+           email = "jitao_david.zhang@roche.com",
+           comment = c(ORCID="0000-0002-3085-0909")),
     person(given = "Balazs",
            family = "Banfai",
            role = c("aut", "cph"),
@@ -29,35 +34,32 @@ Authors@R: c(
            comment = c(ORCID = "0000-0003-0422-7977")),
     person(given = "F. Hoffman-La Roche", role = c("cph", "fnd")))
 Description:
-    Reducing batch effect by intelligently assigning samples to batches.
-    Batch-effect have a strong influence in data analysis, especially when
-    samples-to-batches assignment is coinciding with contrast groups.
-    By defining your batch container and a scoring function reflecting
-    the contrasts, you can assign samples in such a way that the potential
-    batch-effect has minimal effect on the comparison of interest.
+    Intelligently assign samples to batches in order to reduce batch effects.
+    Batch effects can have a significant impact on data analysis, especially
+    when the assignment of samples to batches coincides with the contrast
+    groups being studied. By defining a batch container and a scoring function
+    that reflects the contrasts, this package allows users to assign samples in
+    a way that minimizes the potential impact of batch effects on the
+    comparison of interest. Among other functionality, we provide an
+    implementation for OSAT score by Yan et al. (2012,
+    <doi:10.1186/1471-2164-13-689>).
 License: MIT + file LICENSE
 URL: https://bedapub.github.io/designit/, https://github.com/BEDApub/designit/
 BugReports: https://github.com/BEDApub/designit/issues
 Depends:
-    R (>= 3.5.0)
+    R (>= 4.1.0)
 Imports: 
-    magrittr,
     rlang (>= 0.4.0),
     dplyr (>= 1.0.0),
     purrr,
     ggplot2,
     scales,
     tibble,
-    tidyselect,
     tidyr,
     assertthat,
     stringr,
     R6,
-    ineq,
     data.table,
-    glue,
-    forcats,
-    checkmate,
     stats
 Suggests: 
     testthat,

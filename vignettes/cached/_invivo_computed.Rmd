@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(designit)
 library(dplyr)
-library(forcats)
 library(assertthat)
 library(stringr)
 library(tidyr)
@@ -31,7 +30,7 @@ library(cowplot)
 .precompile <- TRUE
 knitr::purl("../invivo_study_design.Rmd",
             output = tempfile(),
-            documentation = 0) %>% 
+            documentation = 0) |> 
   source(echo = FALSE)
 ```
 

@@ -29,8 +29,8 @@ data("multi_trt_day_samples")
 Samples are grouped by Treatment and Collection time with the following group sizes:
 
 ```{r}
-multi_trt_day_samples %>%
-  count(Time, Treatment) %>%
+multi_trt_day_samples |>
+  count(Time, Treatment) |>
   gt::gt()
 ```
 
@@ -93,8 +93,8 @@ qplot(
 
 ## Final batch layout
 ```{r, fig.width=6, fig.height=5}
-bc$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>%
+bc$get_samples(assignment = TRUE) |>
+  mutate(batch = factor(batch)) |>
   ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   geom_bar()
 ```
@@ -126,8 +126,8 @@ qplot(
   main = str_glue("Final score={bc2$score(scoring_f)}"), geom = "point"
 )
 
-bc2$get_samples(assignment = TRUE) %>%
-  mutate(batch = factor(batch)) %>%
+bc2$get_samples(assignment = TRUE) |>
+  mutate(batch = factor(batch)) |>
   ggplot(aes(x = batch, fill = Treatment, alpha = factor(Time))) +
   geom_bar()
 ```
@@ -177,8 +177,8 @@ qplot(
 This is not giving the expected mix of treatments across runs.
 
 ```{r, fig.width=6, fig.height= 4}
-bc$get_samples() %>%
-  mutate(run = factor(run)) %>%
+bc$get_samples() |>
+  mutate(run = factor(run)) |>
   ggplot(aes(x = run, fill = Treatment, alpha = factor(Time))) +
   geom_bar() +
   facet_wrap(~batch)
