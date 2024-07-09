@@ -1,5 +1,3 @@
-
-
 #' Internal helper function to set up an (n m) x (n m) pairwise distance matrix for a plate with n rows and m columns
 #'
 #' @param plate_x Dimension of plate in x direction (i.e number of columns)
@@ -99,7 +97,6 @@ mk_plate_scoring_functions <- function(batch_container, plate = NULL, row, colum
   )
 
   plate_scoring_func <- function(samples, plate, plate_name, row, column, group) {
-
     # Have to distinguish between empty positions on plate and NA-levels of experimental factors which may happen for real samples, too
     nonempty_pos <- !is.na(samples[[".sample_id"]])
 
@@ -250,9 +247,13 @@ optimize_multi_plate_design <- function(batch_container, across_plates_variables
 
   if (!is.null(within_plate_variables)) {
     plate_levels <- unique(bc$get_locations()[[plate]])
-    scoring_funcs <- purrr::map(within_plate_variables,
-                                ~ mk_plate_scoring_functions(bc, plate = plate, row = row, column = column, group = .x,
-                                                             p = 1, penalize_lines = "none")) |>
+    scoring_funcs <- purrr::map(
+      within_plate_variables,
+      ~ mk_plate_scoring_functions(bc,
+        plate = plate, row = row, column = column, group = .x,
+        p = 1, penalize_lines = "none"
+      )
+    ) |>
       unlist()
     names(scoring_funcs) <- paste(rep(within_plate_variables, each = length(plate_levels)), names(scoring_funcs))
 
