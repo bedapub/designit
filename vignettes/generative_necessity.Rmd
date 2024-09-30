@@ -108,7 +108,7 @@ summary(aov(measurement ~ Compound, data=dat))
 
 To verify, we calculate Turkey's honest significant differences using true effect. As expected, no single compound shows significant difference from the effect of DMSO (adjusted p-value>0.05)
 ```{r}
-versusDMSO <- paste0(conds[-1], "-", conds[1])
+versusDMSO <- paste0(conditions[-1], "-", conditions[1])
 trueDiff <- TukeyHSD(aov(trueEffect ~ Compound, data=dat))$Compound
 trueDiff[versusDMSO,]
 ```
