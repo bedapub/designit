@@ -54,16 +54,19 @@ set.seed(2307111)
 
 conditions <- c("DMSO", sprintf("Compound%02d", 1:11))
 # set up samples with conditions and true effects
-dat <- data.frame(SampleIndex = 1:96,
-                  Compound = factor(rep(conditions, 8), levels = conditions),
-                  trueEffect = rnorm(96, mean = 10, sd = 1))
-  
+dat <- data.frame(
+  SampleIndex = 1:96,
+  Compound = factor(rep(conditions, 8), levels = conditions),
+  trueEffect = rnorm(96, mean = 10, sd = 1)
+)
+
 # add the layout plus plate effect
-dat <- dat |> 
+dat <- dat |>
   mutate(
-    row=rep(1:8, each=12), col=rep(1:12, 8),
-    plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
-    measurement=trueEffect + plateEffect)
+    row = rep(1:8, each = 12), col = rep(1:12, 8),
+    plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
+    measurement = trueEffect + plateEffect
+  )
 
 head(dat) |> gt::gt()
 ```
@@ -74,60 +77,66 @@ First we simulate a study in which randomization is not used. In this context, i
 
 ```{r rawPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
-  plotlist = list(plot_plate(dat,
-                             plate=plate,
-                             row=row, column=col, .color=Compound,
-                             title="Layout by treatment"),
-                  plot_plate(dat,
-                             plate = plate, row = row, column = col, .color = trueEffect,
-                             title = "True effect"
-                  ),
-                  plot_plate(dat,
-                             plate = plate, row = row, column = col, .color = plateEffect,
-                             title = "Plate effect"
-                  ),
-                  plot_plate(dat,
-                             plate = plate, row = row, column = col, .color = measurement,
-                             title = "Measurement"
-                  )
-  ), ncol = 2, nrow=2
+  plotlist = list(
+    plot_plate(dat,
+      plate = plate,
+      row = row, column = col, .color = Compound,
+      title = "Layout by treatment"
+    ),
+    plot_plate(dat,
+      plate = plate, row = row, column = col, .color = trueEffect,
+      title = "True effect"
+    ),
+    plot_plate(dat,
+      plate = plate, row = row, column = col, .color = plateEffect,
+      title = "Plate effect"
+    ),
+    plot_plate(dat,
+      plate = plate, row = row, column = col, .color = measurement,
+      title = "Measurement"
+    )
+  ), ncol = 2, nrow = 2
 )
 ```
 
 When we perform an one-way ANOVA test with the true effect, the F-test suggests that there are no significant differences between the treatments (p>0.05).
 
 ```{r}
-summary(aov(trueEffect ~ Compound, data=dat))
+summary(aov(trueEffect ~ Compound, data = dat))
 ```
 
 However, if we consider the measurement, which sums the true effect and the plate effect, the F-test suggests that there are significant differences between the compounds (p<0.01).
 
 ```{r}
-summary(aov(measurement ~ Compound, data=dat))
+summary(aov(measurement ~ Compound, data = dat))
 ```
 
 To verify, we calculate Turkey's honest significant differences using true effect. As expected, no single compound shows significant difference from the effect of DMSO (adjusted p-value>0.05)
 ```{r}
 versusDMSO <- paste0(conditions[-1], "-", conditions[1])
-trueDiff <- TukeyHSD(aov(trueEffect ~ Compound, data=dat))$Compound
-trueDiff[versusDMSO,]
+trueDiff <- TukeyHSD(aov(trueEffect ~ Compound, data = dat))$Compound
+trueDiff[versusDMSO, ]
 ```
 
 However, calculating the differences with measurements reveal that Compound 6 would have a significant difference in viability from that of DMSO (adjusted p<0.01).
 
 ```{r}
-measureDiff <- TukeyHSD(aov(measurement ~ Compound, 
-                            data=dat))$Compound
-measureDiff[versusDMSO,]
+measureDiff <- TukeyHSD(aov(measurement ~ Compound,
+  data = dat
+))$Compound
+measureDiff[versusDMSO, ]
 ```
 
 We can also detect the difference visually with a Box-Whisker plot.
 
 ```{r boxplot, fig.height=5, fig.width=5}
-ggplot(dat, 
-       aes(x=Compound, y=measurement)) +
-  geom_boxplot() + ylab("Measurement [w/o randomization]") +
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+ggplot(
+  dat,
+  aes(x = Compound, y = measurement)
+) +
+  geom_boxplot() +
+  ylab("Measurement [w/o randomization]") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
 
@@ -141,12 +150,13 @@ Now we use the all but one assumptions made above, with the only change that we 
 set.seed(2307111)
 
 # add the layout plus plate effect
-randomized_dat <- dat |> 
+randomized_dat <- dat |>
   slice(sample(1:n())) |> # shuffle the order of samples in the dataset
   mutate(
-    row=rep(1:8, each=12), col=rep(1:12, 8),
-    plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
-    measurement=trueEffect + plateEffect)
+    row = rep(1:8, each = 12), col = rep(1:12, 8),
+    plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
+    measurement = trueEffect + plateEffect
+  )
 
 randomized_dat |>
   head() |>
@@ -155,41 +165,47 @@ randomized_dat |>
 
 ```{r randomPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
-  plotlist = list(plot_plate(randomized_dat,
-                             plate=plate,
-                             row=row, column=col, .color=Compound,
-                             title="Layout by treatment"),
-                  plot_plate(randomized_dat,
-                             plate = plate, row = row, column = col, .color = trueEffect,
-                             title = "True effect"
-                  ),
-                  plot_plate(randomized_dat,
-                             plate = plate, row = row, column = col, .color = plateEffect,
-                             title = "Plate effect"
-                  ),
-                  plot_plate(randomized_dat,
-                             plate = plate, row = row, column = col, .color = measurement,
-                             title = "Measurement"
-                  )
-  ), ncol = 2, nrow=2
+  plotlist = list(
+    plot_plate(randomized_dat,
+      plate = plate,
+      row = row, column = col, .color = Compound,
+      title = "Layout by treatment"
+    ),
+    plot_plate(randomized_dat,
+      plate = plate, row = row, column = col, .color = trueEffect,
+      title = "True effect"
+    ),
+    plot_plate(randomized_dat,
+      plate = plate, row = row, column = col, .color = plateEffect,
+      title = "Plate effect"
+    ),
+    plot_plate(randomized_dat,
+      plate = plate, row = row, column = col, .color = measurement,
+      title = "Measurement"
+    )
+  ), ncol = 2, nrow = 2
 )
 ```
 
 When we apply the F-test, we detect no significant differences between any compound and DMSO.
 
 ```{r}
-randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound, 
-                            data=randomized_dat))$Compound
-randMeasureDiff[versusDMSO,]
+randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound,
+  data = randomized_dat
+))$Compound
+randMeasureDiff[versusDMSO, ]
 ```
 
 We can also use the boxplot as a visual help to inspect the difference between the treatments, to confirm that randomization prevents plate effect from affecting the statistical inference.
 
 ```{r randBoxplot, fig.height=5, fig.width=5}
-ggplot(randomized_dat, 
-       aes(x=Compound, y=measurement)) +
-  geom_boxplot() + ylab("Measurement [with randomization]") +
-  theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
+ggplot(
+  randomized_dat,
+  aes(x = Compound, y = measurement)
+) +
+  geom_boxplot() +
+  ylab("Measurement [with randomization]") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
 ```
 
 ## Discussions and conclusions
