@@ -59,13 +59,13 @@ dat <- data.frame(SampleIndex = 1:96,
                   trueEffect = rnorm(96, mean = 10, sd = 1))
   
 # add the layout plus plate effect
-dat <- dat %>% 
+dat <- dat |> 
   mutate(
     row=rep(1:8, each=12), col=rep(1:12, 8),
     plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
     measurement=trueEffect + plateEffect)
 
-head(dat) %>% gt::gt()
+head(dat) |> gt::gt()
 ```
 
 ## Simulating a study in which randomization is not used
@@ -141,14 +141,16 @@ Now we use the all but one assumptions made above, with the only change that we 
 set.seed(2307111)
 
 # add the layout plus plate effect
-randomized_dat <- dat %>% 
-  slice(sample(1:n())) %>% # shuffle the order of samples in the dataset
+randomized_dat <- dat |> 
+  slice(sample(1:n())) |> # shuffle the order of samples in the dataset
   mutate(
     row=rep(1:8, each=12), col=rep(1:12, 8),
     plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
     measurement=trueEffect + plateEffect)
 
-head(randomized_dat) %>% gt::gt()
+randomized_dat |>
+  head() |>
+  gt::gt()
 ```
 
 ```{r randomPlatePlots, fig.height=5.5, fig.width=8}
