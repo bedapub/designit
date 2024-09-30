@@ -8,10 +8,11 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 ---
 
-In this document, we demonstrate the necessity of a proper experiment design 
-with a generative model which we use to simulate data with "batch" effects. We show that a proper experiment design helps
-experimentalists and analysts make correct inference about the quantity of 
-interest that is robust against randomness.
+In this document, we demonstrate the necessity of a proper experiment design
+with a generative model which we use to simulate data with "batch" effects. We
+show that a proper experiment design helps experimentalists and analysts make
+correct inference about the quantity of interest that is robust against
+randomness.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -27,27 +28,61 @@ library(tidyverse)
 
 ## A simple case study about plate effect: the background
 
-Assume we perform an experiment to test the effect of eleven drug candidates under development on cell viability. To do so, we treat cells in culture with a fixed concentration of each of the eleven candidates, and we treat cells with DMSO (dimethyl sulfoxide) as a vehicle control, since the drug candidates are all solved in DMSO solutions. 
+Assume we perform an experiment to test the effect of eleven drug candidates
+under development on cell viability. To do so, we treat cells in culture with a
+fixed concentration of each of the eleven candidates, and we treat cells with
+DMSO (dimethyl sulfoxide) as a vehicle control, since the drug candidates are
+all solved in DMSO solutions. 
 
-To assess the effect with regard to the variability intrinsic to the experiment setup, we measure the effect of each drug candidate (and DMSO) in eight different batches of cells, which are comparable to each other.
+To assess the effect with regard to the variability intrinsic to the experiment
+setup, we measure the effect of each drug candidate (and DMSO) in eight
+different batches of cells, which are comparable to each other.
 
-In total, we have 96 samples: 11 drug candidates plus one DMSO control, 8 samples each. The samples neatly fit into a 96-well microtiter plate with 8 rows, and 12 columns.
+In total, we have 96 samples: 11 drug candidates plus one DMSO control, 8
+samples each. The samples neatly fit into a 96-well microtiter plate with 8
+rows, and 12 columns.
 
-In order to avoid batch effects and to make the operation simple, all operations and measurements are done by the same careful operator and performed at the same time. The operator has two possibilities:
+In order to avoid batch effects and to make the operation simple, all operations
+and measurements are done by the same careful operator and performed at the same
+time. The operator has two possibilities:
 
-1. She does *not* randomize the samples with regard to the plate layout. The naive layout will put each drug candidate or control (DMSO) in one column. For simplicity, let us assume that the cells treated with DMSO are put in column 1, and cells treated with the eleven drug candidates are put in columns 2 to 12.
-2. She randomizes the samples with regard to the plate layout, so that nearby samples are not necessarily of the same condition.
+1. She does *not* randomize the samples with regard to the plate layout. The
+   naive layout will put each drug candidate or control (DMSO) in one column.
+   For simplicity, let us assume that the cells treated with DMSO are put in
+   column 1, and cells treated with the eleven drug candidates are put in
+   columns 2 to 12.
+2. She randomizes the samples with regard to the plate layout, so that nearby
+   samples are not necessarily of the same condition.
 
-What is the difference between the two variants? Option 2 apparently involves more planning and labor than option 1. If manual instead of robotic pipetting is involved, option 2 is likely error-prone. So why bothering considering the later option?
+What is the difference between the two variants? Option 2 apparently involves
+more planning and labor than option 1. If manual instead of robotic pipetting is
+involved, option 2 is likely error-prone. So why bothering considering the later
+option?
 
-Randomization pays off when unwanted variance is large enough so that it may distort our estimate of the quantity in which we are interested in. In our example, the unwanted variance may come from a *plate effect*: due to variances in temperature, humidity, and evaporation between wells in the plate, cells may respond differently to *even the same treatment*. Such *plate effects* are difficult to judge practically because they are not known prior to the experiment, unless a calibration study is performed where the cells in a microtiter plate are indeed treated with the same condition and measurements are performed in order to quantify the plate effect. However, it is simple to *simulate* such plate effects *in silico* with *a generative model*, and test the effect of randomization.
+Randomization pays off when unwanted variance is large enough so that it may
+distort our estimate of the quantity in which we are interested in. In our
+example, the unwanted variance may come from a *plate effect*: due to variances
+in temperature, humidity, and evaporation between wells in the plate, cells may
+respond differently to *even the same treatment*. Such *plate effects* are
+difficult to judge practically because they are not known prior to the
+experiment, unless a calibration study is performed where the cells in a
+microtiter plate are indeed treated with the same condition and measurements are
+performed in order to quantify the plate effect. However, it is simple to
+*simulate* such plate effects *in silico* with *a generative model*, and test
+the effect of randomization.
 
 For simplicity, we make following further assumptions:
 
-(1) The plate effect is radial, i.e. cells in wells on the edges are more affected by than cells in wells in the middle of the plate. 
-(2) The plate effect is positive, i.e. cells in edge wells show higher viability than cells in the middle wells.
-(3) None of the tested compounds regulate cell viability significantly, i.e. cells treated with compounds and cell treated with DMSO control have the same expected value of viability. We simulate the effect of DMSO and compounds by drawing random samples from a normal distribution.
-(4) The true effect of compounds and the plate effect is additive, i.e. our measurement is the sum of the true effect and the plate effect.
+(1) The plate effect is radial, i.e. cells in wells on the edges are more
+    affected by than cells in wells in the middle of the plate. 
+(2) The plate effect is positive, i.e. cells in edge wells show higher viability
+    than cells in the middle wells.
+(3) None of the tested compounds regulate cell viability significantly, i.e.
+  cells treated with compounds and cell treated with DMSO control have the same
+  expected value of viability. We simulate the effect of DMSO and compounds by
+  drawing random samples from a normal distribution.
+(4) The true effect of compounds and the plate effect is additive, i.e. our
+    measurement is the sum of the true effect and the plate effect.
 
 ```{r}
 set.seed(2307111)
@@ -73,7 +108,11 @@ head(dat) |> gt::gt()
 
 ## Simulating a study in which randomization is not used
 
-First we simulate a study in which randomization is not used. In this context, it means that the treatment (controls and compounds in columns) and the plate effect are correlated. The following plot visualizes the layout of the plate, the true effect, the plate effect, and the measurement as a sum of the true effect and the plate effect.
+First we simulate a study in which randomization is not used. In this context,
+it means that the treatment (controls and compounds in columns) and the plate
+effect are correlated. The following plot visualizes the layout of the plate,
+the true effect, the plate effect, and the measurement as a sum of the true
+effect and the plate effect.
 
 ```{r rawPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
@@ -99,26 +138,34 @@ cowplot::plot_grid(
 )
 ```
 
-When we perform an one-way ANOVA test with the true effect, the F-test suggests that there are no significant differences between the treatments (p>0.05).
+When we perform an one-way ANOVA test with the true effect, the F-test suggests
+that there are no significant differences between the treatments (p>0.05).
 
 ```{r}
 summary(aov(trueEffect ~ Compound, data = dat))
 ```
 
-However, if we consider the measurement, which sums the true effect and the plate effect, the F-test suggests that there are significant differences between the compounds (p<0.01).
+However, if we consider the measurement, which sums the true effect and the
+plate effect, the F-test suggests that there are significant differences between
+the compounds (p<0.01).
 
 ```{r}
 summary(aov(measurement ~ Compound, data = dat))
 ```
 
-To verify, we calculate Turkey's honest significant differences using true effect. As expected, no single compound shows significant difference from the effect of DMSO (adjusted p-value>0.05)
+To verify, we calculate Turkey's honest significant differences using true
+effect. As expected, no single compound shows significant difference from the
+effect of DMSO (adjusted p-value>0.05)
+
 ```{r}
 versusDMSO <- paste0(conditions[-1], "-", conditions[1])
 trueDiff <- TukeyHSD(aov(trueEffect ~ Compound, data = dat))$Compound
 trueDiff[versusDMSO, ]
 ```
 
-However, calculating the differences with measurements reveal that Compound 6 would have a significant difference in viability from that of DMSO (adjusted p<0.01).
+However, calculating the differences with measurements reveal that Compound 6
+would have a significant difference in viability from that of DMSO (adjusted
+p<0.01).
 
 ```{r}
 measureDiff <- TukeyHSD(aov(measurement ~ Compound,
@@ -140,11 +187,20 @@ ggplot(
 ```
 
 
-Given that our simulation study assumed that no single compound affects cell viability significantly differently from DMSO controls. So the addition of plate effect causes one false discovery in this simulation. It can be expected that the false-discovery rate may vary depending on the relative strength and variability of the plate effect with regard to the true effects. What matters most is the observation that in the presence of plate effect, a lack of randomization, i.e. a correlation of treatment with plate positions, may cause wrong inferences.
+Given that our simulation study assumed that no single compound affects cell
+viability significantly differently from DMSO controls. So the addition of plate
+effect causes one false discovery in this simulation. It can be expected that
+the false-discovery rate may vary depending on the relative strength and
+variability of the plate effect with regard to the true effects. What matters
+most is the observation that in the presence of plate effect, a lack of
+randomization, i.e. a correlation of treatment with plate positions, may cause
+wrong inferences.
 
 ## Randomization prevents plate effect from interfering with inferences
 
-Now we use the all but one assumptions made above, with the only change that we shall randomize the layout of the samples. The randomization will break the correlation between treatments and plate effects.
+Now we use the all but one assumptions made above, with the only change that we
+shall randomize the layout of the samples. The randomization will break the
+correlation between treatments and plate effects.
 
 ```{r}
 set.seed(2307111)
@@ -187,7 +243,8 @@ cowplot::plot_grid(
 )
 ```
 
-When we apply the F-test, we detect no significant differences between any compound and DMSO.
+When we apply the F-test, we detect no significant differences between any
+compound and DMSO.
 
 ```{r}
 randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound,
@@ -196,7 +253,9 @@ randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound,
 randMeasureDiff[versusDMSO, ]
 ```
 
-We can also use the boxplot as a visual help to inspect the difference between the treatments, to confirm that randomization prevents plate effect from affecting the statistical inference.
+We can also use the boxplot as a visual help to inspect the difference between
+the treatments, to confirm that randomization prevents plate effect from
+affecting the statistical inference.
 
 ```{r randBoxplot, fig.height=5, fig.width=5}
 ggplot(
@@ -210,6 +269,17 @@ ggplot(
 
 ## Discussions and conclusions
 
-The simple case study discussed in this vignette is an application of generative models, which means that assuming that we know the mechanism by which the data is generated, we can simulate the data generation process and use it for various purposes. In our cases, we simulated a linear additive model of true effects of compounds and control on cell viability and the plate effect induced by positions in a microtitre plate. Using the model, we demonstrate that (1) plate effect can impact statistical inference by introducing false positive (and in other case, false negative) findings, and (2) a full randomization can guard statistical inference by reducing the bias of the plate effect.
+The simple case study discussed in this vignette is an application of generative
+models, which means that assuming that we know the mechanism by which the data
+is generated, we can simulate the data generation process and use it for various
+purposes. In our cases, we simulated a linear additive model of true effects of
+compounds and control on cell viability and the plate effect induced by
+positions in a microtitre plate. Using the model, we demonstrate that (1) plate
+effect can impact statistical inference by introducing false positive (and in
+other case, false negative) findings, and (2) a full randomization can guard
+statistical inference by reducing the bias of the plate effect.
 
-While the case study is on the margin of being overly simple, we hope that it demonstrates the advantage of appropriate experiment design using tools like \textit{DesignIt}, as well as the necessity of statistical techniques such as randomization and blocking in drug discovery and development.
+While the case study is on the margin of being overly simple, we hope that it
+demonstrates the advantage of appropriate experiment design using tools like
+`designit`, as well as the necessity of statistical techniques such as
+randomization and blocking in drug discovery and development.
