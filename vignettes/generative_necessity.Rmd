@@ -52,8 +52,6 @@ For simplicity, we make following further assumptions:
 ```{r}
 set.seed(2307111)
 
-set.seed(2307111)
-
 conditions <- c("DMSO", sprintf("Compound%02d", 1:11))
 # set up samples with conditions and true effects
 dat <- data.frame(SampleIndex = 1:96,
