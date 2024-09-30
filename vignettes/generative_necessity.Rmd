@@ -1,5 +1,5 @@
 ---
-title: "On the benefits of experiment design: a generative modelling approach"
+title: "On the benefits of experiment design: a simulation approach"
 author: "Jitao david Zhang"
 output: rmarkdown::html_vignette
 vignette: >
@@ -9,7 +9,7 @@ vignette: >
 ---
 
 In this document, we demonstrate the necessity of a proper experiment design 
-with a generative model. We show that a proper experiment design helps
+with a generative model which we use to simulate data with "batch" effects. We show that a proper experiment design helps
 experimentalists and analysts make correct inference about the quantity of 
 interest that is robust against randomness.
 
@@ -40,7 +40,7 @@ In order to avoid batch effects and to make the operation simple, all operations
 
 What is the difference between the two variants? Option 2 apparently involves more planning and labor than option 1. If manual instead of robotic pipetting is involved, option 2 is likely error-prone. So why bothering considering the later option?
 
-Randomization pays off when unwanted variance is large enough so that it may distort our estimate of the quantity in which we are interested in. In our example, the unwanted variance may come from the *plate effect*: due to variances in temperature, humidity, and evaporation between wells in the plate, cells may respond differently to *even the same treatment*. Such *plate effects* are difficult to judge practically because they are not known prior to the experiment, unless a calibration study is performed where the cells in a microtiter plate are indeed treated with the same condition and measurements are performed in order to quantify the plate effect. However, it is simple to *simulate* such plate effects *in silico* with *a generative model*, and test the effect of randomization.
+Randomization pays off when unwanted variance is large enough so that it may distort our estimate of the quantity in which we are interested in. In our example, the unwanted variance may come from a *plate effect*: due to variances in temperature, humidity, and evaporation between wells in the plate, cells may respond differently to *even the same treatment*. Such *plate effects* are difficult to judge practically because they are not known prior to the experiment, unless a calibration study is performed where the cells in a microtiter plate are indeed treated with the same condition and measurements are performed in order to quantify the plate effect. However, it is simple to *simulate* such plate effects *in silico* with *a generative model*, and test the effect of randomization.
 
 For simplicity, we make following further assumptions:
 
@@ -52,23 +52,22 @@ For simplicity, we make following further assumptions:
 ```{r}
 set.seed(2307111)
 
-conds <- c("DMSO", sprintf("Compound%02d", 1:11))
-dat <- data.frame(SampleIndex=1:96,
-                  Compound=factor(rep(conds, 8), levels=conds),
-                  rawRow=rep(1:8, each=12),
-                  rawCol=rep(1:12, 8)) %>%
-  mutate(trueEffect=rnorm(96, mean=10, sd=1),
-    plateEffect=0.5 * sqrt((rawRow-4.5)^2 + (rawCol-6.5)^2),
+set.seed(2307111)
+
+conditions <- c("DMSO", sprintf("Compound%02d", 1:11))
+# set up samples with conditions and true effects
+dat <- data.frame(SampleIndex = 1:96,
+                  Compound = factor(rep(conditions, 8), levels = conditions),
+                  trueEffect = rnorm(96, mean = 10, sd = 1))
+  
+# add the layout plus plate effect
+dat <- dat %>% 
+  mutate(
+    row=rep(1:8, each=12), col=rep(1:12, 8),
+    plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
     measurement=trueEffect + plateEffect)
-bc <- BatchContainer$new(
-  dimensions = list("plate" = 1, 
-                    row = list(values=LETTERS[1:8]), 
-                    col = list(values=sprintf("%02d", 1:12)))
-)
 
-bc <- assign_in_order(bc, dat)
-
-head(bc$get_samples()) %>% gt::gt()
+head(dat) %>% gt::gt()
 ```
 
 ## Simulating a study in which randomization is not used
@@ -77,19 +76,19 @@ First we simulate a study in which randomization is not used. In this context, i
 
 ```{r rawPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
-  plotlist = list(plot_plate(bc,
+  plotlist = list(plot_plate(dat,
                              plate=plate,
                              row=row, column=col, .color=Compound,
                              title="Layout by treatment"),
-                  plot_plate(bc,
+                  plot_plate(dat,
                              plate = plate, row = row, column = col, .color = trueEffect,
                              title = "True effect"
                   ),
-                  plot_plate(bc,
+                  plot_plate(dat,
                              plate = plate, row = row, column = col, .color = plateEffect,
                              title = "Plate effect"
                   ),
-                  plot_plate(bc,
+                  plot_plate(dat,
                              plate = plate, row = row, column = col, .color = measurement,
                              title = "Measurement"
                   )
@@ -120,14 +119,14 @@ However, calculating the differences with measurements reveal that Compound 6 wo
 
 ```{r}
 measureDiff <- TukeyHSD(aov(measurement ~ Compound, 
-                            data=bc$get_samples()))$Compound
+                            data=dat))$Compound
 measureDiff[versusDMSO,]
 ```
 
 We can also detect the difference visually with a Box-Whisker plot.
 
 ```{r boxplot, fig.height=5, fig.width=5}
-ggplot(bc$get_samples(), 
+ggplot(dat, 
        aes(x=Compound, y=measurement)) +
   geom_boxplot() + ylab("Measurement [w/o randomization]") +
   theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
@@ -143,39 +142,32 @@ Now we use the all but one assumptions made above, with the only change that we 
 ```{r}
 set.seed(2307111)
 
-rand_dat <- data.frame(SampleIndex=1:96,
-                  Compound=sample(factor(rep(conds, 8), levels=conds)),
-                  rawRow=rep(1:8, each=12),
-                  rawCol=rep(1:12, 8)) %>%
-  mutate(trueEffect=rnorm(96, mean=10, sd=1),
-    plateEffect=0.5 * sqrt((rawRow-4.5)^2 + (rawCol-6.5)^2),
+# add the layout plus plate effect
+randomized_dat <- dat %>% 
+  slice(sample(1:n())) %>% # shuffle the order of samples in the dataset
+  mutate(
+    row=rep(1:8, each=12), col=rep(1:12, 8),
+    plateEffect=0.5 * sqrt((row-4.5)^2 + (col-6.5)^2),
     measurement=trueEffect + plateEffect)
 
-bc2 <- BatchContainer$new(
-  dimensions = list("plate" = 1, 
-                    row = list(values=LETTERS[1:8]), 
-                    col = list(values=sprintf("%02d", 1:12)))
-)
-
-bc2 <- assign_in_order(bc2, rand_dat)
-head(bc2$get_samples()) %>% gt::gt()
+head(randomized_dat) %>% gt::gt()
 ```
 
 ```{r randomPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
-  plotlist = list(plot_plate(bc2,
+  plotlist = list(plot_plate(randomized_dat,
                              plate=plate,
                              row=row, column=col, .color=Compound,
                              title="Layout by treatment"),
-                  plot_plate(bc2,
+                  plot_plate(randomized_dat,
                              plate = plate, row = row, column = col, .color = trueEffect,
                              title = "True effect"
                   ),
-                  plot_plate(bc2,
+                  plot_plate(randomized_dat,
                              plate = plate, row = row, column = col, .color = plateEffect,
                              title = "Plate effect"
                   ),
-                  plot_plate(bc2,
+                  plot_plate(randomized_dat,
                              plate = plate, row = row, column = col, .color = measurement,
                              title = "Measurement"
                   )
@@ -187,14 +179,14 @@ When we apply the F-test, we detect no significant differences between any compo
 
 ```{r}
 randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound, 
-                            data=bc2$get_samples()))$Compound
+                            data=randomized_dat))$Compound
 randMeasureDiff[versusDMSO,]
 ```
 
 We can also use the boxplot as a visual help to inspect the difference between the treatments, to confirm that randomization prevents plate effect from affecting the statistical inference.
 
 ```{r randBoxplot, fig.height=5, fig.width=5}
-ggplot(bc2$get_samples(), 
+ggplot(randomized_dat, 
        aes(x=Compound, y=measurement)) +
   geom_boxplot() + ylab("Measurement [with randomization]") +
   theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust=1))
@@ -202,6 +194,6 @@ ggplot(bc2$get_samples(),
 
 ## Discussions and conclusions
 
-The simple case study discussed in this vignette is an application of generative models, which means that assuming that we know the mechanism by which the data is generated, we can simulate the data generation process and use it for various purposes. In our cases, we simulated a linear additive model of true effects of compounds and control on cell viability and the plate effect induced by positions in a microtitre plate. Using the model, we demonstrate that (1) plate effect can impact statistical inference by introducing false positive (and in other case, false negative) findings, and (2) a full randomization can guard statistical inference by reducing the effect of plate effect.
+The simple case study discussed in this vignette is an application of generative models, which means that assuming that we know the mechanism by which the data is generated, we can simulate the data generation process and use it for various purposes. In our cases, we simulated a linear additive model of true effects of compounds and control on cell viability and the plate effect induced by positions in a microtitre plate. Using the model, we demonstrate that (1) plate effect can impact statistical inference by introducing false positive (and in other case, false negative) findings, and (2) a full randomization can guard statistical inference by reducing the bias of the plate effect.
 
 While the case study is on the margin of being overly simple, we hope that it demonstrates the advantage of appropriate experiment design using tools like \textit{DesignIt}, as well as the necessity of statistical techniques such as randomization and blocking in drug discovery and development.
