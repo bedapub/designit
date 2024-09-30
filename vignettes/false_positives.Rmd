@@ -1,5 +1,5 @@
 ---
-title: "On the benefits of experiment design: a simulation approach"
+title: "Batch effects and false positives: a simulation study"
 author: "Jitao david Zhang"
 output: rmarkdown::html_vignette
 vignette: >
