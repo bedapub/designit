@@ -179,7 +179,7 @@ A \code{\link[tibble:tibble]{tibble}} with all the available locations.
 \if{html}{\out{<a id="method-BatchContainer-move_samples"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-move_samples}{}}}
 \subsection{Method \code{move_samples()}}{
-Move samples between locations
+Move samples between locations modifying the BatchContainer in place
 
 This method can receive either \code{src} and \code{dst} or \code{locations_assignment}.
 \subsection{Usage}{
