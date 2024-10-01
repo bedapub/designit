@@ -140,12 +140,16 @@ plot_plate(bc$get_samples(remove_empty_locations = TRUE),
 
 Sometimes we may wish to move samples, or to swap samples, or to manually 
 assign some locations. To move individual samples or manually assigning all
-locations we can use the `batchContainer$move_samples()` method.
+locations we can use the `BatchContainer$move_samples()` method.
+
+*Warning*: The `$move_samples()` method will modify the `BatchContainer` object
+in place. That is usually faster than creating a copy. Most of the time you
+will probably call `optimize_design()` instead of moving samples manually.
 
 To swap two or more samples, use
 
 ```{r, fig.width=6, fig.height=3.5}
-bc <- bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
+bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE),
   plate = plate, column = column, row = row,
@@ -158,7 +162,7 @@ To assign all samples in one go, use the option `location_assignment`.
 The example below orders samples by ID and adds the empty locations afterwards
 
 ```{r, fig.width=6, fig.height=3.5}
-bc <- bc$move_samples(
+bc$move_samples(
   location_assignment = c(
     1:nrow(samples),
     rep(NA, (bc$n_locations - nrow(samples)))
