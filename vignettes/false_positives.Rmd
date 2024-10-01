@@ -102,17 +102,6 @@ bc <- BatchContainer$new(
       trueEffect = rnorm(96, mean = 10, sd = 1)
     )
   )
-
-# get observations with batch effect
-get_observations <- function(bc) {
-  bc$get_samples() |>
-    mutate(
-      plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
-      measurement = trueEffect + plateEffect
-    )
-}
-
-head(dat) |> gt::gt()
 ```
 
 ## Simulating a study in which randomization is not used
@@ -124,7 +113,20 @@ the true effect, the plate effect, and the measurement as a sum of the true
 effect and the plate effect.
 
 ```{r}
+# get observations with batch effect
+get_observations <- function(bc) {
+  bc$get_samples() |>
+    mutate(
+      plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
+      measurement = trueEffect + plateEffect
+    )
+}
+```
+
+```{r}
 dat <- get_observations(bc)
+
+head(dat) |> gt::gt()
 ```
 
 ```{r rawPlatePlots, fig.height=5.5, fig.width=8}
