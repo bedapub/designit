@@ -285,9 +285,11 @@ instance of `BatchContainer` with `BatchContainer$new()`.
 2. Use functions `assign_random` and `plot_plate` to assign samples randomly
 and to plot the plate layout. If necessary, you can retrieve the samples from
 the BatchContainer instance `bc` with the method `bc$get_samples()`, or move
-samples with the method `bc$move_samples()`.
-3. The scoring function of `bc` can be set by `bc$scoring_f`. Once it is set,
-we can optimize the design, for instance by shuffling the samples.
+samples with the method `bc$move_samples()`. The better approach usually is to 
+optimize the design with `optimize_design()`.
+3. The scoring function can be set by passinrg `scoring` parameter to the
+`optimize_design()` function. The sample assignent is optimized by shuffling
+the samples.
 4. Various options are available to further customize the design.
 
 Now you have already the first experience of using `designit` for randomization,
