@@ -88,20 +88,29 @@ For simplicity, we make following further assumptions:
 set.seed(2307111)
 
 conditions <- c("DMSO", sprintf("Compound%02d", 1:11))
-# set up samples with conditions and true effects
-dat <- data.frame(
-  SampleIndex = 1:96,
-  Compound = factor(rep(conditions, 8), levels = conditions),
-  trueEffect = rnorm(96, mean = 10, sd = 1)
-)
-
-# add the layout plus plate effect
-dat <- dat |>
-  mutate(
-    row = rep(1:8, each = 12), col = rep(1:12, 8),
-    plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
-    measurement = trueEffect + plateEffect
+# set up batch container
+bc <- BatchContainer$new(
+  dimensions = list(
+    row = 8, col = 12
   )
+) |>
+  # assign samples with conditions and true effects
+  assign_in_order(
+    data.frame(
+      SampleIndex = 1:96,
+      Compound = factor(rep(conditions, 8), levels = conditions),
+      trueEffect = rnorm(96, mean = 10, sd = 1)
+    )
+  )
+
+# get observations with batch effect
+get_observations <- function(bc) {
+  bc$get_samples() |>
+    mutate(
+      plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
+      measurement = trueEffect + plateEffect
+    )
+}
 
 head(dat) |> gt::gt()
 ```
@@ -113,6 +122,10 @@ it means that the treatment (controls and compounds in columns) and the plate
 effect are correlated. The following plot visualizes the layout of the plate,
 the true effect, the plate effect, and the measurement as a sum of the true
 effect and the plate effect.
+
+```{r}
+dat <- get_observations(bc)
+```
 
 ```{r rawPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
@@ -159,7 +172,10 @@ effect of DMSO (adjusted p-value>0.05)
 
 ```{r}
 versusDMSO <- paste0(conditions[-1], "-", conditions[1])
-trueDiff <- TukeyHSD(aov(trueEffect ~ Compound, data = dat))$Compound
+trueDiff <- TukeyHSD(aov(
+  trueEffect ~ Compound,
+  data = dat
+))$Compound
 trueDiff[versusDMSO, ]
 ```
 
@@ -202,19 +218,47 @@ Now we use the all but one assumptions made above, with the only change that we
 shall randomize the layout of the samples. The randomization will break the
 correlation between treatments and plate effects.
 
-```{r}
+We use the builting function `mk_plate_scoring_functions` to define the scoring
+functions for the plate layout. We then use the `optimize_design` function to
+randomize the layout of the samples.
+
+```{r, eval=FALSE}
 set.seed(2307111)
 
-# add the layout plus plate effect
-randomized_dat <- dat |>
-  slice(sample(1:n())) |> # shuffle the order of samples in the dataset
-  mutate(
-    row = rep(1:8, each = 12), col = rep(1:12, 8),
-    plateEffect = 0.5 * sqrt((row - 4.5)^2 + (col - 6.5)^2),
-    measurement = trueEffect + plateEffect
+bc_rnd <- optimize_design(
+  bc,
+  scoring = mk_plate_scoring_functions(bc,
+    row = "row", column = "col",
+    group = "Compound"
   )
+)
+```
 
-randomized_dat |>
+```{r, include=FALSE}
+# this is quite slow, we use cached results
+# bc_rnd$get_samples(include_id=TRUE) |> pull(.sample_id) |> dput()
+
+bc_rnd <- bc$move_samples(
+  location_assignment =
+    c(
+      1, 24, 57, 4, 91, 94, 8, 47, 27, 26, 66, 65, 53,
+      67, 87, 13, 42, 60, 38, 86, 58, 21, 88, 71, 82, 18,
+      56, 11, 77, 64, 31, 45, 85, 25, 3, 36, 69, 75, 50,
+      96, 46, 83, 52, 89, 79, 78, 20, 92, 35, 2, 73, 32,
+      16, 9, 34, 63, 54, 41, 84, 19, 90, 40, 23, 55, 61,
+      29, 12, 68, 74, 39, 70, 33, 80, 5, 48, 15, 93, 49,
+      30, 10, 59, 7, 14, 28, 62, 22, 43, 6, 51, 44, 81,
+      72, 17, 76, 95, 37
+    )
+)
+```
+
+We add plate effect to the randomized data and calculate the measurement.
+
+```{r}
+dat_rnd <- get_observations(bc_rnd)
+
+dat_rnd |>
   head() |>
   gt::gt()
 ```
@@ -222,20 +266,20 @@ randomized_dat |>
 ```{r randomPlatePlots, fig.height=5.5, fig.width=8}
 cowplot::plot_grid(
   plotlist = list(
-    plot_plate(randomized_dat,
+    plot_plate(dat_rnd,
       plate = plate,
       row = row, column = col, .color = Compound,
       title = "Layout by treatment"
     ),
-    plot_plate(randomized_dat,
+    plot_plate(dat_rnd,
       plate = plate, row = row, column = col, .color = trueEffect,
       title = "True effect"
     ),
-    plot_plate(randomized_dat,
+    plot_plate(dat_rnd,
       plate = plate, row = row, column = col, .color = plateEffect,
       title = "Plate effect"
     ),
-    plot_plate(randomized_dat,
+    plot_plate(dat_rnd,
       plate = plate, row = row, column = col, .color = measurement,
       title = "Measurement"
     )
@@ -248,7 +292,7 @@ compound and DMSO.
 
 ```{r}
 randMeasureDiff <- TukeyHSD(aov(measurement ~ Compound,
-  data = randomized_dat
+  data = dat_rnd
 ))$Compound
 randMeasureDiff[versusDMSO, ]
 ```
@@ -259,7 +303,7 @@ affecting the statistical inference.
 
 ```{r randBoxplot, fig.height=5, fig.width=5}
 ggplot(
-  randomized_dat,
+  dat_rnd,
   aes(x = Compound, y = measurement)
 ) +
   geom_boxplot() +
