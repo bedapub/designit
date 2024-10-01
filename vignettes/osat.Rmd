@@ -40,7 +40,6 @@ samples <- read_tsv(file.path(osat_data_path, "samples.txt"),
 ```
 
 # Running OSAT optimization
-
 Here we use OSAT to optimize setup.
 ```{r}
 gs <- OSAT::setup.sample(samples, optimal = c("SampleType", "Race", "AgeGrp"))
