@@ -14,7 +14,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette demonstrates the use of the _deisngit_ package with a series 
+This vignette demonstrates the use of the `deisngit` package with a series 
 of examples deriving from the same task, namely to randomize samples of a 
 two-factor experiment into plate layouts. We shall start with the most basic
 use and gradually exploring some basic yet useful utilities provided
@@ -107,7 +107,6 @@ bc <- BatchContainer$new(
 bc
 
 bc$n_locations
-bc$exclude
 bc$get_locations() |> head()
 ```
 
@@ -146,7 +145,7 @@ locations we can use the `batchContainer$move_samples()` method.
 To swap two or more samples, use
 
 ```{r, fig.width=6, fig.height=3.5}
-bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
+bc <- bc$move_samples(src = c(1L, 2L), dst = c(2L, 1L))
 
 plot_plate(bc$get_samples(remove_empty_locations = TRUE),
   plate = plate, column = column, row = row,
@@ -159,7 +158,7 @@ To assign all samples in one go, use the option `location_assignment`.
 The example below orders samples by ID and adds the empty locations afterwards
 
 ```{r, fig.width=6, fig.height=3.5}
-bc$move_samples(
+bc <- bc$move_samples(
   location_assignment = c(
     1:nrow(samples),
     rep(NA, (bc$n_locations - nrow(samples)))
@@ -287,7 +286,7 @@ samples with the method `bc$move_samples()`.
 we can optimize the design, for instance by shuffling the samples.
 4. Various options are available to further customize the design.
 
-Now you have already the first experience of using _designit_ for randomization,
+Now you have already the first experience of using `designit` for randomization,
 it is time to apply the learning to your work. If you need more examples or 
 if you want to understand more details of the package, please explore other
 vignettes of the package as well as check out the documentations.
