@@ -1,9 +1,10 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   basic_examples: basic_examples.html
   custom_shuffle: custom_shuffle.html
+  false_positives: false_positives.html
   invivo_study_design: invivo_study_design.html
   NCS22_talk: NCS22_talk.html
   nested_dimensions_examples: nested_dimensions_examples.html
@@ -12,7 +13,7 @@ articles:
   plate_layouts: plate_layouts.html
   plate_scoring_examples: plate_scoring_examples.html
   shuffling_with_constraints: shuffling_with_constraints.html
-last_built: 2024-08-19T14:44Z
+last_built: 2024-10-16T12:19Z
 urls:
   reference: https://bedapub.github.io/designit/reference
   article: https://bedapub.github.io/designit/articles
