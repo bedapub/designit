@@ -169,7 +169,7 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Warning in OSAT::create.optimized.setup(sample = gs, container = gc, nSim =</span></span>
 <span><span class="co">#&gt; params$iterations): Using default optimization method: optimal.shuffle</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   911ms   911ms</span></span>
+<span><span class="co">#&gt;   902ms   902ms</span></span>
 <span></span>
 <span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/QC.html" class="external-link">QC</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span></span></code></pre></div>
 <p><img src="osat_files/figure-html/unnamed-chunk-3-1.png" width="576"></p>
@@ -366,7 +366,7 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 786</span></span>
 <span><span class="co">#&gt; Achieved score: 30.857 at iteration 960</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   14.5s   7.49s</span></span></code></pre></div>
+<span><span class="co">#&gt;   14.2s   7.33s</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># final score</span></span>
 <span><span class="va">bc_reference</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
@@ -436,7 +436,7 @@ manual optimization process using <code>data.table</code>.</p>
 <span><span class="co">#&gt; Warning in (function (assignment) : this field might become read-only in the</span></span>
 <span><span class="co">#&gt; future, please use $move_samples() instead</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   9.29s   4.72s</span></span></code></pre></div>
+<span><span class="co">#&gt;   9.14s   4.64s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -527,7 +527,7 @@ manual optimization process using <code>data.table</code>.</p>
 <span><span class="co">#&gt; Achieved score: 34.857 at iteration 807</span></span>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 827</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;  15.22s   7.88s</span></span></code></pre></div>
+<span><span class="co">#&gt;  14.57s   7.49s</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  i <span class="op">=</span> <span class="va">bc_burn_in</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
