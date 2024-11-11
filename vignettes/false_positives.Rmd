@@ -3,7 +3,7 @@ title: "Batch effects and false positives: a simulation study"
 author: "Jitao david Zhang"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Necessity of experiment design}
+  %\VignetteIndexEntry{Batch effects and false positives}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 ---
