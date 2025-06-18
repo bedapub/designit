@@ -267,7 +267,7 @@ BatchContainer <- R6::R6Class("BatchContainer",
 
 
     #' @description
-    #' Move samples between locations
+    #' Move samples between locations modifying the BatchContainer in place
     #'
     #' This method can receive either `src` and `dst` or `locations_assignment`.
     #'
