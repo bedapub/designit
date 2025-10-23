@@ -14,12 +14,20 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette demonstrates the use of the `desingit` when providing a randomization scheme for sample handling order in a study, which is crucial for minimizing bias in experimental designs.
+This vignette demonstrates the use of the `desingit` when providing a
+randomization scheme for sample handling order in a study, which is crucial for
+minimizing bias in experimental designs.
 
-When dealing with a large number of samples, it is often necessary to randomize the order in which samples are handled. This can help ensure that any potential biases related to sample handling are minimized.
-Bias can arise from factors such as operator fatigue, or environmental conditions that may change over the course of sample processing like temperature fluctuations or equipment performance variations.
+When dealing with a large number of samples, it is often necessary to randomize
+the order in which samples are handled. This can help ensure that any potential
+biases related to sample handling are minimized. Bias can arise from factors
+such as operator fatigue, or environmental conditions that may change over the
+course of sample processing like temperature fluctuations or equipment
+performance variations.
 
-To minimize the bias we generate a sample handling order in which the experimental conditions of interest are distributed evenly across the sample processing procedure.
+To minimize the bias we generate a sample handling order in which the
+experimental conditions of interest are distributed evenly across the sample
+processing procedure.
 
 ```{r include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(
@@ -42,7 +50,9 @@ library(ComplexHeatmap)
 
 # Sample simulation
 
-We first generate a hypothetical in-vivo dataset of samples, which includes a treatment factor and a sex factor. The treatment factor represents different experimental conditions.
+We first generate a hypothetical in-vivo dataset of samples, which includes a
+treatment factor and a sex factor. The treatment factor represents different
+experimental conditions.
 
 ```{r generate-data}
 set.seed(42)
@@ -73,12 +83,13 @@ samples |>
 
 ## Scoring functions
 
-We would like to process samples in an order that is balanced by 
+We would like to process samples in an order that is balanced by
 
 * treatment and 
 * sex
 
-To score even distribution of samples across along the processing order we use a X2 test
+To score even distribution of samples across along the processing order we use
+a X2 test
 
 ```{r}
 # scoring function for treatment
@@ -98,7 +109,9 @@ score_sex <- function(bc) {
 
 ## Batch container
 
-We create a `BatchContainer` object to hold the samples and their processing order. The `BatchContainer` allows us to manage the samples and apply randomization and optimization functions.
+We create a `BatchContainer` object to hold the samples and their processing
+order. The `BatchContainer` allows us to manage the samples and apply
+randomization and optimization functions.
 
 ```{r message=FALSE, warning=FALSE}
 set.seed(42)
