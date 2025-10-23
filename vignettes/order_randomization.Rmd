@@ -151,7 +151,7 @@ samples_with_order <- bc$get_samples() %>%
   arrange(`Sample processing order`) %>%
   mutate(
     `Well ID` = paste(rep(LETTERS[1:8], each = 12), rep(1:12, 8))[
-      1:nrow(bc$get_samples())
+      seq_len(nrow(bc$get_samples()))
     ]
   )
 ```
