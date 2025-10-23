@@ -135,9 +135,9 @@ bc$plot_trace()
 
 ```{r fig.width=9}
 ComplexHeatmap::HeatmapAnnotation(
-  df = bc$get_samples() %>%
+  df = bc$get_samples() |>
     select(treatment, sex)
-) %>%
+) |>
   ComplexHeatmap::plot.HeatmapAnnotation()
 ```
 
@@ -147,8 +147,8 @@ We can easily transform the sample handling order into a plate layout according 
 
 ```{r message=FALSE, warning=FALSE}
 # generate plate layout
-samples_with_order <- bc$get_samples() %>%
-  arrange(`Sample processing order`) %>%
+samples_with_order <- bc$get_samples() |>
+  arrange(`Sample processing order`) |>
   mutate(
     `Well ID` = paste(rep(LETTERS[1:8], each = 12), rep(1:12, 8))[
       seq_len(nrow(bc$get_samples()))
