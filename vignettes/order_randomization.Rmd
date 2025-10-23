@@ -24,7 +24,8 @@ To minimize the bias we generate a sample handling order in which the experiment
 ```{r include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(
   echo = TRUE,
-  fig.height = 6, fig.width = 6,
+  fig.height = 6,
+  fig.width = 6,
   collapse = TRUE,
   comment = "#>"
 )
@@ -51,16 +52,20 @@ n_conditions <- 4
 # create a data frame with 40 samples with  ids, treatments and sex
 samples <- data.frame(
   sample_id = 1:n_samples,
-  treatment = paste0("Trt", rep(1:n_conditions, each = ceiling(n_samples/n_conditions))[1:n_samples]),
-  sex = rep(c("F", "M"), n_samples/2)
-  )
+  treatment = paste0(
+    "Trt",
+    rep(1:n_conditions, each = ceiling(n_samples / n_conditions))[1:n_samples]
+  ),
+  sex = rep(c("F", "M"), n_samples / 2)
+)
 ```
 
 Overview of conditions
 
 ```{r}
-samples |> count(treatment, sex) |> 
-  pivot_wider(names_from = sex, values_from = n) |> 
+samples |>
+  count(treatment, sex) |>
+  pivot_wider(names_from = sex, values_from = n) |>
   gt::gt()
 ```
 
@@ -81,7 +86,6 @@ score_treatment <- function(bc) {
   x <- bc$get_samples()$treatment
   mx <- chisq.test(sort(x), sort(x))$statistic
   chisq.test(x, sort(x))$statistic / mx
-
 }
 
 # scoring function for sex
@@ -106,17 +110,19 @@ bc <- BatchContainer$new(
   )
 )
 
-# initial sample assignment 
+# initial sample assignment
 bc <- assign_random(bc, samples)
 ```
 
 ## Optimization
 
 ```{r message=FALSE, warning=FALSE}
-bc <- optimize_design(bc, 
-                      scoring = list(treatment = score_treatment, sex = score_sex), 
-                      aggregate_scores_func = sum_scores, 
-                      max_iter = 100)
+bc <- optimize_design(
+  bc,
+  scoring = list(treatment = score_treatment, sex = score_sex),
+  aggregate_scores_func = sum_scores,
+  max_iter = 100
+)
 ```
 
 The score decreases quickly and reaches a stable solution
@@ -129,8 +135,9 @@ bc$plot_trace()
 
 ```{r fig.width=9}
 ComplexHeatmap::HeatmapAnnotation(
-  df = bc$get_samples() %>% 
-  select(treatment, sex)) %>%
+  df = bc$get_samples() %>%
+    select(treatment, sex)
+) %>%
   ComplexHeatmap::plot.HeatmapAnnotation()
 ```
 
@@ -140,8 +147,12 @@ We can easily transform the sample handling order into a plate layout according 
 
 ```{r message=FALSE, warning=FALSE}
 # generate plate layout
-samples_with_order <- bc$get_samples() %>% 
-  arrange(`Sample processing order`) %>% 
-  mutate(`Well ID` = paste(rep(LETTERS[1:8], each = 12), rep(1:12, 8))[1:nrow(bc$get_samples())]) 
+samples_with_order <- bc$get_samples() %>%
+  arrange(`Sample processing order`) %>%
+  mutate(
+    `Well ID` = paste(rep(LETTERS[1:8], each = 12), rep(1:12, 8))[
+      1:nrow(bc$get_samples())
+    ]
+  )
 ```
 
