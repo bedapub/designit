@@ -79,7 +79,7 @@ samples |>
   gt::gt()
 ```
 
-# Designit set up 
+# Designit set up
 
 ## Scoring functions
 
@@ -89,7 +89,7 @@ We would like to process samples in an order that is balanced by
 * sex
 
 To score even distribution of samples across along the processing order we use
-a X2 test
+a $\chi^2$ test
 
 ```{r}
 # scoring function for treatment
