@@ -44,8 +44,6 @@ library(designit)
 library(ggplot2)
 library(dplyr)
 library(tidyr)
-library(gt)
-library(ComplexHeatmap)
 ```
 
 # Sample simulation
@@ -72,11 +70,11 @@ samples <- data.frame(
 
 Overview of conditions
 
-```{r}
+```{r, results='markup'}
 samples |>
   count(treatment, sex) |>
-  pivot_wider(names_from = sex, values_from = n) |>
-  gt::gt()
+  pivot_wider(names_from = sex, values_from = n) |> 
+  print()
 ```
 
 # Designit set up
@@ -88,8 +86,11 @@ We would like to process samples in an order that is balanced by
 * treatment and 
 * sex
 
-To score even distribution of samples across along the processing order we use
-a $\chi^2$ test
+A first try to score for an even distribution of samples along the processing order we use
+a $\chi^2$ test. The idea of this scoring is to compare the sequence of samples ordered by the variable to randomize, to the current sequence. 
+If the two sequences are similar, the test statistic will be high, the more independent the two sequences are, the smaller the test statistic.
+Comparing a well randomized sequence would thus return a small value.
+We normalize the score by the maximum score of a given sequence.
 
 ```{r}
 # scoring function for treatment
@@ -146,12 +147,18 @@ bc$plot_trace()
 
 ### Visualize Sample Handling order
 
-```{r fig.width=9}
-ComplexHeatmap::HeatmapAnnotation(
-  df = bc$get_samples() |>
-    select(treatment, sex)
-) |>
-  ComplexHeatmap::plot.HeatmapAnnotation()
+```{r fig.width=7, fig.height=1.5}
+bc$get_samples() |> 
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
+  geom_raster() + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
+  labs(y = "")
+
+bc$get_samples() |> 
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
+  geom_raster() + 
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
+  labs(y = "")
 ```
 
 Let's say samples will be transferred into a 96-well plate 
