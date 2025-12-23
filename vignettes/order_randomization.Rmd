@@ -145,7 +145,7 @@ The score decreases quickly and reaches a stable solution
 bc$plot_trace()
 ```
 
-### Visualize Sample Handling order
+# Visualize Sample Handling order
 
 ```{r fig.width=7, fig.height=1.5}
 bc$get_samples() |> 
@@ -160,6 +160,17 @@ bc$get_samples() |>
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
   labs(y = "")
 ```
+
+## Evalutation
+
+The result is not "optimal" given that there are still samples of same treatment next to each other. However, globally treatments look well randomized. Sex still clusters across the sequence, but again, globally it looks evenly distributed.
+
+Problem: the chi2 test scores many solutions equally well because for scoring independence, the local patterns don't have a strong influence.
+
+Could we find a better solution that works in 1D as well as 2D and scores latin square type designs best?
+
+
+# Potential transfer to plate layout
 
 Let's say samples will be transferred into a 96-well plate 
 (e.g., Sample 1 in A1, Sample 2 in A2, etc.). 
