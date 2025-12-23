@@ -1,0 +1,192 @@
+---
+title: "Moran's I"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Moran's I}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r}
+library(designit)
+if (!requireNamespace(spdep)) {
+  install.packages("spdep")
+}
+library(spdep)
+```
+
+We want to score layouts using [Moran's I](https://en.wikipedia.org/wiki/Moran%27s_I).
+
+* I > 0 if the layout has clusters
+* I ~ 0 for random distributions
+* I < 0 for checker board like patterns
+
+Moran’s I is defined for numeric variables. For categorical treatments, we need a one-vs-rest encoding. 
+Then, we compute Moran’s I for each level and take max(|I|) or average as the final score. This should detect clustering of any condition.
+
+## Scoring function
+
+Like the mk_plate_scoring_function
+
+```{r}
+mk_moran_plate_scoring_functions <- function(
+  batch_container,
+  plate = NULL,
+  row,
+  column,
+  group,
+  neighbor = c("rook", "queen"),
+  aggregate = c("max_abs", "mean_abs"),
+  style = "W",
+  zero_policy = TRUE
+) {
+  neighbor  <- match.arg(neighbor)
+  aggregate <- match.arg(aggregate)
+
+  if (!requireNamespace("spdep", quietly = TRUE)) {
+    stop("Please install 'spdep' (install.packages('spdep')) to use Moran scoring.")
+  }
+
+  # helper: build a listw for the observed (non-NA) wells on one plate
+  build_listw_for_plate <- function(df_plate) {
+    # df_plate must have integer row/column; keep only non-NA group rows
+    df_plate <- df_plate[!is.na(df_plate[[group]]), , drop = FALSE]
+    if (nrow(df_plate) < 3) return(NULL)
+
+    n_row <- max(df_plate[[row]], na.rm = TRUE)
+    n_col <- max(df_plate[[column]], na.rm = TRUE)
+
+    # cell ids in spdep::cell2nb indexing: (col-1)*n_row + row
+    cells_full <- (df_plate[[column]] - 1L) * n_row + df_plate[[row]]
+    keep_cells <- unique(cells_full)
+
+    nb_full <- spdep::cell2nb(n_row, n_col, type = neighbor)
+
+    # restrict neighbor list to kept cells, then remap to 1..m indices
+    keep_set <- sort(keep_cells)
+    map <- setNames(seq_along(keep_set), keep_set)
+
+    nb_kept <- lapply(keep_set, function(cell) {
+      neigh <- nb_full[[cell]]
+      neigh_kept <- neigh[neigh %in% keep_set]
+      unname(map[as.character(neigh_kept)])
+    })
+
+    lw <- spdep::nb2listw(nb_kept, style = style, zero.policy = zero_policy)
+    list(listw = lw, df = df_plate)
+  }
+
+  # helper: compute plate score from listw + df
+  score_one_plate <- function(df_plate) {
+    built <- build_listw_for_plate(df_plate)
+    if (is.null(built)) return(0)
+
+    lw <- built$listw
+    df <- built$df
+
+    g <- df[[group]]
+    g <- droplevels(as.factor(g))
+    levels_g <- levels(g)
+
+    # if only one level present, no meaningful clustering to penalize
+    if (length(levels_g) < 2) return(0)
+
+    I_vals <- numeric(0)
+
+    for (lv in levels_g) {
+      x <- as.numeric(g == lv)
+
+      # Moran's I undefined if variance is 0 (all 0 or all 1)
+      if (stats::var(x) == 0) {
+        I <- 0
+      } else {
+        # fast observed statistic (no permutation test)
+        I <- spdep::moran(x, lw, n = length(x), S0 = spdep::Szero(lw))$I
+        if (!is.finite(I)) I <- 0
+      }
+      I_vals <- c(I_vals, abs(I))
+    }
+
+    if (length(I_vals) == 0) return(0)
+
+    if (aggregate == "max_abs") max(I_vals) else mean(I_vals)
+  }
+
+  # build one scoring function per plate present in the *current* container
+  samples0 <- batch_container$get_samples()
+
+  plates <- if (!is.null(plate)) sort(unique(samples0[[plate]])) else NA
+
+  make_scoring_fun <- function(plate_id) {
+    function(bc) {
+      dat <- bc$get_samples()
+
+      if (!is.null(plate)) {
+        dat <- dat[dat[[plate]] == plate_id, , drop = FALSE]
+      }
+
+      # require row/column integer-ish
+      dat[[row]]    <- as.integer(dat[[row]])
+      dat[[column]] <- as.integer(dat[[column]])
+
+      score_one_plate(dat)
+    }
+  }
+
+  if (!is.null(plate)) {
+    out <- stats::setNames(lapply(plates, make_scoring_fun), paste0("moran_", plates))
+  } else {
+    out <- list(moran = make_scoring_fun(NA))
+  }
+
+  out
+}
+```
+
+# Example
+
+```{r}
+
+```
+
+
+
+Run function
+
+```{r}
+# bc already has samples assigned and has columns: plate,row,column,Group (example)
+moran_scoring <- mk_moran_plate_scoring_functions(
+  bc,
+  plate  = "plate",
+  row    = "row",
+  column = "column",
+  group  = "Group",
+  neighbor = "rook",
+  aggregate = "max_abs"
+)
+
+bc_opt <- optimize_design(bc, scoring = moran_scoring, max_iter = 1000)
+```
+
+
+
+
+
+You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(head(mtcars, 10))
+```
+
+Also a quote using `>`:
+
+> "He who gives up [code] safety for [code] speed deserves neither."
+([via](https://twitter.com/hadleywickham/status/504368538874703872))
