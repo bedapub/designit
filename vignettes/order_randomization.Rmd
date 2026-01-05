@@ -198,7 +198,9 @@ min_dist_score <- function(col) {
     min_dist <- length(unique(bc$get_samples()[[col]]))
     d2n <- distance_to_next(bc$get_samples()[[col]])
     d2n <- d2n[d2n < min_dist]
-    sum(d2n)
+    # worst case is repeated samples, they get the highest score:
+    # (min_dist - 1) ** 2
+    sum((min_dist - d2n)**2)
   }
 }
 ```
