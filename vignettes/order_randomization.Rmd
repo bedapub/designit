@@ -73,7 +73,7 @@ Overview of conditions
 ```{r, results='markup'}
 samples |>
   count(treatment, sex) |>
-  pivot_wider(names_from = sex, values_from = n) |> 
+  pivot_wider(names_from = sex, values_from = n) |>
   print()
 ```
 
@@ -86,11 +86,13 @@ We would like to process samples in an order that is balanced by
 * treatment and 
 * sex
 
-A first try to score for an even distribution of samples along the processing order we use
-a $\chi^2$ test. The idea of this scoring is to compare the sequence of samples ordered by the variable to randomize, to the current sequence. 
-If the two sequences are similar, the test statistic will be high, the more independent the two sequences are, the smaller the test statistic.
-Comparing a well randomized sequence would thus return a small value.
-We normalize the score by the maximum score of a given sequence.
+A first try to score for an even distribution of samples along the processing
+order we use a $\chi^2$ test. The idea of this scoring is to compare the
+sequence of samples ordered by the variable to randomize, to the current
+sequence. If the two sequences are similar, the test statistic will be high,
+the more independent the two sequences are, the smaller the test statistic.
+Comparing a well randomized sequence would thus return a small value. We
+normalize the score by the maximum score of a given sequence.
 
 ```{r}
 # scoring function for treatment
@@ -148,33 +150,38 @@ bc$plot_trace()
 # Visualize Sample Handling order
 
 ```{r fig.width=7, fig.height=1.5}
-bc$get_samples() |> 
+bc$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
-  geom_raster() + 
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs(y = "")
 
-bc$get_samples() |> 
+bc$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
-  geom_raster() + 
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) + 
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs(y = "")
 ```
 
 ## Evalutation
 
-The result is not "optimal" given that there are still samples of same treatment next to each other. However, globally treatments look well randomized. Sex still clusters across the sequence, but again, globally it looks evenly distributed.
+The result is not "optimal" given that there are still samples of same
+treatment next to each other. However, globally treatments look well
+randomized. Sex still clusters across the sequence, but again, globally it
+looks evenly distributed.
 
-Problem: the chi2 test scores many solutions equally well because for scoring independence, the local patterns don't have a strong influence.
+Problem: the chi2 test scores many solutions equally well because for scoring
+independence, the local patterns don't have a strong influence.
 
-Could we find a better solution that works in 1D as well as 2D and scores latin square type designs best?
+Could we find a better solution that works in 1D as well as 2D and scores latin
+square type designs best?
 
 
 # Potential transfer to plate layout
 
-Let's say samples will be transferred into a 96-well plate 
-(e.g., Sample 1 in A1, Sample 2 in A2, etc.). 
-We can easily transform the sample handling order into a plate layout according to the sample handling.
+Let's say samples will be transferred into a 96-well plate (e.g., Sample 1 in
+A1, Sample 2 in A2, etc.). We can easily transform the sample handling order
+into a plate layout according to the sample handling.
 
 ```{r message=FALSE, warning=FALSE}
 # generate plate layout
