@@ -133,7 +133,7 @@ bc <- assign_random(bc, samples)
 ## Optimization
 
 ```{r message=FALSE, warning=FALSE}
-bc <- optimize_design(
+bc1 <- optimize_design(
   bc,
   scoring = list(treatment = score_treatment, sex = score_sex),
   aggregate_scores_func = sum_scores,
@@ -144,19 +144,19 @@ bc <- optimize_design(
 The score decreases quickly and reaches a stable solution
 
 ```{r}
-bc$plot_trace()
+bc1$plot_trace()
 ```
 
 # Visualize Sample Handling order
 
 ```{r fig.width=7, fig.height=1.5}
-bc$get_samples() |>
+bc1$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
   geom_raster() +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs(y = "")
 
-bc$get_samples() |>
+bc1$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
   geom_raster() +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
@@ -173,24 +173,72 @@ looks evenly distributed.
 Problem: the chi2 test scores many solutions equally well because for scoring
 independence, the local patterns don't have a strong influence.
 
-Could we find a better solution that works in 1D as well as 2D and scores latin
-square type designs best?
+# Alternative approach: distance maximization
 
+Now we take an alternative approach and try to minimize the number of
+adjacent samples with the same treatment/sex.
 
-# Potential transfer to plate layout
+```{r}
+distance_to_next <- function(x) {
+  out <- rep(Inf, length(x))
+  pos_list <- split(seq_along(x), x)
 
-Let's say samples will be transferred into a 96-well plate (e.g., Sample 1 in
-A1, Sample 2 in A2, etc.). We can easily transform the sample handling order
-into a plate layout according to the sample handling.
+  for (p in pos_list) {
+    if (length(p) > 1) {
+      out[p[-length(p)]] <- diff(p)
+    }
+  }
+
+  out
+}
+
+min_dist_score <- function(col) {
+  force(col)
+  function(bc) {
+    min_dist <- length(unique(bc$get_samples()[[col]]))
+    d2n <- distance_to_next(bc$get_samples()[[col]])
+    d2n <- d2n[d2n < min_dist]
+    sum(d2n)
+  }
+}
+```
+## Optimization
 
 ```{r message=FALSE, warning=FALSE}
-# generate plate layout
-samples_with_order <- bc$get_samples() |>
-  arrange(`Sample processing order`) |>
-  mutate(
-    `Well ID` = paste(rep(LETTERS[1:8], each = 12), rep(1:12, 8))[
-      seq_len(nrow(bc$get_samples()))
-    ]
-  )
+set.seed(43)
+bc2 <- optimize_design(
+  bc,
+  scoring = list(
+    treatment = min_dist_score("treatment"),
+    sex = min_dist_score("sex")
+  ),
+  aggregate_scores_func = sum_scores,
+  max_iter = 500
+)
 ```
 
+The score decreases quickly and reaches a stable solution
+
+```{r}
+bc2$plot_trace()
+```
+
+# Visualize Sample Handling order
+
+```{r fig.width=7, fig.height=1.5}
+bc2$get_samples() |>
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(y = "")
+
+bc2$get_samples() |>
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(y = "")
+```
+
+## Evalutation
+
+The result is better distribution of treatments and sex.
