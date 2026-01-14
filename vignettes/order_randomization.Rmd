@@ -176,34 +176,12 @@ independence, the local patterns don't have a strong influence.
 # Alternative approach: distance maximization
 
 Now we take an alternative approach and try to minimize the number of
-adjacent samples with the same treatment/sex.
+adjacent samples with the same treatment/sex. The `mk_min_distance_score()`
+function creates a scoring function that penalizes samples of the same category
+that are closer together than a threshold distance. By default, the threshold
+is set to `floor(n_locations / n_levels)`, which is the ideal spacing for
+even distribution.
 
-```{r}
-distance_to_next <- function(x) {
-  out <- rep(Inf, length(x))
-  pos_list <- split(seq_along(x), x)
-
-  for (p in pos_list) {
-    if (length(p) > 1) {
-      out[p[-length(p)]] <- diff(p)
-    }
-  }
-
-  out
-}
-
-min_dist_score <- function(col) {
-  force(col)
-  function(bc) {
-    min_dist <- length(unique(bc$get_samples()[[col]]))
-    d2n <- distance_to_next(bc$get_samples()[[col]])
-    d2n <- d2n[d2n < min_dist]
-    # worst case is repeated samples, they get the highest score:
-    # (min_dist - 1) ** 2
-    sum((min_dist - d2n)**2)
-  }
-}
-```
 ## Optimization
 
 ```{r message=FALSE, warning=FALSE}
@@ -211,8 +189,8 @@ set.seed(43)
 bc2 <- optimize_design(
   bc,
   scoring = list(
-    treatment = min_dist_score("treatment"),
-    sex = min_dist_score("sex")
+    treatment = mk_min_distance_score("treatment", "Sample processing order"),
+    sex = mk_min_distance_score("sex", "Sample processing order")
   ),
   aggregate_scores_func = sum_scores,
   max_iter = 500
