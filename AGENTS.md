@@ -84,10 +84,3 @@ assertthat::assert_that(
   msg = "df should be a data.frame"
 )
 ```
-
-### Silencing R CMD check notes for data.table
-
-```r
-# At the start of functions using data.table syntax:
-. <- .N <- `:=` <- NULL
-```
