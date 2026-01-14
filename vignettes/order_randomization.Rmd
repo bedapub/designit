@@ -1,6 +1,6 @@
 ---
 title: "Sample handling order randomization"
-output: 
+output:
   rmarkdown::html_vignette:
     html_document:
     df_print: paged
