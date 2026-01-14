@@ -1,5 +1,7 @@
 # designit (development version)
 
+* add `mk_min_distance_score()` and an order randomization example vignette
+
 # designit 0.5.0
 
 * remove magrittr, glue, checkmate, forcats, ineq, and tidyselect dependencies
