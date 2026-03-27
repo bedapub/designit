@@ -86,29 +86,13 @@ We would like to process samples in an order that is balanced by
 * treatment and 
 * sex
 
-A first try to score for an even distribution of samples along the processing
-order we use a $\chi^2$ test. The idea of this scoring is to compare the
-sequence of samples ordered by the variable to randomize, to the current
-sequence. If the two sequences are similar, the test statistic will be high,
-the more independent the two sequences are, the smaller the test statistic.
-Comparing a well randomized sequence would thus return a small value. We
-normalize the score by the maximum score of a given sequence.
+For this we minimize the number of
+adjacent samples with the same treatment/sex. The `mk_min_distance_score()`
+function creates a scoring function that penalizes samples of the same category
+that are closer together than a threshold distance. By default, the threshold
+is set to `floor(n_locations / n_levels)`, which is the ideal spacing for
+even distribution.
 
-```{r}
-# scoring function for treatment
-score_treatment <- function(bc) {
-  x <- bc$get_samples()$treatment
-  mx <- chisq.test(sort(x), sort(x))$statistic
-  chisq.test(x, sort(x))$statistic / mx
-}
-
-# scoring function for sex
-score_sex <- function(bc) {
-  x <- bc$get_samples()$sex
-  mx <- chisq.test(sort(x), sort(x))$statistic
-  chisq.test(x, sort(x))$statistic / mx
-}
-```
 
 ## Batch container
 
@@ -133,60 +117,8 @@ bc <- assign_random(bc, samples)
 ## Optimization
 
 ```{r message=FALSE, warning=FALSE}
-bc1 <- optimize_design(
-  bc,
-  scoring = list(treatment = score_treatment, sex = score_sex),
-  aggregate_scores_func = sum_scores,
-  max_iter = 100
-)
-```
-
-The score decreases quickly and reaches a stable solution
-
-```{r}
-bc1$plot_trace()
-```
-
-# Visualize Sample Handling order
-
-```{r fig.width=7, fig.height=1.5}
-bc1$get_samples() |>
-  ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
-  geom_raster() +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-  labs(y = "")
-
-bc1$get_samples() |>
-  ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
-  geom_raster() +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
-  labs(y = "")
-```
-
-## Evalutation
-
-The result is not "optimal" given that there are still samples of same
-treatment next to each other. However, globally treatments look well
-randomized. Sex still clusters across the sequence, but again, globally it
-looks evenly distributed.
-
-Problem: the chi2 test scores many solutions equally well because for scoring
-independence, the local patterns don't have a strong influence.
-
-# Alternative approach: distance maximization
-
-Now we take an alternative approach and try to minimize the number of
-adjacent samples with the same treatment/sex. The `mk_min_distance_score()`
-function creates a scoring function that penalizes samples of the same category
-that are closer together than a threshold distance. By default, the threshold
-is set to `floor(n_locations / n_levels)`, which is the ideal spacing for
-even distribution.
-
-## Optimization
-
-```{r message=FALSE, warning=FALSE}
 set.seed(43)
-bc2 <- optimize_design(
+bc <- optimize_design(
   bc,
   scoring = list(
     treatment = mk_min_distance_score("treatment", "Sample processing order"),
@@ -200,19 +132,19 @@ bc2 <- optimize_design(
 The score decreases quickly and reaches a stable solution
 
 ```{r}
-bc2$plot_trace()
+bc$plot_trace()
 ```
 
 # Visualize Sample Handling order
 
 ```{r fig.width=7, fig.height=1.5}
-bc2$get_samples() |>
+bc$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
   geom_raster() +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
   labs(y = "")
 
-bc2$get_samples() |>
+bc$get_samples() |>
   ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
   geom_raster() +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
@@ -221,4 +153,4 @@ bc2$get_samples() |>
 
 ## Evalutation
 
-The result is better distribution of treatments and sex.
+The result shows good randomization of treatments and sex.
