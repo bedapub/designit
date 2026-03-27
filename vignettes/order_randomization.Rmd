@@ -1,0 +1,156 @@
+---
+title: "Sample handling order randomization"
+output:
+  rmarkdown::html_vignette:
+    html_document:
+    df_print: paged
+    mathjax: default
+    number_sections: true
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{Sample handling order randomization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette demonstrates the use of the `desingit` when providing a
+randomization scheme for sample handling order in a study, which is crucial for
+minimizing bias in experimental designs.
+
+When dealing with a large number of samples, it is often necessary to randomize
+the order in which samples are handled. This can help ensure that any potential
+biases related to sample handling are minimized. Bias can arise from factors
+such as operator fatigue, or environmental conditions that may change over the
+course of sample processing like temperature fluctuations or equipment
+performance variations.
+
+To minimize the bias we generate a sample handling order in which the
+experimental conditions of interest are distributed evenly across the sample
+processing procedure.
+
+```{r include=FALSE, message=FALSE, warning=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.height = 6,
+  fig.width = 6,
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, message=FALSE}
+library(designit)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+```
+
+# Sample simulation
+
+We first generate a hypothetical in-vivo dataset of samples, which includes a
+treatment factor and a sex factor. The treatment factor represents different
+experimental conditions.
+
+```{r generate-data}
+set.seed(42)
+# Generate a hypothetical dataset
+n_samples <- 40
+n_conditions <- 4
+# create a data frame with 40 samples with  ids, treatments and sex
+samples <- data.frame(
+  sample_id = 1:n_samples,
+  treatment = paste0(
+    "Trt",
+    rep(1:n_conditions, each = ceiling(n_samples / n_conditions))[1:n_samples]
+  ),
+  sex = rep(c("F", "M"), n_samples / 2)
+)
+```
+
+Overview of conditions
+
+```{r, results='markup'}
+samples |>
+  count(treatment, sex) |>
+  pivot_wider(names_from = sex, values_from = n) |>
+  print()
+```
+
+# Designit set up
+
+## Scoring functions
+
+We would like to process samples in an order that is balanced by
+
+* treatment and 
+* sex
+
+For this we minimize the number of
+adjacent samples with the same treatment/sex. The `mk_min_distance_score()`
+function creates a scoring function that penalizes samples of the same category
+that are closer together than a threshold distance. By default, the threshold
+is set to `floor(n_locations / n_levels)`, which is the ideal spacing for
+even distribution.
+
+
+## Batch container
+
+We create a `BatchContainer` object to hold the samples and their processing
+order. The `BatchContainer` allows us to manage the samples and apply
+randomization and optimization functions.
+
+```{r message=FALSE, warning=FALSE}
+set.seed(42)
+
+# make batch container with one dimension of sample processing order
+bc <- BatchContainer$new(
+  dimensions = list(
+    `Sample processing order` = nrow(samples)
+  )
+)
+
+# initial sample assignment
+bc <- assign_random(bc, samples)
+```
+
+## Optimization
+
+```{r message=FALSE, warning=FALSE}
+set.seed(43)
+bc <- optimize_design(
+  bc,
+  scoring = list(
+    treatment = mk_min_distance_score("treatment", "Sample processing order"),
+    sex = mk_min_distance_score("sex", "Sample processing order")
+  ),
+  aggregate_scores_func = sum_scores,
+  max_iter = 500
+)
+```
+
+The score decreases quickly and reaches a stable solution
+
+```{r}
+bc$plot_trace()
+```
+
+# Visualize Sample Handling order
+
+```{r fig.width=7, fig.height=1.5}
+bc$get_samples() |>
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = treatment)) +
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(y = "")
+
+bc$get_samples() |>
+  ggplot(aes(x = `Sample processing order`, y = 1, fill = sex)) +
+  geom_raster() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank()) +
+  labs(y = "")
+```
+
+## Evalutation
+
+The result shows good randomization of treatments and sex.

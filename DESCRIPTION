@@ -1,6 +1,6 @@
 Package: designit
 Title: Blocking and Randomization for Experimental Design
-Version: 0.5.0.9000
+Version: 0.5.1
 Authors@R: c(
     person(given = c(first = "Iakov", middle = "I."),
            family = "Davydov",
@@ -81,6 +81,6 @@ Suggests:
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 biocViews:

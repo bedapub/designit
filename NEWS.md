@@ -1,4 +1,6 @@
-# designit (development version)
+# designit 0.5.1
+
+* add `mk_min_distance_score()` and an order randomization example vignette
 
 # designit 0.5.0
 
