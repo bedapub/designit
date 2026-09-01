@@ -30,7 +30,7 @@ test_that("random seed is saved when no seed is set", {
   expect_gt(length(bc_opt$trace$seed[[1]]), 0)
   expect_type(bc_opt$trace$rng_kind, "list")
   expect_type(bc_opt$trace$rng_kind[[1]], "character")
-  expect_length(bc_opt$trace$rng_kind[[1]], 3)
+  expect_length(bc_opt$trace$rng_kind[[1]], length(RNGkind()))
 })
 
 
@@ -48,5 +48,5 @@ test_that("random seed is saved when it was set", {
   expect_gt(length(bc_opt$trace$seed[[1]]), 0)
   expect_type(bc_opt$trace$rng_kind, "list")
   expect_type(bc_opt$trace$rng_kind[[1]], "character")
-  expect_length(bc_opt$trace$rng_kind[[1]], 3)
+  expect_length(bc_opt$trace$rng_kind[[1]], length(RNGkind()))
 })

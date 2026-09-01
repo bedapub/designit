@@ -1,4 +1,15 @@
-# designit (development version)
+# designit 0.5.1
+
+* fix test failure on R-devel. `RNGkind()` gained a fourth component,
+  `binom.kind`, in R 4.7.0 (r90299, 2026-07-25, "fix 2 signs in formula of the
+  BTPE algorithm for rbinom(); add RNGkind(binom.kind=*)"). The tests no longer
+  assert that it has exactly three elements. `BatchContainer` traces already
+  stored `RNGkind()` verbatim, so no user-visible behaviour changed.
+* `optimize_multi_plate_design()` now passes `p = 1` and
+  `penalize_lines = "none"` to the within-plate scoring functions.
+* new vignette showing how batch effects produce false positives.
+* `basic_examples` vignette updated to the current `$move_samples()` syntax and
+  a more designit-centric workflow.
 
 # designit 0.5.0
 
