@@ -117,6 +117,10 @@ shuffle_with_constraints <- function(src = TRUE, dst = TRUE) {
 #' @return Returns a new `BatchContainer`.
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' bc <- BatchContainer$new(
 #'   dimensions = list(
 #'     plate = 2,

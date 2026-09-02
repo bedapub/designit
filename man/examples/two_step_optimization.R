@@ -1,3 +1,7 @@
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 set.seed(42)
 
 bc <- BatchContainer$new(

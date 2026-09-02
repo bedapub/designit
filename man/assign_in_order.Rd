@@ -19,6 +19,10 @@ First sample is assigned to the first location, second
 sample is assigned to the second location, etc.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 samples <- data.frame(sampId = 1:3, sampName = letters[1:3])
 samples
 

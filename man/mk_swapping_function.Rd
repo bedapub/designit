@@ -18,6 +18,10 @@ If \code{length(n_swaps)==1}, the returned function may be called an arbitrary n
 If \code{length(n_swaps)>1} and called without argument, the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted. Alternatively, the function may be called with an iteration number as the only argument, giving the user some freedom how to iterate over the sample swapping protocol.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("plate" = 2, "column" = 5, "row" = 6)

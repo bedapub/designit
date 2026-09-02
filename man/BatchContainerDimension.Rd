@@ -9,6 +9,10 @@ R6 Class representing a batch container dimension.
 R6 Class representing a batch container dimension.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 
 ## ------------------------------------------------
 ## Method `BatchContainerDimension$new`

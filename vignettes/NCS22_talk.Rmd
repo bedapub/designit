@@ -18,6 +18,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, include = FALSE}
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+```
+
 ```{r setup, include = FALSE}
 library(designit)
 library(tidyverse)

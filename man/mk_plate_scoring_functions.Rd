@@ -38,6 +38,10 @@ List of scoring functions, one per plate, that calculate a real valued measure f
 Create a list of scoring functions (one per plate) that quantify the spatially homogeneous distribution of conditions across the plate
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("column" = 6, "row" = 10)

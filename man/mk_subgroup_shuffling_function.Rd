@@ -25,6 +25,10 @@ If length(n_swaps)==1, the returned function may be called an arbitrary number o
 If length(n_swaps)>1 the returned function may be called length(n_swaps) timed before returning NULL, which would be the stopping criterion if all requested swaps have been exhausted.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 set.seed(42)
 
 bc <- BatchContainer$new(
