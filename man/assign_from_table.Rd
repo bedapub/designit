@@ -22,6 +22,10 @@ Returns a new \code{BatchContainer}.
 Distributes samples based on a sample sheet.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 bc <- BatchContainer$new(
   dimensions = list(
     plate = 2,

@@ -23,6 +23,10 @@ This function wraps \code{\link[=osat_score]{osat_score()}} in order to take ful
 managing the buffered objects in the user code.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 sample_assignment <- tibble::tribble(
   ~ID, ~SampleType, ~Sex, ~plate,
   1, "Case", "Female", 1,

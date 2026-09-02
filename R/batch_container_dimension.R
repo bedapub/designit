@@ -1,5 +1,10 @@
 #' R6 Class representing a batch container dimension.
 #'
+#' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' @export
 BatchContainerDimension <- R6::R6Class("BatchContainerDimension",
   public = list(

@@ -10,6 +10,10 @@
 #' @return A [BatchContainer] assigned samples.
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' tab <- data.frame(
 #'   row = rep(1:3, each = 3),
 #'   column = rep(1:3, 3),

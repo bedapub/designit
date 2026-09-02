@@ -11,6 +11,10 @@ A typical workflow starts with creating a \code{BatchContainer}. Then
 samples can be assigned to locations in that container.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 
 ## ------------------------------------------------
 ## Method `BatchContainer$new`

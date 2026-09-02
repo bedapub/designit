@@ -33,6 +33,10 @@ batches and is closely related to the chi-square test contingency table
 (Yan et al. (2012) \doi{10.1186/1471-2164-13-689}).
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 sample_assignment <- tibble::tribble(
   ~ID, ~SampleType, ~Sex, ~plate,
   1, "Case", "Female", 1,

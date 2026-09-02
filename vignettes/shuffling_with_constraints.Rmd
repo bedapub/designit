@@ -16,6 +16,11 @@ knitr::opts_chunk$set(
   fig.height = 6
 )
 ```
+
+```{r, include = FALSE}
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+```
   
 ```{r setup, echo=FALSE, message=FALSE}
 library(designit)

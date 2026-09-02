@@ -63,6 +63,10 @@ mk_dist_matrix <- function(plate_x = 12, plate_y = 8, dist = "minkowski", p = 2,
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
 #'   dimensions = c("column" = 6, "row" = 10)

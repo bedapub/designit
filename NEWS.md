@@ -5,6 +5,9 @@
   BTPE algorithm for rbinom(); add RNGkind(binom.kind=*)"). The tests no longer
   assert that it has exactly three elements. `BatchContainer` traces already
   stored `RNGkind()` verbatim, so no user-visible behaviour changed.
+* examples, tests and vignettes now call `data.table::setDTthreads(2)`, to avoid
+  CPU time issues on CRAN check machines. This affects package checks only, not
+  normal use.
 * `optimize_multi_plate_design()` now passes `p = 1` and
   `penalize_lines = "none"` to the within-plate scoring functions.
 * new vignette showing how batch effects produce false positives.

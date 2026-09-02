@@ -19,6 +19,10 @@ This function was just added to test early on the functionality of optimize_desi
 permutation vector rather than a list with src and dst indices.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("plate" = 2, "column" = 5, "row" = 6)

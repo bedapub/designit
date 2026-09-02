@@ -21,6 +21,10 @@
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' sample_assignment <- tibble::tribble(
 #'   ~ID, ~SampleType, ~Sex, ~plate,
 #'   1, "Case", "Female", 1,
@@ -121,6 +125,10 @@ osat_score <- function(bc, batch_vars, feature_vars, expected_dt = NULL, quiet =
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' sample_assignment <- tibble::tribble(
 #'   ~ID, ~SampleType, ~Sex, ~plate,
 #'   1, "Case", "Female", 1,

@@ -82,6 +82,10 @@ mk_constant_swapping_function <- function(n_swaps, quiet = FALSE) {
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
 #'   dimensions = c("plate" = 2, "column" = 5, "row" = 6)
@@ -110,6 +114,10 @@ complete_random_shuffling <- function(batch_container, ...) {
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
 #'   dimensions = c("plate" = 2, "column" = 5, "row" = 6)

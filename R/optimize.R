@@ -167,6 +167,10 @@ update_batchcontainer <- function(bc, shuffle_params) {
 #' @export
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' data("invivo_study_samples")
 #' bc <- BatchContainer$new(
 #'   dimensions = c("plate" = 2, "column" = 5, "row" = 6)

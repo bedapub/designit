@@ -86,6 +86,10 @@ A trace object
 Generic optimizer that can be customized by user provided functions for generating shuffles and progressing towards the minimal score
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 data("invivo_study_samples")
 bc <- BatchContainer$new(
   dimensions = c("plate" = 2, "column" = 5, "row" = 6)

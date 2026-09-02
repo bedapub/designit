@@ -28,6 +28,10 @@ number (\code{i}). This function returns a list with two names: \code{src} vecto
 Can be used with \code{optimize_design} to improve convergence speed.
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 set.seed(43)
 
 samples <- data.frame(

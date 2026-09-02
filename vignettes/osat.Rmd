@@ -18,6 +18,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, include = FALSE}
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+```
+
 In this vignette, we demonstrate how to use the OSAT score
 ([Yan et al. (2012)](https://doi.org/10.1186/1471-2164-13-689)).
 

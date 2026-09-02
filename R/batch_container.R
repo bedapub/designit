@@ -122,6 +122,11 @@ locations_table_from_dimensions <- function(dimensions, exclude) {
 #' A typical workflow starts with creating a `BatchContainer`. Then
 #' samples can be assigned to locations in that container.
 #'
+#' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' @rawNamespace import(R6, except = getNamespaceExports("R6"))
 #' @export
 BatchContainer <- R6::R6Class("BatchContainer",

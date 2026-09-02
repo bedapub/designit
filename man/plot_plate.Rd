@@ -47,6 +47,10 @@ the ggplot object
 Plot plate layouts
 }
 \examples{
+\dontshow{
+# limit threads to avoid CPU time issues on CRAN
+data.table::setDTthreads(2)
+}
 nPlate <- 3
 nColumn <- 4
 nRow <- 6

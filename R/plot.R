@@ -55,6 +55,10 @@ plot_design <- function(.tbl, ..., .color, .alpha = NULL) {
 #' @author siebourj
 #'
 #' @examples
+#' \dontshow{
+#' # limit threads to avoid CPU time issues on CRAN
+#' data.table::setDTthreads(2)
+#' }
 #' nPlate <- 3
 #' nColumn <- 4
 #' nRow <- 6
