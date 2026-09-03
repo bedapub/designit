@@ -153,9 +153,9 @@ dataset.</p>
 <p>Here’s an example of plate effect. Here both top and bottom rows of
 the plate are used as controls.</p>
 <p>This is the experiment design:</p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="384"></p>
-<p>These are the readouts:</p>
 <p><img src="NCS22_talk_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="384"></p>
+<p>These are the readouts:</p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="384"></p>
 <p>Due to the plate effect, the control rows are affected differently.
 It is virtually impossible to normalize readouts in a meaningful
 way.</p>
@@ -176,7 +176,7 @@ layout</li>
 </ul>
 <p>Gone wrong: Random distribution of 31 grouped subjects into 3 batches
 turns out unbalanced:</p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="288"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="288"></p>
 <p>“<strong>Block</strong> what you can and <strong>randomize</strong>
 what you cannot.” (G. Box, 1978)</p>
 </div>
@@ -239,7 +239,7 @@ constrained layouts.</p>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/assign_random.html">assign_random</a></span><span class="op">(</span><span class="va">subject_data</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Batch composition before optimization</strong></p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="528"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="528"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <div id="dezuqsvkwv" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
@@ -785,7 +785,7 @@ constrained layouts.</p>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><strong>Batch composition after optimization</strong></p>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="768"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="768"></p>
 <div id="wbihlbdwyr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#wbihlbdwyr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
@@ -1344,7 +1344,7 @@ effect computationally.</p>
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, row <span class="op">=</span> <span class="va">row</span>, column <span class="op">=</span> <span class="va">col</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">Sex</span>, title <span class="op">=</span> <span class="st">"Initial layout by Sex"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="step-optimization">2-step optimization<a class="anchor" aria-label="anchor" href="#step-optimization"></a>
@@ -1371,7 +1371,7 @@ effect computationally.</p>
 <span>  max_iter <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="480"></p>
 </div>
 <div class="section level4">
 <h4 id="within-plate-optimization-using-distance-based-sample-scoring-function">Within plate optimization using distance based sample scoring
@@ -1389,7 +1389,7 @@ function<a class="anchor" aria-label="anchor" href="#within-plate-optimization-u
 <span>  max_iter <span class="op">=</span> <span class="fl">150</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="480"></p>
 </div>
 </div>
 <div class="section level3">
@@ -1407,12 +1407,12 @@ function<a class="anchor" aria-label="anchor" href="#within-plate-optimization-u
 <span>  max_iter <span class="op">=</span> <span class="fl">500</span> <span class="co"># 2000</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; 1 ... 2 ... 3 ...</span></span></code></pre></div>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-22-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="480"></p>
 <pre><code><span><span class="co">#&gt; Warning: Removed 4509 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_line()`).</span></span>
 <span><span class="co">#&gt; Warning: Removed 4509 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-23-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="480"></p>
 </div>
 </div>
 <div class="section level2">
@@ -1462,7 +1462,7 @@ plates.</li>
 <li>Fabian Birzele</li>
 <li>PMDA group for feedback?</li>
 </ul>
-<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-24-1.png" class="r-plt" alt="" width="384"></p>
+<p><img src="NCS22_talk_files/figure-html/unnamed-chunk-25-1.png" class="r-plt" alt="" width="384"></p>
 </div>
   </div>
 

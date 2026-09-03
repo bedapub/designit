@@ -722,7 +722,7 @@ of iterations.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="480"></p>
 </div>
 <div class="section level3">
 <h3 id="final-batch-layout">Final batch layout<a class="anchor" aria-label="anchor" href="#final-batch-layout"></a>
@@ -733,7 +733,7 @@ of iterations.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 </div>
 <div class="section level2">
@@ -786,7 +786,7 @@ of iterations.</p>
 <span>  y <span class="op">=</span> <span class="va">bc2</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">score_1</span>,</span>
 <span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc2$score(scoring_f)}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">bc2</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -794,7 +794,7 @@ of iterations.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="576">
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" alt="" width="576">
 NOTE: It is not possible to calculate the theoretically minimal osat
 score, right?</p>
 </div>
@@ -843,7 +843,7 @@ and now only optimize <code>run</code> with constraint.</p>
 <span>  color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">n_iterations</span><span class="op">)</span>,</span>
 <span>  main <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score(scoring_f)}"</span><span class="op">)</span>, geom <span class="op">=</span> <span class="st">"point"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
 <div class="section level3">
 <h3 id="final-run-layout">Final run layout<a class="anchor" aria-label="anchor" href="#final-run-layout"></a>
 </h3>
@@ -855,7 +855,7 @@ and now only optimize <code>run</code> with constraint.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">batch</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="nested_dimensions_examples_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 </div>
   </div>

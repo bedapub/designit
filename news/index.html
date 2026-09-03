@@ -90,6 +90,7 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="designit-051">designit 0.5.1<a class="anchor" aria-label="anchor" href="#designit-051"></a></h2>
 <ul><li>fix test failure on R-devel. <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">RNGkind()</a></code> gained a fourth component, <code>binom.kind</code>, in R 4.7.0 (r90299, 2026-07-25, “fix 2 signs in formula of the BTPE algorithm for rbinom(); add RNGkind(binom.kind=*)“). The tests no longer assert that it has exactly three elements. <code>BatchContainer</code> traces already stored <code><a href="https://rdrr.io/r/base/Random.html" class="external-link">RNGkind()</a></code> verbatim, so no user-visible behaviour changed.</li>
+<li>examples, tests and vignettes now call <code>data.table::setDTthreads(2)</code>, to avoid CPU time issues on CRAN check machines. This affects package checks only, not normal use.</li>
 <li>
 <code><a href="../reference/optimize_multi_plate_design.html">optimize_multi_plate_design()</a></code> now passes <code>p = 1</code> and <code>penalize_lines = "none"</code> to the within-plate scoring functions.</li>
 <li>new vignette showing how batch effects produce false positives.</li>

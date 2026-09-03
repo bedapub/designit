@@ -717,7 +717,7 @@ exhausted.</p>
 <span><span class="co">#&gt; Achieved score: 4.504 at iteration 152</span></span>
 <span></span>
 <span><span class="va">bc1</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">elapsed</span></span>
-<span><span class="co">#&gt; Time difference of 2.3184 secs</span></span></code></pre></div>
+<span><span class="co">#&gt; Time difference of 2.154936 secs</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="optimization-trace">Optimization trace<a class="anchor" aria-label="anchor" href="#optimization-trace"></a>
 </h3>
@@ -738,11 +738,11 @@ exhausted.</p>
 <span>    y <span class="op">=</span> <span class="st">"Score"</span>,</span>
 <span>    color <span class="op">=</span> <span class="st">"n_shuffle"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="480"></p>
 <p>Using the internal method…</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc1</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="480"></p>
 <p>We may safely apply the batch container methods get_samples() and
 score() also after using the new optimization code.</p>
 </div>
@@ -767,7 +767,7 @@ score() also after using the new optimization code.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="perform-new-iterations-on-optimized-batch-container">Perform new iterations on optimized batch container<a class="anchor" aria-label="anchor" href="#perform-new-iterations-on-optimized-batch-container"></a>
@@ -1107,7 +1107,7 @@ if you happen to have multiple scores initially.</p>
 the SA protocol at work.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc7</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="480"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="480"></p>
 <p>Better results and quicker convergence may be achieved by playing
 with the starting temperature (T0) and cooling speed (alpha) in a
 specific case.</p>
@@ -1147,7 +1147,7 @@ specific case.</p>
 <span><span class="co">#&gt; Achieved score: 4.504 at iteration 115</span></span>
 <span></span>
 <span><span class="va">bc8</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-19-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="full-blown-example">Full blown example<a class="anchor" aria-label="anchor" href="#full-blown-example"></a>
@@ -1226,7 +1226,7 @@ illustrate the flexibility of the optimization.</p>
 <span><span class="co">#&gt; Reached min delta in 25 iterations.</span></span>
 <span></span>
 <span><span class="va">bc9</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-20-1.png" class="r-plt" alt="" width="700"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-21-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">bc9</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>assignment <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1234,7 +1234,7 @@ illustrate the flexibility of the optimization.</p>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">batch</span>, fill <span class="op">=</span> <span class="va">Treatment</span>, alpha <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">Time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using alpha for a discrete variable is not advised.</span></span></code></pre></div>
-<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-20-2.png" class="r-plt" alt="" width="700"></p>
+<p><img src="optimizer_examples_files/figure-html/unnamed-chunk-21-2.png" class="r-plt" alt="" width="700"></p>
 </div>
   </div>
 

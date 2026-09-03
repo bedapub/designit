@@ -167,10 +167,10 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Warning in OSAT::create.optimized.setup(sample = gs, container = gc, nSim =</span></span>
 <span><span class="co">#&gt; params$iterations): Using default optimization method: optimal.shuffle</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;   1.01s   1.01s</span></span>
+<span><span class="co">#&gt;   911ms   911ms</span></span>
 <span></span>
 <span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/QC.html" class="external-link">QC</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-3-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-4-1.png" class="r-plt" alt="" width="576"></p>
 <pre><code><span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Test independence between "plates" and sample variables</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -198,7 +198,7 @@ choose batch columns of interest.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">AgeGrp</span>, <span class="va">n</span>, fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">name</span>, scales <span class="op">=</span> <span class="st">"free_y"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="576"></p>
 <div class="section level3">
 <h3 id="visualize-for-plates">Visualize for plates<a class="anchor" aria-label="anchor" href="#visualize-for-plates"></a>
 </h3>
@@ -215,12 +215,12 @@ choose batch columns of interest.</p>
 <p>Before the optimization.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">g_setup_start</span> <span class="op">|&gt;</span> <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
 <p>After the optimization.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">OSAT</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/OSAT/man/get.experiment.setup.html" class="external-link">get.experiment.setup</a></span><span class="op">(</span><span class="va">g_setup</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 </div>
 <div class="section level2">
@@ -271,7 +271,7 @@ choose batch columns of interest.</p>
 <span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="576"></p>
 <div class="section level3">
 <h3 id="using-designit-osat-score-implementation">Using designit OSAT score implementation<a class="anchor" aria-label="anchor" href="#using-designit-osat-score-implementation"></a>
 </h3>
@@ -364,7 +364,7 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 786</span></span>
 <span><span class="co">#&gt; Achieved score: 30.857 at iteration 960</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;  16.09s   8.26s</span></span></code></pre></div>
+<span><span class="co">#&gt;  15.52s   7.86s</span></span></code></pre></div>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># final score</span></span>
 <span><span class="va">bc_reference</span><span class="op">$</span><span class="fu">score</span><span class="op">(</span><span class="va">scoring_f</span><span class="op">)</span></span>
@@ -372,11 +372,11 @@ choose batch columns of interest.</p>
 <span><span class="co">#&gt; 30.85714</span></span>
 <span><span class="va">bc_reference</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_glue.html" class="external-link">str_glue</a></span><span class="op">(</span><span class="st">"Final score={bc$score(scoring_f)}"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">plot_batch</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-13-2.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-14-2.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level3">
 <h3 id="manually-work-with-data-table">Manually work with <code>data.table</code><a class="anchor" aria-label="anchor" href="#manually-work-with-data-table"></a>
@@ -434,7 +434,7 @@ manual optimization process using <code>data.table</code>.</p>
 <span><span class="co">#&gt; Warning in (function (assignment) : this field might become read-only in the</span></span>
 <span><span class="co">#&gt; future, please use $move_samples() instead</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;  11.35s   5.75s</span></span></code></pre></div>
+<span><span class="co">#&gt;  11.37s   5.75s</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -525,7 +525,7 @@ manual optimization process using <code>data.table</code>.</p>
 <span><span class="co">#&gt; Achieved score: 34.857 at iteration 807</span></span>
 <span><span class="co">#&gt; Achieved score: 32.857 at iteration 827</span></span>
 <span><span class="co">#&gt; process    real </span></span>
-<span><span class="co">#&gt;  16.58s   8.46s</span></span></code></pre></div>
+<span><span class="co">#&gt;  16.51s   8.41s</span></span></code></pre></div>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>  i <span class="op">=</span> <span class="va">bc_burn_in</span><span class="op">$</span><span class="va">trace</span><span class="op">$</span><span class="va">scores</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">step</span>,</span>
@@ -535,7 +535,7 @@ manual optimization process using <code>data.table</code>.</p>
 <span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="op">-</span><span class="va">i</span>, names_to <span class="op">=</span> <span class="st">"method"</span>, values_to <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">i</span>, <span class="va">score</span>, col <span class="op">=</span> <span class="va">method</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="osat_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="osat_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level2">
 <h2 id="score-demonstration">Score demonstration<a class="anchor" aria-label="anchor" href="#score-demonstration"></a>

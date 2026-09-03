@@ -1305,7 +1305,7 @@ locations.</p>
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, column <span class="op">=</span> <span class="va">column</span>, row <span class="op">=</span> <span class="va">row</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576">
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576">
 To not show empty wells, we can directly plot the sample table as
 well.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -1313,7 +1313,7 @@ well.</p>
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, column <span class="op">=</span> <span class="va">column</span>, row <span class="op">=</span> <span class="va">row</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
 <p>Sometimes we may wish to move samples, or to swap samples, or to
 manually assign some locations. To move individual samples or manually
 assigning all locations we can use the
@@ -1330,7 +1330,7 @@ than creating a copy. Most of the time you will probably call
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, column <span class="op">=</span> <span class="va">column</span>, row <span class="op">=</span> <span class="va">row</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
 <p>To assign all samples in one go, use the option
 <code>location_assignment</code>.</p>
 <p>The example below orders samples by ID and adds the empty locations
@@ -1347,7 +1347,7 @@ afterwards</p>
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, column <span class="op">=</span> <span class="va">column</span>, row <span class="op">=</span> <span class="va">row</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">.sample_id</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level2">
 <h2 id="running-an-optimization">Running an optimization<a class="anchor" aria-label="anchor" href="#running-an-optimization"></a>
@@ -1390,14 +1390,14 @@ across the two plates.</p>
 <p>Development of the score can be viewed with</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-12-1.png" class="r-plt" alt="" width="336"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="336"></p>
 <p>The layout after plate batching looks the following</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_plate.html">plot_plate</a></span><span class="op">(</span><span class="va">bc</span><span class="op">$</span><span class="fu">get_samples</span><span class="op">(</span>remove_empty_locations <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
 <span>  plate <span class="op">=</span> <span class="va">plate</span>, column <span class="op">=</span> <span class="va">column</span>, row <span class="op">=</span> <span class="va">row</span>,</span>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-13-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="576"></p>
 <p>Looking at treatment, we see it’s evenly distributed across the
 plates</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
@@ -1407,7 +1407,7 @@ plates</p>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">plate</span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-14-1.png" class="r-plt" alt="" width="384"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="384"></p>
 </div>
 <div class="section level2">
 <h2 id="customizing-the-plate-layout">Customizing the plate layout<a class="anchor" aria-label="anchor" href="#customizing-the-plate-layout"></a>
@@ -1434,7 +1434,7 @@ do the following.</p>
 <span>  add_excluded <span class="op">=</span> <span class="cn">TRUE</span>, rename_empty <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html" class="external-link">scale_fill_manual</a></span><span class="op">(</span>values <span class="op">=</span> <span class="va">color_palette</span>, na.value <span class="op">=</span> <span class="st">"darkgray"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-15-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="576"></p>
 <p>To remove all empty wells from the plot, hand the pruned sample list
 to <code>plot_plate</code> rather than the whole
 <code>BatchContainer</code> object. You can still assign your own
@@ -1445,7 +1445,7 @@ colors.</p>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-16-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="576"></p>
 <p>Note: removing all empty and excluded wells will lead to omitting
 completely empty rows or columns!</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
@@ -1456,7 +1456,7 @@ completely empty rows or columns!</p>
 <span>  .color <span class="op">=</span> <span class="va">treatment</span>, .alpha <span class="op">=</span> <span class="va">dose</span></span>
 <span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_viridis.html" class="external-link">scale_fill_viridis_d</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="basic_examples_files/figure-html/unnamed-chunk-17-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="basic_examples_files/figure-html/unnamed-chunk-18-1.png" class="r-plt" alt="" width="576"></p>
 </div>
 <div class="section level2">
 <h2 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
@@ -1524,10 +1524,10 @@ of the package as well as check out the documentations.</p>
 <span><span class="co">#&gt; [25] utf8_1.2.6          stringi_1.8.9       cachem_1.1.0       </span></span>
 <span><span class="co">#&gt; [28] xfun_0.60           fs_2.1.0            sass_0.4.10        </span></span>
 <span><span class="co">#&gt; [31] S7_0.2.2            otel_0.2.0          viridisLite_0.4.3  </span></span>
-<span><span class="co">#&gt; [34] cli_3.6.6           pkgdown_2.2.1       withr_3.0.3        </span></span>
+<span><span class="co">#&gt; [34] cli_3.6.6           withr_3.0.3         pkgdown_2.2.1      </span></span>
 <span><span class="co">#&gt; [37] magrittr_2.0.5      digest_0.6.39       grid_4.6.1         </span></span>
-<span><span class="co">#&gt; [40] lifecycle_1.0.5     vctrs_0.7.3         data.table_1.18.6.1</span></span>
-<span><span class="co">#&gt; [43] evaluate_1.0.5      glue_1.8.1          farver_2.1.2       </span></span>
+<span><span class="co">#&gt; [40] lifecycle_1.0.5     vctrs_0.7.3         evaluate_1.0.5     </span></span>
+<span><span class="co">#&gt; [43] glue_1.8.1          data.table_1.18.6.1 farver_2.1.2       </span></span>
 <span><span class="co">#&gt; [46] ragg_1.5.2          gt_1.3.0            purrr_1.2.2        </span></span>
 <span><span class="co">#&gt; [49] rmarkdown_2.32      tools_4.6.1         pkgconfig_2.0.3    </span></span>
 <span><span class="co">#&gt; [52] htmltools_0.5.9</span></span></code></pre></div>

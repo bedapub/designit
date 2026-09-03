@@ -209,7 +209,7 @@ treatment/control ratios.</p>
 <span><span class="op">}</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">males_per_cage</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
@@ -218,10 +218,10 @@ treatment/control ratios.</p>
 <span><span class="co">#&gt; (`stat_summary()`).</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-6-2.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-7-2.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-6-3.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-7-3.png" class="r-plt" alt="" width="576"></p>
 <p>First, we use OSAT scoring function to ensure even distribution of
 males among cages. Only <code>cage</code> and <code>sex</code>
 interactions are considered in the scoring function. We only use 10
@@ -251,12 +251,12 @@ enforces change of cage on every iteration.</p>
 <span><span class="co">#&gt; Achieved score: 9.818 at iteration 10</span></span>
 <span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="576">
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576">
 We expect the distribution of males become even, while other variables
 are not significantly affected.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">males_per_cage</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
@@ -265,10 +265,10 @@ are not significantly affected.</p>
 <span><span class="co">#&gt; (`stat_summary()`).</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-2.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-9-2.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-8-3.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-9-3.png" class="r-plt" alt="" width="576"></p>
 <p>Here we only define our custom scoring function which ensures even
 distribution of weights and treatment/control groups. Only female
 samples are shuffled and male samples are kept in their locations. We
@@ -327,7 +327,7 @@ allocation.</p>
 <span><span class="co">#&gt; Achieved score: 0.241 at iteration 191</span></span>
 <span><span class="co">#&gt; Achieved score: 0.237 at iteration 196</span></span>
 <span><span class="va">bc</span><span class="op">$</span><span class="fu">plot_trace</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-9-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">scoring_f</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 0.2370109</span></span></code></pre></div>
@@ -335,7 +335,7 @@ allocation.</p>
 treatment/control balance.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">males_per_cage</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-1.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-11-1.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">weight_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
@@ -344,10 +344,10 @@ treatment/control balance.</p>
 <span><span class="co">#&gt; (`stat_summary()`).</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
 <span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-2.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-11-2.png" class="r-plt" alt="" width="576"></p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">group_d</span><span class="op">(</span><span class="va">bc</span><span class="op">)</span></span></code></pre></div>
-<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-10-3.png" class="r-plt" alt="" width="576"></p>
+<p><img src="custom_shuffle_files/figure-html/unnamed-chunk-11-3.png" class="r-plt" alt="" width="576"></p>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
