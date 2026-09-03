@@ -5,8 +5,6 @@
 \title{R6 Class representing a batch container dimension.}
 \description{
 R6 Class representing a batch container dimension.
-
-R6 Class representing a batch container dimension.
 }
 \examples{
 \dontshow{
@@ -15,7 +13,7 @@ data.table::setDTthreads(2)
 }
 
 ## ------------------------------------------------
-## Method `BatchContainerDimension$new`
+## Method `BatchContainerDimension$new()`
 ## ------------------------------------------------
 
 plate_dimension <- BatchContainerDimension$new("plate", size=3)
@@ -30,58 +28,57 @@ bc <- BatchContainer$new(
 bc
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{name}}{dimension name.}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{name}}{dimension name.}
 
-\item{\code{values}}{vector of dimension values.}
-}
-\if{html}{\out{</div>}}
+    \item{\code{values}}{vector of dimension values.}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{size}}{Returns size of a dimension.}
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{size}}{Returns size of a dimension.}
 
-\item{\code{short_info}}{Returns a string summarizing the dimension.
+    \item{\code{short_info}}{Returns a string summarizing the dimension.
 E.g., "mydim<size=10>".}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-BatchContainerDimension-new}{\code{BatchContainerDimension$new()}}
-\item \href{#method-BatchContainerDimension-clone}{\code{BatchContainerDimension$clone()}}
-}
+  \itemize{
+    \item \href{#method-BatchContainerDimension-initialize}{\code{BatchContainerDimension$new()}}
+    \item \href{#method-BatchContainerDimension-clone}{\code{BatchContainerDimension$clone()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BatchContainerDimension-new"></a>}}
-\if{latex}{\out{\hypertarget{method-BatchContainerDimension-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new BatchContainerDimension object.
+\if{html}{\out{<a id="method-BatchContainerDimension-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainerDimension-initialize}{}}}
+\subsection{\code{BatchContainerDimension$new()}}{
+  Create a new BatchContainerDimension object.
 
 This is usually used implicitly via \code{\link[=BatchContainer]{BatchContainer$new()}}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$new(name, size = NULL, values = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{name}}{Dimension name, a character string. Requiered.}
-
-\item{\code{size}}{Dimension size. Setting this implies that dimension values are 1:\code{size}.}
-
-\item{\code{values}}{Explicit list of dimension values. Could be numeric, character or factor.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainerDimension$new(name, size = NULL, values = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{name}}{Dimension name, a character string. Requiered.}
+      \item{\code{size}}{Dimension size. Setting this implies that dimension values are 1:\code{size}.}
+      \item{\code{values}}{Explicit list of dimension values. Could be numeric, character or factor.
 
 It is required to provide dimension namd and either size of values.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{plate_dimension <- BatchContainerDimension$new("plate", size=3)
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{plate_dimension <- BatchContainerDimension$new("plate", size=3)
 row_dimension <- BatchContainerDimension$new("row", values = letters[1:3])
 column_dimension <- BatchContainerDimension$new("column", values = 1:3)
 
@@ -92,26 +89,27 @@ bc <- BatchContainer$new(
 
 bc
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainerDimension-clone"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainerDimension-clone}{}}}
-\subsection{Method \code{clone()}}{
-The objects of this class are cloneable with this method.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainerDimension$clone(deep = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainerDimension$clone()}}{
+  The objects of this class are cloneable with this method.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainerDimension$clone(deep = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{deep}}{Whether to make a deep clone.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{deep}}{Whether to make a deep clone.}
-}
-\if{html}{\out{</div>}}
-}
-}
 }
