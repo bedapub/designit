@@ -6,6 +6,8 @@
 \alias{designit-package}
 \title{designit: Blocking and Randomization for Experimental Design}
 \description{
+\if{html}{\figure{logo.svg}{options: style='float: right' alt='logo' width='120'}}
+
 Intelligently assign samples to batches in order to reduce batch effects. Batch effects can have a significant impact on data analysis, especially when the assignment of samples to batches coincides with the contrast groups being studied. By defining a batch container and a scoring function that reflects the contrasts, this package allows users to assign samples in a way that minimizes the potential impact of batch effects on the comparison of interest. Among other functionality, we provide an implementation for OSAT score by Yan et al. (2012, \doi{10.1186/1471-2164-13-689}).
 }
 \seealso{
@@ -22,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Iakov I. Davydov \email{iakov.davydov@roche.com} (\href{https://orcid.org/0000-0003-3510-3926}{ORCID}) [copyright holder]
   \item Juliane Siebourg-Polster \email{juliane.siebourg-polster@roche.com} (\href{https://orcid.org/0000-0002-1759-3223}{ORCID}) [copyright holder]
   \item Guido Steiner \email{guido.steiner@roche.com} [copyright holder]
   \item Jitao David Zhang \email{jitao_david.zhang@roche.com} (\href{https://orcid.org/0000-0002-3085-0909}{ORCID}) [copyright holder]

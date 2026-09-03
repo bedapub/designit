@@ -17,7 +17,7 @@ data.table::setDTthreads(2)
 }
 
 ## ------------------------------------------------
-## Method `BatchContainer$new`
+## Method `BatchContainer$new()`
 ## ------------------------------------------------
 
 bc <- BatchContainer$new(
@@ -32,89 +32,88 @@ bc <- BatchContainer$new(
 bc
 }
 \section{Public fields}{
-\if{html}{\out{<div class="r6-fields">}}
-\describe{
-\item{\code{trace}}{Optimization trace, a \code{\link[tibble:tibble]{tibble::tibble()}}}
-}
-\if{html}{\out{</div>}}
+  \if{html}{\out{<div class="r6-fields">}}
+  \describe{
+    \item{\code{trace}}{Optimization trace, a \code{\link[tibble:tibble]{tibble::tibble()}}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Active bindings}{
-\if{html}{\out{<div class="r6-active-bindings">}}
-\describe{
-\item{\code{scoring_f}}{Scoring functions used for optimization.
+  \if{html}{\out{<div class="r6-active-bindings">}}
+  \describe{
+    \item{\code{scoring_f}}{Scoring functions used for optimization.
 Each scoring function should receive a \link{BatchContainer}.
 This function should return a floating
 point score value for the assignment. This a list of functions.
 Upon assignment a single function will be automatically converted to a list
 In the later case each function is called.}
 
-\item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
+    \item{\code{has_samples}}{Returns TRUE if \code{BatchContainer} has samples.}
 
-\item{\code{has_samples_attr}}{Returns TRUE if \code{BatchContainer} has sample atrributes assigned.}
+    \item{\code{has_samples_attr}}{Returns TRUE if \code{BatchContainer} has sample atrributes assigned.}
 
-\item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}.}
+    \item{\code{n_locations}}{Returns number of locations in a \code{BatchContainer}.}
 
-\item{\code{n_dimensions}}{Returns number of dimensions in a \code{BatchContainer}.
+    \item{\code{n_dimensions}}{Returns number of dimensions in a \code{BatchContainer}.
 This field cannot be assigned.}
 
-\item{\code{dimension_names}}{\link{character} vector with dimension names.
+    \item{\code{dimension_names}}{\link{character} vector with dimension names.
 This field cannot be assigned.}
 
-\item{\code{samples}}{Samples in the batch container.
+    \item{\code{samples}}{Samples in the batch container.
 When assigning data.frame should not have column named .sample_id column.}
 
-\item{\code{samples_attr}}{Extra attributes of samples. If set, this is included into
+    \item{\code{samples_attr}}{Extra attributes of samples. If set, this is included into
 \code{BatchContainer$get_samples()} output.}
 
-\item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.
+    \item{\code{assignment}}{Sample assignment vector. Should contain NAs for empty locations.
 
 Assigning this field is deprecated, please use \verb{$move_samples()} instead.}
-}
-\if{html}{\out{</div>}}
+  }
+  \if{html}{\out{</div>}}
 }
 \section{Methods}{
 \subsection{Public methods}{
-\itemize{
-\item \href{#method-BatchContainer-new}{\code{BatchContainer$new()}}
-\item \href{#method-BatchContainer-get_samples}{\code{BatchContainer$get_samples()}}
-\item \href{#method-BatchContainer-get_locations}{\code{BatchContainer$get_locations()}}
-\item \href{#method-BatchContainer-move_samples}{\code{BatchContainer$move_samples()}}
-\item \href{#method-BatchContainer-score}{\code{BatchContainer$score()}}
-\item \href{#method-BatchContainer-copy}{\code{BatchContainer$copy()}}
-\item \href{#method-BatchContainer-print}{\code{BatchContainer$print()}}
-\item \href{#method-BatchContainer-scores_table}{\code{BatchContainer$scores_table()}}
-\item \href{#method-BatchContainer-plot_trace}{\code{BatchContainer$plot_trace()}}
-}
+  \itemize{
+    \item \href{#method-BatchContainer-initialize}{\code{BatchContainer$new()}}
+    \item \href{#method-BatchContainer-get_samples}{\code{BatchContainer$get_samples()}}
+    \item \href{#method-BatchContainer-get_locations}{\code{BatchContainer$get_locations()}}
+    \item \href{#method-BatchContainer-move_samples}{\code{BatchContainer$move_samples()}}
+    \item \href{#method-BatchContainer-score}{\code{BatchContainer$score()}}
+    \item \href{#method-BatchContainer-copy}{\code{BatchContainer$copy()}}
+    \item \href{#method-BatchContainer-print}{\code{BatchContainer$print()}}
+    \item \href{#method-BatchContainer-scores_table}{\code{BatchContainer$scores_table()}}
+    \item \href{#method-BatchContainer-plot_trace}{\code{BatchContainer$plot_trace()}}
+  }
 }
 \if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-BatchContainer-new"></a>}}
-\if{latex}{\out{\hypertarget{method-BatchContainer-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new BatchContainer object.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$new(locations_table, dimensions, exclude = NULL)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{locations_table}}{A table with available locations.}
-
-\item{\code{dimensions}}{A vector or list of dimensions. Every dimension
+\if{html}{\out{<a id="method-BatchContainer-initialize"></a>}}
+\if{latex}{\out{\hypertarget{method-BatchContainer-initialize}{}}}
+\subsection{\code{BatchContainer$new()}}{
+  Create a new BatchContainer object.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$new(locations_table, dimensions, exclude = NULL)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{locations_table}}{A table with available locations.}
+      \item{\code{dimensions}}{A vector or list of dimensions. Every dimension
 should have a name. Could be an integer vector of dimensions or
 a named list. Every value of a list could be either dimension size
 or parameters for
 \link[=BatchContainerDimension]{BatchContainerDimension$new()}.
 Can be used as an alternative to passing \code{locations_table}.}
-
-\item{\code{exclude}}{\link{data.frame} with excluded locations of a container.
+      \item{\code{exclude}}{\link{data.frame} with excluded locations of a container.
 Only used together with dimensions.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Examples}{
-\if{html}{\out{<div class="r example copy">}}
-\preformatted{bc <- BatchContainer$new(
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Examples}{
+    \if{html}{\out{<div class="r example copy">}}
+    \preformatted{bc <- BatchContainer$new(
   dimensions = list(
     "plate" = 3,
     "row" = list(values = letters[1:3]),
@@ -125,183 +124,189 @@ Only used together with dimensions.}
 
 bc
 }
-\if{html}{\out{</div>}}
-
+    \if{html}{\out{</div>}}
+  }
 }
 
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-get_samples"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-get_samples}{}}}
-\subsection{Method \code{get_samples()}}{
-Return table with samples and sample assignment.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_samples(
+\subsection{\code{BatchContainer$get_samples()}}{
+  Return table with samples and sample assignment.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$get_samples(
   assignment = TRUE,
   include_id = FALSE,
   remove_empty_locations = FALSE,
   as_tibble = TRUE
-)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{assignment}}{Return sample assignment. If FALSE, only
+)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{assignment}}{Return sample assignment. If FALSE, only
 samples table is returned, with out batch assignment.}
-
-\item{\code{include_id}}{Keep .sample_id in the table. Use \code{TRUE} for
+      \item{\code{include_id}}{Keep .sample_id in the table. Use \code{TRUE} for
 lower overhead.}
-
-\item{\code{remove_empty_locations}}{Removes empty locations
+      \item{\code{remove_empty_locations}}{Removes empty locations
 from the result tibble.}
-
-\item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble}}.
+      \item{\code{as_tibble}}{Return \code{\link[tibble:tibble]{tibble}}.
 If \code{FALSE} returns \code{\link[data.table:data.table]{data.table}}. This should have
 lower overhead, as internally there is a cached \code{\link[data.table:data.table]{data.table}}.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    table with samples and sample assignment.
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-table with samples and sample assignment.
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-get_locations"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-get_locations}{}}}
-\subsection{Method \code{get_locations()}}{
-Get a table with all the locations in a \code{BatchContainer}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$get_locations()}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainer$get_locations()}}{
+  Get a table with all the locations in a \code{BatchContainer}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$get_locations()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    A \code{\link[tibble:tibble]{tibble}} with all the available locations.
+  }
 }
 
-\subsection{Returns}{
-A \code{\link[tibble:tibble]{tibble}} with all the available locations.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-move_samples"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-move_samples}{}}}
-\subsection{Method \code{move_samples()}}{
-Move samples between locations modifying the BatchContainer in place
+\subsection{\code{BatchContainer$move_samples()}}{
+  Move samples between locations modifying the BatchContainer in place
 
 This method can receive either \code{src} and \code{dst} or \code{locations_assignment}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$move_samples(src, dst, location_assignment)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{src}}{integer vector of source locations}
-
-\item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).}
-
-\item{\code{location_assignment}}{integer vector with location assignment.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$move_samples(src, dst, location_assignment)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{src}}{integer vector of source locations}
+      \item{\code{dst}}{integer vector of destination locations (the same length as \code{src}).}
+      \item{\code{location_assignment}}{integer vector with location assignment.
 The length of the vector should match the number of locations,
 \code{NA} should be used for empty locations.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    \code{BatchContainer}, invisibly
+  }
 }
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-\code{BatchContainer}, invisibly
-}
-}
+
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-score"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-score}{}}}
-\subsection{Method \code{score()}}{
-Score current sample assignment,
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$score(scoring)}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainer$score()}}{
+  Score current sample assignment,
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$score(scoring)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{scoring}}{a function or a names list of scoring functions.
+Each function should return a numeric vector.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a named vector of all scoring functions values.
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{scoring}}{a function or a names list of scoring functions.
-Each function should return a numeric vector.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-Returns a named vector of all scoring functions values.
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-copy"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-copy}{}}}
-\subsection{Method \code{copy()}}{
-Create an independent copy (clone) of a \code{BatchContainer}
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$copy()}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainer$copy()}}{
+  Create an independent copy (clone) of a \code{BatchContainer}
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$copy()}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    Returns a new \code{BatchContainer}
+  }
 }
 
-\subsection{Returns}{
-Returns a new \code{BatchContainer}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-print"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-print}{}}}
-\subsection{Method \code{print()}}{
-Prints information about \code{BatchContainer}.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$print(...)}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainer$print()}}{
+  Prints information about \code{BatchContainer}.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$print(...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{...}}{not used.}
+    }
+    \if{html}{\out{</div>}}
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{...}}{not used.}
-}
-\if{html}{\out{</div>}}
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-scores_table"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-scores_table}{}}}
-\subsection{Method \code{scores_table()}}{
-Return a table with scores from an optimization.
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$scores_table(index = NULL, include_aggregated = FALSE)}\if{html}{\out{</div>}}
+\subsection{\code{BatchContainer$scores_table()}}{
+  Return a table with scores from an optimization.
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$scores_table(index = NULL, include_aggregated = FALSE)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{index}}{optimization index, all by default}
+      \item{\code{include_aggregated}}{include aggregated scores}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    a \code{\link[tibble:tibble]{tibble::tibble()}} with scores
+  }
 }
 
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{index}}{optimization index, all by default}
-
-\item{\code{include_aggregated}}{include aggregated scores}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a \code{\link[tibble:tibble]{tibble::tibble()}} with scores
-}
-}
 \if{html}{\out{<hr>}}
 \if{html}{\out{<a id="method-BatchContainer-plot_trace"></a>}}
 \if{latex}{\out{\hypertarget{method-BatchContainer-plot_trace}{}}}
-\subsection{Method \code{plot_trace()}}{
-Plot trace
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{BatchContainer$plot_trace(index = NULL, include_aggregated = FALSE, ...)}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{index}}{optimization index, all by default}
-
-\item{\code{include_aggregated}}{include aggregated scores}
-
-\item{\code{...}}{not used.}
-}
-\if{html}{\out{</div>}}
-}
-\subsection{Returns}{
-a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
+\subsection{\code{BatchContainer$plot_trace()}}{
+  Plot trace
+  \subsection{Usage}{
+    \if{html}{\out{<div class="r">}}
+    \preformatted{BatchContainer$plot_trace(index = NULL, include_aggregated = FALSE, ...)}
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Arguments}{
+    \if{html}{\out{<div class="arguments">}}
+    \describe{
+      \item{\code{index}}{optimization index, all by default}
+      \item{\code{include_aggregated}}{include aggregated scores}
+      \item{\code{...}}{not used.}
+    }
+    \if{html}{\out{</div>}}
+  }
+  \subsection{Returns}{
+    a \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object
 List of scoring functions.
 Tibble with batch container locations.
 Tibble with sample information and sample ids.
@@ -309,6 +314,7 @@ Sample attributes, a data.table.
 Vector with assignment of sample ids to locations.
 Cached data.table with samples assignment.
 Validate sample assignment.
+  }
 }
-}
+
 }
