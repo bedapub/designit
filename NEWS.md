@@ -1,3 +1,5 @@
+# designit (development version)
+
 # designit 0.5.1
 
 * fix test failure on R-devel. `RNGkind()` gained a fourth component,
